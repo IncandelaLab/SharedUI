@@ -1,0 +1,2 @@
+datadir = C:\Users\hep\Documents\testdata
+MPC = UCSB
