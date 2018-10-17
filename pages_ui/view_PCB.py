@@ -60,6 +60,7 @@ class Ui_Form(object):
         self.lineEdit_8.setObjectName(_fromUtf8("lineEdit_8"))
         self.sbPCBID = QtGui.QSpinBox(Form)
         self.sbPCBID.setGeometry(QtCore.QRect(90, 10, 81, 21))
+        self.sbPCBID.setMaximum(65535)
         self.sbPCBID.setObjectName(_fromUtf8("sbPCBID"))
         self.leIdentifier = QtGui.QLineEdit(Form)
         self.leIdentifier.setGeometry(QtCore.QRect(90, 30, 81, 21))

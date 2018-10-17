@@ -54,7 +54,7 @@ class func(object):
 			return
 
 	def goPCB(self):
-		ID = self.page.leBaseplateID.text()
+		ID = self.page.lePCBID.text()
 		if len(ID) > 0:
 			try:
 				ID = int(ID)

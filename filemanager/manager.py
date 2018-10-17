@@ -1,14 +1,37 @@
 import os
 
-def process_lines(lines,sep='='):
+COMMSTR = '#'
+
+def load_file(file):
+	if os.path.exists(file):
+		opfl = open(file,'r')
+		cont = opfl.read()
+		opfl.close()
+		return cont
+	else:
+		return None
+
+def process_lines(lines,file,sep='='):
 	cfgVars = {}
 	for i,line in enumerate(lines):
 		if not (sep in line):
 			pass
+		elif line.startswith(COMMSTR):
+			pass
 		else:
 			var,_,val = line.partition(sep)
-			cfgVars.update([[var.strip(WHITESPACE),val.strip(WHITESPACE)]])
+			var=var.strip(WHITESPACE)
+			if var in cfgVars.keys():
+				print("Warning: file {} has two declarations with same variable <{}>".format(file,var))
+				print("Ignoring all but first instance")
+			else:
+				cfgVars.update([[var,val.strip(WHITESPACE)]])
 	return cfgVars
+
+def load_lines(file):
+	cont = load_file(file)
+	if cont is None:return cont
+	return process_lines(cont.splitlines(),file)
 
 CWD = os.getcwd()
 SEP = os.sep
@@ -53,42 +76,19 @@ class manager(object):
 
 	def loadModuleDetails(self,ID):
 		file = os.sep.join([DATADIR,MODULE_DIR,MODULE_FOLDER.format(MPC=MPC,ID=ID),MODULE_DETAILS])
-		if os.path.exists(file):
-			opfl=open(file,'r')
-			cont=opfl.read().splitlines()
-			opfl.close()
-			return process_lines(cont)
-		else:
-			return None
+		return load_lines(file)
 
 	def loadBaseplateDetails(self,ID):
 		file = os.sep.join([DATADIR,BASEPLATE_DIR,BASEPLATE_FOLDER.format(MPC=MPC,ID=ID),BASEPLATE_DETAILS])
-		if os.path.exists(file):
-			opfl=open(file,'r')
-			cont=opfl.read().splitlines()
-			opfl.close()
-			return process_lines(cont)
-		else:
-			return None
+		return load_lines(file)
 
 	def loadSensorDetails(self,ID):
 		file = os.sep.join([DATADIR,SENSOR_DIR,SENSOR_FOLDER.format(MPC=MPC,ID=ID),SENSOR_DETAILS])
-		if os.path.exists(file):
-			opfl=open(file,'r')
-			cont=opfl.read().splitlines()
-			opfl.close()
-			return process_lines(cont)
-		else:
-			return None
+		return load_lines(file)
 
 	def loadPCBDetails(self,ID):
 		file = os.sep.join([DATADIR,PCB_DIR,PCB_FOLDER.format(MPC=MPC,ID=ID),PCB_DETAILS])
-		if os.path.exists(file):
-			opfl=open(file,'r')
-			cont=opfl.read().splitlines()
-			opfl.close()
-			return process_lines(cont)
-		return None
+		return load_lines(file)
 
 	def loadConfig(self):
 		if not (os.path.exists(CFG_PATH)):

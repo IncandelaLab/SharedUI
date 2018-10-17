@@ -38,6 +38,9 @@
      <height>21</height>
     </rect>
    </property>
+   <property name="maximum">
+    <number>65535</number>
+   </property>
   </widget>
   <widget class="QLineEdit" name="lineEdit_2">
    <property name="geometry">

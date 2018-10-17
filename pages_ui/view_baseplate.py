@@ -32,6 +32,7 @@ class Ui_Form(object):
         self.lineEdit.setObjectName(_fromUtf8("lineEdit"))
         self.sbBaseplateID = QtGui.QSpinBox(Form)
         self.sbBaseplateID.setGeometry(QtCore.QRect(90, 10, 81, 21))
+        self.sbBaseplateID.setMaximum(65535)
         self.sbBaseplateID.setObjectName(_fromUtf8("sbBaseplateID"))
         self.lineEdit_2 = QtGui.QLineEdit(Form)
         self.lineEdit_2.setGeometry(QtCore.QRect(10, 30, 81, 21))

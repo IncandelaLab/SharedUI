@@ -21,7 +21,7 @@
        <number>0</number>
       </property>
       <item>
-       <layout class="QVBoxLayout" name="vlUISelect" stretch="1,7,27">
+       <layout class="QVBoxLayout" name="vlUISelect" stretch="1,7,1,1,11,1,1,4">
         <property name="spacing">
          <number>0</number>
         </property>
@@ -89,6 +89,116 @@
            </size>
           </property>
          </spacer>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="lineEdit">
+          <property name="text">
+           <string>Production and testing</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QListWidget" name="listAssembly">
+          <item>
+           <property name="text">
+            <string>kapton application</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>kapton insulation test</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>sensor application</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>PCB application</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>pre-wirebonding DAQ</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>wirebonding</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>post-wirebonding 0v DAQ</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>post-wirebonding IV &amp; biased DAQ</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>encapsulation</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>post-encapsulation 0v DAQ</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>post-encapsulation IV &amp; biased DAQ</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="lineEdit_2">
+          <property name="text">
+           <string>Shipping and receiving</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QListWidget" name="listShippingAndReceiving">
+          <item>
+           <property name="text">
+            <string>Receiving baseplates</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Receiving sensors</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Receiving PCBs</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Shipping</string>
+           </property>
+          </item>
+         </widget>
         </item>
        </layout>
       </item>

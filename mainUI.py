@@ -4,11 +4,13 @@ from PyQt4 import QtGui as gui, QtCore as core
 import sys
 import time
 
+# Import page functionality classes
 from pages.view_module    import func as c_func_view_module
 from pages.view_baseplate import func as c_func_view_baseplate
 from pages.view_sensor    import func as c_func_view_sensor
 from pages.view_PCB       import func as c_func_view_PCB
 
+# Set up page widgets
 from pages_ui.view_module import Ui_Form as form_view_module
 class widget_view_module(gui.QWidget,form_view_module):
 	def __init__(self,parent):
@@ -33,6 +35,7 @@ class widget_view_PCB(gui.QWidget,form_view_PCB):
 		super(widget_view_PCB,self).__init__(parent)
 		self.setupUi(self)
 
+# Dict of page IDs by name (as the name shows up in the page list widgets)
 PAGE_IDS = {
 	'modules':0,
 	'baseplates':1,
@@ -47,13 +50,21 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 
 	def __init__(self):
 		super(mainDesigner,self).__init__(None)
+		print("Setting up main UI ...")
 		self.setupUi(self)
+		print("Finished setting up main UI.")
+		print("Initializing file manager...")
 		self.fm = manager.manager()
-		
+		print("Finished initializing file manager.")
+		print("Setting up pages' UI...")
 		self.setupPagesUI()
-
+		print("Finished setting up pages' UI.")
+		print("Initializing pages...")
 		self.initPages()
+		print("Finished initializing pages.")
+		print("Rigging UI...")
 		self.rig()
+		print("Finished rigging UI.")
 		self.setUIPage('modules')
 
 		#self.start()
@@ -64,6 +75,8 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 		self.page_view_sensor    = widget_view_sensor(None)    ; self.swPages.addWidget(self.page_view_sensor)
 		self.page_view_PCB       = widget_view_PCB(None)       ; self.swPages.addWidget(self.page_view_PCB)
 
+
+	# Timer is not used yet, as timer-driven pages (routines) have not been added yet.
 
 	# def timer_event(self):
 	# 	pass
@@ -95,7 +108,6 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 	def changeUIPage(self,*args,**kwargs):
 		self.setUIPage(args[0].text())
 	def setUIPage(self,which_page,**kwargs):
-		print(kwargs)
 		if which_page in PAGE_IDS.keys():
 			self.swPages.setCurrentIndex(PAGE_IDS[which_page])
 			if len(kwargs) > 0:
@@ -106,7 +118,8 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 
 	def rig(self):
 		self.listInformation.itemActivated.connect(self.changeUIPage)
-		# connect all other lists to same function
+		self.listAssembly.itemActivated.connect(self.changeUIPage)
+		self.listShippingAndReceiving.itemActivated.connect(self.changeUIPage)
 
 		# later: add forward/back keyboard shortcuts (along with history support)
 
