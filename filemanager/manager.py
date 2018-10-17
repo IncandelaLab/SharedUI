@@ -1,4 +1,5 @@
 import os
+import numpy
 
 COMMSTR = '#'
 
@@ -33,6 +34,12 @@ def load_lines(file):
 	if cont is None:return cont
 	return process_lines(cont.splitlines(),file)
 
+def list_files(folder):
+	if os.path.exists(folder):
+		return os.listdir(folder)
+	else:
+		return None
+
 CWD = os.getcwd()
 SEP = os.sep
 
@@ -47,9 +54,10 @@ if __name__=='__main__':
 else:
 	CFG_PATH = SEP.join([CWD,MANAGER_DIR,CFG_NAME])
 
-MODULE_DIR     = 'modules'
-MODULE_FOLDER  = 'module_{MPC}_{ID}'
-MODULE_DETAILS = 'details.txt'
+MODULE_DIR       = 'modules'
+MODULE_FOLDER    = 'module_{MPC}_{ID}'
+MODULE_IV_FOLDER = 'IV'
+MODULE_DETAILS   = 'details.txt'
 
 BASEPLATE_DIR     = 'baseplates'
 BASEPLATE_FOLDER  = 'baseplate_{MPC}_{ID}'
@@ -66,17 +74,22 @@ PCB_DETAILS = 'details.txt'
 
 class manager(object):
 	def __init__(self):
-
 		configSuccess = self.loadConfig()
 		if not configSuccess:
 			print("{} could not load config".format(PROGRAM_NAME))
 			print("restore file manually or run {}{} to generate new config file".format(CWD+SEP,CFGSETUP_NAME))
 			raise Exception
 
+	def loadModuleIV(self,ID,file):
+		file = os.sep.join([DATADIR,MODULE_DIR,MODULE_FOLDER.format(MPC=MPC,ID=ID),MODULE_IV_FOLDER,file])
+		return numpy.loadtxt(file)
+
 
 	def loadModuleDetails(self,ID):
-		file = os.sep.join([DATADIR,MODULE_DIR,MODULE_FOLDER.format(MPC=MPC,ID=ID),MODULE_DETAILS])
-		return load_lines(file)
+		folder       = os.sep.join([DATADIR,MODULE_DIR,MODULE_FOLDER.format(MPC=MPC,ID=ID)])
+		details_file = os.sep.join([folder,MODULE_DETAILS])
+		iv_folder    = os.sep.join([folder,MODULE_IV_FOLDER])
+		return load_lines(details_file), list_files(iv_folder)
 
 	def loadBaseplateDetails(self,ID):
 		file = os.sep.join([DATADIR,BASEPLATE_DIR,BASEPLATE_FOLDER.format(MPC=MPC,ID=ID),BASEPLATE_DETAILS])
@@ -89,6 +102,8 @@ class manager(object):
 	def loadPCBDetails(self,ID):
 		file = os.sep.join([DATADIR,PCB_DIR,PCB_FOLDER.format(MPC=MPC,ID=ID),PCB_DETAILS])
 		return load_lines(file)
+
+
 
 	def loadConfig(self):
 		if not (os.path.exists(CFG_PATH)):
