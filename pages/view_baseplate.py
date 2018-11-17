@@ -1,9 +1,15 @@
+nstr = lambda v:'' if v is None else str(v)
+
 class func(object):
 	
-	def __init__(self,fm,page,setUIPage):
+	def __init__(self,fm,page,setUIPage,setSwitchingEnabled):
 		self.fm        = fm
 		self.page      = page
 		self.setUIPage = setUIPage
+		self.setMainSwitchingEnabled = setSwitchingEnabled
+
+		self.currentBaseplateExists = None
+		self.editing = False
 
 		self.rig()
 		self.update_info()
@@ -11,12 +17,25 @@ class func(object):
 	def rig(self):
 		self.page.sbBaseplateID.valueChanged.connect(self.update_info)
 		self.page.pbGoModule.clicked.connect(self.goModule)
+		self.page.pbEditCornerHeights.clicked.connect(self.startEditingCorners)
+		self.page.pbSaveCorners.clicked.connect(self.saveEditingCorners)
+		self.page.pbCancelCorners.clicked.connect(self.cancelEditingCorners)
+
+		self.corners = [self.page.dsbC0,self.page.dsbC1,self.page.dsbC2,self.page.dsbC3,self.page.dsbC4,self.page.dsbC5]
+
+		# self.page.dsbC0.valueChanged.connect()
+		# self.page.dsbC1.valueChanged.connect()
+		# self.page.dsbC2.valueChanged.connect()
+		# self.page.dsbC3.valueChanged.connect()
+		# self.page.dsbC4.valueChanged.connect()
+		# self.page.dsbC5.valueChanged.connect()
 
 	def update_info(self,ID=None):
 		if ID is None:ID = self.page.sbBaseplateID.value()
 		info = self.fm.loadBaseplateDetails(ID)
 
 		if info is None:
+			self.currentBaseplateExists = False
 			self.page.leIdentifier.setText('')
 			self.page.leMaterial.setText('')
 			self.page.leNomThickness.setText('')
@@ -24,15 +43,70 @@ class func(object):
 			self.page.leSize.setText('')
 			self.page.leManufacturer.setText('')
 			self.page.leOnModule.setText('')
+			self.page.dsbC0.clear()
+			self.page.dsbC1.clear()
+			self.page.dsbC2.clear()
+			self.page.dsbC3.clear()
+			self.page.dsbC4.clear()
+			self.page.dsbC5.clear()
 
 		else:
-			self.page.leIdentifier.setText(info['identifier'])
-			self.page.leMaterial.setText(info['material'])
-			self.page.leNomThickness.setText(info['nomthickness'])
-			self.page.leFlatness.setText(info['flatness'])
-			self.page.leSize.setText(info['size'])
-			self.page.leManufacturer.setText(info['manufacturer'])
-			self.page.leOnModule.setText(info['onModuleID'])
+			self.currentBaseplateExists = True
+			self.page.leIdentifier.setText(nstr(info['identifier']))
+			self.page.leMaterial.setText(nstr(info['material']))
+			self.page.leNomThickness.setText(nstr(info['nomthickness']))
+			self.page.leFlatness.setText(nstr(info['flatness']))
+			self.page.leSize.setText(nstr(info['size']))
+			self.page.leManufacturer.setText(nstr(info['manufacturer']))
+			self.page.leOnModule.setText(nstr(info['onModuleID']))
+			self.page.dsbC0.clear() if info['c0'] is None else self.page.dsbC0.setValue(info['c0'])
+			self.page.dsbC1.clear() if info['c1'] is None else self.page.dsbC1.setValue(info['c1'])
+			self.page.dsbC2.clear() if info['c2'] is None else self.page.dsbC2.setValue(info['c2'])
+			self.page.dsbC3.clear() if info['c3'] is None else self.page.dsbC3.setValue(info['c3'])
+			self.page.dsbC4.clear() if info['c4'] is None else self.page.dsbC4.setValue(info['c4'])
+			self.page.dsbC5.clear() if info['c5'] is None else self.page.dsbC5.setValue(info['c5'])
+
+	def udpateElements(self):
+		self.page.pbEditCornerHeights.setEnabled(not self.editing)
+		self.page.pbGoModule.setEnabled(not self.editing)
+		self.page.sbBaseplateID.setEnabled(not self.editing)
+		self.page.pbSaveCorners.setEnabled(self.editing)
+		self.page.pbCancelCorners.setEnabled(self.editing)
+		self.page.dsbC0.setEnabled(self.editing)
+		self.page.dsbC1.setEnabled(self.editing)
+		self.page.dsbC2.setEnabled(self.editing)
+		self.page.dsbC3.setEnabled(self.editing)
+		self.page.dsbC4.setEnabled(self.editing)
+		self.page.dsbC5.setEnabled(self.editing)
+		self.setMainSwitchingEnabled(not self.editing)
+
+	def startEditingCorners(self):
+		ID = self.page.sbBaseplateID.value()
+		if self.currentBaseplateExists:
+			self.editing = True
+			self.udpateElements()
+
+	def cancelEditingCorners(self):
+		if self.editing:
+			self.editing=False
+			self.udpateElements()
+			self.update_info()
+		else:
+			print("Warning: tried to cancel editing corners while not editing corners")
+
+	def saveEditingCorners(self):
+		if self.editing:
+			ID = self.page.sbBaseplateID.value()
+			values  = [_.value() for _ in self.corners]
+			changes = {'c{}'.format(i):_ for i,_ in enumerate(values)}
+			changes.update([['flatness',round(max(values)-min(values),6)]])
+			self.fm.changeBaseplateDetails(ID,changes)
+			self.editing=False
+			self.udpateElements()
+			self.update_info()
+		else:
+			print("Warning: tried to save editing corners while not editing corners")
+
 
 	def goModule(self):
 		ID = self.page.leOnModule.text()
@@ -54,3 +128,7 @@ class func(object):
 				raise ValueError("ID cannot be negative")
 			self.page.sbBaseplateID.setValue(ID)
 
+	def changed_to(self):
+		print("changed to view_baseplate")
+		self.update_info()
+		# later change this to only update if the baseplate loaded has changed

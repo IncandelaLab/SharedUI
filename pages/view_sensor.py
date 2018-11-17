@@ -1,3 +1,5 @@
+nstr = lambda v:'' if v is None else str(v)
+
 class func(object):
 	
 	def __init__(self,fm,page,setUIPage):
@@ -25,12 +27,12 @@ class func(object):
 			self.page.leOnModule.setText("")
 
 		else:
-			self.page.leIdentifier.setText(info["identifier"])
-			self.page.leType.setText(info["type"])
-			self.page.leSize.setText(info["size"])
-			self.page.leChannels.setText(info["channels"])
-			self.page.leManufacturer.setText(info["manufacturer"])
-			self.page.leOnModule.setText(info["onModuleID"])
+			self.page.leIdentifier.setText(nstr(info["identifier"]))
+			self.page.leType.setText(nstr(info["type"]))
+			self.page.leSize.setText(nstr(info["size"]))
+			self.page.leChannels.setText(nstr(info["channels"]))
+			self.page.leManufacturer.setText(nstr(info["manufacturer"]))
+			self.page.leOnModule.setText(nstr(info["onModuleID"]))
 
 	def goModule(self):
 		ID = self.page.leOnModule.text()
@@ -51,3 +53,6 @@ class func(object):
 			if ID < 0:
 				raise ValueError("ID cannot be negative")
 			self.page.sbSensorID.setValue(ID)
+
+	def changed_to(self):
+		print("changed to view_sensor")

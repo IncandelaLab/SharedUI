@@ -90,10 +90,10 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 
 
 	def initPages(self):
-		self.func_view_module    = c_func_view_module(    self.fm, self.page_view_module   , self.setUIPage )
-		self.func_view_baseplate = c_func_view_baseplate( self.fm, self.page_view_baseplate, self.setUIPage )
-		self.func_view_sensor    = c_func_view_sensor(    self.fm, self.page_view_sensor   , self.setUIPage )
-		self.func_view_PCB       = c_func_view_PCB(       self.fm, self.page_view_PCB      , self.setUIPage )
+		self.func_view_module    = c_func_view_module(    self.fm, self.page_view_module   , self.setUIPage, )
+		self.func_view_baseplate = c_func_view_baseplate( self.fm, self.page_view_baseplate, self.setUIPage, self.setSwitchingEnabled)
+		self.func_view_sensor    = c_func_view_sensor(    self.fm, self.page_view_sensor   , self.setUIPage, )
+		self.func_view_PCB       = c_func_view_PCB(       self.fm, self.page_view_PCB      , self.setUIPage, )
 
 		# This list must be in the same order that the pages are in in the stackedWidget in the main UI file.
 		# This is the same order as in the dict PAGE_IDS
@@ -104,9 +104,12 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 			self.func_view_PCB,
 			]
 
+	def pageChanged(self,*args,**kwargs):
+		self.func_list[args[0]].changed_to()
 
 	def changeUIPage(self,*args,**kwargs):
 		self.setUIPage(args[0].text())
+
 	def setUIPage(self,which_page,**kwargs):
 		if which_page in PAGE_IDS.keys():
 			self.swPages.setCurrentIndex(PAGE_IDS[which_page])
@@ -115,11 +118,16 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 		else:
 			print("Page <{}> not supported yet".format(which_page))
 
+	def setSwitchingEnabled(self,enabled):
+		self.listInformation.setEnabled(enabled)
+		self.listAssembly.setEnabled(enabled)
+		self.listShippingAndReceiving.setEnabled(enabled)
 
 	def rig(self):
 		self.listInformation.itemActivated.connect(self.changeUIPage)
 		self.listAssembly.itemActivated.connect(self.changeUIPage)
 		self.listShippingAndReceiving.itemActivated.connect(self.changeUIPage)
+		self.swPages.currentChanged.connect(self.pageChanged)
 
 		# later: add forward/back keyboard shortcuts (along with history support)
 
