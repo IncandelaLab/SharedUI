@@ -112,6 +112,11 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 
 	def setUIPage(self,which_page,**kwargs):
 		if which_page in PAGE_IDS.keys():
+
+			if not self.func_list[PAGE_IDS[which_page]].is_setup:
+				print("page {} not yet setup; doing setup".format(which_page))
+				self.func_list[PAGE_IDS[which_page]].setup()
+
 			self.swPages.setCurrentIndex(PAGE_IDS[which_page])
 			if len(kwargs) > 0:
 				self.func_list[PAGE_IDS[which_page]].load_kwargs(kwargs)

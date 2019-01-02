@@ -2,6 +2,9 @@ from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg    as FigureCan
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.figure import Figure
 
+PAGE_NAME = "view_module"
+DEBUG = False
+
 USE_MICROAMP = True
 MICRO = 1e6
 
@@ -24,9 +27,30 @@ class func(object):
 		self.ivDataName = None
 		self.ivData     = None
 
-		self.setupFigures()
-		self.rig()
-		self.update_info()
+		self.is_setup = False
+
+	def must_be_setup(function):
+		def wrapper(self,*args,**kwargs):
+			if self.is_setup:
+				if DEBUG:print("page {} called {} with args {} and kwargs {} after setup. Executing.".format(PAGE_NAME, function, args, kwargs))
+				return function(self,*args,**kwargs)
+			else:
+				print("Warning: page {} called {} with args {} and kwargs {} before setup. Not executing.".format(PAGE_NAME, function, args, kwargs))
+				return
+		return wrapper
+
+	def setup(self):
+		if not self.is_setup:
+			self.setupFigures()
+			self.rig()
+			self.is_setup = True
+			print("set up view_module")
+
+			self.update_info()
+
+		else:
+			print("warning: page {} setup function called after setup.".format(PAGE_NAME))
+
 
 	def setupFigures(self):
 		self.fig = Figure()
@@ -51,7 +75,9 @@ class func(object):
 		self.page.cbRawYAxis.currentIndexChanged.connect(self.updateIVPlot)
 		self.page.tabBinsRaw.currentChanged.connect(self.updateIVPlot)
 
-	def update_info(self,ID=None):
+
+	@must_be_setup
+	def update_info(self,ID=None,*args,**kwargs):
 		if ID is None:ID = self.page.sbModuleID.value()
 		info, IVtests = self.fm.loadModuleDetails(ID)
 		
@@ -71,7 +97,8 @@ class func(object):
 		if not (IVtests is None):
 			self.page.cbIVCurves.addItems(IVtests)
 
-	def updateIVData(self,index):
+	@must_be_setup
+	def updateIVData(self,index,*args,**kwargs):
 		#print("")
 		#print("Beginning updateIVData")
 		if self.page.cbIVCurves.currentIndex() == -1:
@@ -95,6 +122,7 @@ class func(object):
 		#print("")
 		self.updateIVPlot()
 
+	@must_be_setup
 	def updateIVPlot(self,*args,**kwargs):
 		print("Update plot!")
 		tab = self.page.tabBinsRaw.currentIndex()
@@ -147,8 +175,8 @@ class func(object):
 			print("Invalid tab - clearing")
 
 
-
-	def goBaseplate(self):
+	@must_be_setup
+	def goBaseplate(self,*args,**kwargs):
 		ID = self.page.leBaseplateID.text()
 		if len(ID) > 0:
 			try:
@@ -159,7 +187,8 @@ class func(object):
 		else:
 			return
 
-	def goSensor(self):
+	@must_be_setup
+	def goSensor(self,*args,**kwargs):
 		ID = self.page.leSensorID.text()
 		if len(ID) > 0:
 			try:
@@ -170,7 +199,8 @@ class func(object):
 		else:
 			return
 
-	def goPCB(self):
+	@must_be_setup
+	def goPCB(self,*args,**kwargs):
 		ID = self.page.lePCBID.text()
 		if len(ID) > 0:
 			try:
@@ -183,7 +213,7 @@ class func(object):
 
 
 
-
+	@must_be_setup
 	def load_kwargs(self,kwargs):
 		if 'ID' in kwargs.keys():
 			ID = kwargs['ID']
@@ -193,5 +223,6 @@ class func(object):
 				raise ValueError("ID cannot be negative")
 			self.page.sbModuleID.setValue(ID)
 
+	@must_be_setup
 	def changed_to(self):
 		print("changed to view_module")

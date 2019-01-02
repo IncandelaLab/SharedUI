@@ -1,5 +1,8 @@
 nstr = lambda v:'' if v is None else str(v)
 
+PAGE_NAME = "view_baseplate"
+DEBUG = False
+
 class func(object):
 	
 	def __init__(self,fm,page,setUIPage,setSwitchingEnabled):
@@ -11,8 +14,29 @@ class func(object):
 		self.currentBaseplateExists = None
 		self.editing = False
 
-		self.rig()
-		self.update_info()
+		self.is_setup = False
+
+	def must_be_setup(function):
+		def wrapper(self,*args,**kwargs):
+			if self.is_setup:
+				if DEBUG:print("page {} called {} with args {} and kwargs {} after setup. Executing.".format(PAGE_NAME, function, args, kwargs))
+				return function(self,*args,**kwargs)
+			else:
+				print("Warning: page {} called {} with args {} and kwargs {} before setup. Not executing.".format(PAGE_NAME, function, args, kwargs))
+				return
+		return wrapper
+
+	def setup(self):
+		if not self.is_setup:
+			self.rig()
+			print("set up view_baseplate")
+			self.is_setup = True
+
+			self.update_info()
+
+		else:
+			print("warning: page {} setup function called after setup.".format(PAGE_NAME))
+
 
 	def rig(self):
 		self.page.sbBaseplateID.valueChanged.connect(self.update_info)
@@ -21,7 +45,14 @@ class func(object):
 		self.page.pbSaveCorners.clicked.connect(self.saveEditingCorners)
 		self.page.pbCancelCorners.clicked.connect(self.cancelEditingCorners)
 
-		self.corners = [self.page.dsbC0,self.page.dsbC1,self.page.dsbC2,self.page.dsbC3,self.page.dsbC4,self.page.dsbC5]
+		self.corners = [
+			self.page.dsbC0,
+			self.page.dsbC1,
+			self.page.dsbC2,
+			self.page.dsbC3,
+			self.page.dsbC4,
+			self.page.dsbC5
+			]
 
 		# self.page.dsbC0.valueChanged.connect()
 		# self.page.dsbC1.valueChanged.connect()
@@ -30,6 +61,7 @@ class func(object):
 		# self.page.dsbC4.valueChanged.connect()
 		# self.page.dsbC5.valueChanged.connect()
 
+	@must_be_setup
 	def update_info(self,ID=None):
 		if ID is None:ID = self.page.sbBaseplateID.value()
 		info = self.fm.loadBaseplateDetails(ID)
@@ -66,6 +98,7 @@ class func(object):
 			self.page.dsbC4.clear() if info['c4'] is None else self.page.dsbC4.setValue(info['c4'])
 			self.page.dsbC5.clear() if info['c5'] is None else self.page.dsbC5.setValue(info['c5'])
 
+	@must_be_setup
 	def udpateElements(self):
 		self.page.pbEditCornerHeights.setEnabled(not self.editing)
 		self.page.pbGoModule.setEnabled(not self.editing)
@@ -80,13 +113,15 @@ class func(object):
 		self.page.dsbC5.setEnabled(self.editing)
 		self.setMainSwitchingEnabled(not self.editing)
 
-	def startEditingCorners(self):
+	@must_be_setup
+	def startEditingCorners(self,*args,**kwargs):
 		ID = self.page.sbBaseplateID.value()
 		if self.currentBaseplateExists:
 			self.editing = True
 			self.udpateElements()
 
-	def cancelEditingCorners(self):
+	@must_be_setup
+	def cancelEditingCorners(self,*args,**kwargs):
 		if self.editing:
 			self.editing=False
 			self.udpateElements()
@@ -94,7 +129,8 @@ class func(object):
 		else:
 			print("Warning: tried to cancel editing corners while not editing corners")
 
-	def saveEditingCorners(self):
+	@must_be_setup
+	def saveEditingCorners(self,*args,**kwargs):
 		if self.editing:
 			ID = self.page.sbBaseplateID.value()
 			values  = [_.value() for _ in self.corners]
@@ -108,7 +144,8 @@ class func(object):
 			print("Warning: tried to save editing corners while not editing corners")
 
 
-	def goModule(self):
+	@must_be_setup
+	def goModule(self,*args,**kwargs):
 		ID = self.page.leOnModule.text()
 		if len(ID) > 0:
 			try:
@@ -119,6 +156,7 @@ class func(object):
 		else:
 			return
 
+	@must_be_setup
 	def load_kwargs(self,kwargs):
 		if 'ID' in kwargs.keys():
 			ID = kwargs['ID']
@@ -128,6 +166,7 @@ class func(object):
 				raise ValueError("ID cannot be negative")
 			self.page.sbBaseplateID.setValue(ID)
 
+	@must_be_setup
 	def changed_to(self):
 		print("changed to view_baseplate")
 		self.update_info()
