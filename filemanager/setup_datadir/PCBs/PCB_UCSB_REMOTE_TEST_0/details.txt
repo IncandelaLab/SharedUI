@@ -1,0 +1,8 @@
+ID = 0
+identifier = test0
+thickness = 2
+flatness = 0.42
+size = 6
+channels = 128
+manufacturer = test_manuf
+onModuleID = 0

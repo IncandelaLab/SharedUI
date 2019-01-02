@@ -1,6 +1,6 @@
 import os
 import numpy
-
+import shutil
 
 CWD = os.getcwd()
 SEP = os.sep
@@ -13,11 +13,13 @@ CFGSETUP_NAME = 'cfgsetup.py'  #
 CFG_NAME      = 'config.txt'   # 
 
 if __name__=='__main__':
-	CFG_PATH = SEP.join([CWD,CFG_NAME])
+	FM_DIR   = SEP.join([CWD])
+	CFG_PATH = SEP.join([FM_DIR,CFG_NAME])
 else:
 	# assumes this is being run from one directory up
 	# will not work if imported from any other location
-	CFG_PATH = SEP.join([CWD,MANAGER_DIR,CFG_NAME])
+	FM_DIR   = SEP.join([CWD,MANAGER_DIR])
+	CFG_PATH = SEP.join([FM_DIR,CFG_NAME])
 
 
 
@@ -44,6 +46,29 @@ SENSOR_DETAILS = 'details.txt'
 PCB_DIR     = 'PCBs'
 PCB_FOLDER  = 'PCB_{MPC}_{ID}'
 PCB_DETAILS = 'details.txt'
+
+DATADIR_SUBFOLDERS = [
+	MODULE_DIR,
+	BASEPLATE_DIR,
+	SENSOR_DIR,
+	PCB_DIR,
+]
+
+STRUCT_FOLDERS = [
+	MODULE_FOLDER,
+	BASEPLATE_FOLDER,
+	SENSOR_FOLDER,
+	PCB_FOLDER,
+]
+
+
+###############
+## Test data ##
+###############
+
+LOAD_TEST_OBJECTS = True
+TEST_OBJECT_ID = 0
+TEST_OBJECT_TEMPLATE_DIR = "setup_datadir"
 
 
 
@@ -262,6 +287,78 @@ class manager(object):
 			print("restore file manually or run {}{} to generate new config file".format(CWD+SEP,CFGSETUP_NAME))
 			raise Exception
 
+		else:
+			self._check_datadir()
+			if LOAD_TEST_OBJECTS:
+				self._check_test_objects()
+
+
+	def _loadConfig(self):
+		if not (os.path.exists(CFG_PATH)):
+			print("config file for {} does not exist".format(PROGRAM_NAME))
+			return False
+
+		opfl = open(CFG_PATH,'r')
+		cont = opfl.read()
+		opfl.close()
+		lines = cont.splitlines()
+
+		if len(lines) == 0:
+			print("config file is empty")
+			return False
+
+		cfgVars = {}
+		for i,line in enumerate(lines):
+			if not ('=' in line):
+				print("warning: {} config has nondeclarative line <{}> at line number {}".format(PROGRAM_NAME,line,i))
+			else:
+				var,_,val = line.partition('=')
+				cfgVars.update([[var.strip(WHITESPACE),val.strip(WHITESPACE)]])
+
+		if not ('datadir' in cfgVars.keys()):
+			print("missing config variable: datadir")
+			return False
+
+		if not ('MPC' in cfgVars.keys()):
+			print("missing config variable: MPC")
+			return False
+
+		global DATADIR
+		DATADIR = cfgVars['datadir']
+
+		global MPC
+		MPC = cfgVars['MPC']
+
+		if not (os.path.exists(DATADIR)):
+			print("config data directory does not exist")
+			return True
+
+		return True
+
+	def _check_datadir(self):
+		if not (os.path.exists(DATADIR)):
+			print("Creating data directory...")
+			os.makedirs(DATADIR)
+
+		for DATADIR_SUBFOLDER in DATADIR_SUBFOLDERS:
+			if not os.path.exists(os.sep.join([DATADIR, DATADIR_SUBFOLDER])):
+				print("Creating data subfolder {}".format(os.sep.join([DATADIR, DATADIR_SUBFOLDER])))
+				os.mkdir(os.sep.join([DATADIR, DATADIR_SUBFOLDER]))
+
+	def _check_test_objects(self):
+		for i,STRUCT_FOLDER in enumerate(STRUCT_FOLDERS):
+			
+			TEST_OBJECT_FOLDER = os.sep.join([DATADIR, DATADIR_SUBFOLDERS[i], STRUCT_FOLDER.format(MPC=MPC, ID=TEST_OBJECT_ID)])
+			if not os.path.exists(TEST_OBJECT_FOLDER):
+
+				TEST_OBJECT_TEMPLATE = os.sep.join([FM_DIR, TEST_OBJECT_TEMPLATE_DIR, DATADIR_SUBFOLDERS[i], STRUCT_FOLDER.format(MPC=MPC, ID=TEST_OBJECT_ID)])
+				print("Creating test object {}".format(TEST_OBJECT_FOLDER))
+				shutil.copytree(TEST_OBJECT_TEMPLATE,TEST_OBJECT_FOLDER)
+
+			# print('')
+			# print(TEST_OBJECT_TEMPLATE)
+			# print(TEST_OBJECT_FOLDER)
+			# print('')
 
 
 
@@ -333,48 +430,6 @@ class manager(object):
 		return _load_and_cast_dict(file,DETAILS_PCB)
 
 
-
-	def _loadConfig(self):
-		if not (os.path.exists(CFG_PATH)):
-			print("config file for {} does not exist".format(PROGRAM_NAME))
-			return False
-
-		opfl = open(CFG_PATH,'r')
-		cont = opfl.read()
-		opfl.close()
-		lines = cont.splitlines()
-
-		if len(lines) == 0:
-			print("config file is empty")
-			return False
-
-		cfgVars = {}
-		for i,line in enumerate(lines):
-			if not ('=' in line):
-				print("warning: {} config has nondeclarative line <{}> at line number {}".format(PROGRAM_NAME,line,i))
-			else:
-				var,_,val = line.partition('=')
-				cfgVars.update([[var.strip(WHITESPACE),val.strip(WHITESPACE)]])
-
-		if not ('datadir' in cfgVars.keys()):
-			print("missing config variable: datadir")
-			return False
-
-		if not ('MPC' in cfgVars.keys()):
-			print("missing config variable: MPC")
-			return False
-
-		global DATADIR
-		DATADIR = cfgVars['datadir']
-
-		global MPC
-		MPC = cfgVars['MPC']
-
-		if not (os.path.exists(DATADIR)):
-			print("config data directory does not exist")
-			return False
-
-		return True
 
 
 
