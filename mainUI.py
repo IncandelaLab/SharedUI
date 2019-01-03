@@ -43,8 +43,15 @@ PAGE_IDS = {
 	'PCBs':3,
 	#'assembly steps':4,
 }
+	
 
-TIMERINTERVAL = 50
+def get_timer_id():
+	"""generator for unique timer ID values"""
+	next_id = 0
+	while True:
+		yield next_id
+		next_id += 1
+
 
 class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 
@@ -67,7 +74,10 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 		print("Finished rigging UI.")
 		self.setUIPage('modules')
 
-		#self.start()
+		self.setWindowTitle("Module Production User Interface")
+	
+		self.timer_setup()
+
 
 	def setupPagesUI(self):
 		self.page_view_module    = widget_view_module(None)    ; self.swPages.addWidget(self.page_view_module)
@@ -76,17 +86,68 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 		self.page_view_PCB       = widget_view_PCB(None)       ; self.swPages.addWidget(self.page_view_PCB)
 
 
-	# Timer is not used yet, as timer-driven pages (routines) have not been added yet.
+	# def test_timer_event(self,*args,**kwargs):
+	# 	print("test timer event")
 
-	# def timer_event(self):
-	# 	pass
+	def timer_setup(self):
+		self.timer_id_gen = get_timer_id() # unique ID generator for timers
+		self.timers = {} # dict of timers {ID:timer}
+		#self.timer_add(1000,self.test_timer_event)
 
-	# def start(self):
-	# 	self.setWindowTitle("Module Production User Interface")
-	# 	self.timer = core.QTimer(self)               # Create timer object
-	# 	self.timer.setInterval(TIMERINTERVAL)        # Set timer interval to global TIMERINTERVAL, defined at the top of this file
-	# 	self.timer.timeout.connect(self.timer_event) # Connect timer to the timer_event function
-	# 	self.timer.start()                           # Start the timer
+	def timer_add(self,interval,cxn=None,start=True):
+		timer = core.QTimer(self)
+		ID    = next(self.timer_id_gen)
+
+		timer.setInterval(interval)
+
+		if not (cxn is None):
+			timer.timeout.connect(cxn)
+
+		if start:
+			timer.start()
+
+		self.timers.update([ [ID, timer] ])
+		#self.tslcs.update( [ [ID, 0.0  ] ])
+
+	def timer_remove(self,ID):
+		if ID in self.timers.keys():
+			timer = self.timers.pop(ID)
+			timer.stop()
+			timer.timeout.disconnect()
+			del timer
+		else:
+			print("Warning: tried to remove nonexistent timer with ID {}".format(ID))
+
+	def timer_start(self,ID):
+		if ID in self.timers.keys():
+			self.timers[ID].start()
+		else:
+			print("Warning: tried to start nonexistent timer with ID {}".format(ID))
+
+	def timer_stop(self,ID):
+		if ID in self.timers.keys():
+			self.timers[ID].stop()
+		else:
+			print("Warning: tried to stop nonexistent timer with ID {}".format(ID))
+
+	def timer_connect(self,ID,cxn):
+		if ID in self.timers.keys():
+			self.timers[ID].timeout.connect(cxn)
+		else:
+			print("Warning: tried to connect {} to nonexistent timer with ID {}".format(cxn,ID))
+
+	def timer_disconnect(self,ID):
+		if ID in self.timers.keys():
+			self.timers[ID].timeout.disconnect()
+		else:
+			print("Warning: tried to disconnect nonexistent timer with ID {}".format(ID))
+
+	def timer_set_interval(self,ID,interval_ms):
+		if ID in self.timers.keys():
+			self.timers[ID].setInterval(interval_ms)
+		else:
+			print("Warning: tried to set interval of nonexistent timer with ID {} to {}".format(ID, interval_ms))
+
 
 
 	def initPages(self):
