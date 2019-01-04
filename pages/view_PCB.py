@@ -4,40 +4,64 @@ PAGE_NAME = "view_pcb"
 DEBUG = False
 
 class func(object):
-	
 	def __init__(self,fm,page,setUIPage):
 		self.fm        = fm
 		self.page      = page
 		self.setUIPage = setUIPage
+		self.mode = 'setup'
 
-		self.is_setup = False
 
-	def must_be_setup(function):
-		def wrapper(self,*args,**kwargs):
-			if self.is_setup:
-				if DEBUG:print("page {} called {} with args {} and kwargs {} after setup. Executing.".format(PAGE_NAME, function, args, kwargs))
-				return function(self,*args,**kwargs)
-			else:
-				print("Warning: page {} called {} with args {} and kwargs {} before setup. Not executing.".format(PAGE_NAME, function, args, kwargs))
-				return
+
+	def enforce_mode(mode):
+		if not (type(mode) in [str,list]):
+			raise ValueError
+		def wrapper(function):
+			def wrapped_function(self,*args,**kwargs):
+				if type(mode) is str:
+					valid_mode = self.mode == mode
+				elif type(mode) is list:
+					valid_mode = self.mode in mode
+				else:
+					valid_mode = False
+				if valid_mode:
+					if DEBUG:
+						print("page {} with mode {} req {} calling function {} with args {} kwargs {}".format(
+							PAGE_NAME,
+							self.mode,
+							mode,
+							function.__name__,
+							args,
+							kwargs,
+							))
+					function(self,*args,**kwargs)
+				else:
+					print("page {} mode is {}, needed {} for function {} with args {} kwargs {}".format(
+						PAGE_NAME,
+						self.mode,
+						mode,
+						function.__name__,
+						args,
+						kwargs,
+						))
+			return wrapped_function
 		return wrapper
 
+
+
+	@enforce_mode('setup')
 	def setup(self):
-		if not self.is_setup:
-			self.rig()
-			self.is_setup = True
-			print("set up view_pcb")
+		self.rig()
+		self.mode = 'view'
+		print("{} setup completed".format(PAGE_NAME))
+		self.update_info()
 
-			self.update_info()
-
-		else:
-			print("warning: page {} setup function called after setup.".format(PAGE_NAME))
-
+	@enforce_mode('setup')
 	def rig(self):
 		self.page.sbPCBID.valueChanged.connect(self.update_info)
 		self.page.pbGoModule.clicked.connect(self.goModule)
 
-	@must_be_setup
+
+	@enforce_mode('view')
 	def update_info(self,ID=None,*args,**kwargs):
 		if ID is None:ID = self.page.sbPCBID.value()
 		info = self.fm.loadPCBDetails(ID)
@@ -60,7 +84,7 @@ class func(object):
 			self.page.leManufacturer.setText(nstr(info["manufacturer"]))
 			self.page.leOnModule.setText(nstr(info["onModuleID"]))
 
-	@must_be_setup
+	@enforce_mode('view')
 	def goModule(self,*args,**kwargs):
 		ID = self.page.leOnModule.text()
 		if len(ID) > 0:
@@ -72,7 +96,7 @@ class func(object):
 		else:
 			return
 
-	@must_be_setup
+	@enforce_mode('view')
 	def load_kwargs(self,kwargs):
 		if 'ID' in kwargs.keys():
 			ID = kwargs['ID']
@@ -82,6 +106,6 @@ class func(object):
 				raise ValueError("ID cannot be negative")
 			self.page.sbPCBID.setValue(ID)
 
-	@must_be_setup
+	@enforce_mode('view')
 	def changed_to(self):
-		print("changed to view_pcb")
+		print("changed to {}".format(PAGE_NAME))

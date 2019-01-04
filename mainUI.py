@@ -174,7 +174,7 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 	def setUIPage(self,which_page,**kwargs):
 		if which_page in PAGE_IDS.keys():
 
-			if not self.func_list[PAGE_IDS[which_page]].is_setup:
+			if self.func_list[PAGE_IDS[which_page]].mode == 'setup':
 				print("page {} not yet setup; doing setup".format(which_page))
 				self.func_list[PAGE_IDS[which_page]].setup()
 

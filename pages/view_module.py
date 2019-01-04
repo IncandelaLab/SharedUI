@@ -17,7 +17,6 @@ LABELS = [LBL_TIME,LBL_VOLTAGE,LBL_CURRENT,LBL_VSOURCE]
 nstr = lambda v:'' if v is None else str(v)
 
 class func(object):
-
 	def __init__(self,fm,page,setUIPage):
 		self.fm        = fm
 		self.page      = page
@@ -27,31 +26,44 @@ class func(object):
 		self.ivDataName = None
 		self.ivData     = None
 
-		self.is_setup = False
+		self.mode = 'setup'
 
-	def must_be_setup(function):
-		def wrapper(self,*args,**kwargs):
-			if self.is_setup:
-				if DEBUG:print("page {} called {} with args {} and kwargs {} after setup. Executing.".format(PAGE_NAME, function, args, kwargs))
-				return function(self,*args,**kwargs)
-			else:
-				print("Warning: page {} called {} with args {} and kwargs {} before setup. Not executing.".format(PAGE_NAME, function, args, kwargs))
-				return
+
+
+	def enforce_mode(mode):
+		if not (type(mode) in [str,list]):
+			raise ValueError
+		def wrapper(function):
+			def wrapped_function(self,*args,**kwargs):
+				if type(mode) is str:
+					valid_mode = self.mode == mode
+				elif type(mode) is list:
+					valid_mode = self.mode in mode
+				else:
+					valid_mode = False
+				if valid_mode:
+					function(self,*args,**kwargs)
+				else:
+					print("mode is {}, needed {} for function {} with args {} kwargs {}".format(
+						self.mode,
+						mode,
+						function.__name__,
+						args,
+						kwargs,
+						))
+			return wrapped_function
 		return wrapper
 
+
+	@enforce_mode('setup')
 	def setup(self):
-		if not self.is_setup:
-			self.setupFigures()
-			self.rig()
-			self.is_setup = True
-			print("set up view_module")
+		self.setupFigures()
+		self.rig()
+		self.mode = 'view'
+		print("{} setup completed".format(PAGE_NAME))
+		self.update_info()
 
-			self.update_info()
-
-		else:
-			print("warning: page {} setup function called after setup.".format(PAGE_NAME))
-
-
+	@enforce_mode('setup')
 	def setupFigures(self):
 		self.fig = Figure()
 		self.ax  = self.fig.add_subplot(111)
@@ -60,6 +72,7 @@ class func(object):
 		self.page.vlPlotIV.addWidget(self.tb)
 		self.page.vlPlotIV.addWidget(self.fc)
 
+	@enforce_mode('setup')
 	def rig(self):
 		self.page.sbModuleID.valueChanged.connect(self.update_info)
 		self.page.pbGoBaseplate.clicked.connect(self.goBaseplate)
@@ -76,7 +89,7 @@ class func(object):
 		self.page.tabBinsRaw.currentChanged.connect(self.updateIVPlot)
 
 
-	@must_be_setup
+	@enforce_mode('view')
 	def update_info(self,ID=None,*args,**kwargs):
 		if ID is None:ID = self.page.sbModuleID.value()
 		info, IVtests = self.fm.loadModuleDetails(ID)
@@ -97,7 +110,7 @@ class func(object):
 		if not (IVtests is None):
 			self.page.cbIVCurves.addItems(IVtests)
 
-	@must_be_setup
+	@enforce_mode('view')
 	def updateIVData(self,index,*args,**kwargs):
 		#print("")
 		#print("Beginning updateIVData")
@@ -122,7 +135,7 @@ class func(object):
 		#print("")
 		self.updateIVPlot()
 
-	@must_be_setup
+	@enforce_mode('view')
 	def updateIVPlot(self,*args,**kwargs):
 		print("Update plot!")
 		tab = self.page.tabBinsRaw.currentIndex()
@@ -175,7 +188,7 @@ class func(object):
 			print("Invalid tab - clearing")
 
 
-	@must_be_setup
+	@enforce_mode('view')
 	def goBaseplate(self,*args,**kwargs):
 		ID = self.page.leBaseplateID.text()
 		if len(ID) > 0:
@@ -187,7 +200,7 @@ class func(object):
 		else:
 			return
 
-	@must_be_setup
+	@enforce_mode('view')
 	def goSensor(self,*args,**kwargs):
 		ID = self.page.leSensorID.text()
 		if len(ID) > 0:
@@ -199,7 +212,7 @@ class func(object):
 		else:
 			return
 
-	@must_be_setup
+	@enforce_mode('view')
 	def goPCB(self,*args,**kwargs):
 		ID = self.page.lePCBID.text()
 		if len(ID) > 0:
@@ -213,7 +226,7 @@ class func(object):
 
 
 
-	@must_be_setup
+	@enforce_mode('view')
 	def load_kwargs(self,kwargs):
 		if 'ID' in kwargs.keys():
 			ID = kwargs['ID']
@@ -223,6 +236,6 @@ class func(object):
 				raise ValueError("ID cannot be negative")
 			self.page.sbModuleID.setValue(ID)
 
-	@must_be_setup
+	@enforce_mode('view')
 	def changed_to(self):
-		print("changed to view_module")
+		print("changed to {}".format(PAGE_NAME))
