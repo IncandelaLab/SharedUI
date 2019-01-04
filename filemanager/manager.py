@@ -362,6 +362,22 @@ class manager(object):
 
 
 
+
+	def _changeDetails(self, file, cast_to, change_dict):
+		details = _load_and_cast_dict(file,cast_to)
+		for key,val in change_dict.items():
+			if key in details.keys():
+				try:
+					val = cast_to[key][0](val)
+					details[key] = val
+				except:
+					print("Warning: tried to change variable <{}> to value not interpretable as <{}>".format(key,cast_to[key][0]))
+			else:
+				print("Warning: tried to change value of invalid variable <{}>".format(key))
+		_save_dict(details,file)
+
+
+
 	########################
 	### module functions ###
 	########################
@@ -390,6 +406,10 @@ class manager(object):
 		iv_folder    = os.sep.join([folder,MODULE_IV_FOLDER])
 		return _load_and_cast_dict(details_file,DETAILS_MODULE), _list_files(iv_folder)
 
+	def changeModuleDetails(self,ID,change_dict):
+		file = os.sep.join([DATADIR,MODULE_DIR,MODULE_FOLDER.format(MPC=MPC,ID=ID),MODULE_DETAILS])
+		cast_to = DETAILS_MODULE
+		self._changeDetails(file,cast_to,change_dict)
 
 
 	###########################
@@ -401,17 +421,8 @@ class manager(object):
 		
 	def changeBaseplateDetails(self,ID,change_dict):
 		file = os.sep.join([DATADIR,BASEPLATE_DIR,BASEPLATE_FOLDER.format(MPC=MPC,ID=ID),BASEPLATE_DETAILS])
-		details = _load_and_cast_dict(file,DETAILS_BASEPLATE)
-		for key,val in change_dict.items():
-			if key in details.keys():
-				try:
-					val = DETAILS_BASEPLATE[key][0](val)
-					details[key] = val
-				except:
-					print("Warning: tried to change variable <{}> to value not interpretable as <{}>".format(key,DETAILS_BASEPLATE[key][0]))
-			else:
-				print("Warning: tried to change value of invalid variable <{}>".format(item[0]))
-		_save_dict(details,file)
+		cast_to = DETAILS_BASEPLATE
+		self._changeDetails(file,cast_to,change_dict)
 
 
 	########################
@@ -421,6 +432,11 @@ class manager(object):
 		file  = os.sep.join([DATADIR,SENSOR_DIR,SENSOR_FOLDER.format(MPC=MPC,ID=ID),SENSOR_DETAILS])
 		return _load_and_cast_dict(file,DETAILS_SENSOR)
 
+	def changeSensorDetails(self,ID,change_dict):
+		file = os.sep.join([DATADIR,SENSOR_DIR,SENSOR_FOLDER.format(MPC=MPC,ID=ID),SENSOR_DETAILS])
+		cast_to = DETAILS_SENSOR
+		self._changeDetails(file,cast_to,change_dict)
+
 
 	#####################
 	### PCB functions ###
@@ -429,6 +445,10 @@ class manager(object):
 		file  = os.sep.join([DATADIR,PCB_DIR,PCB_FOLDER.format(MPC=MPC,ID=ID),PCB_DETAILS])
 		return _load_and_cast_dict(file,DETAILS_PCB)
 
+	def changePCBDetails(self,ID,change_dict):
+		file = os.sep.join([DATADIR,PCB_DIR,PCB_FOLDER.format(MPC=MPC,ID=ID),PCB_DETAILS])
+		cast_to = DETAILS_PCB
+		self._changeDetails(file,cast_to,change_dict)
 
 
 

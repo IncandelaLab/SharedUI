@@ -24,6 +24,15 @@ class func(object):
 				else:
 					valid_mode = False
 				if valid_mode:
+					if DEBUG:
+						print("page {} with mode {} req {} calling function {} with args {} kwargs {}".format(
+							PAGE_NAME,
+							self.mode,
+							mode,
+							function.__name__,
+							args,
+							kwargs,
+							))
 					function(self,*args,**kwargs)
 				else:
 					print("mode is {}, needed {} for function {} with args {} kwargs {}".format(
