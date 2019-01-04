@@ -87,9 +87,7 @@ class func(object):
 
 	@enforce_mode(['view','editing_corners'])
 	def updateElements(self,use_info=False):
-
 		if use_info:
-
 			if self.info is None:
 				self.currentBaseplateExists = False
 				self.page.leIdentifier.setText('')
@@ -105,7 +103,6 @@ class func(object):
 				self.page.dsbC3.clear()
 				self.page.dsbC4.clear()
 				self.page.dsbC5.clear()
-
 			else:
 				self.currentBaseplateExists = True
 				self.page.leIdentifier.setText(nstr(self.info['identifier']))

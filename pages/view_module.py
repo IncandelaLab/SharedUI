@@ -26,6 +26,8 @@ class func(object):
 		self.ivDataName = None
 		self.ivData     = None
 
+		self.info = None
+		self.IVtests = None
 		self.mode = 'setup'
 
 
@@ -101,23 +103,33 @@ class func(object):
 	@enforce_mode('view')
 	def update_info(self,ID=None,*args,**kwargs):
 		if ID is None:ID = self.page.sbModuleID.value()
-		info, IVtests = self.fm.loadModuleDetails(ID)
-		
-		if info is None:
-			self.page.leBaseplateID.setText( '' )
-			self.page.leSensorID.setText(    '' )
-			self.page.lePCBID.setText(       '' )
-			self.page.leThickness.setText(   '' )
+		self.info, self.IVtests = self.fm.loadModuleDetails(ID)
+		self.updateElements(use_info=True)
 
-		else:
-			self.page.leBaseplateID.setText( nstr(info['baseplate']) )
-			self.page.leSensorID.setText(    nstr(info['sensor']   ) )
-			self.page.lePCBID.setText(       nstr(info['PCB']      ) )
-			self.page.leThickness.setText(   nstr(info['thickness']) )
+	@enforce_mode(['view','editing','creating'])
+	def updateElements(self,use_info = False):
+		if use_info:
+			if self.info is None:
+				self.page.leBaseplateID.setText( '' )
+				self.page.leSensorID.setText(    '' )
+				self.page.lePCBID.setText(       '' )
+				self.page.leThickness.setText(   '' )
 
-		self.page.cbIVCurves.clear()
-		if not (IVtests is None):
-			self.page.cbIVCurves.addItems(IVtests)
+			else:
+				self.page.leBaseplateID.setText( nstr(self.info['baseplate']) )
+				self.page.leSensorID.setText(    nstr(self.info['sensor']   ) )
+				self.page.lePCBID.setText(       nstr(self.info['PCB']      ) )
+				self.page.leThickness.setText(   nstr(self.info['thickness']) )
+
+			self.page.cbIVCurves.clear()
+			if not (self.IVtests is None):
+				self.page.cbIVCurves.addItems(self.IVtests)
+
+		self.page.pbModuleNew.setEnabled(    self.mode == 'view'                 )
+		self.page.pbModuleEdit.setEnabled(   self.mode == 'view'                 )
+		self.page.pbModuleSave.setEnabled(   self.mode in ['editing','creating'] )
+		self.page.pbModuleCancel.setEnabled( self.mode in ['editing','creating'] )
+
 
 	@enforce_mode('view')
 	def updateIVData(self,index,*args,**kwargs):

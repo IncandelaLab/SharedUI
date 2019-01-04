@@ -8,6 +8,7 @@ class func(object):
 		self.fm        = fm
 		self.page      = page
 		self.setUIPage = setUIPage
+		self.info = None
 		self.mode = 'setup'
 
 
@@ -63,23 +64,32 @@ class func(object):
 	@enforce_mode('view')
 	def update_info(self,ID=None,*args,**kwargs):
 		if ID is None:ID = self.page.sbSensorID.value()
-		info = self.fm.loadSensorDetails(ID)
+		self.info = self.fm.loadSensorDetails(ID)
+		self.updateElements(use_info = True)
 
-		if info is None:
-			self.page.leIdentifier.setText("")
-			self.page.leType.setText("")
-			self.page.leSize.setText("")
-			self.page.leChannels.setText("")
-			self.page.leManufacturer.setText("")
-			self.page.leOnModule.setText("")
+	@enforce_mode(['view','editing','creating'])
+	def updateElements(self,use_info=False):
+		if use_info:
+			if self.info is None:
+				self.page.leIdentifier.setText("")
+				self.page.leType.setText("")
+				self.page.leSize.setText("")
+				self.page.leChannels.setText("")
+				self.page.leManufacturer.setText("")
+				self.page.leOnModule.setText("")
+			else:
+				self.page.leIdentifier.setText(nstr(self.info["identifier"]))
+				self.page.leType.setText(nstr(self.info["type"]))
+				self.page.leSize.setText(nstr(self.info["size"]))
+				self.page.leChannels.setText(nstr(self.info["channels"]))
+				self.page.leManufacturer.setText(nstr(self.info["manufacturer"]))
+				self.page.leOnModule.setText(nstr(self.info["onModuleID"]))
 
-		else:
-			self.page.leIdentifier.setText(nstr(info["identifier"]))
-			self.page.leType.setText(nstr(info["type"]))
-			self.page.leSize.setText(nstr(info["size"]))
-			self.page.leChannels.setText(nstr(info["channels"]))
-			self.page.leManufacturer.setText(nstr(info["manufacturer"]))
-			self.page.leOnModule.setText(nstr(info["onModuleID"]))
+		self.page.pbSensorNew.setEnabled(    self.mode == 'view'                 )
+		self.page.pbSensorEdit.setEnabled(   self.mode == 'view'                 )
+		self.page.pbSensorSave.setEnabled(   self.mode in ['editing','creating'] )
+		self.page.pbSensorCancel.setEnabled( self.mode in ['editing','creating'] )
+
 
 	@enforce_mode('view')
 	def goModule(self,*args,**kwargs):
