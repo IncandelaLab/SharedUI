@@ -151,10 +151,10 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 
 
 	def initPages(self):
-		self.func_view_module    = c_func_view_module(    self.fm, self.page_view_module   , self.setUIPage, )
+		self.func_view_module    = c_func_view_module(    self.fm, self.page_view_module   , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_baseplate = c_func_view_baseplate( self.fm, self.page_view_baseplate, self.setUIPage, self.setSwitchingEnabled)
-		self.func_view_sensor    = c_func_view_sensor(    self.fm, self.page_view_sensor   , self.setUIPage, )
-		self.func_view_PCB       = c_func_view_PCB(       self.fm, self.page_view_PCB      , self.setUIPage, )
+		self.func_view_sensor    = c_func_view_sensor(    self.fm, self.page_view_sensor   , self.setUIPage, self.setSwitchingEnabled)
+		self.func_view_PCB       = c_func_view_PCB(       self.fm, self.page_view_PCB      , self.setUIPage, self.setSwitchingEnabled)
 
 		# This list must be in the same order that the pages are in in the stackedWidget in the main UI file.
 		# This is the same order as in the dict PAGE_IDS

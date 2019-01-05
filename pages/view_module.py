@@ -14,13 +14,16 @@ LBL_CURRENT = 'current ({})'.format('microamps' if USE_MICROAMP else 'amps')
 LBL_VSOURCE = 'sourced voltage (volts)'
 LABELS = [LBL_TIME,LBL_VOLTAGE,LBL_CURRENT,LBL_VSOURCE]
 
-nstr = lambda v:'' if v is None else str(v)
+nstr = lambda v:''  if v is None else str(v)
+nflt = lambda v:0.0 if v is None else float(v)
+nint = lambda v:0   if v is None else int(v)
 
 class func(object):
-	def __init__(self,fm,page,setUIPage):
+	def __init__(self,fm,page,setUIPage,setSwitchingEnabled):
 		self.fm        = fm
 		self.page      = page
 		self.setUIPage = setUIPage
+		self.setMainSwitchingEnabled = setSwitchingEnabled
 
 		self.ivModuleID = None
 		self.ivDataName = None
@@ -55,7 +58,8 @@ class func(object):
 							))
 					function(self,*args,**kwargs)
 				else:
-					print("mode is {}, needed {} for function {} with args {} kwargs {}".format(
+					print("page {} mode is {}, needed {} for function {} with args {} kwargs {}".format(
+						PAGE_NAME,
 						self.mode,
 						mode,
 						function.__name__,
@@ -99,6 +103,11 @@ class func(object):
 		self.page.cbRawYAxis.currentIndexChanged.connect(self.updateIVPlot)
 		self.page.tabBinsRaw.currentChanged.connect(self.updateIVPlot)
 
+		self.page.pbModuleNew.clicked.connect(self.startCreating)
+		self.page.pbModuleEdit.clicked.connect(self.startEditing)
+		self.page.pbModuleSave.clicked.connect(self.saveEditig)
+		self.page.pbModuleCancel.clicked.connect(self.cancelEditing)
+
 
 	@enforce_mode('view')
 	def update_info(self,ID=None,*args,**kwargs):
@@ -110,26 +119,80 @@ class func(object):
 	def updateElements(self,use_info = False):
 		if use_info:
 			if self.info is None:
-				self.page.leBaseplateID.setText( '' )
-				self.page.leSensorID.setText(    '' )
-				self.page.lePCBID.setText(       '' )
-				self.page.leThickness.setText(   '' )
+				self.page.sbBaseplateID.setValue(  -1);self.page.sbBaseplateID.clear()
+				self.page.sbSensorID.setValue(     -1);self.page.sbSensorID.clear()
+				self.page.sbPCBID.setValue(        -1);self.page.sbPCBID.clear()
+				self.page.dsbThickness.setValue(  0.0);self.page.dsbThickness.clear()
 
 			else:
-				self.page.leBaseplateID.setText( nstr(self.info['baseplate']) )
-				self.page.leSensorID.setText(    nstr(self.info['sensor']   ) )
-				self.page.lePCBID.setText(       nstr(self.info['PCB']      ) )
-				self.page.leThickness.setText(   nstr(self.info['thickness']) )
+				self.page.sbBaseplateID.setValue( nint(self.info['baseplate']) )
+				self.page.sbSensorID.setValue(    nint(self.info['sensor']   ) )
+				self.page.sbPCBID.setValue(       nint(self.info['PCB']      ) )
+				self.page.dsbThickness.setValue(  nflt(self.info['thickness']) )
 
 			self.page.cbIVCurves.clear()
 			if not (self.IVtests is None):
 				self.page.cbIVCurves.addItems(self.IVtests)
 
-		self.page.pbModuleNew.setEnabled(    self.mode == 'view'                 )
-		self.page.pbModuleEdit.setEnabled(   self.mode == 'view'                 )
+		self.page.pbModuleNew.setEnabled(   (self.mode == 'view') and     (self.info is None) )
+		self.page.pbModuleEdit.setEnabled(  (self.mode == 'view') and not (self.info is None) )
 		self.page.pbModuleSave.setEnabled(   self.mode in ['editing','creating'] )
 		self.page.pbModuleCancel.setEnabled( self.mode in ['editing','creating'] )
 
+		self.setMainSwitchingEnabled(       self.mode == 'view') 
+		self.page.pbGoPCB.setEnabled(      (self.mode == 'view') and (self.page.sbPCBID.value() >= 0)       )
+		self.page.pbGoSensor.setEnabled(   (self.mode == 'view') and (self.page.sbSensorID.value() >= 0)    )
+		self.page.pbGoBaseplate.setEnabled((self.mode == 'view') and (self.page.sbBaseplateID.value() >= 0) )
+		self.page.sbModuleID.setEnabled(    self.mode == 'view')
+
+		self.page.tabBinsRaw.setEnabled(    (self.mode == 'view') and not (self.info is None) )
+		self.tb.setEnabled(                 (self.mode == 'view') and not (self.info is None) )
+		self.fc.setEnabled(                 (self.mode == 'view') and not (self.info is None) )
+		self.page.cbIVCurves.setEnabled(    (self.mode == 'view') and not (self.info is None) )
+
+		self.page.dsbThickness.setReadOnly(  not (self.mode in ['editing','creating']) )
+		self.page.sbBaseplateID.setReadOnly( not (self.mode in ['editing','creating']) )
+		self.page.sbSensorID.setReadOnly(    not (self.mode in ['editing','creating']) )
+		self.page.sbPCBID.setReadOnly(       not (self.mode in ['editing','creating']) )
+
+	@enforce_mode('view')
+	def startCreating(self,*args,**kwargs):
+		if self.info is None:
+			self.mode = 'creating'
+			self.updateElements()
+		else:
+			pass
+
+	@enforce_mode('view')
+	def startEditing(self,*args,**kwargs):
+		if self.info is None:
+			pass
+		else:
+			self.mode = 'editing'
+			self.updateElements()
+
+	@enforce_mode(['editing','creating'])
+	def cancelEditing(self,*args,**kwargs):
+		self.mode = 'view'
+		self.update_info()
+
+	@enforce_mode(['editing','creating'])
+	def saveEditig(self,*args,**kwargs):
+		ID = self.page.sbModuleID.value()
+		details = {
+			'baseplate'  : self.page.sbBaseplateID.value(),
+			'sensor'     : self.page.sbSensorID.value(),
+			'PCB'        : self.page.sbPCBID.value(),
+			'thickness'  : self.page.dsbThickness.value(),
+			# 'kaptontype' : 
+			# 'kaptonstep' : 
+			# 'sensorstep' : 
+			# 'PCBstep'    : 
+			}
+		new = self.mode == 'creating'
+		self.fm.changeModuleDetails(ID,details,new)
+		self.mode = 'view'
+		self.update_info()
 
 	@enforce_mode('view')
 	def updateIVData(self,index,*args,**kwargs):
@@ -211,36 +274,24 @@ class func(object):
 
 	@enforce_mode('view')
 	def goBaseplate(self,*args,**kwargs):
-		ID = self.page.leBaseplateID.text()
-		if len(ID) > 0:
-			try:
-				ID = int(ID)
-			except:
-				return
+		ID = self.page.sbBaseplateID.value()
+		if ID>=0:
 			self.setUIPage('baseplates',ID=ID)
 		else:
 			return
 
 	@enforce_mode('view')
 	def goSensor(self,*args,**kwargs):
-		ID = self.page.leSensorID.text()
-		if len(ID) > 0:
-			try:
-				ID = int(ID)
-			except:
-				return
+		ID = self.page.sbSensorID.value()
+		if ID>=0:
 			self.setUIPage('sensors',ID=ID)
 		else:
 			return
 
 	@enforce_mode('view')
 	def goPCB(self,*args,**kwargs):
-		ID = self.page.lePCBID.text()
-		if len(ID) > 0:
-			try:
-				ID = int(ID)
-			except:
-				return
+		ID = self.page.sbPCBID.value()
+		if ID>=0:
 			self.setUIPage('PCBs',ID=ID)
 		else:
 			return

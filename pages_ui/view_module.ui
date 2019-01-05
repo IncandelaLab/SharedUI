@@ -34,7 +34,7 @@
     <rect>
      <x>80</x>
      <y>10</y>
-     <width>91</width>
+     <width>111</width>
      <height>21</height>
     </rect>
    </property>
@@ -93,49 +93,10 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QLineEdit" name="leBaseplateID">
-   <property name="geometry">
-    <rect>
-     <x>80</x>
-     <y>30</y>
-     <width>51</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="leSensorID">
-   <property name="geometry">
-    <rect>
-     <x>80</x>
-     <y>50</y>
-     <width>51</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lePCBID">
-   <property name="geometry">
-    <rect>
-     <x>80</x>
-     <y>70</y>
-     <width>51</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
   <widget class="QPushButton" name="pbGoBaseplate">
    <property name="geometry">
     <rect>
-     <x>130</x>
+     <x>150</x>
      <y>30</y>
      <width>41</width>
      <height>21</height>
@@ -148,7 +109,7 @@
   <widget class="QPushButton" name="pbGoSensor">
    <property name="geometry">
     <rect>
-     <x>130</x>
+     <x>150</x>
      <y>50</y>
      <width>41</width>
      <height>21</height>
@@ -161,7 +122,7 @@
   <widget class="QPushButton" name="pbGoPCB">
    <property name="geometry">
     <rect>
-     <x>130</x>
+     <x>150</x>
      <y>70</y>
      <width>41</width>
      <height>21</height>
@@ -182,19 +143,6 @@
    </property>
    <property name="text">
     <string>Thickness</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="leThickness">
-   <property name="geometry">
-    <rect>
-     <x>80</x>
-     <y>100</y>
-     <width>91</width>
-     <height>21</height>
-    </rect>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -535,6 +483,70 @@
    </property>
    <property name="text">
     <string>Save</string>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="sbSensorID">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>50</y>
+     <width>71</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="minimum">
+    <number>-1</number>
+   </property>
+   <property name="maximum">
+    <number>2147483647</number>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="sbPCBID">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>70</y>
+     <width>71</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="minimum">
+    <number>-1</number>
+   </property>
+   <property name="maximum">
+    <number>2147483647</number>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="sbBaseplateID">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>30</y>
+     <width>71</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="minimum">
+    <number>-1</number>
+   </property>
+   <property name="maximum">
+    <number>2147483647</number>
+   </property>
+  </widget>
+  <widget class="QDoubleSpinBox" name="dsbThickness">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>100</y>
+     <width>91</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="minimum">
+    <double>0.000000000000000</double>
+   </property>
+   <property name="maximum">
+    <double>2147483647.000000000000000</double>
    </property>
   </widget>
  </widget>

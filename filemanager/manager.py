@@ -361,7 +361,14 @@ class manager(object):
 			# print('')
 
 
-
+	def _createDetails(self, ID, file, cast_to, details):
+		#os.mkdir(folder)
+		cast_details = {}
+		cast_details.update([['ID',ID]])
+		for key,val in details.items():
+			val_cast = cast_to[key][0](val)
+			cast_details.update([[key,val_cast]])
+		_save_dict(cast_details, file)
 
 	def _changeDetails(self, file, cast_to, change_dict):
 		details = _load_and_cast_dict(file,cast_to)
@@ -376,7 +383,41 @@ class manager(object):
 				print("Warning: tried to change value of invalid variable <{}>".format(key))
 		_save_dict(details,file)
 
+	def _createModule(self,ID):
+		folder      = os.sep.join([DATADIR,MODULE_DIR,MODULE_FOLDER.format(MPC=MPC,ID=ID)])
+		iv_folder   = os.sep.join([folder,MODULE_IV_FOLDER])
+		bins_folder = os.sep.join([iv_folder,MODULE_IV_BINS_FOLDER])
+		if os.path.exists(folder):
+			print("Warning: tried to create existing module with ID {}".format(ID))
+			return False
+		os.mkdir(folder)
+		os.mkdir(iv_folder)
+		os.mkdir(bins_folder)
+		return True
 
+	def _createBaseplate(self,ID):
+		folder = os.sep.join([DATADIR,BASEPLATE_DIR,BASEPLATE_FOLDER.format(MPC=MPC,ID=ID)])
+		if os.path.exists(folder):
+			print("Warning: tried to create existing baseplate with ID {}".format(ID))
+			return False
+		os.mkdir(folder)
+		return True
+
+	def _createSensor(self,ID):
+		folder  = os.sep.join([DATADIR,SENSOR_DIR,SENSOR_FOLDER.format(MPC=MPC,ID=ID)])
+		if os.path.exists(folder):
+			print("Warning: tried to create existing sensor with ID {}".format(ID))
+			return False
+		os.mkdir(folder)
+		return True
+
+	def _createPCB(self,ID):
+		folder  = os.sep.join([DATADIR,PCB_DIR,PCB_FOLDER.format(MPC=MPC,ID=ID)])
+		if os.path.exists(folder):
+			print("Warning: tried to create existing PCB with ID {}".format(ID))
+			return False
+		os.mkdir(folder)
+		return True
 
 	########################
 	### module functions ###
@@ -406,10 +447,15 @@ class manager(object):
 		iv_folder    = os.sep.join([folder,MODULE_IV_FOLDER])
 		return _load_and_cast_dict(details_file,DETAILS_MODULE), _list_files(iv_folder)
 
-	def changeModuleDetails(self,ID,change_dict):
-		file = os.sep.join([DATADIR,MODULE_DIR,MODULE_FOLDER.format(MPC=MPC,ID=ID),MODULE_DETAILS])
+	def changeModuleDetails(self,ID,change_dict,new=False):
+		folder  = os.sep.join([DATADIR,MODULE_DIR,MODULE_FOLDER.format(MPC=MPC,ID=ID)])
+		file    = os.sep.join([folder,MODULE_DETAILS])
 		cast_to = DETAILS_MODULE
-		self._changeDetails(file,cast_to,change_dict)
+		if new:
+			self._createModule(ID)
+			self._createDetails(ID,file,cast_to,change_dict)
+		else:
+			self._changeDetails(file,cast_to,change_dict)
 
 
 	###########################
@@ -419,10 +465,15 @@ class manager(object):
 		file  = os.sep.join([DATADIR,BASEPLATE_DIR,BASEPLATE_FOLDER.format(MPC=MPC,ID=ID),BASEPLATE_DETAILS])
 		return _load_and_cast_dict(file,DETAILS_BASEPLATE)
 		
-	def changeBaseplateDetails(self,ID,change_dict):
-		file = os.sep.join([DATADIR,BASEPLATE_DIR,BASEPLATE_FOLDER.format(MPC=MPC,ID=ID),BASEPLATE_DETAILS])
+	def changeBaseplateDetails(self,ID,change_dict,new=False):
+		folder = os.sep.join([DATADIR,BASEPLATE_DIR,BASEPLATE_FOLDER.format(MPC=MPC,ID=ID)])
+		file = os.sep.join([folder,BASEPLATE_DETAILS])
 		cast_to = DETAILS_BASEPLATE
-		self._changeDetails(file,cast_to,change_dict)
+		if new:
+			self._createBaseplate(ID)
+			self._createDetails(ID,file,cast_to,change_dict)
+		else:
+			self._changeDetails(file,cast_to,change_dict)
 
 
 	########################
@@ -432,10 +483,15 @@ class manager(object):
 		file  = os.sep.join([DATADIR,SENSOR_DIR,SENSOR_FOLDER.format(MPC=MPC,ID=ID),SENSOR_DETAILS])
 		return _load_and_cast_dict(file,DETAILS_SENSOR)
 
-	def changeSensorDetails(self,ID,change_dict):
-		file = os.sep.join([DATADIR,SENSOR_DIR,SENSOR_FOLDER.format(MPC=MPC,ID=ID),SENSOR_DETAILS])
+	def changeSensorDetails(self,ID,change_dict,new=False):
+		folder  = os.sep.join([DATADIR,SENSOR_DIR,SENSOR_FOLDER.format(MPC=MPC,ID=ID)])
+		file    = os.sep.join([folder,SENSOR_DETAILS])
 		cast_to = DETAILS_SENSOR
-		self._changeDetails(file,cast_to,change_dict)
+		if new:
+			self._createSensor(ID)
+			self._createDetails(ID,file,cast_to,change_dict)
+		else:
+			self._changeDetails(file,cast_to,change_dict)
 
 
 	#####################
@@ -445,10 +501,15 @@ class manager(object):
 		file  = os.sep.join([DATADIR,PCB_DIR,PCB_FOLDER.format(MPC=MPC,ID=ID),PCB_DETAILS])
 		return _load_and_cast_dict(file,DETAILS_PCB)
 
-	def changePCBDetails(self,ID,change_dict):
-		file = os.sep.join([DATADIR,PCB_DIR,PCB_FOLDER.format(MPC=MPC,ID=ID),PCB_DETAILS])
+	def changePCBDetails(self,ID,change_dict,new=False):	
+		folder  = os.sep.join([DATADIR,PCB_DIR,PCB_FOLDER.format(MPC=MPC,ID=ID)])
+		file    = os.sep.join([folder,PCB_DETAILS])
 		cast_to = DETAILS_PCB
-		self._changeDetails(file,cast_to,change_dict)
+		if new:
+			self._createPCB(ID)
+			self._createDetails(ID,file,cast_to,change_dict)
+		else:
+			self._changeDetails(file,cast_to,change_dict)
 
 
 

@@ -1,5 +1,7 @@
 nstr = lambda v:''  if v is None else str(v)
 nflt = lambda v:0.0 if v is None else float(v)
+nint = lambda v:0   if v is None else int(v)
+
 
 PAGE_NAME = "view_baseplate"
 DEBUG = False
@@ -42,7 +44,8 @@ class func(object):
 							))
 					function(self,*args,**kwargs)
 				else:
-					print("mode is {}, needed {} for function {} with args {} kwargs {}".format(
+					print("page {} mode is {}, needed {} for function {} with args {} kwargs {}".format(
+						PAGE_NAME,
 						self.mode,
 						mode,
 						function.__name__,
@@ -77,6 +80,11 @@ class func(object):
 			self.page.dsbC5
 			]
 
+		self.page.pbBaseplateNew.clicked.connect(self.startCreating)
+		self.page.pbBaseplateEdit.clicked.connect(self.startEditing)
+		self.page.pbBaseplateSave.clicked.connect(self.saveEditing)
+		self.page.pbBaseplateCancel.clicked.connect(self.cancelEditing)
+
 
 	@enforce_mode('view')
 	def update_info(self,ID=None):
@@ -85,7 +93,7 @@ class func(object):
 		self.info = self.fm.loadBaseplateDetails(ID)
 		self.updateElements(use_info = True)
 
-	@enforce_mode(['view','editing_corners'])
+	@enforce_mode(['view','editing_corners','editing','creating'])
 	def updateElements(self,use_info=False):
 		if use_info:
 			if self.info is None:
@@ -93,16 +101,20 @@ class func(object):
 				self.page.leIdentifier.setText('')
 				self.page.leMaterial.setText('')
 				self.page.dsbNomThickness.setValue(0.0)
+				self.page.dsbNomThickness.clear()
 				self.page.dsbFlatness.setValue(0.0)
+				self.page.dsbFlatness.clear()
 				self.page.dsbSize.setValue(0.0)
+				self.page.dsbSize.clear()
 				self.page.leManufacturer.setText('')
-				self.page.leOnModule.setText('')
-				self.page.dsbC0.clear()
-				self.page.dsbC1.clear()
-				self.page.dsbC2.clear()
-				self.page.dsbC3.clear()
-				self.page.dsbC4.clear()
-				self.page.dsbC5.clear()
+				self.page.sbOnModule.setValue(-1)
+				self.page.sbOnModule.clear()
+				self.page.dsbC0.setValue(0.0); self.page.dsbC0.clear()
+				self.page.dsbC1.setValue(0.0); self.page.dsbC1.clear()
+				self.page.dsbC2.setValue(0.0); self.page.dsbC2.clear()
+				self.page.dsbC3.setValue(0.0); self.page.dsbC3.clear()
+				self.page.dsbC4.setValue(0.0); self.page.dsbC4.clear()
+				self.page.dsbC5.setValue(0.0); self.page.dsbC5.clear()
 			else:
 				self.currentBaseplateExists = True
 				self.page.leIdentifier.setText(nstr(self.info['identifier']))
@@ -111,7 +123,7 @@ class func(object):
 				self.page.dsbFlatness.setValue(nflt(self.info['flatness']))
 				self.page.dsbSize.setValue(nflt(self.info['size']))
 				self.page.leManufacturer.setText(nstr(self.info['manufacturer']))
-				self.page.leOnModule.setText(nstr(self.info['onModuleID']))
+				self.page.sbOnModule.setValue(nint(self.info['onModuleID']))
 				self.page.dsbC0.clear() if self.info['c0'] is None else self.page.dsbC0.setValue(self.info['c0'])
 				self.page.dsbC1.clear() if self.info['c1'] is None else self.page.dsbC1.setValue(self.info['c1'])
 				self.page.dsbC2.clear() if self.info['c2'] is None else self.page.dsbC2.setValue(self.info['c2'])
@@ -119,23 +131,31 @@ class func(object):
 				self.page.dsbC4.clear() if self.info['c4'] is None else self.page.dsbC4.setValue(self.info['c4'])
 				self.page.dsbC5.clear() if self.info['c5'] is None else self.page.dsbC5.setValue(self.info['c5'])
 
-		self.page.pbEditCornerHeights.setEnabled( self.mode == 'view'                                    )
-		self.page.pbGoModule.setEnabled(          self.mode == 'view'                                    )
-		self.page.sbBaseplateID.setEnabled(       self.mode == 'view'                                    )
-		self.page.pbSaveCorners.setEnabled(       self.mode == 'editing_corners'                         )
-		self.page.pbCancelCorners.setEnabled(     self.mode == 'editing_corners'                         )
-		self.page.dsbC0.setEnabled(               self.mode in ['editing_corners', 'creating_baseplate'] )
-		self.page.dsbC1.setEnabled(               self.mode in ['editing_corners', 'creating_baseplate'] )
-		self.page.dsbC2.setEnabled(               self.mode in ['editing_corners', 'creating_baseplate'] )
-		self.page.dsbC3.setEnabled(               self.mode in ['editing_corners', 'creating_baseplate'] )
-		self.page.dsbC4.setEnabled(               self.mode in ['editing_corners', 'creating_baseplate'] )
-		self.page.dsbC5.setEnabled(               self.mode in ['editing_corners', 'creating_baseplate'] )
-		self.setMainSwitchingEnabled(             self.mode == 'view'                                    )
+		self.page.pbEditCornerHeights.setEnabled((self.mode == 'view') and not (self.info is None)         )
+		self.page.pbGoModule.setEnabled(         (self.mode == 'view') and self.page.sbOnModule.value()>=0 )
+		self.page.sbBaseplateID.setEnabled(       self.mode == 'view'                                      )
+		self.page.pbSaveCorners.setEnabled(       self.mode == 'editing_corners'                           )
+		self.page.pbCancelCorners.setEnabled(     self.mode == 'editing_corners'                           )
+		self.page.dsbC0.setEnabled(               self.mode in ['editing_corners', 'creating', 'editing']  )
+		self.page.dsbC1.setEnabled(               self.mode in ['editing_corners', 'creating', 'editing']  )
+		self.page.dsbC2.setEnabled(               self.mode in ['editing_corners', 'creating', 'editing']  )
+		self.page.dsbC3.setEnabled(               self.mode in ['editing_corners', 'creating', 'editing']  )
+		self.page.dsbC4.setEnabled(               self.mode in ['editing_corners', 'creating', 'editing']  )
+		self.page.dsbC5.setEnabled(               self.mode in ['editing_corners', 'creating', 'editing']  )
+		self.setMainSwitchingEnabled(             self.mode == 'view'                                      )
 
-		self.page.pbBaseplateNew.setEnabled(    self.mode == 'view'               )
-		self.page.pbBaseplateEdit.setEnabled(   self.mode == 'view'               )
-		self.page.pbBaseplateSave.setEnabled(   self.mode == 'creating_baseplate' )
-		self.page.pbBaseplateCancel.setEnabled( self.mode == 'creating_baseplate' )
+		self.page.pbBaseplateNew.setEnabled(   (self.mode == 'view') and     (self.info is None) )
+		self.page.pbBaseplateEdit.setEnabled(  (self.mode == 'view') and not (self.info is None) )
+		self.page.pbBaseplateSave.setEnabled(   self.mode in ['creating','editing'] )
+		self.page.pbBaseplateCancel.setEnabled( self.mode in ['creating','editing'] )
+
+		self.page.leIdentifier.setReadOnly(    not (self.mode in ['creating','editing']) )
+		self.page.leMaterial.setReadOnly(      not (self.mode in ['creating','editing']) )
+		self.page.dsbNomThickness.setReadOnly( not (self.mode in ['creating','editing']) )
+		#self.page.dsbFlatness.setReadOnly(     not (self.mode in ['creating','editing']) )
+		self.page.dsbSize.setReadOnly(         not (self.mode in ['creating','editing']) )
+		self.page.leManufacturer.setReadOnly(  not (self.mode in ['creating','editing']) )
+		self.page.sbOnModule.setReadOnly(      not (self.mode in ['creating','editing']) )
 
 	@enforce_mode('view')
 	def startEditingCorners(self,*args,**kwargs):
@@ -160,15 +180,54 @@ class func(object):
 		self.mode='view'
 		self.update_info()
 
+	@enforce_mode('view')
+	def startCreating(self,*args,**kwargs):
+		if self.info is None:
+			self.mode = 'creating'
+			self.updateElements()
+		else:
+			pass
+
+	@enforce_mode('view')
+	def startEditing(self,*args,**kwargs):
+		if self.info is None:
+			pass
+		else:
+			self.mode = 'editing'
+			self.updateElements()
+
+	@enforce_mode(['editing','creating'])
+	def cancelEditing(self,*args,**kwargs):
+		self.mode = 'view'
+		self.update_info()
+
+	@enforce_mode(['editing','creating'])
+	def saveEditing(self,*args,**kwargs):
+		ID = self.page.sbBaseplateID.value()
+
+		details = {
+			'identifier'   : str(self.page.leIdentifier.text()),
+			'material'     : str(self.page.leMaterial.text()),
+			'nomthickness' : self.page.dsbNomThickness.value(),
+			'flatness'     : self.page.dsbFlatness.value(),
+			'size'         : self.page.dsbSize.value(),
+			'manufacturer' : str(self.page.leManufacturer.text()),
+			'onModuleID'   : self.page.sbOnModule.value(),
+			}
+
+		values  = [_.value() for _ in self.corners]
+		details.update([ ['c{}'.format(i),_] for i,_ in enumerate(values) ])
+		details.update([['flatness',round(max(values)-min(values),6)]])
+
+		new = self.mode == 'creating'
+		self.fm.changeBaseplateDetails(ID,details,new)
+		self.mode = 'view'
+		self.update_info()
 
 	@enforce_mode('view')
 	def goModule(self,*args,**kwargs):
-		ID = self.page.leOnModule.text()
-		if len(ID) > 0:
-			try:
-				ID = int(ID)
-			except:
-				return
+		ID = self.page.sbOnModule.value()
+		if ID >= 0:
 			self.setUIPage('modules',ID=ID)
 		else:
 			return

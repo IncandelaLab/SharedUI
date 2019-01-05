@@ -196,19 +196,6 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QLineEdit" name="leOnModule">
-   <property name="geometry">
-    <rect>
-     <x>90</x>
-     <y>160</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
   <widget class="QPushButton" name="pbGoModule">
    <property name="geometry">
     <rect>
@@ -532,7 +519,7 @@
     <bool>true</bool>
    </property>
    <property name="maximum">
-    <double>65535.000000000000000</double>
+    <double>2147483647.000000000000000</double>
    </property>
    <property name="singleStep">
     <double>0.050000000000000</double>
@@ -551,7 +538,7 @@
     <bool>true</bool>
    </property>
    <property name="maximum">
-    <double>65535.000000000000000</double>
+    <double>2147483647.000000000000000</double>
    </property>
    <property name="singleStep">
     <double>0.050000000000000</double>
@@ -570,10 +557,26 @@
     <bool>true</bool>
    </property>
    <property name="maximum">
-    <double>65535.000000000000000</double>
+    <double>2147483647.000000000000000</double>
    </property>
    <property name="singleStep">
     <double>0.050000000000000</double>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="sbOnModule">
+   <property name="geometry">
+    <rect>
+     <x>90</x>
+     <y>160</y>
+     <width>81</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="minimum">
+    <number>-1</number>
+   </property>
+   <property name="maximum">
+    <number>2147483647</number>
    </property>
   </widget>
  </widget>
