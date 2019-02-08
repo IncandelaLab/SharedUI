@@ -1,7 +1,5 @@
-
-
-
 PAGE_NAME = "view_baseplate"
+OBJECTTYPE = "baseplate"
 DEBUG = False
 
 class func(object):
@@ -88,7 +86,7 @@ class func(object):
 	def update_info(self,ID=None):
 		"""Loads info on the selected baseplate ID and updates UI elements accordingly"""
 		if ID is None:ID = self.page.sbBaseplateID.value()
-		self.info = self.fm.loadBaseplateDetails(ID)
+		self.info = self.fm.loadObjectDetails(OBJECTTYPE,ID)
 		self.updateElements(use_info = True)
 
 	@enforce_mode(['view','editing_corners','editing','creating'])
@@ -178,7 +176,7 @@ class func(object):
 		values  = [_.value() for _ in self.corners]
 		changes = {'c{}'.format(i):_ for i,_ in enumerate(values)}
 		changes.update([['flatness',round(max(values)-min(values),6)]])
-		self.fm.changeBaseplateDetails(ID,changes)
+		self.fm.changeObjectDetails(OBJECTTYPE,ID,changes)
 
 		self.mode='view'
 		self.update_info()
@@ -223,7 +221,7 @@ class func(object):
 		details.update([['flatness',round(max(values)-min(values),6)]])
 
 		new = self.mode == 'creating'
-		self.fm.changeBaseplateDetails(ID,details,new)
+		self.fm.changeObjectDetails(OBJECTTYPE,ID,details,new)
 		self.mode = 'view'
 		self.update_info()
 

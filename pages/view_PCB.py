@@ -1,6 +1,5 @@
-
-
 PAGE_NAME = "view_pcb"
+PARTTYPE = "PCB"
 DEBUG = False
 
 class func(object):
@@ -72,7 +71,7 @@ class func(object):
 	@enforce_mode('view')
 	def update_info(self,ID=None,*args,**kwargs):
 		if ID is None:ID = self.page.sbPCBID.value()
-		self.info = self.fm.loadPCBDetails(ID)
+		self.info = self.fm.loadObjectDetails(PARTTYPE,ID)
 		self.updateElements(use_info = True)
 
 	@enforce_mode(['view','editing','creating'])
@@ -158,7 +157,7 @@ class func(object):
 			'onModuleID'   : self.page.sbOnModule.value(),
 			}
 		new = self.mode == 'creating'
-		self.fm.changePCBDetails(ID,details,new)
+		self.fm.changeObjectDetails(PARTTYPE,ID,details,new)
 		self.mode = 'view'
 		self.update_info()
 

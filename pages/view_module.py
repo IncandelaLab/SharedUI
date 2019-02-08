@@ -3,6 +3,7 @@ from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as Navigatio
 from matplotlib.figure import Figure
 
 PAGE_NAME = "view_module"
+OBJECTTYPE = "module"
 DEBUG = False
 
 USE_MICROAMP = True
@@ -112,7 +113,7 @@ class func(object):
 	@enforce_mode('view')
 	def update_info(self,ID=None,*args,**kwargs):
 		if ID is None:ID = self.page.sbModuleID.value()
-		self.info, self.IVtests = self.fm.loadModuleDetails(ID)
+		self.info, self.IVtests = self.fm.loadObjectDetails(OBJECTTYPE,ID)
 		self.updateElements(use_info=True)
 		#print(self.info)
 
@@ -213,7 +214,7 @@ class func(object):
 			'PCBstep'    : self.page.sbPCBStep.value(),
 			}
 		new = self.mode == 'creating'
-		self.fm.changeModuleDetails(ID,details,new)
+		self.fm.changeObjectDetails(OBJECTTYPE,ID,details,new)
 		self.mode = 'view'
 		self.update_info()
 

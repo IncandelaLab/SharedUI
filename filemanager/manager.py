@@ -3,7 +3,9 @@ import numpy
 import shutil
 
 CWD = os.getcwd()
-SEP = os.sep
+
+nstr = lambda v:'' if v is None else str(v)
+
 
 COMM_STR      = '#'            # comment string - lines starting with this string will be ignored
 WHITESPACE    = ' \t\r'        # whitespace - these character will be stripped from lines, variable names, and values
@@ -12,14 +14,15 @@ PROGRAM_NAME  = 'filemanager'  #
 CFGSETUP_NAME = 'cfgsetup.py'  # 
 CFG_NAME      = 'config.txt'   # 
 
+
 if __name__=='__main__':
-	FM_DIR   = SEP.join([CWD])
-	CFG_PATH = SEP.join([FM_DIR,CFG_NAME])
+	FM_DIR   = os.sep.join([CWD])
+	CFG_PATH = os.sep.join([FM_DIR,CFG_NAME])
 else:
 	# assumes this is being run from one directory up
 	# will not work if imported from any other location
-	FM_DIR   = SEP.join([CWD,MANAGER_DIR])
-	CFG_PATH = SEP.join([FM_DIR,CFG_NAME])
+	FM_DIR   = os.sep.join([CWD,MANAGER_DIR])
+	CFG_PATH = os.sep.join([FM_DIR,CFG_NAME])
 
 
 
@@ -72,6 +75,8 @@ STRUCT_FOLDERS = [
 	SENSOR_FOLDER,
 	PCB_FOLDER,
 ]
+
+
 
 
 ###############
@@ -139,24 +144,44 @@ DETAILS_MODULE = {
 }
 
 DETAILS_KAPTON_STEP = {
-	'ID'            : [int       ],
-	'who'           : [str  , "" ],
-	'date'          : [str  , "" ],
-	'time'          : [str  , "" ],
-	'cure_start'    : [str  , "" ],
-	'cure_stop'     : [str  , "" ],
-	'cure_duration' : [str  , "" ],
-	'cure_temp'     : [str  , "" ],
-	'cure_hum'      : [str  , "" ],
-	'module_1'      : [int  , -1 ],
-	'module_2'      : [int  , -1 ],
-	'module_3'      : [int  , -1 ],
-	'module_4'      : [int  , -1 ],
-	'module_5'      : [int  , -1 ],
-	'module_6'      : [int  , -1 ],
+	'ID'            : [int    ],
+	'who'           : [str, ""],
+	'date'          : [str, ""],
+	'time'          : [str, ""],
+	'cure_start'    : [str, ""],
+	'cure_stop'     : [str, ""],
+	'cure_duration' : [str, ""],
+	'cure_temp'     : [str, ""],
+	'cure_hum'      : [str, ""],
+	'module_1'      : [int, -1],
+	'module_2'      : [int, -1],
+	'module_3'      : [int, -1],
+	'module_4'      : [int, -1],
+	'module_5'      : [int, -1],
+	'module_6'      : [int, -1],
+	'araldite_batch': [str, ""],
 }
 
-nstr = lambda v:'' if v is None else str(v)
+DETAILS_SENSOR_STEP = {
+	
+}
+
+DETAILS_PCB_STEP = {
+	
+}
+
+CAST_DICTS = {
+	'baseplate'  : DETAILS_BASEPLATE,
+	'sensor'     : DETAILS_SENSOR,
+	'PCB'        : DETAILS_PCB,
+	'module'     : DETAILS_MODULE,
+	'kapton_step': DETAILS_KAPTON_STEP,
+	'sensor_step': DETAILS_SENSOR_STEP,
+	'PCB_step'   : DETAILS_PCB_STEP,
+}
+
+
+
 
 
 ######################
@@ -255,6 +280,8 @@ def _list_files(folder,ext=None):
 
 
 
+
+
 ######################
 ### data functions ###
 ######################
@@ -306,6 +333,9 @@ def make_bins(raw_data,discard_first_point_per_bin=False):
 
 
 
+
+
+
 #####################
 ### manager class ###
 #####################
@@ -314,13 +344,14 @@ class manager(object):
 		configSuccess = self._loadConfig()
 		if not configSuccess:
 			print("{} could not load config".format(PROGRAM_NAME))
-			print("restore file manually or run {}{} to generate new config file".format(CWD+SEP,CFGSETUP_NAME))
+			print("restore file manually or run {}{} to generate new config file".format(CWD+os.sep,CFGSETUP_NAME))
 			raise Exception
 
 		else:
 			self._check_datadir()
 			if LOAD_TEST_OBJECTS:
 				self._check_test_objects()
+			self._join_directories()
 
 
 	def _loadConfig(self):
@@ -390,72 +421,33 @@ class manager(object):
 			# print(TEST_OBJECT_FOLDER)
 			# print('')
 
+	def _join_directories(self):
+		"""Creates global dicts of object folders and details files"""
 
-	def _createDetails(self, ID, file, cast_to, details):
-		#os.mkdir(folder)
-		cast_details = {}
-		cast_details.update([['ID',ID]])
-		for key,val in details.items():
-			val_cast = cast_to[key][0](val)
-			cast_details.update([[key,val_cast]])
-		_save_dict(cast_details, file)
+		global OBJECT_FOLDERS
+		global DETAILS_FILES
 
-	def _changeDetails(self, file, cast_to, change_dict):
-		details = _load_and_cast_dict(file,cast_to)
-		for key,val in change_dict.items():
-			if key in details.keys():
-				try:
-					val = cast_to[key][0](val)
-					details[key] = val
-				except:
-					print("Warning: tried to change variable <{}> to value not interpretable as <{}>".format(key,cast_to[key][0]))
-			else:
-				print("Warning: tried to change value of invalid variable <{}>".format(key))
-		_save_dict(details,file)
+		OBJECT_FOLDERS = {
+			'baseplate'  : os.sep.join([ DATADIR,   BASEPLATE_DIR,   BASEPLATE_FOLDER ]),
+			'sensor'     : os.sep.join([ DATADIR,      SENSOR_DIR,      SENSOR_FOLDER ]),
+			'PCB'        : os.sep.join([ DATADIR,         PCB_DIR,         PCB_FOLDER ]),
+			'module'     : os.sep.join([ DATADIR,      MODULE_DIR,      MODULE_FOLDER ]),
+			'kapton_step': os.sep.join([ DATADIR, KAPTON_STEP_DIR, KAPTON_STEP_FOLDER ]),
+			'sensor_step': os.sep.join([ DATADIR, SENSOR_STEP_DIR, SENSOR_STEP_FOLDER ]),
+			'PCB_step'   : os.sep.join([ DATADIR,    PCB_STEP_DIR,    PCB_STEP_FOLDER ]),
+		}
 
-	def _createModule(self,ID):
-		folder      = os.sep.join([DATADIR,MODULE_DIR,MODULE_FOLDER.format(MPC=MPC,ID=ID)])
-		iv_folder   = os.sep.join([folder,MODULE_IV_FOLDER])
-		bins_folder = os.sep.join([iv_folder,MODULE_IV_BINS_FOLDER])
-		if os.path.exists(folder):
-			print("Warning: tried to create existing module with ID {}".format(ID))
-			return False
-		os.mkdir(folder)
-		os.mkdir(iv_folder)
-		os.mkdir(bins_folder)
-		return True
+		DETAILS_FILES = {
+			'baseplate'  : os.sep.join([ OBJECT_FOLDERS['baseplate'  ],   BASEPLATE_DETAILS ]),
+			'sensor'     : os.sep.join([ OBJECT_FOLDERS['sensor'     ],      SENSOR_DETAILS ]),
+			'PCB'        : os.sep.join([ OBJECT_FOLDERS['PCB'        ],         PCB_DETAILS ]),
+			'module'     : os.sep.join([ OBJECT_FOLDERS['module'     ],      MODULE_DETAILS ]),
+			'kapton_step': os.sep.join([ OBJECT_FOLDERS['kapton_step'], KAPTON_STEP_DETAILS ]),
+			'sensor_step': os.sep.join([ OBJECT_FOLDERS['sensor_step'], SENSOR_STEP_DETAILS ]),
+			'PCB_step'   : os.sep.join([ OBJECT_FOLDERS['PCB_step'   ],    PCB_STEP_DETAILS ]),
+		}
 
-	def _createBaseplate(self,ID):
-		folder = os.sep.join([DATADIR,BASEPLATE_DIR,BASEPLATE_FOLDER.format(MPC=MPC,ID=ID)])
-		if os.path.exists(folder):
-			print("Warning: tried to create existing baseplate with ID {}".format(ID))
-			return False
-		os.mkdir(folder)
-		return True
 
-	def _createSensor(self,ID):
-		folder  = os.sep.join([DATADIR,SENSOR_DIR,SENSOR_FOLDER.format(MPC=MPC,ID=ID)])
-		if os.path.exists(folder):
-			print("Warning: tried to create existing sensor with ID {}".format(ID))
-			return False
-		os.mkdir(folder)
-		return True
-
-	def _createPCB(self,ID):
-		folder  = os.sep.join([DATADIR,PCB_DIR,PCB_FOLDER.format(MPC=MPC,ID=ID)])
-		if os.path.exists(folder):
-			print("Warning: tried to create existing PCB with ID {}".format(ID))
-			return False
-		os.mkdir(folder)
-		return True
-
-	def _createKaptonStep(self,ID):
-		folder = os.sep.join([DATADIR,KAPTON_STEP_DIR,KAPTON_STEP_FOLDER.format(MPC=MPC,ID=ID)])
-		if os.path.exists(filder):
-			print("Warning: tried to create existing kapton step with ID {}".format(ID))
-			return False
-		os.mkdir(folder)
-		return True
 
 	########################
 	### module functions ###
@@ -479,93 +471,95 @@ class manager(object):
 			bd = numpy.loadtxt(bdfile)
 		return rawdata, ba, bd
 
-	def loadModuleDetails(self,ID):
+	def _load_module_details(self,ID):
 		folder       = os.sep.join([DATADIR,MODULE_DIR,MODULE_FOLDER.format(MPC=MPC,ID=ID)])
 		details_file = os.sep.join([folder,MODULE_DETAILS])
 		iv_folder    = os.sep.join([folder,MODULE_IV_FOLDER])
 		return _load_and_cast_dict(details_file,DETAILS_MODULE), _list_files(iv_folder)
 
-	def changeModuleDetails(self,ID,change_dict,new=False):
+	def _change_module_details(self,ID,change_dict,new=False):
 		folder  = os.sep.join([DATADIR,MODULE_DIR,MODULE_FOLDER.format(MPC=MPC,ID=ID)])
 		file    = os.sep.join([folder,MODULE_DETAILS])
 		cast_to = DETAILS_MODULE
 		if new:
-			self._createModule(ID)
+			self._create_module(ID)
 			self._createDetails(ID,file,cast_to,change_dict)
 		else:
 			self._changeDetails(file,cast_to,change_dict)
 
+	def _create_module(self,ID):
+		folder      = os.sep.join([DATADIR,MODULE_DIR,MODULE_FOLDER.format(MPC=MPC,ID=ID)])
+		iv_folder   = os.sep.join([folder,MODULE_IV_FOLDER])
+		bins_folder = os.sep.join([iv_folder,MODULE_IV_BINS_FOLDER])
+		if os.path.exists(folder):
+			print("Warning: tried to create existing module with ID {}".format(ID))
+			return False
+		os.mkdir(folder)
+		os.mkdir(iv_folder)
+		os.mkdir(bins_folder)
+		return True
 
-	###########################
-	### baseplate functions ###
-	###########################
-	def loadBaseplateDetails(self,ID):
-		file  = os.sep.join([DATADIR,BASEPLATE_DIR,BASEPLATE_FOLDER.format(MPC=MPC,ID=ID),BASEPLATE_DETAILS])
-		return _load_and_cast_dict(file,DETAILS_BASEPLATE)
-		
-	def changeBaseplateDetails(self,ID,change_dict,new=False):
-		folder = os.sep.join([DATADIR,BASEPLATE_DIR,BASEPLATE_FOLDER.format(MPC=MPC,ID=ID)])
-		file = os.sep.join([folder,BASEPLATE_DETAILS])
-		cast_to = DETAILS_BASEPLATE
+
+
+	#############################################
+	## loading, changing, and creating details ##
+	#############################################
+
+	def loadObjectDetails(self,objecttype,ID):
+		if objecttype == 'module':
+			return self._load_module_details(ID)
+		else:
+			return self._load_object_details(objecttype,ID)
+
+	def changeObjectDetails(self,objecttype,ID,change_dict,new=False):
+		if objecttype == 'module':
+			return self._change_module_details(ID,change_dict,new)
+		else:
+			return self._change_object_details(objecttype,ID,change_dict,new)
+
+	def _load_object_details(self,objecttype,ID):
+		file = DETAILS_FILES[objecttype].format(MPC=MPC,ID=ID)
+		return _load_and_cast_dict(file,CAST_DICTS[objecttype])
+
+	def _change_object_details(self,objecttype,ID,change_dict,new=False):
+		folder  = OBJECT_FOLDERS[objecttype].format(MPC=MPC,ID=ID)
+		file    = DETAILS_FILES[objecttype].format(MPC=MPC,ID=ID)
+		cast_to = CAST_DICTS[objecttype]
 		if new:
-			self._createBaseplate(ID)
+			self._create_object(objecttype,ID)
 			self._createDetails(ID,file,cast_to,change_dict)
 		else:
 			self._changeDetails(file,cast_to,change_dict)
 
+	def _create_object(self,objecttype,ID):
+		folder = OBJECT_FOLDERS[objecttype].format(MPC=MPC,ID=ID)
+		if os.path.exists(folder):
+			print("Warning: tried to create existing {} with ID {}".format(objecttype,ID))
+			return False
+		os.mkdir(folder)
+		return True
 
-	########################
-	### sensor functions ###
-	########################
-	def loadSensorDetails(self,ID):
-		file  = os.sep.join([DATADIR,SENSOR_DIR,SENSOR_FOLDER.format(MPC=MPC,ID=ID),SENSOR_DETAILS])
-		return _load_and_cast_dict(file,DETAILS_SENSOR)
+	def _createDetails(self, ID, file, cast_to, details):
+		#os.mkdir(folder)
+		cast_details = {}
+		cast_details.update([['ID',ID]])
+		for key,val in details.items():
+			val_cast = cast_to[key][0](val)
+			cast_details.update([[key,val_cast]])
+		_save_dict(cast_details, file)
 
-	def changeSensorDetails(self,ID,change_dict,new=False):
-		folder  = os.sep.join([DATADIR,SENSOR_DIR,SENSOR_FOLDER.format(MPC=MPC,ID=ID)])
-		file    = os.sep.join([folder,SENSOR_DETAILS])
-		cast_to = DETAILS_SENSOR
-		if new:
-			self._createSensor(ID)
-			self._createDetails(ID,file,cast_to,change_dict)
-		else:
-			self._changeDetails(file,cast_to,change_dict)
-
-
-	#####################
-	### PCB functions ###
-	#####################
-	def loadPCBDetails(self,ID):
-		file  = os.sep.join([DATADIR,PCB_DIR,PCB_FOLDER.format(MPC=MPC,ID=ID),PCB_DETAILS])
-		return _load_and_cast_dict(file,DETAILS_PCB)
-
-	def changePCBDetails(self,ID,change_dict,new=False):	
-		folder  = os.sep.join([DATADIR,PCB_DIR,PCB_FOLDER.format(MPC=MPC,ID=ID)])
-		file    = os.sep.join([folder,PCB_DETAILS])
-		cast_to = DETAILS_PCB
-		if new:
-			self._createPCB(ID)
-			self._createDetails(ID,file,cast_to,change_dict)
-		else:
-			self._changeDetails(file,cast_to,change_dict)
-
-
-	#############################
-	### kapton step functions ###
-	#############################
-	def loadKaptonStepDetails(self,ID):
-		file = os.sep.join([DATADIR,KAPTON_STEP_DIR,KAPTON_STEP_FOLDER.format(MPC=MPC,ID=ID),KAPTON_STEP_DETAILS])
-		return _load_and_cast_dict(file,DETAILS_KAPTON_STEP)
-
-	def changeKaptonStepDetails(self,ID,change_dict,new=False):
-		folder  = os.sep.join([DATADIR,KAPTON_STEP_DIR,KAPTON_STEP_FOLDER.format(MPC=MPC,ID=ID)])
-		file    = os.sep.join([folder,KAPTON_STEP_DETAILS])
-		cast_to = DETAILS_KAPTON_STEP
-		if new:
-			self._createKaptonStep(ID)
-			self._createDetails(ID,file,cast_to,change_dict)
-		else:
-			self._changeDetails(file,cast_to,change_dict)
+	def _changeDetails(self, file, cast_to, change_dict):
+		details = _load_and_cast_dict(file,cast_to)
+		for key,val in change_dict.items():
+			if key in details.keys():
+				try:
+					val = cast_to[key][0](val)
+					details[key] = val
+				except:
+					print("Warning: tried to change variable <{}> to value not interpretable as <{}>".format(key,cast_to[key][0]))
+			else:
+				print("Warning: tried to change value of invalid variable <{}>".format(key))
+		_save_dict(details,file)
 
 
 

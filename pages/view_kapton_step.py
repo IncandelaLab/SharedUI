@@ -1,4 +1,5 @@
-PAGE_NAME = 'view_kapton_step'
+PAGE_NAME = "view_kapton_step"
+OBJECTTYPE = "kapton_step"
 DEBUG = False
 
 class func(object):
@@ -71,7 +72,7 @@ class func(object):
 	@enforce_mode('view')
 	def update_info(self,ID=None,*args,**kwargs):
 		if ID is None:ID = self.page.sbKaptonStepID.value()
-		self.info = self.fm.loadKaptonStepDetails(ID)
+		self.info = self.fm.loadObjectDetails(OBJECTTYPE,ID)
 		self.updateElements(use_info = True)
 
 	@enforce_mode(['view','editing','creating'])
@@ -92,6 +93,7 @@ class func(object):
 				self.page.sbModule4.setValue(-1); self.page.sbModule4.clear()
 				self.page.sbModule5.setValue(-1); self.page.sbModule5.clear()
 				self.page.sbModule6.setValue(-1); self.page.sbModule6.clear()
+				self.page.leAralditeBatch.setText("")
 
 			else:
 				self.page.leWho.setText(          self.info['who']           )
@@ -108,6 +110,7 @@ class func(object):
 				self.page.sbModule4.setValue(     self.info['module_4']      )
 				self.page.sbModule5.setValue(     self.info['module_5']      )
 				self.page.sbModule6.setValue(     self.info['module_6']      )
+				self.page.leAralditeBatch.setText(self.info['araldite_batch'])
 
 				if self.info['module_1'] == -1: self.page.sbModule1.clear()
 				if self.info['module_2'] == -1: self.page.sbModule2.clear()
@@ -133,6 +136,7 @@ class func(object):
 		self.page.sbModule4.setReadOnly(      not (self.mode in ['editing','creating']) )
 		self.page.sbModule5.setReadOnly(      not (self.mode in ['editing','creating']) )
 		self.page.sbModule6.setReadOnly(      not (self.mode in ['editing','creating']) )
+		self.page.leAralditeBatch.setReadOnly(not (self.mode in ['editing','creating']) )
 
 		self.page.pbGoModule1.setEnabled( self.mode == 'view' and self.page.sbModule1.value()>=0 )
 		self.page.pbGoModule2.setEnabled( self.mode == 'view' and self.page.sbModule2.value()>=0 )
@@ -170,7 +174,6 @@ class func(object):
 
 	@enforce_mode(['editing','creating'])
 	def saveEditig(self,*args,**kwargs):
-		...
 		ID = self.page.sbKaptonStepID.value()
 		details = {
 			'ID'            : ID,
@@ -188,9 +191,10 @@ class func(object):
 			'module_4'      : self.page.sbModule4.value(),
 			'module_5'      : self.page.sbModule5.value(),
 			'module_6'      : self.page.sbModule6.value(),
+			'araldite_batch': str(self.page.leAralditeBatch.text()),
 			}
 		new = self.mode == 'creating'
-		self.fm.changeKaptonStepDetails(ID,details,new)
+		self.fm.changeObjectDetails(OBJECTTYPE,ID,details,new)
 		self.mode = 'view'
 		self.update_info()
 

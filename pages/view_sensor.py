@@ -1,6 +1,5 @@
-
-
 PAGE_NAME = "view_sensor"
+OBJECTTYPE = "sensor"
 DEBUG = False
 
 class func(object):
@@ -73,7 +72,7 @@ class func(object):
 	@enforce_mode('view')
 	def update_info(self,ID=None,*args,**kwargs):
 		if ID is None:ID = self.page.sbSensorID.value()
-		self.info = self.fm.loadSensorDetails(ID)
+		self.info = self.fm.loadObjectDetails(OBJECTTYPE,ID)
 		self.updateElements(use_info = True)
 
 	@enforce_mode(['view','editing','creating'])
@@ -151,7 +150,7 @@ class func(object):
 			'onModuleID'   : self.page.sbOnModule.value(),
 			}
 		new = self.mode == 'creating'
-		self.fm.changeSensorDetails(ID,details,new)
+		self.fm.changeObjectDetails(OBJECTTYPE,ID,details,new)
 		self.mode = 'view'
 		self.update_info()
 

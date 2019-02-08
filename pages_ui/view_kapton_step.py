@@ -153,6 +153,13 @@ class Ui_Form(object):
         self.pbKaptonStepSave = QtGui.QPushButton(Form)
         self.pbKaptonStepSave.setGeometry(QtCore.QRect(200, 40, 71, 21))
         self.pbKaptonStepSave.setObjectName(_fromUtf8("pbKaptonStepSave"))
+        self.leAralditeBatch = QtGui.QLineEdit(Form)
+        self.leAralditeBatch.setGeometry(QtCore.QRect(90, 360, 71, 20))
+        self.leAralditeBatch.setObjectName(_fromUtf8("leAralditeBatch"))
+        self.lineEdit_11 = QtGui.QLineEdit(Form)
+        self.lineEdit_11.setGeometry(QtCore.QRect(10, 360, 81, 21))
+        self.lineEdit_11.setReadOnly(True)
+        self.lineEdit_11.setObjectName(_fromUtf8("lineEdit_11"))
 
         self.retranslateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
@@ -179,4 +186,5 @@ class Ui_Form(object):
         self.pbKaptonStepEdit.setText(_translate("Form", "Edit", None))
         self.pbKaptonStepCancel.setText(_translate("Form", "Cancel", None))
         self.pbKaptonStepSave.setText(_translate("Form", "Save", None))
+        self.lineEdit_11.setText(_translate("Form", "Araldite batch#", None))
 
