@@ -1,6 +1,4 @@
-nstr = lambda v:''  if v is None else str(v)
-nflt = lambda v:0.0 if v is None else float(v)
-nint = lambda v:0   if v is None else int(v)
+
 
 PAGE_NAME = "view_pcb"
 DEBUG = False
@@ -82,26 +80,32 @@ class func(object):
 		if use_info:
 			if self.info is None:
 				self.page.leIdentifier.setText("")
-				self.page.dsbThickness.setValue(0.0)
+				self.page.dsbThickness.setValue(-1.0)
 				self.page.dsbThickness.clear()
-				self.page.dsbFlatness.setValue(0.0)
+				self.page.dsbFlatness.setValue(-1.0)
 				self.page.dsbFlatness.clear()
-				self.page.dsbSize.setValue(0.0)
+				self.page.dsbSize.setValue(-1.0)
 				self.page.dsbSize.clear()
-				self.page.sbChannels.setValue(0)
+				self.page.sbChannels.setValue(-1)
 				self.page.sbChannels.clear()
 				self.page.leManufacturer.setText("")
 				self.page.sbOnModule.setValue(-1)
 				self.page.sbOnModule.clear()
 
 			else:
-				self.page.leIdentifier.setText(nstr(self.info["identifier"]))
-				self.page.dsbThickness.setValue(nflt(self.info["thickness"]))
-				self.page.dsbFlatness.setValue(nflt(self.info["flatness"]))
-				self.page.dsbSize.setValue(nflt(self.info["size"]))
-				self.page.sbChannels.setValue(nint(self.info["channels"]))
-				self.page.leManufacturer.setText(nstr(self.info["manufacturer"]))
-				self.page.sbOnModule.setValue(nint(self.info["onModuleID"]))
+				self.page.leIdentifier.setText(   self.info["identifier"]   )
+				self.page.dsbThickness.setValue(  self.info["thickness"]    )
+				self.page.dsbFlatness.setValue(   self.info["flatness"]     )
+				self.page.dsbSize.setValue(       self.info["size"]         )
+				self.page.sbChannels.setValue(    self.info["channels"]     )
+				self.page.leManufacturer.setText( self.info["manufacturer"] )
+				self.page.sbOnModule.setValue(    self.info["onModuleID"]   )
+				if self.info["thickness"]    == -1.0:self.page.dsbThickness.clear()
+				if self.info["flatness"]     == -1.0:self.page.dsbFlatness.clear()
+				if self.info["size"]         == -1.0:self.page.dsbSize.clear()
+				if self.info["channels"]     == -1  :self.page.sbChannels.clear()
+				if self.info["onModuleID"]   == -1  :self.page.sbOnModule.clear()
+
 
 		self.page.pbPCBNew.setEnabled(    (self.mode == 'view') and     (self.info is None) )
 		self.page.pbPCBEdit.setEnabled(   (self.mode == 'view') and not (self.info is None) )

@@ -263,6 +263,9 @@
    <property name="readOnly">
     <bool>true</bool>
    </property>
+   <property name="minimum">
+    <double>-1.000000000000000</double>
+   </property>
    <property name="maximum">
     <double>2147483647.000000000000000</double>
    </property>
@@ -278,6 +281,9 @@
    </property>
    <property name="readOnly">
     <bool>true</bool>
+   </property>
+   <property name="minimum">
+    <number>-1</number>
    </property>
    <property name="maximum">
     <number>2147483647</number>

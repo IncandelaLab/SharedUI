@@ -14,9 +14,6 @@ LBL_CURRENT = 'current ({})'.format('microamps' if USE_MICROAMP else 'amps')
 LBL_VSOURCE = 'sourced voltage (volts)'
 LABELS = [LBL_TIME,LBL_VOLTAGE,LBL_CURRENT,LBL_VSOURCE]
 
-nstr = lambda v:''  if v is None else str(v)
-nflt = lambda v:0.0 if v is None else float(v)
-nint = lambda v:0   if v is None else int(v)
 
 class func(object):
 	def __init__(self,fm,page,setUIPage,setSwitchingEnabled):
@@ -93,6 +90,9 @@ class func(object):
 		self.page.pbGoBaseplate.clicked.connect(self.goBaseplate)
 		self.page.pbGoSensor.clicked.connect(self.goSensor)
 		self.page.pbGoPCB.clicked.connect(self.goPCB)
+		self.page.pbGoKaptonStep.clicked.connect(self.goKaptonStep)
+		self.page.pbGoSensorStep.clicked.connect(self.goSensorStep)
+		self.page.pbGoPCBStep.clicked.connect(self.goPCBStep)
 
 		self.page.cbIVCurves.currentIndexChanged.connect(self.updateIVData)
 		self.page.ckPlotAsc.stateChanged.connect(self.updateIVPlot)
@@ -114,21 +114,38 @@ class func(object):
 		if ID is None:ID = self.page.sbModuleID.value()
 		self.info, self.IVtests = self.fm.loadModuleDetails(ID)
 		self.updateElements(use_info=True)
+		#print(self.info)
 
 	@enforce_mode(['view','editing','creating'])
 	def updateElements(self,use_info = False):
 		if use_info:
 			if self.info is None:
-				self.page.sbBaseplateID.setValue(  -1);self.page.sbBaseplateID.clear()
-				self.page.sbSensorID.setValue(     -1);self.page.sbSensorID.clear()
-				self.page.sbPCBID.setValue(        -1);self.page.sbPCBID.clear()
-				self.page.dsbThickness.setValue(  0.0);self.page.dsbThickness.clear()
+				self.page.sbBaseplateID.setValue( -1  );self.page.sbBaseplateID.clear()
+				self.page.sbSensorID.setValue(    -1  );self.page.sbSensorID.clear()
+				self.page.sbPCBID.setValue(       -1  );self.page.sbPCBID.clear()
+				self.page.dsbThickness.setValue(  -1.0);self.page.dsbThickness.clear()
+				self.page.sbKaptonStep.setValue(  -1  );self.page.sbKaptonStep.clear()
+				self.page.sbSensorStep.setValue(  -1  );self.page.sbSensorStep.clear()
+				self.page.sbPCBStep.setValue(     -1  );self.page.sbPCBStep.clear()
 
 			else:
-				self.page.sbBaseplateID.setValue( nint(self.info['baseplate']) )
-				self.page.sbSensorID.setValue(    nint(self.info['sensor']   ) )
-				self.page.sbPCBID.setValue(       nint(self.info['PCB']      ) )
-				self.page.dsbThickness.setValue(  nflt(self.info['thickness']) )
+				self.page.sbBaseplateID.setValue( self.info['baseplate']  ) # Load values into UI elements
+				self.page.sbSensorID.setValue(    self.info['sensor']     ) # 
+				self.page.sbPCBID.setValue(       self.info['PCB']        ) # 
+				self.page.dsbThickness.setValue(  self.info['thickness']  ) # 
+				self.page.sbKaptonStep.setValue(  self.info['kaptonstep'] ) # 
+				self.page.sbSensorStep.setValue(  self.info['sensorstep'] ) # 
+				self.page.sbPCBStep.setValue(     self.info['PCBstep']    ) # 
+
+				if self.info['baseplate']  == -1  : self.page.sbBaseplateID.clear() # clear UI elements with "empty" values
+				if self.info['sensor']     == -1  : self.page.sbSensorID.clear()    #
+				if self.info['PCB']        == -1  : self.page.sbPCBID.clear()       #
+				if self.info['thickness']  == -1.0: self.page.dsbThickness.clear()  #
+				if self.info['kaptonstep'] == -1  : self.page.sbKaptonStep.clear()  #
+				if self.info['sensorstep'] == -1  : self.page.sbSensorStep.clear()  #
+				if self.info['PCBstep']    == -1  : self.page.sbPCBStep.clear()     #
+
+
 
 			self.page.cbIVCurves.clear()
 			if not (self.IVtests is None):
@@ -139,11 +156,14 @@ class func(object):
 		self.page.pbModuleSave.setEnabled(   self.mode in ['editing','creating'] )
 		self.page.pbModuleCancel.setEnabled( self.mode in ['editing','creating'] )
 
-		self.setMainSwitchingEnabled(       self.mode == 'view') 
-		self.page.pbGoPCB.setEnabled(      (self.mode == 'view') and (self.page.sbPCBID.value() >= 0)       )
-		self.page.pbGoSensor.setEnabled(   (self.mode == 'view') and (self.page.sbSensorID.value() >= 0)    )
-		self.page.pbGoBaseplate.setEnabled((self.mode == 'view') and (self.page.sbBaseplateID.value() >= 0) )
-		self.page.sbModuleID.setEnabled(    self.mode == 'view')
+		self.setMainSwitchingEnabled(         self.mode == 'view') 
+		self.page.pbGoPCB.setEnabled(        (self.mode == 'view') and (self.page.sbPCBID.value() >= 0)        )
+		self.page.pbGoSensor.setEnabled(     (self.mode == 'view') and (self.page.sbSensorID.value() >= 0)     )
+		self.page.pbGoBaseplate.setEnabled(  (self.mode == 'view') and (self.page.sbBaseplateID.value() >= 0)  )
+		self.page.pbGoKaptonStep.setEnabled( (self.mode == 'view') and (self.page.sbKaptonStep.value() >= 0) )
+		self.page.pbGoSensorStep.setEnabled( (self.mode == 'view') and (self.page.sbSensorStep.value() >= 0) )
+		self.page.pbGoPCBStep.setEnabled(    (self.mode == 'view') and (self.page.sbPCBStep.value() >= 0)    )
+		self.page.sbModuleID.setEnabled(      self.mode == 'view')
 
 		self.page.tabBinsRaw.setEnabled(    (self.mode == 'view') and not (self.info is None) )
 		self.tb.setEnabled(                 (self.mode == 'view') and not (self.info is None) )
@@ -154,6 +174,9 @@ class func(object):
 		self.page.sbBaseplateID.setReadOnly( not (self.mode in ['editing','creating']) )
 		self.page.sbSensorID.setReadOnly(    not (self.mode in ['editing','creating']) )
 		self.page.sbPCBID.setReadOnly(       not (self.mode in ['editing','creating']) )
+		self.page.sbKaptonStep.setReadOnly(  not (self.mode in ['editing','creating']) )
+		self.page.sbSensorStep.setReadOnly(  not (self.mode in ['editing','creating']) )
+		self.page.sbPCBStep.setReadOnly(     not (self.mode in ['editing','creating']) )
 
 	@enforce_mode('view')
 	def startCreating(self,*args,**kwargs):
@@ -185,14 +208,15 @@ class func(object):
 			'PCB'        : self.page.sbPCBID.value(),
 			'thickness'  : self.page.dsbThickness.value(),
 			# 'kaptontype' : 
-			# 'kaptonstep' : 
-			# 'sensorstep' : 
-			# 'PCBstep'    : 
+			'kaptonstep' : self.page.sbKaptonStep.value(),
+			'sensorstep' : self.page.sbSensorStep.value(),
+			'PCBstep'    : self.page.sbPCBStep.value(),
 			}
 		new = self.mode == 'creating'
 		self.fm.changeModuleDetails(ID,details,new)
 		self.mode = 'view'
 		self.update_info()
+
 
 	@enforce_mode('view')
 	def updateIVData(self,index,*args,**kwargs):
@@ -295,6 +319,25 @@ class func(object):
 			self.setUIPage('PCBs',ID=ID)
 		else:
 			return
+
+	@enforce_mode('view')
+	def goKaptonStep(self,*args,**kwargs):
+		print('go kapton')
+		ID = self.page.sbKaptonStep.value()
+		if ID>=0:
+			self.setUIPage('kapton placement steps',ID=ID)
+		else:
+			return
+
+	@enforce_mode('view')
+	def goSensorStep(self,*args,**kwargs):
+		print('go sensor')
+		...
+
+	@enforce_mode('view')
+	def goPCBStep(self,*args,**kwargs):
+		print('go PCB')
+		...
 
 
 

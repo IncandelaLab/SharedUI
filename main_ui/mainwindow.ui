@@ -38,7 +38,7 @@
         <item>
          <widget class="QListWidget" name="listInformation">
           <property name="currentRow">
-           <number>0</number>
+           <number>-1</number>
           </property>
           <item>
            <property name="text">
@@ -62,7 +62,17 @@
           </item>
           <item>
            <property name="text">
-            <string>assembly steps</string>
+            <string>kapton placement steps</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>sensor placement steps</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>PCB placement steps</string>
            </property>
           </item>
           <item>
@@ -93,7 +103,7 @@
         <item>
          <widget class="QLineEdit" name="lineEdit">
           <property name="text">
-           <string>Production and testing</string>
+           <string>Production and testing routines</string>
           </property>
          </widget>
         </item>

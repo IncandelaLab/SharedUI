@@ -1,6 +1,4 @@
-nstr = lambda v:''  if v is None else str(v)
-nflt = lambda v:0.0 if v is None else float(v)
-nint = lambda v:0   if v is None else int(v)
+
 
 
 PAGE_NAME = "view_baseplate"
@@ -100,11 +98,11 @@ class func(object):
 				self.currentBaseplateExists = False
 				self.page.leIdentifier.setText('')
 				self.page.leMaterial.setText('')
-				self.page.dsbNomThickness.setValue(0.0)
+				self.page.dsbNomThickness.setValue(-1.0)
 				self.page.dsbNomThickness.clear()
-				self.page.dsbFlatness.setValue(0.0)
+				self.page.dsbFlatness.setValue(-1.0)
 				self.page.dsbFlatness.clear()
-				self.page.dsbSize.setValue(0.0)
+				self.page.dsbSize.setValue(-1.0)
 				self.page.dsbSize.clear()
 				self.page.leManufacturer.setText('')
 				self.page.sbOnModule.setValue(-1)
@@ -117,19 +115,24 @@ class func(object):
 				self.page.dsbC5.setValue(0.0); self.page.dsbC5.clear()
 			else:
 				self.currentBaseplateExists = True
-				self.page.leIdentifier.setText(nstr(self.info['identifier']))
-				self.page.leMaterial.setText(nstr(self.info['material']))
-				self.page.dsbNomThickness.setValue(nflt(self.info['nomthickness']))
-				self.page.dsbFlatness.setValue(nflt(self.info['flatness']))
-				self.page.dsbSize.setValue(nflt(self.info['size']))
-				self.page.leManufacturer.setText(nstr(self.info['manufacturer']))
-				self.page.sbOnModule.setValue(nint(self.info['onModuleID']))
-				self.page.dsbC0.clear() if self.info['c0'] is None else self.page.dsbC0.setValue(self.info['c0'])
-				self.page.dsbC1.clear() if self.info['c1'] is None else self.page.dsbC1.setValue(self.info['c1'])
-				self.page.dsbC2.clear() if self.info['c2'] is None else self.page.dsbC2.setValue(self.info['c2'])
-				self.page.dsbC3.clear() if self.info['c3'] is None else self.page.dsbC3.setValue(self.info['c3'])
-				self.page.dsbC4.clear() if self.info['c4'] is None else self.page.dsbC4.setValue(self.info['c4'])
-				self.page.dsbC5.clear() if self.info['c5'] is None else self.page.dsbC5.setValue(self.info['c5'])
+				self.page.leIdentifier.setText(     self.info['identifier']   )
+				self.page.leMaterial.setText(       self.info['material']     )
+				self.page.dsbNomThickness.setValue( self.info['nomthickness'] )
+				self.page.dsbFlatness.setValue(     self.info['flatness']     )
+				self.page.dsbSize.setValue(         self.info['size']         )
+				self.page.leManufacturer.setText(   self.info['manufacturer'] )
+				self.page.sbOnModule.setValue(      self.info['onModuleID']   )
+				self.page.dsbC0.setValue(           self.info['c0']           )
+				self.page.dsbC1.setValue(           self.info['c1']           )
+				self.page.dsbC2.setValue(           self.info['c2']           )
+				self.page.dsbC3.setValue(           self.info['c3']           )
+				self.page.dsbC4.setValue(           self.info['c4']           )
+				self.page.dsbC5.setValue(           self.info['c5']           )
+
+				if self.info['nomthickness'] == -1.0: self.page.dsbNomThickness.clear()
+				if self.info['flatness']     == -1.0: self.page.dsbFlatness.clear()
+				if self.info['size']         == -1.0: self.page.dsbSize.clear()
+				if self.info['onModuleID']   == -1  : self.page.sbOnModule.clear()
 
 		self.page.pbEditCornerHeights.setEnabled((self.mode == 'view') and not (self.info is None)         )
 		self.page.pbGoModule.setEnabled(         (self.mode == 'view') and self.page.sbOnModule.value()>=0 )

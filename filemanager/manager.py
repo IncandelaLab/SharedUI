@@ -47,6 +47,18 @@ PCB_DIR     = 'PCBs'
 PCB_FOLDER  = 'PCB_{MPC}_{ID}'
 PCB_DETAILS = 'details.txt'
 
+STEP_DIR = 'steps'
+KAPTON_STEP_DIR = os.sep.join([STEP_DIR,'kapton_steps'])
+SENSOR_STEP_DIR = os.sep.join([STEP_DIR,'sensor_steps'])
+PCB_STEP_DIR    = os.sep.join([STEP_DIR,'PCB_steps'])
+KAPTON_STEP_FOLDER = 'kapton_step_{MPC}_{ID}'
+SENSOR_STEP_FOLDER = 'sensor_step_{MPC}_{ID}'
+PCB_STEP_FOLDER    = 'PCB_step_{MPC}_{ID}'
+KAPTON_STEP_DETAILS = 'details.txt'
+SENSOR_STEP_DETAILS = 'details.txt'
+PCB_STEP_DETAILS    = 'details.txt'
+
+
 DATADIR_SUBFOLDERS = [
 	MODULE_DIR,
 	BASEPLATE_DIR,
@@ -77,53 +89,71 @@ TEST_OBJECT_TEMPLATE_DIR = "setup_datadir"
 ### details vars ###
 ####################
 DETAILS_BASEPLATE = {
-	'ID'           : [int       ],
-	'identifier'   : [str  ,None],
-	'material'     : [str  ,None],
-	'nomthickness' : [float,None],
-	'flatness'     : [float,None],
-	'size'         : [float,None],
-	'manufacturer' : [str  ,None],
-	'onModuleID'   : [int  ,None],
-	'c0'           : [float,None],
-	'c1'           : [float,None],
-	'c2'           : [float,None],
-	'c3'           : [float,None],
-	'c4'           : [float,None],
-	'c5'           : [float,None],
+	'ID'           : [int        ],
+	'identifier'   : [str  , ""  ],
+	'material'     : [str  , ""  ],
+	'nomthickness' : [float, -1.0],
+	'flatness'     : [float, -1.0],
+	'size'         : [float, -1.0],
+	'manufacturer' : [str  , ""  ],
+	'onModuleID'   : [int  , -1  ],
+	'c0'           : [float,  0.0],
+	'c1'           : [float,  0.0],
+	'c2'           : [float,  0.0],
+	'c3'           : [float,  0.0],
+	'c4'           : [float,  0.0],
+	'c5'           : [float,  0.0],
 }
 
 DETAILS_SENSOR = {
 	'ID'           : [int        ],
-	'identifier'   : [str  , None],
-	'type'         : [str  , None],
-	'size'         : [float, None],
-	'channels'     : [int  , None],
-	'manufacturer' : [str  , None],
-	'onModuleID'   : [int  , None],
+	'identifier'   : [str  , ""  ],
+	'type'         : [str  , ""  ],
+	'size'         : [float, -1.0],
+	'channels'     : [int  , -1  ],
+	'manufacturer' : [str  , ""  ],
+	'onModuleID'   : [int  , -1  ],
 }
 
 DETAILS_PCB = {
 	'ID'           : [int        ],
-	'identifier'   : [str  , None],
-	'thickness'    : [float, None],
-	'flatness'     : [float, None],
-	'size'         : [float, None],
-	'channels'     : [int  , None],
-	'manufacturer' : [str  , None],
-	'onModuleID'   : [int  , None],
+	'identifier'   : [str  , ""  ],
+	'thickness'    : [float, -1.0],
+	'flatness'     : [float, -1.0],
+	'size'         : [float, -1.0],
+	'channels'     : [int  , -1  ],
+	'manufacturer' : [str  , ""  ],
+	'onModuleID'   : [int  , -1  ],
 }
 
 DETAILS_MODULE = {
 	'ID'         : [int        ],
-	'baseplate'  : [int  , None],
-	'sensor'     : [int  , None],
-	'PCB'        : [int  , None],
-	'thickness'  : [float, None],
-	'kaptontype' : [str  , None],
-	'kaptonstep' : [int  , None],
-	'sensorstep' : [int  , None],
-	'PCBstep'    : [int  , None],
+	'baseplate'  : [int  , -1  ],
+	'sensor'     : [int  , -1  ],
+	'PCB'        : [int  , -1  ],
+	'thickness'  : [float, -1.0],
+	'kaptontype' : [str  , -1  ],
+	'kaptonstep' : [int  , -1  ],
+	'sensorstep' : [int  , -1  ],
+	'PCBstep'    : [int  , -1  ],
+}
+
+DETAILS_KAPTON_STEP = {
+	'ID'            : [int       ],
+	'who'           : [str  , "" ],
+	'date'          : [str  , "" ],
+	'time'          : [str  , "" ],
+	'cure_start'    : [str  , "" ],
+	'cure_stop'     : [str  , "" ],
+	'cure_duration' : [str  , "" ],
+	'cure_temp'     : [str  , "" ],
+	'cure_hum'      : [str  , "" ],
+	'module_1'      : [int  , -1 ],
+	'module_2'      : [int  , -1 ],
+	'module_3'      : [int  , -1 ],
+	'module_4'      : [int  , -1 ],
+	'module_5'      : [int  , -1 ],
+	'module_6'      : [int  , -1 ],
 }
 
 nstr = lambda v:'' if v is None else str(v)
@@ -419,6 +449,14 @@ class manager(object):
 		os.mkdir(folder)
 		return True
 
+	def _createKaptonStep(self,ID):
+		folder = os.sep.join([DATADIR,KAPTON_STEP_DIR,KAPTON_STEP_FOLDER.format(MPC=MPC,ID=ID)])
+		if os.path.exists(filder):
+			print("Warning: tried to create existing kapton step with ID {}".format(ID))
+			return False
+		os.mkdir(folder)
+		return True
+
 	########################
 	### module functions ###
 	########################
@@ -512,6 +550,22 @@ class manager(object):
 			self._changeDetails(file,cast_to,change_dict)
 
 
+	#############################
+	### kapton step functions ###
+	#############################
+	def loadKaptonStepDetails(self,ID):
+		file = os.sep.join([DATADIR,KAPTON_STEP_DIR,KAPTON_STEP_FOLDER.format(MPC=MPC,ID=ID),KAPTON_STEP_DETAILS])
+		return _load_and_cast_dict(file,DETAILS_KAPTON_STEP)
+
+	def changeKaptonStepDetails(self,ID,change_dict,new=False):
+		folder  = os.sep.join([DATADIR,KAPTON_STEP_DIR,KAPTON_STEP_FOLDER.format(MPC=MPC,ID=ID)])
+		file    = os.sep.join([folder,KAPTON_STEP_DETAILS])
+		cast_to = DETAILS_KAPTON_STEP
+		if new:
+			self._createKaptonStep(ID)
+			self._createDetails(ID,file,cast_to,change_dict)
+		else:
+			self._changeDetails(file,cast_to,change_dict)
 
 
 
@@ -520,6 +574,8 @@ class manager(object):
 ################################################
 if __name__ == '__main__':
 	m = manager()
+	# m.changeKaptonStepDetails(0,{'who':'wo'})
+	# print(m.loadKaptonStepDetails(0))
 	print(m.loadModuleDetails(0))
 	print(m.loadBaseplateDetails(0))
 	print(m.loadSensorDetails(0))

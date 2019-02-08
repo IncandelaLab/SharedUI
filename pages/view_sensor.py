@@ -1,6 +1,4 @@
-nstr = lambda v:''  if v is None else str(v)
-nflt = lambda v:0.0 if v is None else float(v)
-nint = lambda v:0   if v is None else int(v)
+
 
 PAGE_NAME = "view_sensor"
 DEBUG = False
@@ -84,20 +82,25 @@ class func(object):
 			if self.info is None:
 				self.page.leIdentifier.setText("")
 				self.page.leType.setText("")
-				self.page.dsbSize.setValue(0.0)
+				self.page.dsbSize.setValue(-1.0)
 				self.page.dsbSize.clear()
-				self.page.sbChannels.setValue(0)
+				self.page.sbChannels.setValue(-1)
 				self.page.sbChannels.clear()
 				self.page.leManufacturer.setText("")
 				self.page.sbOnModule.setValue(-1)
 				self.page.sbOnModule.clear()
 			else:
-				self.page.leIdentifier.setText(nstr(self.info["identifier"]))
-				self.page.leType.setText(nstr(self.info["type"]))
-				self.page.dsbSize.setValue(nflt(self.info["size"]))
-				self.page.sbChannels.setValue(nint(self.info["channels"]))
-				self.page.leManufacturer.setText(nstr(self.info["manufacturer"]))
-				self.page.sbOnModule.setValue(nint(self.info["onModuleID"]))
+				self.page.leIdentifier.setText(   self.info["identifier"]   )
+				self.page.leType.setText(         self.info["type"]         )
+				self.page.dsbSize.setValue(       self.info["size"]         )
+				self.page.sbChannels.setValue(    self.info["channels"]     )
+				self.page.leManufacturer.setText( self.info["manufacturer"] )
+				self.page.sbOnModule.setValue(    self.info["onModuleID"]   )
+
+				if self.info["size"]         == -1.0: self.page.dsbSize.clear()
+				if self.info["channels"]     == -1  : self.page.sbChannels.clear()
+				if self.info["onModuleID"]   == -1  : self.page.sbOnModule.clear()
+
 
 		self.page.pbSensorNew.setEnabled(    (self.mode == 'view') and     (self.info is None) )
 		self.page.pbSensorEdit.setEnabled(   (self.mode == 'view') and not (self.info is None) )

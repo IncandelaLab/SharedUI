@@ -5,10 +5,11 @@ import sys
 import time
 
 # Import page functionality classes
-from pages.view_module    import func as c_func_view_module
-from pages.view_baseplate import func as c_func_view_baseplate
-from pages.view_sensor    import func as c_func_view_sensor
-from pages.view_PCB       import func as c_func_view_PCB
+from pages.view_module      import func as c_func_view_module
+from pages.view_baseplate   import func as c_func_view_baseplate
+from pages.view_sensor      import func as c_func_view_sensor
+from pages.view_PCB         import func as c_func_view_PCB
+from pages.view_kapton_step import func as c_func_view_kapton_step
 
 # Set up page widgets
 from pages_ui.view_module import Ui_Form as form_view_module
@@ -35,18 +36,27 @@ class widget_view_PCB(gui.QWidget,form_view_PCB):
 		super(widget_view_PCB,self).__init__(parent)
 		self.setupUi(self)
 
+from pages_ui.view_kapton_step import Ui_Form as form_view_kapton_step
+class widget_view_kapton_step(gui.QWidget,form_view_kapton_step):
+	def __init__(self,parent):
+		super(widget_view_kapton_step,self).__init__(parent)
+		self.setupUi(self)
+
+
 # Dict of page IDs by name (as the name shows up in the page list widgets)
 PAGE_IDS = {
 	'modules':0,
 	'baseplates':1,
 	'sensors':2,
 	'PCBs':3,
-	#'assembly steps':4,
+	'kapton placement steps':4,
+	#'sensor placement steps':5,
+	#'PCB placement steps':6,
 }
 	
 
-def get_timer_id():
-	"""generator for unique timer ID values"""
+def id_generator():
+	"""creates a generator for unique ID values"""
 	next_id = 0
 	while True:
 		yield next_id
@@ -80,34 +90,61 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 
 
 	def setupPagesUI(self):
-		self.page_view_module    = widget_view_module(None)    ; self.swPages.addWidget(self.page_view_module)
-		self.page_view_baseplate = widget_view_baseplate(None) ; self.swPages.addWidget(self.page_view_baseplate)
-		self.page_view_sensor    = widget_view_sensor(None)    ; self.swPages.addWidget(self.page_view_sensor)
-		self.page_view_PCB       = widget_view_PCB(None)       ; self.swPages.addWidget(self.page_view_PCB)
+		self.page_view_module      = widget_view_module(None)      ; self.swPages.addWidget(self.page_view_module)
+		self.page_view_baseplate   = widget_view_baseplate(None)   ; self.swPages.addWidget(self.page_view_baseplate)
+		self.page_view_sensor      = widget_view_sensor(None)      ; self.swPages.addWidget(self.page_view_sensor)
+		self.page_view_PCB         = widget_view_PCB(None)         ; self.swPages.addWidget(self.page_view_PCB)
+		self.page_view_kapton_step = widget_view_kapton_step(None) ; self.swPages.addWidget(self.page_view_kapton_step)
 
+	def initPages(self):
+		self.func_view_module      = c_func_view_module(      self.fm, self.page_view_module     , self.setUIPage, self.setSwitchingEnabled)
+		self.func_view_baseplate   = c_func_view_baseplate(   self.fm, self.page_view_baseplate  , self.setUIPage, self.setSwitchingEnabled)
+		self.func_view_sensor      = c_func_view_sensor(      self.fm, self.page_view_sensor     , self.setUIPage, self.setSwitchingEnabled)
+		self.func_view_PCB         = c_func_view_PCB(         self.fm, self.page_view_PCB        , self.setUIPage, self.setSwitchingEnabled)
+		self.func_view_kapton_step = c_func_view_kapton_step( self.fm, self.page_view_kapton_step, self.setUIPage, self.setSwitchingEnabled)
 
-	# def test_timer_event(self,*args,**kwargs):
-	# 	print("test timer event")
+		# This list must be in the same order that the pages are in in the stackedWidget in the main UI file.
+		# This is the same order as in the dict PAGE_IDS
+		self.func_list = [
+			self.func_view_module,
+			self.func_view_baseplate,
+			self.func_view_sensor,
+			self.func_view_PCB,
+			self.func_view_kapton_step
+			]
+
+	def rig(self):
+		self.listInformation.itemActivated.connect(self.changeUIPage)
+		self.listAssembly.itemActivated.connect(self.changeUIPage)
+		self.listShippingAndReceiving.itemActivated.connect(self.changeUIPage)
+		self.swPages.currentChanged.connect(self.pageChanged)
+
+		# later: add forward/back keyboard shortcuts (along with history support)
 
 	def timer_setup(self):
-		self.timer_id_gen = get_timer_id() # unique ID generator for timers
+		self.timer_id_gen = id_generator() # unique ID generator for timers
 		self.timers = {} # dict of timers {ID:timer}
-		#self.timer_add(1000,self.test_timer_event)
 
-	def timer_add(self,interval,cxn=None,start=True):
+
+
+	def timer_add(self,interval=None,cxn=None,start=False):
 		timer = core.QTimer(self)
 		ID    = next(self.timer_id_gen)
+		self.timers.update([ [ID, timer] ])
 
-		timer.setInterval(interval)
+		if not (interval is None):
+			self.timer_set_interval(ID,interval)
 
 		if not (cxn is None):
-			timer.timeout.connect(cxn)
+			self.timer_connect(ID,cxn)
 
 		if start:
-			timer.start()
+			if interval is None:
+				print("Warning: cannot start timer without interval")
+			else:
+				self.timer_start(ID)
 
-		self.timers.update([ [ID, timer] ])
-		#self.tslcs.update( [ [ID, 0.0  ] ])
+		return ID
 
 	def timer_remove(self,ID):
 		if ID in self.timers.keys():
@@ -149,21 +186,7 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 			print("Warning: tried to set interval of nonexistent timer with ID {} to {}".format(ID, interval_ms))
 
 
-
-	def initPages(self):
-		self.func_view_module    = c_func_view_module(    self.fm, self.page_view_module   , self.setUIPage, self.setSwitchingEnabled)
-		self.func_view_baseplate = c_func_view_baseplate( self.fm, self.page_view_baseplate, self.setUIPage, self.setSwitchingEnabled)
-		self.func_view_sensor    = c_func_view_sensor(    self.fm, self.page_view_sensor   , self.setUIPage, self.setSwitchingEnabled)
-		self.func_view_PCB       = c_func_view_PCB(       self.fm, self.page_view_PCB      , self.setUIPage, self.setSwitchingEnabled)
-
-		# This list must be in the same order that the pages are in in the stackedWidget in the main UI file.
-		# This is the same order as in the dict PAGE_IDS
-		self.func_list = [
-			self.func_view_module,
-			self.func_view_baseplate,
-			self.func_view_sensor,
-			self.func_view_PCB,
-			]
+	
 
 	def pageChanged(self,*args,**kwargs):
 		self.func_list[args[0]].changed_to()
@@ -189,13 +212,7 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 		self.listAssembly.setEnabled(enabled)
 		self.listShippingAndReceiving.setEnabled(enabled)
 
-	def rig(self):
-		self.listInformation.itemActivated.connect(self.changeUIPage)
-		self.listAssembly.itemActivated.connect(self.changeUIPage)
-		self.listShippingAndReceiving.itemActivated.connect(self.changeUIPage)
-		self.swPages.currentChanged.connect(self.pageChanged)
-
-		# later: add forward/back keyboard shortcuts (along with history support)
+	
 
 
 if __name__ == '__main__':
