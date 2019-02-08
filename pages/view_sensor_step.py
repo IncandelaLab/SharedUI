@@ -1,5 +1,5 @@
-PAGE_NAME = "view_kapton_step"
-OBJECTTYPE = "kapton_step"
+PAGE_NAME = "view_sensor_step"
+OBJECTTYPE = "sensor_step"
 DEBUG = False
 
 class func(object):
@@ -55,7 +55,7 @@ class func(object):
 
 	@enforce_mode('setup')
 	def rig(self):
-		self.page.sbKaptonStepID.valueChanged.connect(self.update_info)
+		self.page.sbSensorStepID.valueChanged.connect(self.update_info)
 		self.page.pbGoModule1.clicked.connect(self.goModule1)
 		self.page.pbGoModule2.clicked.connect(self.goModule2)
 		self.page.pbGoModule3.clicked.connect(self.goModule3)
@@ -63,15 +63,15 @@ class func(object):
 		self.page.pbGoModule5.clicked.connect(self.goModule5)
 		self.page.pbGoModule6.clicked.connect(self.goModule6)
 
-		self.page.pbKaptonStepNew.clicked.connect(self.startCreating)
-		self.page.pbKaptonStepEdit.clicked.connect(self.startEditing)
-		self.page.pbKaptonStepSave.clicked.connect(self.saveEditig)
-		self.page.pbKaptonStepCancel.clicked.connect(self.cancelEditing)
+		self.page.pbSensorStepNew.clicked.connect(self.startCreating)
+		self.page.pbSensorStepEdit.clicked.connect(self.startEditing)
+		self.page.pbSensorStepSave.clicked.connect(self.saveEditig)
+		self.page.pbSensorStepCancel.clicked.connect(self.cancelEditing)
 
 
 	@enforce_mode('view')
 	def update_info(self,ID=None,*args,**kwargs):
-		if ID is None:ID = self.page.sbKaptonStepID.value()
+		if ID is None:ID = self.page.sbSensorStepID.value()
 		self.info = self.fm.loadObjectDetails(OBJECTTYPE,ID)
 		self.updateElements(use_info = True)
 
@@ -100,6 +100,7 @@ class func(object):
 				self.page.sbTool5.setValue(-1); self.page.sbTool5.clear()
 				self.page.sbTool6.setValue(-1); self.page.sbTool6.clear()
 				self.page.leAralditeBatch.setText("")
+				self.page.leLoctiteBatch.setText("")
 
 			else:
 				self.page.leWho.setText(          self.info['who']           )
@@ -123,6 +124,7 @@ class func(object):
 				self.page.sbTool5.setValue(       self.info['tool_5']        )
 				self.page.sbTool6.setValue(       self.info['tool_6']        )
 				self.page.leAralditeBatch.setText(self.info['araldite_batch'])
+				self.page.leLoctiteBatch.setText( self.info['loctite_batch'] )
 
 				if self.info['module_1'] == -1: self.page.sbModule1.clear()
 				if self.info['module_2'] == -1: self.page.sbModule2.clear()
@@ -138,7 +140,7 @@ class func(object):
 				if self.info['tool_6'] == -1: self.page.sbTool6.clear()
 
 		self.setMainSwitchingEnabled( self.mode == 'view' )
-		self.page.sbKaptonStepID.setEnabled( self.mode == 'view' )
+		self.page.sbSensorStepID.setEnabled( self.mode == 'view' )
 
 		self.page.leWho.setReadOnly(          not (self.mode in ['editing','creating']) )
 		self.page.leDate.setReadOnly(         not (self.mode in ['editing','creating']) )
@@ -161,6 +163,7 @@ class func(object):
 		self.page.sbTool5.setReadOnly(        not (self.mode in ['editing','creating']) )
 		self.page.sbTool6.setReadOnly(        not (self.mode in ['editing','creating']) )
 		self.page.leAralditeBatch.setReadOnly(not (self.mode in ['editing','creating']) )
+		self.page.leLoctiteBatch.setReadOnly( not (self.mode in ['editing','creating']) )
 
 		self.page.pbGoModule1.setEnabled( self.mode == 'view' and self.page.sbModule1.value()>=0 )
 		self.page.pbGoModule2.setEnabled( self.mode == 'view' and self.page.sbModule2.value()>=0 )
@@ -169,10 +172,10 @@ class func(object):
 		self.page.pbGoModule5.setEnabled( self.mode == 'view' and self.page.sbModule5.value()>=0 )
 		self.page.pbGoModule6.setEnabled( self.mode == 'view' and self.page.sbModule6.value()>=0 )
 
-		self.page.pbKaptonStepNew.setEnabled(    (self.mode == 'view') and     (self.info is None) )
-		self.page.pbKaptonStepEdit.setEnabled(   (self.mode == 'view') and not (self.info is None) )
-		self.page.pbKaptonStepSave.setEnabled(    self.mode in ['editing','creating'] )
-		self.page.pbKaptonStepCancel.setEnabled(  self.mode in ['editing','creating'] )
+		self.page.pbSensorStepNew.setEnabled(    (self.mode == 'view') and     (self.info is None) )
+		self.page.pbSensorStepEdit.setEnabled(   (self.mode == 'view') and not (self.info is None) )
+		self.page.pbSensorStepSave.setEnabled(    self.mode in ['editing','creating'] )
+		self.page.pbSensorStepCancel.setEnabled(  self.mode in ['editing','creating'] )
 
 
 	@enforce_mode('view')
@@ -198,7 +201,7 @@ class func(object):
 
 	@enforce_mode(['editing','creating'])
 	def saveEditig(self,*args,**kwargs):
-		ID = self.page.sbKaptonStepID.value()
+		ID = self.page.sbSensorStepID.value()
 		details = {
 			'ID'            : ID,
 			'who'           : str(self.page.leWho.text()),
@@ -222,6 +225,7 @@ class func(object):
 			'tool_5'        : self.page.sbTool5.value(),
 			'tool_6'        : self.page.sbTool6.value(),
 			'araldite_batch': str(self.page.leAralditeBatch.text()),
+			'loctite_batch' : str(self.page.leLoctiteBatch.text()),
 			}
 		new = self.mode == 'creating'
 		self.fm.changeObjectDetails(OBJECTTYPE,ID,details,new)
@@ -284,7 +288,7 @@ class func(object):
 				raise TypeError("Expected type <int> for ID; got <{}>".format(type(ID)))
 			if ID < 0:
 				raise ValueError("ID cannot be negative")
-			self.page.sbKaptonStepID.setValue(ID)
+			self.page.sbSensorStepID.setValue(ID)
 
 	@enforce_mode('view')
 	def changed_to(self):

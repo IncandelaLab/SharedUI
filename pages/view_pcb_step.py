@@ -1,5 +1,5 @@
-PAGE_NAME = "view_kapton_step"
-OBJECTTYPE = "kapton_step"
+PAGE_NAME = "view_pcb_step"
+OBJECTTYPE = "PCB_step"
 DEBUG = False
 
 class func(object):
@@ -55,7 +55,7 @@ class func(object):
 
 	@enforce_mode('setup')
 	def rig(self):
-		self.page.sbKaptonStepID.valueChanged.connect(self.update_info)
+		self.page.sbPCBStepID.valueChanged.connect(self.update_info)
 		self.page.pbGoModule1.clicked.connect(self.goModule1)
 		self.page.pbGoModule2.clicked.connect(self.goModule2)
 		self.page.pbGoModule3.clicked.connect(self.goModule3)
@@ -63,15 +63,15 @@ class func(object):
 		self.page.pbGoModule5.clicked.connect(self.goModule5)
 		self.page.pbGoModule6.clicked.connect(self.goModule6)
 
-		self.page.pbKaptonStepNew.clicked.connect(self.startCreating)
-		self.page.pbKaptonStepEdit.clicked.connect(self.startEditing)
-		self.page.pbKaptonStepSave.clicked.connect(self.saveEditig)
-		self.page.pbKaptonStepCancel.clicked.connect(self.cancelEditing)
+		self.page.pbPCBStepNew.clicked.connect(self.startCreating)
+		self.page.pbPCBStepEdit.clicked.connect(self.startEditing)
+		self.page.pbPCBStepSave.clicked.connect(self.saveEditig)
+		self.page.pbPCBStepCancel.clicked.connect(self.cancelEditing)
 
 
 	@enforce_mode('view')
 	def update_info(self,ID=None,*args,**kwargs):
-		if ID is None:ID = self.page.sbKaptonStepID.value()
+		if ID is None:ID = self.page.sbPCBStepID.value()
 		self.info = self.fm.loadObjectDetails(OBJECTTYPE,ID)
 		self.updateElements(use_info = True)
 
@@ -138,7 +138,7 @@ class func(object):
 				if self.info['tool_6'] == -1: self.page.sbTool6.clear()
 
 		self.setMainSwitchingEnabled( self.mode == 'view' )
-		self.page.sbKaptonStepID.setEnabled( self.mode == 'view' )
+		self.page.sbPCBStepID.setEnabled( self.mode == 'view' )
 
 		self.page.leWho.setReadOnly(          not (self.mode in ['editing','creating']) )
 		self.page.leDate.setReadOnly(         not (self.mode in ['editing','creating']) )
@@ -169,10 +169,10 @@ class func(object):
 		self.page.pbGoModule5.setEnabled( self.mode == 'view' and self.page.sbModule5.value()>=0 )
 		self.page.pbGoModule6.setEnabled( self.mode == 'view' and self.page.sbModule6.value()>=0 )
 
-		self.page.pbKaptonStepNew.setEnabled(    (self.mode == 'view') and     (self.info is None) )
-		self.page.pbKaptonStepEdit.setEnabled(   (self.mode == 'view') and not (self.info is None) )
-		self.page.pbKaptonStepSave.setEnabled(    self.mode in ['editing','creating'] )
-		self.page.pbKaptonStepCancel.setEnabled(  self.mode in ['editing','creating'] )
+		self.page.pbPCBStepNew.setEnabled(    (self.mode == 'view') and     (self.info is None) )
+		self.page.pbPCBStepEdit.setEnabled(   (self.mode == 'view') and not (self.info is None) )
+		self.page.pbPCBStepSave.setEnabled(    self.mode in ['editing','creating'] )
+		self.page.pbPCBStepCancel.setEnabled(  self.mode in ['editing','creating'] )
 
 
 	@enforce_mode('view')
@@ -198,7 +198,7 @@ class func(object):
 
 	@enforce_mode(['editing','creating'])
 	def saveEditig(self,*args,**kwargs):
-		ID = self.page.sbKaptonStepID.value()
+		ID = self.page.sbPCBStepID.value()
 		details = {
 			'ID'            : ID,
 			'who'           : str(self.page.leWho.text()),
@@ -284,7 +284,7 @@ class func(object):
 				raise TypeError("Expected type <int> for ID; got <{}>".format(type(ID)))
 			if ID < 0:
 				raise ValueError("ID cannot be negative")
-			self.page.sbKaptonStepID.setValue(ID)
+			self.page.sbPCBStepID.setValue(ID)
 
 	@enforce_mode('view')
 	def changed_to(self):

@@ -23,13 +23,13 @@
     </rect>
    </property>
    <property name="text">
-    <string>Kapton step ID</string>
+    <string>Sensor step ID</string>
    </property>
    <property name="readOnly">
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QSpinBox" name="sbKaptonStepID">
+  <widget class="QSpinBox" name="sbSensorStepID">
    <property name="geometry">
     <rect>
      <x>100</x>
@@ -421,7 +421,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QPushButton" name="pbKaptonStepNew">
+  <widget class="QPushButton" name="pbSensorStepNew">
    <property name="geometry">
     <rect>
      <x>200</x>
@@ -434,7 +434,7 @@
     <string>New</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pbKaptonStepEdit">
+  <widget class="QPushButton" name="pbSensorStepEdit">
    <property name="geometry">
     <rect>
      <x>280</x>
@@ -447,7 +447,7 @@
     <string>Edit</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pbKaptonStepCancel">
+  <widget class="QPushButton" name="pbSensorStepCancel">
    <property name="geometry">
     <rect>
      <x>280</x>
@@ -460,7 +460,7 @@
     <string>Cancel</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pbKaptonStepSave">
+  <widget class="QPushButton" name="pbSensorStepSave">
    <property name="geometry">
     <rect>
      <x>200</x>
@@ -737,6 +737,32 @@
    </property>
    <property name="maximum">
     <number>2147483647</number>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_21">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>380</y>
+     <width>81</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Loctite batch#</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="leLoctiteBatch">
+   <property name="geometry">
+    <rect>
+     <x>90</x>
+     <y>380</y>
+     <width>71</width>
+     <height>20</height>
+    </rect>
    </property>
   </widget>
  </widget>

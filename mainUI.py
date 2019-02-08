@@ -10,6 +10,8 @@ from pages.view_baseplate   import func as c_func_view_baseplate
 from pages.view_sensor      import func as c_func_view_sensor
 from pages.view_PCB         import func as c_func_view_PCB
 from pages.view_kapton_step import func as c_func_view_kapton_step
+from pages.view_sensor_step import func as c_func_view_sensor_step
+from pages.view_pcb_step    import func as c_func_view_pcb_step
 
 # Set up page widgets
 from pages_ui.view_module import Ui_Form as form_view_module
@@ -42,6 +44,18 @@ class widget_view_kapton_step(gui.QWidget,form_view_kapton_step):
 		super(widget_view_kapton_step,self).__init__(parent)
 		self.setupUi(self)
 
+from pages_ui.view_sensor_step import Ui_Form as form_view_sensor_step
+class widget_view_sensor_step(gui.QWidget,form_view_sensor_step):
+	def __init__(self,parent):
+		super(widget_view_sensor_step,self).__init__(parent)
+		self.setupUi(self)
+
+from pages_ui.view_pcb_step import Ui_Form as form_view_pcb_step
+class widget_view_pcb_step(gui.QWidget, form_view_pcb_step):
+	def __init__(self,parent):
+		super(widget_view_pcb_step,self).__init__(parent)
+		self.setupUi(self)
+
 
 # Dict of page IDs by name (as the name shows up in the page list widgets)
 PAGE_IDS = {
@@ -50,8 +64,8 @@ PAGE_IDS = {
 	'sensors':2,
 	'PCBs':3,
 	'kapton placement steps':4,
-	#'sensor placement steps':5,
-	#'PCB placement steps':6,
+	'sensor placement steps':5,
+	'PCB placement steps':6,
 }
 	
 
@@ -95,6 +109,8 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 		self.page_view_sensor      = widget_view_sensor(None)      ; self.swPages.addWidget(self.page_view_sensor)
 		self.page_view_PCB         = widget_view_PCB(None)         ; self.swPages.addWidget(self.page_view_PCB)
 		self.page_view_kapton_step = widget_view_kapton_step(None) ; self.swPages.addWidget(self.page_view_kapton_step)
+		self.page_view_sensor_step = widget_view_sensor_step(None) ; self.swPages.addWidget(self.page_view_sensor_step)
+		self.page_view_pcb_step    = widget_view_pcb_step(None)    ; self.swPages.addWidget(self.page_view_pcb_step)
 
 	def initPages(self):
 		self.func_view_module      = c_func_view_module(      self.fm, self.page_view_module     , self.setUIPage, self.setSwitchingEnabled)
@@ -102,6 +118,8 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 		self.func_view_sensor      = c_func_view_sensor(      self.fm, self.page_view_sensor     , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_PCB         = c_func_view_PCB(         self.fm, self.page_view_PCB        , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_kapton_step = c_func_view_kapton_step( self.fm, self.page_view_kapton_step, self.setUIPage, self.setSwitchingEnabled)
+		self.func_view_sensor_step = c_func_view_sensor_step( self.fm, self.page_view_sensor_step, self.setUIPage, self.setSwitchingEnabled)
+		self.func_view_pcb_step    = c_func_view_pcb_step(    self.fm, self.page_view_pcb_step   , self.setUIPage, self.setSwitchingEnabled)
 
 		# This list must be in the same order that the pages are in in the stackedWidget in the main UI file.
 		# This is the same order as in the dict PAGE_IDS
@@ -110,7 +128,9 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 			self.func_view_baseplate,
 			self.func_view_sensor,
 			self.func_view_PCB,
-			self.func_view_kapton_step
+			self.func_view_kapton_step,
+			self.func_view_sensor_step,
+			self.func_view_pcb_step
 			]
 
 	def rig(self):

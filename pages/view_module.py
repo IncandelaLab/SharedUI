@@ -323,7 +323,6 @@ class func(object):
 
 	@enforce_mode('view')
 	def goKaptonStep(self,*args,**kwargs):
-		print('go kapton')
 		ID = self.page.sbKaptonStep.value()
 		if ID>=0:
 			self.setUIPage('kapton placement steps',ID=ID)
@@ -332,13 +331,19 @@ class func(object):
 
 	@enforce_mode('view')
 	def goSensorStep(self,*args,**kwargs):
-		print('go sensor')
-		...
+		ID = self.page.sbSensorStep.value()
+		if ID>=0:
+			self.setUIPage('sensor placement steps',ID=ID)
+		else:
+			return
 
 	@enforce_mode('view')
 	def goPCBStep(self,*args,**kwargs):
-		print('go PCB')
-		...
+		ID = self.page.sbPCBStep.value()
+		if ID>=0:
+			self.setUIPage('PCB placement steps',ID=ID)
+		else:
+			return
 
 
 

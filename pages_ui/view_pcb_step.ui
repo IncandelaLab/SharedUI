@@ -23,13 +23,13 @@
     </rect>
    </property>
    <property name="text">
-    <string>Kapton step ID</string>
+    <string>PCB step ID</string>
    </property>
    <property name="readOnly">
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QSpinBox" name="sbKaptonStepID">
+  <widget class="QSpinBox" name="sbPCBStepID">
    <property name="geometry">
     <rect>
      <x>100</x>
@@ -421,7 +421,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QPushButton" name="pbKaptonStepNew">
+  <widget class="QPushButton" name="pbPCBStepNew">
    <property name="geometry">
     <rect>
      <x>200</x>
@@ -434,7 +434,7 @@
     <string>New</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pbKaptonStepEdit">
+  <widget class="QPushButton" name="pbPCBStepEdit">
    <property name="geometry">
     <rect>
      <x>280</x>
@@ -447,7 +447,7 @@
     <string>Edit</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pbKaptonStepCancel">
+  <widget class="QPushButton" name="pbPCBStepCancel">
    <property name="geometry">
     <rect>
      <x>280</x>
@@ -460,7 +460,7 @@
     <string>Cancel</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pbKaptonStepSave">
+  <widget class="QPushButton" name="pbPCBStepSave">
    <property name="geometry">
     <rect>
      <x>200</x>
