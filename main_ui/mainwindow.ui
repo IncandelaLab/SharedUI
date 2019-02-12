@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1173</width>
-    <height>693</height>
+    <width>1366</width>
+    <height>810</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,7 +16,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
-     <layout class="QHBoxLayout" name="hlMainSections" stretch="8,1,22">
+     <layout class="QHBoxLayout" name="hlMainSections" stretch="8,1,40">
       <property name="spacing">
        <number>0</number>
       </property>
@@ -24,6 +24,9 @@
        <layout class="QVBoxLayout" name="vlUISelect" stretch="1,7,1,1,11,1,1,4">
         <property name="spacing">
          <number>0</number>
+        </property>
+        <property name="sizeConstraint">
+         <enum>QLayout::SetDefaultConstraint</enum>
         </property>
         <item>
          <widget class="QLineEdit" name="leInformation">
@@ -232,6 +235,9 @@
       </item>
       <item>
        <layout class="QHBoxLayout" name="hlUIpane">
+        <property name="spacing">
+         <number>0</number>
+        </property>
         <item>
          <widget class="QStackedWidget" name="swPages">
           <property name="frameShape">
@@ -250,7 +256,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1173</width>
+     <width>1366</width>
      <height>21</height>
     </rect>
    </property>

@@ -238,5 +238,6 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 if __name__ == '__main__':
 	app = gui.QApplication(sys.argv)
 	m=mainDesigner()
+	m.resize(1366,768)
 	m.show()
 	sys.exit(app.exec_())
