@@ -84,7 +84,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <item>
     <property name="text">
@@ -99,11 +99,6 @@
    <item>
     <property name="text">
      <string>Current</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Vsource</string>
     </property>
    </item>
   </widget>
@@ -133,7 +128,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>0</number>
    </property>
    <item>
     <property name="text">
@@ -148,11 +143,6 @@
    <item>
     <property name="text">
      <string>Current</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Vsource</string>
     </property>
    </item>
   </widget>
@@ -348,7 +338,7 @@
     <number>2147483647</number>
    </property>
    <property name="singleStep">
-    <number>0</number>
+    <number>1</number>
    </property>
    <property name="value">
     <number>0</number>
@@ -1335,19 +1325,6 @@ save date and time (+unix time?) in data file footer</string>
     <string>End routine</string>
    </property>
   </widget>
-  <widget class="QPlainTextEdit" name="plainTextEdit_2">
-   <property name="geometry">
-    <rect>
-     <x>830</x>
-     <y>140</y>
-     <width>261</width>
-     <height>121</height>
-    </rect>
-   </property>
-   <property name="placeholderText">
-    <string>write notes here</string>
-   </property>
-  </widget>
   <widget class="QLineEdit" name="lineEdit_27">
    <property name="geometry">
     <rect>
@@ -1359,6 +1336,19 @@ save date and time (+unix time?) in data file footer</string>
    </property>
    <property name="text">
     <string>Notes (saved with IV data file when routine is ended)</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QPlainTextEdit" name="plainTextEdit_2">
+   <property name="geometry">
+    <rect>
+     <x>830</x>
+     <y>140</y>
+     <width>261</width>
+     <height>121</height>
+    </rect>
    </property>
   </widget>
  </widget>

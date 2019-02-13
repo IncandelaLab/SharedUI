@@ -139,37 +139,22 @@
           </item>
           <item>
            <property name="text">
-            <string>pre-wirebonding DAQ</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
             <string>wirebonding</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>post-wirebonding 0v DAQ</string>
+            <string>DAQ (unbiased)</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>post-wirebonding IV &amp; biased DAQ</string>
+            <string>IV curve</string>
            </property>
           </item>
           <item>
            <property name="text">
             <string>encapsulation</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>post-encapsulation 0v DAQ</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>post-encapsulation IV &amp; biased DAQ</string>
            </property>
           </item>
          </widget>
