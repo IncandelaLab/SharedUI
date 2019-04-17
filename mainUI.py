@@ -74,6 +74,10 @@ PAGE_IDS = {
 	'PCB placement steps':6,
 	'IV curve':7,
 }
+
+# FUTURE_PAGES = [
+# 	''
+# ]
 	
 
 def id_generator():
@@ -232,6 +236,7 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 				self.func_list[PAGE_IDS[which_page]].setup()
 
 			self.swPages.setCurrentIndex(PAGE_IDS[which_page])
+			self.func_list[PAGE_IDS[which_page]].changed_to() # notify page function that page has been changed to
 			if len(kwargs) > 0:
 				self.func_list[PAGE_IDS[which_page]].load_kwargs(kwargs)
 		else:

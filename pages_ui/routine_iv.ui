@@ -84,7 +84,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <item>
     <property name="text">
@@ -128,7 +128,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>2</number>
    </property>
    <item>
     <property name="text">
@@ -382,7 +382,7 @@
     <string>Module exists?</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton">
+  <widget class="QPushButton" name="pbGoModule">
    <property name="geometry">
     <rect>
      <x>120</x>
@@ -426,7 +426,7 @@
     </property>
    </item>
   </widget>
-  <widget class="QPushButton" name="pushButton_2">
+  <widget class="QPushButton" name="pbRefreshComPorts">
    <property name="geometry">
     <rect>
      <x>0</x>
@@ -706,7 +706,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QDoubleSpinBox" name="doubleSpinBox">
+  <widget class="QDoubleSpinBox" name="dsbCurrentReadInterval">
    <property name="geometry">
     <rect>
      <x>350</x>
@@ -722,7 +722,7 @@
     <double>65535.000000000000000</double>
    </property>
   </widget>
-  <widget class="QSpinBox" name="spinBox">
+  <widget class="QSpinBox" name="sbAscStepSize">
    <property name="geometry">
     <rect>
      <x>350</x>
@@ -741,7 +741,7 @@
     <number>10</number>
    </property>
   </widget>
-  <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
+  <widget class="QDoubleSpinBox" name="dsbAscStepInterval">
    <property name="geometry">
     <rect>
      <x>350</x>
@@ -760,7 +760,7 @@
     <double>5.000000000000000</double>
    </property>
   </widget>
-  <widget class="QSpinBox" name="spinBox_2">
+  <widget class="QSpinBox" name="sbDescStepSize">
    <property name="geometry">
     <rect>
      <x>350</x>
@@ -779,7 +779,7 @@
     <number>10</number>
    </property>
   </widget>
-  <widget class="QDoubleSpinBox" name="doubleSpinBox_3">
+  <widget class="QDoubleSpinBox" name="dsbDescStepInterval">
    <property name="geometry">
     <rect>
      <x>350</x>
@@ -814,7 +814,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QSpinBox" name="spinBox_3">
+  <widget class="QSpinBox" name="sbTargetVoltage">
    <property name="geometry">
     <rect>
      <x>350</x>
@@ -836,7 +836,7 @@
     <number>1090</number>
    </property>
   </widget>
-  <widget class="QRadioButton" name="radioButton">
+  <widget class="QRadioButton" name="rbWaitTime">
    <property name="geometry">
     <rect>
      <x>210</x>
@@ -852,7 +852,7 @@
     <string notr="true">buttonGroup</string>
    </attribute>
   </widget>
-  <widget class="QRadioButton" name="radioButton_2">
+  <widget class="QRadioButton" name="rbWaitUser">
    <property name="geometry">
     <rect>
      <x>210</x>
@@ -871,7 +871,7 @@
     <string notr="true">buttonGroup</string>
    </attribute>
   </widget>
-  <widget class="QSpinBox" name="spinBox_4">
+  <widget class="QSpinBox" name="sbWaitAtTarget">
    <property name="geometry">
     <rect>
      <x>350</x>
@@ -887,7 +887,7 @@
     <number>600</number>
    </property>
   </widget>
-  <widget class="QCheckBox" name="checkBox">
+  <widget class="QCheckBox" name="ckStopCurrent">
    <property name="geometry">
     <rect>
      <x>210</x>
@@ -903,7 +903,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QCheckBox" name="checkBox_2">
+  <widget class="QCheckBox" name="ckStopPower">
    <property name="geometry">
     <rect>
      <x>210</x>
@@ -916,7 +916,7 @@
     <string>Stop if  P(mW)       &gt; </string>
    </property>
   </widget>
-  <widget class="QCheckBox" name="checkBox_3">
+  <widget class="QCheckBox" name="ckDescPower">
    <property name="geometry">
     <rect>
      <x>210</x>
@@ -929,7 +929,7 @@
     <string>Descend if  P(mW) &gt; </string>
    </property>
   </widget>
-  <widget class="QCheckBox" name="checkBox_4">
+  <widget class="QCheckBox" name="ckDescCurrent">
    <property name="geometry">
     <rect>
      <x>210</x>
@@ -945,7 +945,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QDoubleSpinBox" name="doubleSpinBox_4">
+  <widget class="QDoubleSpinBox" name="dsbStopCurrent">
    <property name="geometry">
     <rect>
      <x>330</x>
@@ -961,7 +961,7 @@
     <double>2.000000000000000</double>
    </property>
   </widget>
-  <widget class="QDoubleSpinBox" name="doubleSpinBox_5">
+  <widget class="QDoubleSpinBox" name="dsbStopPower">
    <property name="geometry">
     <rect>
      <x>330</x>
@@ -977,7 +977,7 @@
     <double>2.000000000000000</double>
    </property>
   </widget>
-  <widget class="QDoubleSpinBox" name="doubleSpinBox_6">
+  <widget class="QDoubleSpinBox" name="dsbDescPower">
    <property name="geometry">
     <rect>
      <x>330</x>
@@ -993,7 +993,7 @@
     <double>10.000000000000000</double>
    </property>
   </widget>
-  <widget class="QDoubleSpinBox" name="doubleSpinBox_7">
+  <widget class="QDoubleSpinBox" name="dsbDescCurrent">
    <property name="geometry">
     <rect>
      <x>330</x>
@@ -1009,7 +1009,7 @@
     <double>10.000000000000000</double>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_3">
+  <widget class="QPushButton" name="pbRoutineStart">
    <property name="geometry">
     <rect>
      <x>450</x>
@@ -1022,7 +1022,7 @@
     <string>Start</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_4">
+  <widget class="QPushButton" name="pbRoutinePause">
    <property name="geometry">
     <rect>
      <x>450</x>
@@ -1035,7 +1035,7 @@
     <string>Pause</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_5">
+  <widget class="QPushButton" name="pbRoutineResume">
    <property name="geometry">
     <rect>
      <x>450</x>
@@ -1048,7 +1048,7 @@
     <string>Resume</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_6">
+  <widget class="QPushButton" name="pbRoutineDescend">
    <property name="geometry">
     <rect>
      <x>450</x>
@@ -1061,7 +1061,7 @@
     <string>Begin descent</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_17">
+  <widget class="QLineEdit" name="leStage">
    <property name="geometry">
     <rect>
      <x>560</x>
@@ -1080,7 +1080,7 @@
     <string>stage</string>
    </property>
   </widget>
-  <widget class="QProgressBar" name="progressBar">
+  <widget class="QProgressBar" name="prStage">
    <property name="geometry">
     <rect>
      <x>710</x>
@@ -1099,7 +1099,7 @@
     <bool>false</bool>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_18">
+  <widget class="QLineEdit" name="leActivity">
    <property name="geometry">
     <rect>
      <x>560</x>
@@ -1118,7 +1118,7 @@
     <string>activity</string>
    </property>
   </widget>
-  <widget class="QProgressBar" name="progressBar_2">
+  <widget class="QProgressBar" name="prActivity">
    <property name="enabled">
     <bool>true</bool>
    </property>
@@ -1213,7 +1213,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_23">
+  <widget class="QLineEdit" name="leDispBiasVoltage">
    <property name="geometry">
     <rect>
      <x>650</x>
@@ -1229,7 +1229,7 @@
     <string>bias voltage</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_24">
+  <widget class="QLineEdit" name="leDispCurrent">
    <property name="geometry">
     <rect>
      <x>650</x>
@@ -1245,7 +1245,7 @@
     <string>current</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_25">
+  <widget class="QLineEdit" name="leDispHumifity">
    <property name="enabled">
     <bool>false</bool>
    </property>
@@ -1264,7 +1264,7 @@
     <string>humidity</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_26">
+  <widget class="QLineEdit" name="leDispTemperature">
    <property name="enabled">
     <bool>false</bool>
    </property>
@@ -1283,7 +1283,7 @@
     <string>temperature</string>
    </property>
   </widget>
-  <widget class="QPlainTextEdit" name="plainTextEdit">
+  <widget class="QPlainTextEdit" name="pteConsole">
    <property name="geometry">
     <rect>
      <x>450</x>
@@ -1304,15 +1304,14 @@
     <string> 0:00:00 test statement
 10:00:00 test statement 2
 22:14:07 test statement 3
-23:59:59 this string is too long for a single line
-         so we will split it and add spaces
+23:59:59 this string is too long for one line so we let line wrap do it
 ____0____1____2____3____4____5____6____7____8____9____a____b____c____d____e____f____
 
 display only time in console (this)
 save date and time (+unix time?) in data file footer</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_7">
+  <widget class="QPushButton" name="pbRoutineEnd">
    <property name="geometry">
     <rect>
      <x>450</x>
@@ -1341,7 +1340,7 @@ save date and time (+unix time?) in data file footer</string>
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QPlainTextEdit" name="plainTextEdit_2">
+  <widget class="QPlainTextEdit" name="pteNotes">
    <property name="geometry">
     <rect>
      <x>830</x>

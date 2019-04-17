@@ -84,29 +84,30 @@ class func(object):
 		self.tb  = NavigationToolbar(self.fc,self.page)
 		self.page.vlPlotIV.addWidget(self.tb)
 		self.page.vlPlotIV.addWidget(self.fc)
+		self.fig.subplots_adjust(left=0.06,right=0.995,top=0.995,bottom=0.102)
 
 	@enforce_mode('setup')
 	def rig(self):
-		self.page.sbModuleID.valueChanged.connect(self.update_info)
-		self.page.pbGoBaseplate.clicked.connect(self.goBaseplate)
-		self.page.pbGoSensor.clicked.connect(self.goSensor)
-		self.page.pbGoPCB.clicked.connect(self.goPCB)
-		self.page.pbGoKaptonStep.clicked.connect(self.goKaptonStep)
-		self.page.pbGoSensorStep.clicked.connect(self.goSensorStep)
-		self.page.pbGoPCBStep.clicked.connect(self.goPCBStep)
+		self.page.sbModuleID    .valueChanged.connect(self.update_info )
+		self.page.pbGoBaseplate .clicked     .connect(self.goBaseplate )
+		self.page.pbGoSensor    .clicked     .connect(self.goSensor    )
+		self.page.pbGoPCB       .clicked     .connect(self.goPCB       )
+		self.page.pbGoKaptonStep.clicked     .connect(self.goKaptonStep)
+		self.page.pbGoSensorStep.clicked     .connect(self.goSensorStep)
+		self.page.pbGoPCBStep   .clicked     .connect(self.goPCBStep   )
 
-		self.page.cbIVCurves.currentIndexChanged.connect(self.updateIVData)
-		self.page.ckPlotAsc.stateChanged.connect(self.updateIVPlot)
-		self.page.ckPlotDesc.stateChanged.connect(self.updateIVPlot)
+		self.page.cbIVCurves .currentIndexChanged.connect(self.updateIVData)
+		self.page.ckPlotAsc  .stateChanged       .connect(self.updateIVPlot)
+		self.page.ckPlotDesc .stateChanged       .connect(self.updateIVPlot)
 		self.page.cbBinsXAxis.currentIndexChanged.connect(self.updateIVPlot)
 		self.page.cbBinsYAxis.currentIndexChanged.connect(self.updateIVPlot)
-		self.page.cbRawXAxis.currentIndexChanged.connect(self.updateIVPlot)
-		self.page.cbRawYAxis.currentIndexChanged.connect(self.updateIVPlot)
-		self.page.tabBinsRaw.currentChanged.connect(self.updateIVPlot)
+		self.page.cbRawXAxis .currentIndexChanged.connect(self.updateIVPlot)
+		self.page.cbRawYAxis .currentIndexChanged.connect(self.updateIVPlot)
+		self.page.tabBinsRaw .currentChanged     .connect(self.updateIVPlot)
 
-		self.page.pbModuleNew.clicked.connect(self.startCreating)
-		self.page.pbModuleEdit.clicked.connect(self.startEditing)
-		self.page.pbModuleSave.clicked.connect(self.saveEditig)
+		self.page.pbModuleNew   .clicked.connect(self.startCreating)
+		self.page.pbModuleEdit  .clicked.connect(self.startEditing )
+		self.page.pbModuleSave  .clicked.connect(self.saveEditig   )
 		self.page.pbModuleCancel.clicked.connect(self.cancelEditing)
 
 
@@ -121,63 +122,62 @@ class func(object):
 	def updateElements(self,use_info = False):
 		if use_info:
 			if self.info is None:
-				self.page.sbBaseplateID.setValue( -1  );self.page.sbBaseplateID.clear()
-				self.page.sbSensorID.setValue(    -1  );self.page.sbSensorID.clear()
-				self.page.sbPCBID.setValue(       -1  );self.page.sbPCBID.clear()
-				self.page.dsbThickness.setValue(  -1.0);self.page.dsbThickness.clear()
-				self.page.sbKaptonStep.setValue(  -1  );self.page.sbKaptonStep.clear()
-				self.page.sbSensorStep.setValue(  -1  );self.page.sbSensorStep.clear()
-				self.page.sbPCBStep.setValue(     -1  );self.page.sbPCBStep.clear()
+				self.page.sbBaseplateID.setValue(-1  ); self.page.sbBaseplateID.clear()
+				self.page.sbSensorID   .setValue(-1  ); self.page.sbSensorID   .clear()
+				self.page.sbPCBID      .setValue(-1  ); self.page.sbPCBID      .clear()
+				self.page.dsbThickness .setValue(-1.0); self.page.dsbThickness .clear()
+				self.page.sbKaptonStep .setValue(-1  ); self.page.sbKaptonStep .clear()
+				self.page.sbSensorStep .setValue(-1  ); self.page.sbSensorStep .clear()
+				self.page.sbPCBStep    .setValue(-1  ); self.page.sbPCBStep    .clear()
 
 			else:
-				self.page.sbBaseplateID.setValue( self.info['baseplate']  ) # Load values into UI elements
-				self.page.sbSensorID.setValue(    self.info['sensor']     ) # 
-				self.page.sbPCBID.setValue(       self.info['PCB']        ) # 
-				self.page.dsbThickness.setValue(  self.info['thickness']  ) # 
-				self.page.sbKaptonStep.setValue(  self.info['kaptonstep'] ) # 
-				self.page.sbSensorStep.setValue(  self.info['sensorstep'] ) # 
-				self.page.sbPCBStep.setValue(     self.info['PCBstep']    ) # 
+				self.page.sbBaseplateID.setValue(self.info['baseplate' ]) # Load values into UI elements
+				self.page.sbSensorID   .setValue(self.info['sensor'    ]) # 
+				self.page.sbPCBID      .setValue(self.info['PCB'       ]) # 
+				self.page.dsbThickness .setValue(self.info['thickness' ]) # 
+				self.page.sbKaptonStep .setValue(self.info['kaptonstep']) # 
+				self.page.sbSensorStep .setValue(self.info['sensorstep']) # 
+				self.page.sbPCBStep    .setValue(self.info['PCBstep'   ]) # 
 
-				if self.info['baseplate']  == -1  : self.page.sbBaseplateID.clear() # clear UI elements with "empty" values
-				if self.info['sensor']     == -1  : self.page.sbSensorID.clear()    #
-				if self.info['PCB']        == -1  : self.page.sbPCBID.clear()       #
-				if self.info['thickness']  == -1.0: self.page.dsbThickness.clear()  #
-				if self.info['kaptonstep'] == -1  : self.page.sbKaptonStep.clear()  #
-				if self.info['sensorstep'] == -1  : self.page.sbSensorStep.clear()  #
-				if self.info['PCBstep']    == -1  : self.page.sbPCBStep.clear()     #
-
-
+				if self.info['baseplate' ] == -1  : self.page.sbBaseplateID.clear() # clear UI elements with "empty" values
+				if self.info['sensor'    ] == -1  : self.page.sbSensorID   .clear() #
+				if self.info['PCB'       ] == -1  : self.page.sbPCBID      .clear() #
+				if self.info['thickness' ] == -1.0: self.page.dsbThickness .clear() #
+				if self.info['kaptonstep'] == -1  : self.page.sbKaptonStep .clear() #
+				if self.info['sensorstep'] == -1  : self.page.sbSensorStep .clear() #
+				if self.info['PCBstep'   ] == -1  : self.page.sbPCBStep    .clear() #
 
 			self.page.cbIVCurves.clear()
 			if not (self.IVtests is None):
 				self.page.cbIVCurves.addItems(self.IVtests)
 
-		self.page.pbModuleNew.setEnabled(   (self.mode == 'view') and     (self.info is None) )
-		self.page.pbModuleEdit.setEnabled(  (self.mode == 'view') and not (self.info is None) )
-		self.page.pbModuleSave.setEnabled(   self.mode in ['editing','creating'] )
-		self.page.pbModuleCancel.setEnabled( self.mode in ['editing','creating'] )
+		self.setMainSwitchingEnabled(self.mode == 'view') 
 
-		self.setMainSwitchingEnabled(         self.mode == 'view') 
-		self.page.pbGoPCB.setEnabled(        (self.mode == 'view') and (self.page.sbPCBID.value() >= 0)        )
-		self.page.pbGoSensor.setEnabled(     (self.mode == 'view') and (self.page.sbSensorID.value() >= 0)     )
-		self.page.pbGoBaseplate.setEnabled(  (self.mode == 'view') and (self.page.sbBaseplateID.value() >= 0)  )
-		self.page.pbGoKaptonStep.setEnabled( (self.mode == 'view') and (self.page.sbKaptonStep.value() >= 0) )
-		self.page.pbGoSensorStep.setEnabled( (self.mode == 'view') and (self.page.sbSensorStep.value() >= 0) )
-		self.page.pbGoPCBStep.setEnabled(    (self.mode == 'view') and (self.page.sbPCBStep.value() >= 0)    )
-		self.page.sbModuleID.setEnabled(      self.mode == 'view')
+		self.page.pbModuleNew   .setEnabled( (self.mode == 'view') and     (self.info is None) )
+		self.page.pbModuleEdit  .setEnabled( (self.mode == 'view') and not (self.info is None) )
+		self.page.pbModuleSave  .setEnabled(  self.mode in ['editing','creating'] )
+		self.page.pbModuleCancel.setEnabled(  self.mode in ['editing','creating'] )
 
-		self.page.tabBinsRaw.setEnabled(    (self.mode == 'view') and not (self.info is None) )
-		self.tb.setEnabled(                 (self.mode == 'view') and not (self.info is None) )
-		self.fc.setEnabled(                 (self.mode == 'view') and not (self.info is None) )
-		self.page.cbIVCurves.setEnabled(    (self.mode == 'view') and not (self.info is None) )
+		self.page.pbGoPCB       .setEnabled( (self.mode == 'view') and (self.page.sbPCBID      .value() >= 0) )
+		self.page.pbGoSensor    .setEnabled( (self.mode == 'view') and (self.page.sbSensorID   .value() >= 0) )
+		self.page.pbGoBaseplate .setEnabled( (self.mode == 'view') and (self.page.sbBaseplateID.value() >= 0) )
+		self.page.pbGoKaptonStep.setEnabled( (self.mode == 'view') and (self.page.sbKaptonStep .value() >= 0) )
+		self.page.pbGoSensorStep.setEnabled( (self.mode == 'view') and (self.page.sbSensorStep .value() >= 0) )
+		self.page.pbGoPCBStep   .setEnabled( (self.mode == 'view') and (self.page.sbPCBStep    .value() >= 0) )
+		self.page.sbModuleID    .setEnabled(  self.mode == 'view')
 
-		self.page.dsbThickness.setReadOnly(  not (self.mode in ['editing','creating']) )
+		self.page.tabBinsRaw.setEnabled( (self.mode == 'view') and not (self.info is None) )
+		self.page.cbIVCurves.setEnabled( (self.mode == 'view') and not (self.info is None) )
+		self.tb             .setEnabled( (self.mode == 'view') and not (self.info is None) )
+		self.fc             .setEnabled( (self.mode == 'view') and not (self.info is None) )
+
+		self.page.dsbThickness .setReadOnly( not (self.mode in ['editing','creating']) )
 		self.page.sbBaseplateID.setReadOnly( not (self.mode in ['editing','creating']) )
-		self.page.sbSensorID.setReadOnly(    not (self.mode in ['editing','creating']) )
-		self.page.sbPCBID.setReadOnly(       not (self.mode in ['editing','creating']) )
-		self.page.sbKaptonStep.setReadOnly(  not (self.mode in ['editing','creating']) )
-		self.page.sbSensorStep.setReadOnly(  not (self.mode in ['editing','creating']) )
-		self.page.sbPCBStep.setReadOnly(     not (self.mode in ['editing','creating']) )
+		self.page.sbSensorID   .setReadOnly( not (self.mode in ['editing','creating']) )
+		self.page.sbPCBID      .setReadOnly( not (self.mode in ['editing','creating']) )
+		self.page.sbKaptonStep .setReadOnly( not (self.mode in ['editing','creating']) )
+		self.page.sbSensorStep .setReadOnly( not (self.mode in ['editing','creating']) )
+		self.page.sbPCBStep    .setReadOnly( not (self.mode in ['editing','creating']) )
 
 	@enforce_mode('view')
 	def startCreating(self,*args,**kwargs):
@@ -247,13 +247,13 @@ class func(object):
 	@enforce_mode('view')
 	def updateIVPlot(self,*args,**kwargs):
 		print("Update plot!")
-		tab = self.page.tabBinsRaw.currentIndex()
-		bins_asc  = self.page.ckPlotAsc.isChecked()
-		bins_desc = self.page.ckPlotDesc.isChecked()
-		bins_x = self.page.cbBinsXAxis.currentIndex()
-		bins_y = self.page.cbBinsYAxis.currentIndex()
-		raw_x = self.page.cbRawXAxis.currentIndex()
-		raw_y = self.page.cbRawYAxis.currentIndex()
+		tab       = self.page.tabBinsRaw .currentIndex()
+		bins_asc  = self.page.ckPlotAsc  .isChecked()
+		bins_desc = self.page.ckPlotDesc .isChecked()
+		bins_x    = self.page.cbBinsXAxis.currentIndex()
+		bins_y    = self.page.cbBinsYAxis.currentIndex()
+		raw_x     = self.page.cbRawXAxis .currentIndex()
+		raw_y     = self.page.cbRawYAxis .currentIndex()
 
 		if self.ivData is None:
 			self.ax.clear()
