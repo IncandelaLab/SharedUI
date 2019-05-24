@@ -162,7 +162,7 @@ class Ui_MainWindow(object):
         item = self.listInformation.item(7)
         item.setText(_translate("MainWindow", "supplies", None))
         item = self.listInformation.item(8)
-        item.setText(_translate("MainWindow", "equipment", None))
+        item.setText(_translate("MainWindow", "tooling", None))
         self.listInformation.setSortingEnabled(__sortingEnabled)
         self.lineEdit.setText(_translate("MainWindow", "Production and testing routines", None))
         __sortingEnabled = self.listAssembly.isSortingEnabled()
