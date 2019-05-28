@@ -2,6 +2,95 @@ PAGE_NAME = "view_tooling"
 #OBJECTTYPE = "sensor_step"
 DEBUG = False
 
+class simple_fsobj_vc(object):
+	def __init__(self,
+		fsobj,
+		sbID,
+		dsbSize,
+		pbEditNew,
+		pbSave,
+		pbCancel,
+		listComments,
+		pteWriteComment,
+		pbDeleteComment,
+		pbAddComment,
+		):
+
+		self.fsobj_exists    = None
+		self.fsobj           = fsobj
+		self.sbID            = sbID
+		self.dsbSize         = dsbSize
+		self.pbEditNew       = pbEditNew
+		self.pbSave          = pbSave
+		self.pbCancel        = pbCancel
+		self.listComments    = listComments
+		self.pteWriteComment = pteWriteComment
+		self.pbDeleteComment = pbDeleteComment
+		self.pbAddComment    = pbAddComment
+
+	def update_info(self,ID=None,*args,**kwargs):
+		if ID is None:
+			ID = self.sbID.value()
+		else:
+			self.sbID.setValue(ID)
+		self.fsobj_exists = self.fsobj.load(ID)
+
+		if self.fsobj_exists:
+			self.pbEditNew.setText("edit")
+			if self.fsobj.size is None:
+				self.dsbSize.setValue(0)
+				self.dsbSize.clear()
+			else:
+				self.dsbSize.setValue(self.fsobj.size)
+			self.listComments.clear()
+			for comment in self.fsobj.comments:
+				self.listComments.addItem(comment)
+			self.pteWriteComment.clear()
+
+		else:
+			self.pbEditNew.setText("new")
+			self.dsbSize.setValue(0)
+			self.dsbSize.clear()
+			self.listComments.clear()
+			self.pteWriteComment.clear()
+
+	def start_editing(self,*args,**kwargs):
+		#self.mode = 'editing_sensor_tool'
+		if not self.fsobj_exists:
+			self.fsobj.new(self.sbID.value())
+		#self.update_elements()
+
+	def cancel_editing(self,*args,**kwargs):
+		#self.mode='view'
+		#self.update_elements()
+		self.update_info()
+
+	def save_editing(self,*args,**kwargs):
+		comments = []
+		for i in range(self.listComments.count()):
+			comments.append(self.listComments.item(i).text())
+		self.fsobj.comments = comments
+		size = self.dsbSize.value()
+		if size == 0.0:
+			size = None
+		self.fsobj.size = size
+		self.fsobj.save()
+		#self.mode='view'
+		#self.update_elements()
+		self.update_info()
+
+	def add_comment(self,*args,**kwargs):
+		text = self.pteWriteComment.toPlainText()
+		if text:
+			self.listComments.addItem(text)
+			self.pteWriteComment.clear()
+
+	def delete_comment(self,*args,**kwargs):
+		index = self.listComments.currentRow()
+		if index >= 0:
+			self.listComments.takeItem(index)
+
+
 class func(object):
 	def __init__(self,fm,page,setUIPage,setSwitchingEnabled):
 		self.fm        = fm
@@ -9,19 +98,72 @@ class func(object):
 		self.setUIPage = setUIPage
 		self.setMainSwitchingEnabled = setSwitchingEnabled
 
-		self.tool_sensor           = self.fm.tool_sensor()
-		self.tool_pcb              = self.fm.tool_pcb()
-		self.tray_component_sensor = self.fm.tray_component_sensor()
-		self.tray_component_pcb    = self.fm.tray_component_pcb()
-		self.tray_assembly         = self.fm.tray_assembly()
+		self.tool_sensor = simple_fsobj_vc(
+			self.fm.tool_sensor(),
+			self.page.sbSensorToolID,
+			self.page.dsbSensorToolSize,
+			self.page.pbSensorToolEditNew,
+			self.page.pbSensorToolSave,
+			self.page.pbSensorToolCancel,
+			self.page.listSensorToolComments,
+			self.page.pteSensorToolWriteComment,
+			self.page.pbSensorToolDeleteComment,
+			self.page.pbSensorToolAddComment,
+			)
+
+		self.tool_pcb = simple_fsobj_vc(
+			self.fm.tool_pcb(),
+			self.page.sbPcbToolID,
+			self.page.dsbPcbToolSize,
+			self.page.pbPcbToolEditNew,
+			self.page.pbPcbToolSave,
+			self.page.pbPcbToolCancel,
+			self.page.listPcbToolComments,
+			self.page.ptePcbToolWriteComment,
+			self.page.pbPcbToolDeleteComment,
+			self.page.pbPcbToolAddComment,
+			)
+
+		self.tray_component_sensor = simple_fsobj_vc(
+			self.fm.tray_component_sensor(),
+			self.page.sbSensorTrayID,
+			self.page.dsbSensorTraySize,
+			self.page.pbSensorTrayEditNew,
+			self.page.pbSensorTraySave,
+			self.page.pbSensorTrayCancel,
+			self.page.listSensorTrayComments,
+			self.page.pteSensorTrayWriteComment,
+			self.page.pbSensorTrayDeleteComment,
+			self.page.pbSensorTrayAddComment,
+			)
+
+		self.tray_component_pcb = simple_fsobj_vc(
+			self.fm.tray_component_pcb(),
+			self.page.sbPcbTrayID,
+			self.page.dsbPcbTraySize,
+			self.page.pbPcbTrayEditNew,
+			self.page.pbPcbTraySave,
+			self.page.pbPcbTrayCancel,
+			self.page.listPcbTrayComments,
+			self.page.ptePcbTrayWriteComment,
+			self.page.pbPcbTrayDeleteComment,
+			self.page.pbPcbTrayAddComment,
+			)
+
+		self.tray_assembly = simple_fsobj_vc(
+			self.fm.tray_assembly(),
+			self.page.sbAssemblyTrayID,
+			self.page.dsbAssemblyTraySize,
+			self.page.pbAssemblyTrayEditNew,
+			self.page.pbAssemblyTraySave,
+			self.page.pbAssemblyTrayCancel,
+			self.page.listAssemblyTrayComments,
+			self.page.pteAssemblyTrayWriteComment,
+			self.page.pbAssemblyTrayDeleteComment,
+			self.page.pbAssemblyTrayAddComment,
+			)
 
 		self.mode = 'setup'
-
-		self.tool_sensor_exists           = None
-		self.tool_pcb_exists              = None
-		self.tray_component_sensor_exists = None
-		self.tray_component_pcb_exists    = None
-		self.tray_assembly_exists         = None
 
 	def enforce_mode(mode):
 		if not (type(mode) in [str,list]):
@@ -105,142 +247,25 @@ class func(object):
 
 
 
-	# change modes for these to any except relevant editing mode
-
 	@enforce_mode(['view','editing_pcb_tool','editing_sensor_tray','editing_pcb_tray','editing_assembly_tray'])
 	def update_info_sensor_tool(self,ID=None,*args,**kwargs):
-		if ID is None:
-			ID = self.page.sbSensorToolID.value()
-		else:
-			self.page.sbSensorToolID.setValue(ID)
-		self.tool_sensor_exists = self.tool_sensor.load(ID)
-
-		if self.tool_sensor_exists:
-			self.page.pbSensorToolEditNew.setText("edit")
-			if self.tool_sensor.size is None:
-				self.page.dsbSensorToolSize.setValue(0)
-				self.page.dsbSensorToolSize.clear()
-			else:
-				self.page.dsbSensorToolSize.setValue(self.tool_sensor.size)
-			self.page.listSensorToolComments.clear()
-			for comment in self.tool_sensor.comments:
-				self.page.listSensorToolComments.addItem(comment)
-			self.page.pteSensorToolWriteComment.clear()
-
-		else:
-			self.page.pbSensorToolEditNew.setText("new")
-			self.page.dsbSensorToolSize.setValue(0)
-			self.page.dsbSensorToolSize.clear()
-			self.page.listSensorToolComments.clear()
-			self.page.pteSensorToolWriteComment.clear()
+		self.tool_sensor.update_info(ID)
 
 	@enforce_mode(['view','editing_sensor_tool','editing_sensor_tray','editing_pcb_tray','editing_assembly_tray'])
 	def update_info_pcb_tool(self,ID=None,*args,**kwargs):
-		if ID is None:
-			ID = self.page.sbPcbToolID.value()
-		else:
-			self.page.sbPcbToolID.setValue(ID)
-		self.tool_pcb_exists = self.tool_pcb.load(ID)
-
-		if self.tool_pcb_exists:
-			self.page.pbPcbToolEditNew.setText("edit")
-			if self.tool_pcb.size is None:
-				self.page.dsbPcbToolSize.setValue(0)
-				self.page.dsbPcbToolSize.clear()
-			else:
-				self.page.dsbPcbToolSize.setValue(self.tool_pcb.size)
-			self.page.listPcbToolComments.clear()
-			for comment in self.tool_pcb.comments:
-				self.page.listPcbToolComments.addItem(comment)
-			self.page.ptePcbToolWriteComment.clear()
-
-		else:
-			self.page.pbPcbToolEditNew.setText("new")
-			self.page.dsbPcbToolSize.setValue(0)
-			self.page.dsbPcbToolSize.clear()
-			self.page.listPcbToolComments.clear()
-			self.page.ptePcbToolWriteComment.clear()
+		self.tool_pcb.update_info()
 
 	@enforce_mode(['view','editing_sensor_tool','editing_pcb_tool','editing_pcb_tray','editing_assembly_tray'])
 	def update_info_sensor_tray(self,ID=None,*args,**kwargs):
-		if ID is None:
-			ID = self.page.sbSensorTrayID.value()
-		else:
-			self.page.sbSensorTrayID.setValue(ID)
-		self.tray_component_sensor_exists = self.tray_component_sensor.load(ID)
-
-		if self.tray_component_sensor_exists:
-			self.page.pbSensorTrayEditNew.setText("edit")
-			if self.tray_component_sensor.size is None:
-				self.page.dsbSensorTraySize.setValue(0)
-				self.page.dsbSensorTraySize.clear()
-			else:
-				self.page.dsbSensorTraySize.setValue(self.tray_component_sensor.size)
-			self.page.listSensorTrayComments.clear()
-			for comment in self.tray_component_sensor.comments:
-				self.page.listSensorTrayComments.addItem(comment)
-			self.page.pteSensorTrayWriteComment.clear()
-
-		else:
-			self.page.pbSensorTrayEditNew.setText("new")
-			self.page.dsbSensorTraySize.setValue(0)
-			self.page.dsbSensorTraySize.clear()
-			self.page.listSensorTrayComments.clear()
-			self.page.pteSensorTrayWriteComment.clear()
+		self.tray_component_sensor.update_info()
 
 	@enforce_mode(['view','editing_sensor_tool','editing_pcb_tool','editing_sensor_tray','editing_assembly_tray'])
 	def update_info_pcb_tray(self,ID=None,*args,**kwargs):
-		if ID is None:
-			ID = self.page.sbPcbTrayID.value()
-		else:
-			self.page.sbPcbTrayID.setValue(ID)
-		self.tray_component_pcb_exists = self.tray_component_pcb.load(ID)
-
-		if self.tray_component_pcb_exists:
-			self.page.pbPcbTrayEditNew.setText("edit")
-			if self.tray_component_pcb.size is None:
-				self.page.dsbPcbTraySize.setValue(0)
-				self.page.dsbPcbTraySize.clear()
-			else:
-				self.page.dsbPcbTraySize.setValue(self.tray_component_pcb.size)
-			self.page.listPcbTrayComments.clear()
-			for comment in self.tray_component_pcb.comments:
-				self.page.listPcbTrayComments.addItem(comment)
-			self.page.ptePcbTrayWriteComment.clear()
-
-		else:
-			self.page.pbPcbTrayEditNew.setText("new")
-			self.page.dsbPcbTraySize.setValue(0)
-			self.page.dsbPcbTraySize.clear()
-			self.page.listPcbTrayComments.clear()
-			self.page.ptePcbTrayWriteComment.clear()
+		self.tray_component_pcb.update_info()
 
 	@enforce_mode(['view','editing_sensor_tool','editing_pcb_tool','editing_sensor_tray','editing_pcb_tray'])
 	def update_info_assembly_tray(self,ID=None,*args,**kwargs):
-		if ID is None:
-			ID = self.page.sbAssemblyTrayID.value()
-		else:
-			self.page.sbAssemblyTrayID.setValue(ID)
-		self.tray_assembly_exists = self.tray_assembly.load(ID)
-
-		if self.tray_assembly_exists:
-			self.page.pbAssemblyTrayEditNew.setText("edit")
-			if self.tray_assembly.size is None:
-				self.page.dsbAssemblyTraySize.setValue(0)
-				self.page.dsbAssemblyTraySize.clear()
-			else:
-				self.page.dsbAssemblyTraySize.setValue(self.tray_assembly.size)
-			self.page.listAssemblyTrayComments.clear()
-			for comment in self.tray_assembly.comments:
-				self.page.listAssemblyTrayComments.addItem(comment)
-			self.page.pteAssemblyTrayWriteComment.clear()
-
-		else:
-			self.page.pbAssemblyTrayEditNew.setText("new")
-			self.page.dsbAssemblyTraySize.setValue(0)
-			self.page.dsbAssemblyTraySize.clear()
-			self.page.listAssemblyTrayComments.clear()
-			self.page.pteAssemblyTrayWriteComment.clear()
+		self.tray_assembly.update_info()
 
 	@enforce_mode('view')
 	def update_info(self,*args,**kwargs):
@@ -316,213 +341,140 @@ class func(object):
 	@enforce_mode('view')
 	def start_editing_sensor_tool(self,*args,**kwargs):
 		self.mode = 'editing_sensor_tool'
-		if not self.tool_sensor_exists:
-			self.tool_sensor.new(self.page.sbSensorToolID.value())
+		self.tool_sensor.start_editing()
 		self.update_elements()
 
 	@enforce_mode('editing_sensor_tool')
 	def cancel_editing_sensor_tool(self,*args,**kwargs):
 		self.mode='view'
 		self.update_elements()
-		self.update_info_sensor_tool()
+		self.tool_sensor.update_info()
 
 	@enforce_mode('editing_sensor_tool')
 	def save_editing_sensor_tool(self,*args,**kwargs):
-		comments = []
-		for i in range(self.page.listSensorToolComments.count()):
-			comments.append(self.page.listSensorToolComments.item(i).text())
-		self.tool_sensor.comments = comments
-		size = self.page.dsbSensorToolSize.value()
-		if size == 0.0:
-			size = None
-		self.tool_sensor.size = size
-		self.tool_sensor.save()
+		self.tool_sensor.save_editing()
 		self.mode='view'
 		self.update_elements()
-		self.update_info_sensor_tool()
 
 	@enforce_mode('editing_sensor_tool')
 	def add_comment_sensor_tool(self,*args,**kwargs):
-		text = self.page.pteSensorToolWriteComment.toPlainText()
-		if text:
-			self.page.listSensorToolComments.addItem(text)
-			self.page.pteSensorToolWriteComment.clear()
+		self.tool_sensor.add_comment()
 
 	@enforce_mode('editing_sensor_tool')
 	def delete_comment_sensor_tool(self,*args,**kwargs):
-		index = self.page.listSensorToolComments.currentRow()
-		if index >= 0:
-			self.page.listSensorToolComments.takeItem(index)
+		self.tool_sensor.delete_comment()
 
 
 
 	@enforce_mode('view')
 	def start_editing_pcb_tool(self,*args,**kwargs):
 		self.mode = 'editing_pcb_tool'
-		if not self.tool_pcb_exists:
-			self.tool_pcb.new(self.page.sbPcbToolID.value())
+		self.tool_pcb.start_editing()
 		self.update_elements()
 
 	@enforce_mode('editing_pcb_tool')
 	def cancel_editing_pcb_tool(self,*args,**kwargs):
 		self.mode='view'
 		self.update_elements()
-		self.update_info_pcb_tool()
+		self.tool_pcb.update_info()
 
 	@enforce_mode('editing_pcb_tool')
 	def save_editing_pcb_tool(self,*args,**kwargs):
-		comments = []
-		for i in range(self.page.listPcbToolComments.count()):
-			comments.append(self.page.listPcbToolComments.item(i).text())
-		self.tool_pcb.comments = comments
-		size = self.page.dsbPcbToolSize.value()
-		if size == 0.0:
-			size = None
-		self.tool_pcb.size = size
-		self.tool_pcb.save()
+		self.tool_pcb.save_editing()
 		self.mode='view'
 		self.update_elements()
-		self.update_info_pcb_tool()
 
 	@enforce_mode('editing_pcb_tool')
 	def add_comment_pcb_tool(self,*args,**kwargs):
-		text = self.page.ptePcbToolWriteComment.toPlainText()
-		if text:
-			self.page.listPcbToolComments.addItem(text)
-			self.page.ptePcbToolWriteComment.clear()
+		self.tool_pcb.add_comment()
 
 	@enforce_mode('editing_pcb_tool')
 	def delete_comment_pcb_tool(self,*args,**kwargs):
-		index = self.page.listPcbToolComments.currentRow()
-		if index >= 0:
-			self.page.listPcbToolComments.takeItem(index)
+		self.tool_pcb.delete_comment()
 
 
 
 	@enforce_mode('view')
 	def start_editing_sensor_tray(self,*args,**kwargs):
 		self.mode = 'editing_sensor_tray'
-		if not self.tray_component_sensor_exists:
-			self.tray_component_sensor.new(self.page.sbSensorTrayID.value())
+		self.tray_component_sensor.start_editing()
 		self.update_elements()
 
 	@enforce_mode('editing_sensor_tray')
 	def cancel_editing_sensor_tray(self,*args,**kwargs):
 		self.mode='view'
 		self.update_elements()
-		self.update_info_sensor_tray()
+		self.tray_component_sensor.update_info()
 
 	@enforce_mode('editing_sensor_tray')
 	def save_editing_sensor_tray(self,*args,**kwargs):
-		comments = []
-		for i in range(self.page.listSensorTrayComments.count()):
-			comments.append(self.page.listSensorTrayComments.item(i).text())
-		self.tray_component_sensor.comments = comments
-		size = self.page.dsbSensorTraySize.value()
-		if size == 0.0:
-			size = None
-		self.tray_component_sensor.size = size
-		self.tray_component_sensor.save()
+		self.tray_component_sensor.save_editing()
 		self.mode='view'
 		self.update_elements()
-		self.update_info_sensor_tray()
 
 	@enforce_mode('editing_sensor_tray')
 	def add_comment_sensor_tray(self,*args,**kwargs):
-		text = self.page.pteSensorTrayWriteComment.toPlainText()
-		if text:
-			self.page.listSensorTrayComments.addItem(text)
-			self.page.pteSensorTrayWriteComment.clear()
+		self.tray_component_sensor.add_comment()
 
 	@enforce_mode('editing_sensor_tray')
 	def delete_comment_sensor_tray(self,*args,**kwargs):
-		index = self.page.listSensorTrayComments.currentRow()
-		if index >= 0:
-			self.page.listSensorTrayComments.takeItem(index)
+		self.tray_component_sensor.delete_comment()
 
 
 
 	@enforce_mode('view')
 	def start_editing_pcb_tray(self,*args,**kwargs):
 		self.mode = 'editing_pcb_tray'
-		if not self.tray_component_pcb_exists:
-			self.tray_component_pcb.new(self.page.sbPcbTrayID.value())
+		self.tray_component_pcb.start_editing()
 		self.update_elements()
 
 	@enforce_mode('editing_pcb_tray')
 	def cancel_editing_pcb_tray(self,*args,**kwargs):
 		self.mode='view'
 		self.update_elements()
-		self.update_info_pcb_tray()
+		self.tray_component_pcb.update_info()
 
 	@enforce_mode('editing_pcb_tray')
 	def save_editing_pcb_tray(self,*args,**kwargs):
-		comments = []
-		for i in range(self.page.listPcbTrayComments.count()):
-			comments.append(self.page.listPcbTrayComments.item(i).text())
-		self.tray_component_pcb.comments = comments
-		size = self.page.dsbPcbTraySize.value()
-		if size == 0.0:
-			size = None
-		self.tray_component_pcb.size = size
-		self.tray_component_pcb.save()
+		self.tray_component_pcb.save_editing()
 		self.mode='view'
 		self.update_elements()
-		self.update_info_pcb_tray()
 
 	@enforce_mode('editing_pcb_tray')
 	def add_comment_pcb_tray(self,*args,**kwargs):
-		text = self.page.ptePcbTrayWriteComment.toPlainText()
-		if text:
-			self.page.listPcbTrayComments.addItem(text)
-			self.page.ptePcbTrayWriteComment.clear()
+		self.tray_component_pcb.add_comment()
 
 	@enforce_mode('editing_pcb_tray')
 	def delete_comment_pcb_tray(self,*args,**kwargs):
-		index = self.page.listPcbTrayComments.currentRow()
-		if index >= 0:
-			self.page.listPcbTrayComments.takeItem(index)
+		self.tray_component_pcb.delete_comment()
 
 
 
 	@enforce_mode('view')
 	def start_editing_assembly_tray(self,*args,**kwargs):
 		self.mode = 'editing_assembly_tray'
+		self.tray_assembly.start_editing()
 		self.update_elements()
 
 	@enforce_mode('editing_assembly_tray')
 	def cancel_editing_assembly_tray(self,*args,**kwargs):
 		self.mode='view'
 		self.update_elements()
-		self.update_info_assembly_tray()
+		self.tray_assembly.update_info()
 
 	@enforce_mode('editing_assembly_tray')
 	def save_editing_assembly_tray(self,*args,**kwargs):
-		comments = []
-		for i in range(self.page.listAssemblyTrayComments.count()):
-			comments.append(self.page.listAssemblyTrayComments.item(i).text())
-		self.tray_assembly.comments = comments
-		size = self.page.dsbAssemblyTraySize.value()
-		if size == 0.0:
-			size = None
-		self.tray_assembly.size = size
-		self.tray_assembly.save()
+		self.tray_assembly.save_editing()
 		self.mode='view'
 		self.update_elements()
-		self.update_info_assembly_tray()
 
 	@enforce_mode('editing_assembly_tray')
 	def add_comment_assembly_tray(self,*args,**kwargs):
-		text = self.page.pteAssemblyTrayWriteComment.toPlainText()
-		if text:
-			self.page.listAssemblyTrayComments.addItem(text)
-			self.page.pteAssemblyTrayWriteComment.clear()
+		self.tray_assembly.add_comment()
 
 	@enforce_mode('editing_assembly_tray')
 	def delete_comment_assembly_tray(self,*args,**kwargs):
-		index = self.page.listAssemblyTrayComments.currentRow()
-		if index >= 0:
-			self.page.listAssemblyTrayComments.takeItem(index)
+		self.tray_assembly.delete_comment()
 
 
 
@@ -531,7 +483,7 @@ class func(object):
 	def load_kwargs(self,kwargs):
 		keys = kwargs.keys()
 
-		if 'sensor_tool' in keys:
+		if "sensor_tool" in keys:
 			self.update_info_sensor_tool(kwargs['sensor_tool'])
 		if "pcb_tool" in keys:
 			self.update_info_pcb_tool(kwargs['pcb_tool'])
