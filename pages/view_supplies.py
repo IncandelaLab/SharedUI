@@ -4,8 +4,6 @@ PAGE_NAME = "view_tooling"
 #OBJECTTYPE = "sensor_step"
 DEBUG = False
 
-DATE_FORMAT = "{yyyy}-{mm}-{dd}"
-
 class simple_fsobj_vc(object):
 	def __init__(self,
 		fsobj,
@@ -94,13 +92,13 @@ class simple_fsobj_vc(object):
 
 class func(object):
 	def __init__(self,fm,page,setUIPage,setSwitchingEnabled):
-		self.fm        = fm
+		#self.fm        = fm
 		self.page      = page
 		self.setUIPage = setUIPage
 		self.setMainSwitchingEnabled = setSwitchingEnabled
 
 		self.batch_araldite = simple_fsobj_vc(
-			self.fm.batch_araldite(),
+			fm.batch_araldite(),
 			self.page.sbAralditeID,
 			self.page.dAralditeReceived,
 			self.page.dAralditeExpires,
@@ -114,7 +112,7 @@ class func(object):
 			)
 
 		self.batch_loctite = simple_fsobj_vc(
-			self.fm.batch_loctite(),
+			fm.batch_loctite(),
 			self.page.sbLoctiteID,
 			self.page.dLoctiteReceived,
 			self.page.dLoctiteExpires,
@@ -128,7 +126,7 @@ class func(object):
 			)
 
 		self.batch_sylgard_thick = simple_fsobj_vc(
-			self.fm.batch_sylgard_thick(),
+			fm.batch_sylgard_thick(),
 			self.page.sbSylgardThickID,
 			self.page.dSylgardThickReceived,
 			self.page.dSylgardThickExpires,
@@ -142,7 +140,7 @@ class func(object):
 			)
 
 		self.batch_sylgard_thin = simple_fsobj_vc(
-			self.fm.batch_sylgard_thin(),
+			fm.batch_sylgard_thin(),
 			self.page.sbSylgardThinID,
 			self.page.dSylgardThinReceived,
 			self.page.dSylgardThinExpires,
@@ -156,7 +154,7 @@ class func(object):
 			)
 
 		self.batch_bond_wire = simple_fsobj_vc(
-			self.fm.batch_bond_wire(),
+			fm.batch_bond_wire(),
 			self.page.sbBondWireID,
 			self.page.dBondWireReceived,
 			self.page.dBondWireExpires,

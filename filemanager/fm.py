@@ -286,8 +286,8 @@ class step_pcb(fsobj):
 ###############################################
 
 class baseplate(fsobj):
-	FILEDIR = []
-	FILENAME = ""
+	FILEDIR = os.sep.join(['baseplates','{century}'])
+	FILENAME = "baseplate_{ID:0>5}.json"
 	PROPERTIES = [
 		"identifier",   # idenfitier given by manufacturer or distributor. not the same as ID!
 		"material",     #
@@ -482,15 +482,28 @@ class batch_bond_wire(fsobj):
 
 if __name__ == '__main__':
 
-	ts = tool_sensor()
-	ts.load(0)
-	ts.comments = ['comment 1', 'comment 2', 'spam and eggs']
-	ts.save()
+	bp = baseplate()
+	bp.new(0)
+	bp.corner_heights = [0,0,0,1,0,0]
+	bp.identifier = "ident0"
+	bp.material = "CuW"
+	bp.nomthickness = 1.2
+	bp.size = 8
+	bp.manufacturer = "man0"
+	bp.protomodule = 0
+	bp.module = 0
+	
+	bp.save()
 
-	tp = tool_pcb()
-	tp.load(0)
-	tp.comments = ['pcb comment 1','spam egg sausage and spam','ni','nu']
-	tp.save()
+	# ts = tool_sensor()
+	# ts.load(0)
+	# ts.comments = ['comment 1', 'comment 2', 'spam and eggs']
+	# ts.save()
+
+	# tp = tool_pcb()
+	# tp.load(0)
+	# tp.comments = ['pcb comment 1','spam egg sausage and spam','ni','nu']
+	# tp.save()
 
 	# ta = tray_assembly()
 	# ta.new(0)
