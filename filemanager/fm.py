@@ -432,6 +432,52 @@ class module(fsobj):
 		...
 
 
+###############################################
+##################  supplies  #################
+###############################################
+
+class batch_araldite(fsobj):
+	FILEDIR = os.sep.join(['supplies','batch_araldite','{century}'])
+	FILENAME = 'batch_araldite_{ID:0>5}.json'
+	PROPERTIES = [
+		'date_received',
+		'date_expires',
+	]
+
+class batch_loctite(fsobj):
+	FILEDIR = os.sep.join(['supplies','batch_loctite','{century}'])
+	FILENAME = 'batch_loctite_{ID:0>5}.json'
+	PROPERTIES = [
+		'date_received',
+		'date_expires',
+	]
+
+class batch_sylgard_thick(fsobj):
+	FILEDIR = os.sep.join(['supplies','batch_sylgard_thick','{century}'])
+	FILENAME = 'batch_sylgard_thick_{ID:0>5}.json'
+	PROPERTIES = [
+		'date_received',
+		'date_expires',
+	]
+
+class batch_sylgard_thin(fsobj):
+	FILEDIR = os.sep.join(['supplies','batch_sylgard_thin','{century}'])
+	FILENAME = 'batch_sylgard_thin_{ID:0>5}.json'
+	PROPERTIES = [
+		'date_received',
+		'date_expires',
+	]
+
+class batch_bond_wire(fsobj):
+	FILEDIR = os.sep.join(['supplies','batch_bond_wire','{century}'])
+	FILENAME = 'batch_bond_wire_{ID:0>5}.json'
+	PROPERTIES = [
+		'date_received',
+		'date_expires',
+	]
+
+
+
 
 
 if __name__ == '__main__':

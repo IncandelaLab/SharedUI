@@ -17,6 +17,7 @@ from pages.view_pcb_step    import func as cls_func_view_pcb_step
 from pages.routine_iv       import func as cls_func_routine_iv
 
 from pages.view_tooling     import func as cls_func_view_tooling
+from pages.view_supplies    import func as cls_func_view_supplies
 
 
 # Set up page widgets
@@ -74,6 +75,11 @@ class widget_view_tooling(gui.QWidget, form_view_tooling):
 		super(widget_view_tooling,self).__init__(parent)
 		self.setupUi(self)
 
+from pages_ui.view_supplies import Ui_Form as form_view_supplies
+class widget_view_supplies(gui.QWidget, form_view_supplies):
+	def __init__(self,parent):
+		super(widget_view_supplies,self).__init__(parent)
+		self.setupUi(self)
 
 
 # Dict of page IDs by name (as the name shows up in the page list widgets)
@@ -87,11 +93,9 @@ PAGE_IDS = {
 	'PCB placement steps':6,
 	'IV curve':7,
 	'tooling':8,
+	'supplies':9,
 }
 
-# FUTURE_PAGES = [
-# 	''
-# ]
 	
 
 def id_generator():
@@ -138,6 +142,7 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 		self.page_view_pcb_step    = widget_view_pcb_step(None)    ; self.swPages.addWidget(self.page_view_pcb_step)
 		self.page_routine_iv       = widget_routine_iv(None)       ; self.swPages.addWidget(self.page_routine_iv)
 		self.page_view_tooling     = widget_view_tooling(None)     ; self.swPages.addWidget(self.page_view_tooling)
+		self.page_view_supplies    = widget_view_supplies(None)    ; self.swPages.addWidget(self.page_view_supplies)
 
 	def initPages(self):
 		self.func_view_module      = cls_func_view_module(      self.fm, self.page_view_module     , self.setUIPage, self.setSwitchingEnabled)
@@ -149,6 +154,7 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 		self.func_view_pcb_step    = cls_func_view_pcb_step(    self.fm, self.page_view_pcb_step   , self.setUIPage, self.setSwitchingEnabled)
 		self.func_routine_iv       = cls_func_routine_iv(       self.fm, self.page_routine_iv      , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_tooling     = cls_func_view_tooling(          fm, self.page_view_tooling    , self.setUIPage, self.setSwitchingEnabled)
+		self.func_view_supplies    = cls_func_view_supplies(         fm, self.page_view_supplies   , self.setUIPage, self.setSwitchingEnabled)
 
 		# This list must be in the same order that the pages are in in the stackedWidget in the main UI file.
 		# This is the same order as in the dict PAGE_IDS
@@ -162,6 +168,7 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 			self.func_view_pcb_step,
 			self.func_routine_iv,
 			self.func_view_tooling,
+			self.func_view_supplies,
 			]
 
 	def rig(self):

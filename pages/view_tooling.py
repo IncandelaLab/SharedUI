@@ -55,14 +55,10 @@ class simple_fsobj_vc(object):
 			self.pteWriteComment.clear()
 
 	def start_editing(self,*args,**kwargs):
-		#self.mode = 'editing_sensor_tool'
 		if not self.fsobj_exists:
 			self.fsobj.new(self.sbID.value())
-		#self.update_elements()
 
 	def cancel_editing(self,*args,**kwargs):
-		#self.mode='view'
-		#self.update_elements()
 		self.update_info()
 
 	def save_editing(self,*args,**kwargs):
@@ -75,8 +71,6 @@ class simple_fsobj_vc(object):
 			size = None
 		self.fsobj.size = size
 		self.fsobj.save()
-		#self.mode='view'
-		#self.update_elements()
 		self.update_info()
 
 	def add_comment(self,*args,**kwargs):
