@@ -2,12 +2,6 @@ PAGE_NAME = "view_baseplate"
 OBJECTTYPE = "baseplate"
 DEBUG = False
 
-# class baseplate_vc(object):
-# 	def __init__(self,
-# 		baseplate,
-# 		sbID,
-
-# 		)
 
 class func(object):
 	

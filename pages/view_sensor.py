@@ -4,12 +4,13 @@ DEBUG = False
 
 class func(object):
 	def __init__(self,fm,page,setUIPage,setSwitchingEnabled):
-		self.fm        = fm
 		self.page      = page
 		self.setUIPage = setUIPage
 		self.setMainSwitchingEnabled = setSwitchingEnabled
 
-		self.info = None
+		self.sensor = fm.sensor()
+		self.sensor_exists = None
+
 		self.mode = 'setup'
 
 
@@ -61,7 +62,6 @@ class func(object):
 	def rig(self):
 		self.page.sbSensorID.valueChanged.connect(self.update_info)
 		self.page.pbGoModule.clicked.connect(self.goModule)
-
 		self.page.pbSensorNew.clicked.connect(self.startCreating)
 		self.page.pbSensorEdit.clicked.connect(self.startEditing)
 		self.page.pbSensorSave.clicked.connect(self.saveEditing)
@@ -71,63 +71,93 @@ class func(object):
 
 	@enforce_mode('view')
 	def update_info(self,ID=None,*args,**kwargs):
-		if ID is None:ID = self.page.sbSensorID.value()
-		self.info = self.fm.loadObjectDetails(OBJECTTYPE,ID)
-		self.updateElements(use_info = True)
+		if ID is None:
+			ID = self.page.sbSensorID.value()
+		else:
+			self.page.sbSensorID.setValue(ID)
 
-	@enforce_mode(['view','editing','creating'])
-	def updateElements(self,use_info=False):
-		if use_info:
-			if self.info is None:
-				self.page.leIdentifier.setText("")
-				self.page.leType.setText("")
-				self.page.dsbSize.setValue(-1.0)
+		exists = self.sensor.load(ID)
+		if exists:
+			self.sensor_exists = True
+
+			self.page.leIdentifier.setText(   self.sensor.identifier   )
+			self.page.leType.setText(         self.sensor.type         )
+
+			size = self.sensor.size
+			if size:
+				self.page.dsbSize.setValue(size)
+			else:
+				self.page.dsbSize.setValue(0)
 				self.page.dsbSize.clear()
-				self.page.sbChannels.setValue(-1)
+
+			channels = self.sensor.channels
+			if channels:
+				self.page.sbChannels.setValue(channels)
+			else:
+				self.page.sbChannels.setValue(0)
 				self.page.sbChannels.clear()
-				self.page.leManufacturer.setText("")
+
+			self.page.leManufacturer.setText( self.sensor.manufacturer )
+
+			module = self.sensor.module
+			if not (module is None):
+				self.page.sbOnModule.setValue(module)
+			else:
 				self.page.sbOnModule.setValue(-1)
 				self.page.sbOnModule.clear()
-			else:
-				self.page.leIdentifier.setText(   self.info["identifier"]   )
-				self.page.leType.setText(         self.info["type"]         )
-				self.page.dsbSize.setValue(       self.info["size"]         )
-				self.page.sbChannels.setValue(    self.info["channels"]     )
-				self.page.leManufacturer.setText( self.info["manufacturer"] )
-				self.page.sbOnModule.setValue(    self.info["onModuleID"]   )
 
-				if self.info["size"]         == -1.0: self.page.dsbSize.clear()
-				if self.info["channels"]     == -1  : self.page.sbChannels.clear()
-				if self.info["onModuleID"]   == -1  : self.page.sbOnModule.clear()
+		else:
+			self.sensor_exists = False
 
+			self.page.leIdentifier.setText("")
+			self.page.leType.setText("")
+			self.page.dsbSize.setValue(0)
+			self.page.dsbSize.clear()
+			self.page.sbChannels.setValue(0)
+			self.page.sbChannels.clear()
+			self.page.leManufacturer.setText("")
+			self.page.sbOnModule.setValue(-1)
+			self.page.sbOnModule.clear()
 
-		self.page.pbSensorNew.setEnabled(    (self.mode == 'view') and     (self.info is None) )
-		self.page.pbSensorEdit.setEnabled(   (self.mode == 'view') and not (self.info is None) )
-		self.page.pbSensorSave.setEnabled(   self.mode in ['editing','creating'] )
-		self.page.pbSensorCancel.setEnabled( self.mode in ['editing','creating'] )
+		self.updateElements()
 
-		self.setMainSwitchingEnabled(self.mode == 'view')
+	@enforce_mode(['view','editing','creating'])
+	def updateElements(self):
+		mode_view     = self.mode == 'view'
+		mode_editing  = self.mode == 'editing'
+		mode_creating = self.mode == 'creating'
+		module_exists = self.page.sbOnModule.value() >= 0
+		sensor_exists = self.sensor_exists
+		#protomodule_exists
 
-		self.page.pbGoModule.setEnabled( (self.mode=='view') and (self.page.sbOnModule.value()>=0) ) 
-		self.page.sbSensorID.setEnabled( self.mode=='view' )
-		self.page.leIdentifier.setReadOnly(   not (self.mode in ['editing','creating']))
-		self.page.leType.setReadOnly(         not (self.mode in ['editing','creating']))
-		self.page.dsbSize.setReadOnly(        not (self.mode in ['editing','creating']))
-		self.page.sbChannels.setReadOnly(     not (self.mode in ['editing','creating']))
-		self.page.leManufacturer.setReadOnly( not (self.mode in ['editing','creating']))
-		self.page.sbOnModule.setReadOnly(     not (self.mode in ['editing','creating']))
+		self.setMainSwitchingEnabled(mode_view)
+
+		self.page.pbSensorNew.setEnabled(     mode_view and not sensor_exists )
+		self.page.pbSensorEdit.setEnabled(    mode_view and     sensor_exists )
+		self.page.pbSensorSave.setEnabled(    mode_editing or mode_creating )
+		self.page.pbSensorCancel.setEnabled(  mode_editing or mode_creating )
+		self.page.pbGoModule.setEnabled(      mode_view and module_exists ) 
+		self.page.sbSensorID.setEnabled(      mode_view )
+		self.page.leIdentifier.setReadOnly(   not (mode_creating or mode_editing))
+		self.page.leType.setReadOnly(         not (mode_creating or mode_editing))
+		self.page.dsbSize.setReadOnly(        not (mode_creating or mode_editing))
+		self.page.sbChannels.setReadOnly(     not (mode_creating or mode_editing))
+		self.page.leManufacturer.setReadOnly( not (mode_creating or mode_editing))
+		self.page.sbOnModule.setReadOnly(     not (mode_creating or mode_editing))
 
 	@enforce_mode('view')
 	def startCreating(self,*args,**kwargs):
-		if self.info is None:
+		if not self.sensor_exists:
+			ID = self.page.sbSensorID.value()
 			self.mode = 'creating'
+			self.sensor.new(ID)
 			self.updateElements()
 		else:
 			pass
 
 	@enforce_mode('view')
 	def startEditing(self,*args,**kwargs):
-		if self.info is None:
+		if not self.sensor_exists:
 			pass
 		else:
 			self.mode = 'editing'
@@ -140,17 +170,31 @@ class func(object):
 
 	@enforce_mode(['editing','creating'])
 	def saveEditing(self,*args,**kwargs):
-		ID = self.page.sbSensorID.value()
-		details = {
-			'identifier'   : str(self.page.leIdentifier.text()),
-			'type'         : str(self.page.leType.text()),
-			'size'         : self.page.dsbSize.value(),
-			'channels'     : self.page.sbChannels.value(),
-			'manufacturer' : str(self.page.leManufacturer.text()),
-			'onModuleID'   : self.page.sbOnModule.value(),
-			}
-		new = self.mode == 'creating'
-		self.fm.changeObjectDetails(OBJECTTYPE,ID,details,new)
+		self.sensor.identifier   = str(self.page.leIdentifier.text())
+		self.sensor.type         = str(self.page.leType.text())
+
+		size = self.page.dsbSize.value()
+		if size > 0:
+			self.sensor.size = size
+		else:
+			self.sensor.size = None
+
+		channels     = self.page.sbChannels.value()
+		if channels > 0:
+			self.sensor.channels = channels
+		else:
+			self.sensor.channels = None
+
+		self.sensor.manufacturer = str(self.page.leManufacturer.text())
+
+
+		module = self.page.sbOnModule.value()
+		if module >= 0:
+			self.sensor.module = module
+		else:
+			self.sensor.module = None
+		
+		self.sensor.save()
 		self.mode = 'view'
 		self.update_info()
 

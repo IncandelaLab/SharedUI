@@ -310,7 +310,17 @@ class baseplate(fsobj):
 
 
 class sensor(fsobj):
-	...
+	FILEDIR = os.sep.join(['sensors','{century}'])
+	FILENAME = "sensor_{ID:0>5}.json"
+	PROPERTIES = [
+		"identifier",
+		"type",
+		"size",
+		"channels",
+		"manufacturer",
+		"protomodule",
+		"module",
+	]
 
 
 class pcb(fsobj):
