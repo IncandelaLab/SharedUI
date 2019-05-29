@@ -2,7 +2,7 @@ import os
 import json
 import numpy
 
-
+CENTURY = '{:0>3}__'
 
 CFG_FILE = 'cfg.json'
 CWD = os.getcwd()
@@ -43,7 +43,7 @@ class fsobj(object):
 	def get_filedir_filename(self, ID = None):
 		if ID is None:
 			ID = self.ID
-		filedir  = os.sep.join([ DATADIR, self.FILEDIR.format(ID=ID, century = '{:0>3}__'.format(ID//100)) ])
+		filedir  = os.sep.join([ DATADIR, self.FILEDIR.format(ID=ID, century = CENTURY.format(ID//100)) ])
 		filename = self.FILENAME.format(ID=ID)
 		return filedir, filename
 
@@ -410,8 +410,8 @@ class module(fsobj):
 	IV_BINS_DATADIR = 'bins'
 	DAQ_DATADIR     = 'daq'
 
-	BA_FILENAME = 'ba {}'
-	BD_FILENAME = 'bd {}'
+	BA_FILENAME = 'ba {which}'
+	BD_FILENAME = 'bd {which}'
 
 
 	def fetch_datasets(self):
@@ -476,8 +476,8 @@ class module(fsobj):
 		filedir, filename = self.get_filedir_filename(self.ID)
 		iv_bins_datadir = os.sep.join([filedir, self.IV_DATADIR, self.IV_BINS_DATADIR])
 
-		file_a = os.sep.join([iv_bins_datadir, self.BA_FILENAME.format(which)])
-		file_d = os.sep.join([iv_bins_datadir, self.BD_FILENAME.format(which)])
+		file_a = os.sep.join([iv_bins_datadir, self.BA_FILENAME.format(which=which)])
+		file_d = os.sep.join([iv_bins_datadir, self.BD_FILENAME.format(which=which)])
 
 		if not (os.path.exists(file_a) and os.path.exists(file_d)):
 			self.make_iv_bins(which)
@@ -508,7 +508,56 @@ class module(fsobj):
 		"""Creates bins for specified dataset. Won't overwrite unless force = True"""
 		# call automatically when loading bins if bins don't exist yet
 		# add kwarg to load_iv_bins to override this and force creation of bins from raw iv data
-		print("make_iv_bins not implemented yet!")
+		if isinstance(which, int):
+			which = self.iv_data[which]
+		
+		raw_data = self.load_iv(which)
+
+		asc_bins  = []
+		desc_bins = []
+
+		first_bin    = None
+		last_bin     = None
+		this_bin     = []
+		this_voltage = raw_data[0,1]
+		this_bin_asc = None
+		for data_point in raw_data:
+			if data_point[1] == this_voltage:
+				this_bin.append(data_point)
+			else:
+				if first_bin is None:
+					first_bin = this_bin
+				else:
+					if this_bin_asc:
+						asc_bins.append(this_bin)
+					else:
+						desc_bins.append(this_bin)
+
+				if data_point[1] > this_voltage:
+					this_bin_asc = True
+				else:
+					this_bin_asc = False
+
+				this_voltage = data_point[1]
+				this_bin     = [data_point]
+
+		fb_raw = numpy.array(first_bin)
+		lb_raw = numpy.array(this_bin)
+		ab_raw = [numpy.array(_) for _ in asc_bins]
+		db_raw = [numpy.array(_) for _ in desc_bins]
+
+		fb_mean = fb_raw[0:].mean(0)
+		lb_mean = lb_raw[0:].mean(0)
+		ab_mean = numpy.array([_[0:].mean(0) for _ in ab_raw])
+		db_mean = numpy.array([_[0:].mean(0) for _ in db_raw])
+
+		filedir, filename = self.get_filedir_filename(self.ID)
+
+		ba_filename = os.sep.join([filedir, self.IV_DATADIR, self.IV_BINS_DATADIR, self.BA_FILENAME]).format(which=which)
+		bd_filename = os.sep.join([filedir, self.IV_DATADIR, self.IV_BINS_DATADIR, self.BD_FILENAME]).format(which=which)
+
+		numpy.savetxt(ba_filename, ab_mean)
+		numpy.savetxt(bd_filename, db_mean)
 
 
 ###############################################
