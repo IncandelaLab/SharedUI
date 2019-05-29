@@ -1,5 +1,6 @@
 import os
 import json
+import numpy
 
 
 
@@ -376,6 +377,7 @@ class pcb(fsobj):
 
 		print('load {}'.format(file))
 
+
 class protomodule(fsobj):
 	...
 
@@ -452,7 +454,12 @@ class module(fsobj):
 			which = self.iv_data[which]
 		filedir, filename = self.get_filedir_filename(self.ID)
 		file = os.sep.join([filedir, self.IV_DATADIR, which])
-		print('load {}'.format(file))
+		
+		if os.path.exists(file):
+			return numpy.loadtxt(file)
+
+		else:
+			return None
 
 
 	def load_iv_bins(self, which, direction='ad'):
@@ -468,18 +475,23 @@ class module(fsobj):
 
 		filedir, filename = self.get_filedir_filename(self.ID)
 		iv_bins_datadir = os.sep.join([filedir, self.IV_DATADIR, self.IV_BINS_DATADIR])
-		if load_a:
-			file_a = os.sep.join([iv_bins_datadir, self.BA_FILENAME.format(which)])
-			#data_a = numpy.loadtxt(file_a)
-			print("load {}".format(file_a))
-		if load_d:
-			file_d = os.sep.join([iv_bins_datadir, self.BD_FILENAME.format(which)])
-			#data_b = numpy.loadtxt(file_b)
-			print("load {}".format(file_d))
+
+		file_a = os.sep.join([iv_bins_datadir, self.BA_FILENAME.format(which)])
+		file_d = os.sep.join([iv_bins_datadir, self.BD_FILENAME.format(which)])
+
+		if not (os.path.exists(file_a) and os.path.exists(file_d)):
+			self.make_iv_bins(which)
 
 		to_return = []
-		if load_a:to_return.append(file_a) # replace with data_a, data_d after making it actually load stuff
-		if load_d:to_return.append(file_d) #
+
+		if load_a:
+			data_a = numpy.loadtxt(file_a)
+			to_return.append(data_a)
+			
+		if load_d:
+			data_d = numpy.loadtxt(file_d)
+			to_return.append(data_d)
+
 		return to_return
 
 
@@ -496,7 +508,7 @@ class module(fsobj):
 		"""Creates bins for specified dataset. Won't overwrite unless force = True"""
 		# call automatically when loading bins if bins don't exist yet
 		# add kwarg to load_iv_bins to override this and force creation of bins from raw iv data
-		...
+		print("make_iv_bins not implemented yet!")
 
 
 ###############################################
@@ -550,7 +562,12 @@ class batch_bond_wire(fsobj):
 if __name__ == '__main__':
 
 	m = module()
-	m.load(30945)
+	m.load(0)
+	f = m.load_iv(0)
+	print(f[0], f[10])
+
+	a, d = m.load_iv_bins(0)
+	print(a[3], d[3])
 
 	# ts = tool_sensor()
 	# ts.load(0)
