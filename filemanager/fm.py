@@ -324,8 +324,57 @@ class sensor(fsobj):
 
 
 class pcb(fsobj):
-	...
+	FILEDIR = os.sep.join(['pcbs','{century}','pcb_{ID:0>5}'])
+	FILENAME = "pcb_{ID:0>5}.json"
+	PROPERTIES = [
+		"identifier",
+		"thickness",
+		"flatness",
+		"size",
+		"channels",
+		"manufacturer",
+		"module",
+		"daq_data"
+	]
 
+	PROPERTIES_DO_NOT_SAVE = [
+		"daq_data",
+	]
+
+	DAQ_DATADIR = 'daq'
+
+	def fetch_datasets(self):
+		if self.ID is None:
+			err = "no pcb loaded; cannot fetch datasets"
+			raise ValueError(err)
+		filedir, filename = self.get_filedir_filename(self.ID)
+		daq_datadir = os.sep.join([filedir, self.DAQ_DATADIR])
+		if os.path.exists(daq_datadir):
+			self.daq_data = [_ for _ in os.listdir(daq_datadir) if os.path.isfile(os.sep.join([daq_datadir,_]))]
+		else:
+			self.daq_data = []
+
+	def load(self,ID):
+		success = super(pcb,self).load(ID)
+		if success:
+			self.fetch_datasets()
+		return success
+
+	def save(self):
+		super(pcb,self).save()
+		filedir, filename = self.get_filedir_filename(self.ID)
+		if not os.path.exists(os.sep.join([filedir, self.DAQ_DATADIR])):
+			os.makedirs(os.sep.join([filedir, self.DAQ_DATADIR]))
+		self.fetch_datasets()
+
+	def load_daq(self,which):
+		if isinstance(which, int):
+			which = self.daq_data[which]
+
+		filedir, filename = self.get_filedir_filename()
+		file = os.sep.join([filedir, self.DAQ_DATADIR, which])
+
+		print('load {}'.format(file))
 
 class protomodule(fsobj):
 	...
@@ -371,13 +420,21 @@ class module(fsobj):
 		filedir, filename = self.get_filedir_filename(self.ID)
 		iv_datadir  = os.sep.join([filedir, self.IV_DATADIR])
 		daq_datadir = os.sep.join([filedir, self.DAQ_DATADIR])
-		self.iv_data  = [_ for _ in os.listdir(iv_datadir ) if os.path.isfile(os.sep.join([iv_datadir ,_]))]
-		self.daq_data = [_ for _ in os.listdir(daq_datadir) if os.path.isfile(os.sep.join([daq_datadir,_]))]
+		if os.path.exists(iv_datadir):
+			self.iv_data  = [_ for _ in os.listdir(iv_datadir ) if os.path.isfile(os.sep.join([iv_datadir ,_]))]
+		else:
+			self.iv_datadir = []
+		if os.path.exists(daq_datadir):
+			self.daq_data = [_ for _ in os.listdir(daq_datadir) if os.path.isfile(os.sep.join([daq_datadir,_]))]
+		else:
+			self.daq_data = []
 
 
 	def load(self, ID):
-		super(module, self).load(ID)
-		self.fetch_datasets()
+		success = super(module, self).load(ID)
+		if success:
+			self.fetch_datasets()
+		return success
 
 
 	def save(self):
@@ -492,18 +549,8 @@ class batch_bond_wire(fsobj):
 
 if __name__ == '__main__':
 
-	bp = baseplate()
-	bp.new(0)
-	bp.corner_heights = [0,0,0,1,0,0]
-	bp.identifier = "ident0"
-	bp.material = "CuW"
-	bp.nomthickness = 1.2
-	bp.size = 8
-	bp.manufacturer = "man0"
-	bp.protomodule = 0
-	bp.module = 0
-	
-	bp.save()
+	m = module()
+	m.load(30945)
 
 	# ts = tool_sensor()
 	# ts.load(0)

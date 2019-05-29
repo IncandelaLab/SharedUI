@@ -76,10 +76,9 @@ class func(object):
 		else:
 			self.page.sbSensorID.setValue(ID)
 
-		exists = self.sensor.load(ID)
-		if exists:
-			self.sensor_exists = True
+		self.sensor_exists = self.sensor.load(ID)
 
+		if self.sensor_exists:
 			self.page.leIdentifier.setText(   self.sensor.identifier   )
 			self.page.leType.setText(         self.sensor.type         )
 
@@ -107,8 +106,6 @@ class func(object):
 				self.page.sbOnModule.clear()
 
 		else:
-			self.sensor_exists = False
-
 			self.page.leIdentifier.setText("")
 			self.page.leType.setText("")
 			self.page.dsbSize.setValue(0)
@@ -172,27 +169,11 @@ class func(object):
 	def saveEditing(self,*args,**kwargs):
 		self.sensor.identifier   = str(self.page.leIdentifier.text())
 		self.sensor.type         = str(self.page.leType.text())
-
-		size = self.page.dsbSize.value()
-		if size > 0:
-			self.sensor.size = size
-		else:
-			self.sensor.size = None
-
-		channels     = self.page.sbChannels.value()
-		if channels > 0:
-			self.sensor.channels = channels
-		else:
-			self.sensor.channels = None
-
 		self.sensor.manufacturer = str(self.page.leManufacturer.text())
 
-
-		module = self.page.sbOnModule.value()
-		if module >= 0:
-			self.sensor.module = module
-		else:
-			self.sensor.module = None
+		self.sensor.size     = self.page.dsbSize.value()    if self.page.dsbSize.value()    >  0 else None
+		self.sensor.channels = self.page.sbChannels.value() if self.page.sbChannels.value() >  0 else None
+		self.sensor.module   = self.page.sbOnModule.value() if self.page.sbOnModule.value() >= 0 else None
 		
 		self.sensor.save()
 		self.mode = 'view'

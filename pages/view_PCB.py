@@ -4,12 +4,13 @@ DEBUG = False
 
 class func(object):
 	def __init__(self,fm,page,setUIPage,setSwitchingEnabled):
-		self.fm        = fm
 		self.page      = page
 		self.setUIPage = setUIPage
 		self.setMainSwitchingEnabled = setSwitchingEnabled
 
-		self.info = None
+		self.pcb = fm.pcb()
+		self.pcb_exists = None
+
 		self.mode = 'setup'
 
 
@@ -61,7 +62,6 @@ class func(object):
 	def rig(self):
 		self.page.sbPCBID.valueChanged.connect(self.update_info)
 		self.page.pbGoModule.clicked.connect(self.goModule)
-
 		self.page.pbPCBNew.clicked.connect(self.startCreating)
 		self.page.pbPCBEdit.clicked.connect(self.startEditing)
 		self.page.pbPCBSave.clicked.connect(self.saveEditig)
@@ -70,70 +70,110 @@ class func(object):
 
 	@enforce_mode('view')
 	def update_info(self,ID=None,*args,**kwargs):
-		if ID is None:ID = self.page.sbPCBID.value()
-		self.info = self.fm.loadObjectDetails(PARTTYPE,ID)
-		self.updateElements(use_info = True)
+		if ID is None:
+			ID = self.page.sbPCBID.value()
+		else:
+			self.page.sbPCBID.setValue(ID)
 
-	@enforce_mode(['view','editing','creating'])
-	def updateElements(self,use_info=False):
-		if use_info:
-			if self.info is None:
-				self.page.leIdentifier.setText("")
-				self.page.dsbThickness.setValue(-1.0)
+		self.pcb_exists = self.pcb.load(ID)
+
+		if self.pcb_exists:
+			self.page.leIdentifier.setText(   self.pcb.identifier   )
+
+			thickness = self.pcb.thickness
+			if thickness:
+				self.page.dsbThickness.setValue(thickness)
+			else:
+				self.page.dsbThickness.setValue(0)
 				self.page.dsbThickness.clear()
-				self.page.dsbFlatness.setValue(-1.0)
+
+			flatness = self.pcb.flatness
+			if not (flatness is None):
+				self.page.dsbFlatness.setValue(flatness)
+			else:
+				self.page.dsbFlatness.setValue(-1)
 				self.page.dsbFlatness.clear()
-				self.page.dsbSize.setValue(-1.0)
+
+			size = self.pcb.size
+			if size:
+				self.page.dsbSize.setValue(size)
+			else:
+				self.page.dsbSize.setValue(0)
 				self.page.dsbSize.clear()
-				self.page.sbChannels.setValue(-1)
+
+
+			channels = self.pcb.channels
+			if channels:
+				self.page.sbChannels.setValue(channels)
+			else:
+				self.page.sbChannels.setValue(0)
 				self.page.sbChannels.clear()
-				self.page.leManufacturer.setText("")
+
+			self.page.leManufacturer.setText( self.pcb.manufacturer )
+			
+			module = self.pcb.module
+			if not (module is None):
+				self.page.sbOnModule.setValue(module)
+			else:
 				self.page.sbOnModule.setValue(-1)
 				self.page.sbOnModule.clear()
 
-			else:
-				self.page.leIdentifier.setText(   self.info["identifier"]   )
-				self.page.dsbThickness.setValue(  self.info["thickness"]    )
-				self.page.dsbFlatness.setValue(   self.info["flatness"]     )
-				self.page.dsbSize.setValue(       self.info["size"]         )
-				self.page.sbChannels.setValue(    self.info["channels"]     )
-				self.page.leManufacturer.setText( self.info["manufacturer"] )
-				self.page.sbOnModule.setValue(    self.info["onModuleID"]   )
-				if self.info["thickness"]    == -1.0:self.page.dsbThickness.clear()
-				if self.info["flatness"]     == -1.0:self.page.dsbFlatness.clear()
-				if self.info["size"]         == -1.0:self.page.dsbSize.clear()
-				if self.info["channels"]     == -1  :self.page.sbChannels.clear()
-				if self.info["onModuleID"]   == -1  :self.page.sbOnModule.clear()
+		else:
+			self.page.leIdentifier.setText("")
+			self.page.dsbThickness.setValue(0)
+			self.page.dsbThickness.clear()
+			self.page.dsbFlatness.setValue(-1)
+			self.page.dsbFlatness.clear()
+			self.page.dsbSize.setValue(0)
+			self.page.dsbSize.clear()
+			self.page.sbChannels.setValue(0)
+			self.page.sbChannels.clear()
+			self.page.leManufacturer.setText("")
+			self.page.sbOnModule.setValue(-1)
+			self.page.sbOnModule.clear()
 
+		self.updateElements()
 
-		self.page.pbPCBNew.setEnabled(    (self.mode == 'view') and     (self.info is None) )
-		self.page.pbPCBEdit.setEnabled(   (self.mode == 'view') and not (self.info is None) )
-		self.page.pbPCBSave.setEnabled(    self.mode in ['editing','creating'] )
-		self.page.pbPCBCancel.setEnabled(  self.mode in ['editing','creating'] )
+	@enforce_mode(['view','editing','creating'])
+	def updateElements(self,use_info=False):
 
-		self.setMainSwitchingEnabled( self.mode == 'view' )
+		mode_view     = self.mode == 'view'
+		mode_editing  = self.mode == 'editing'
+		mode_creating = self.mode == 'creating'
+		pcb_exists    = self.pcb_exists
+		module_exists = self.page.sbOnModule.value() >= 0
+		#protomodul exists
 
-		self.page.pbGoModule.setEnabled( (self.mode == 'view') and (self.page.sbOnModule.value()>=0) )
-		self.page.sbPCBID.setEnabled(     self.mode == 'view' )
-		self.page.leIdentifier.setReadOnly(   not (self.mode in ['editing','creating']) )
-		self.page.dsbThickness.setReadOnly(   not (self.mode in ['editing','creating']) )
-		self.page.dsbFlatness.setReadOnly(    not (self.mode in ['editing','creating']) )
-		self.page.dsbSize.setReadOnly(        not (self.mode in ['editing','creating']) )
-		self.page.sbChannels.setReadOnly(     not (self.mode in ['editing','creating']) )
-		self.page.leManufacturer.setReadOnly( not (self.mode in ['editing','creating']) )
-		self.page.sbOnModule.setReadOnly(     not (self.mode in ['editing','creating']) )
+		self.setMainSwitchingEnabled(mode_view)
+				
+		self.page.pbPCBNew.setEnabled(    mode_view and not pcb_exists  )
+		self.page.pbPCBEdit.setEnabled(   mode_view and     pcb_exists  )
+		self.page.pbPCBSave.setEnabled(   mode_editing or mode_creating )
+		self.page.pbPCBCancel.setEnabled( mode_editing or mode_creating )
+
+		self.page.pbGoModule.setEnabled( mode_view and module_exists )
+		self.page.sbPCBID.setEnabled(    mode_view )
+		self.page.leIdentifier.setReadOnly(   not (mode_editing or mode_creating) )
+		self.page.dsbThickness.setReadOnly(   not (mode_editing or mode_creating) )
+		self.page.dsbFlatness.setReadOnly(    not (mode_editing or mode_creating) )
+		self.page.dsbSize.setReadOnly(        not (mode_editing or mode_creating) )
+		self.page.sbChannels.setReadOnly(     not (mode_editing or mode_creating) )
+		self.page.leManufacturer.setReadOnly( not (mode_editing or mode_creating) )
+		self.page.sbOnModule.setReadOnly(     not (mode_editing or mode_creating) )
 
 	@enforce_mode('view')
 	def startCreating(self,*args,**kwargs):
-		if self.info is None:
+		if not self.pcb_exists:
+			ID = self.page.sbPCBID.value()
 			self.mode = 'creating'
+			self.pcb.new(ID)
 			self.updateElements()
 		else:
 			pass
 
 	@enforce_mode('view')
 	def startEditing(self,*args,**kwargs):
-		if self.info is None:
+		if not self.pcb_exists:
 			pass
 		else:
 			self.mode = 'editing'
@@ -146,18 +186,16 @@ class func(object):
 
 	@enforce_mode(['editing','creating'])
 	def saveEditig(self,*args,**kwargs):
-		ID = self.page.sbPCBID.value()
-		details = {
-			'identifier'   : str(self.page.leIdentifier.text()),
-			'thickness'    : self.page.dsbThickness.value(),
-			'flatness'     : self.page.dsbFlatness.value(),
-			'size'         : self.page.dsbSize.value(),
-			'channels'     : self.page.sbChannels.value(),
-			'manufacturer' : str(self.page.leManufacturer.text()),
-			'onModuleID'   : self.page.sbOnModule.value(),
-			}
-		new = self.mode == 'creating'
-		self.fm.changeObjectDetails(PARTTYPE,ID,details,new)
+		self.pcb.identifier   = str(self.page.leIdentifier.text())
+		self.pcb.manufacturer = str(self.page.leManufacturer.text())
+
+		self.pcb.thickness    = self.page.dsbThickness.value() if self.page.dsbThickness.value() >  0 else None
+		self.pcb.flatness     = self.page.dsbFlatness.value()  if self.page.dsbFlatness.value()  >= 0 else None
+		self.pcb.size         = self.page.dsbSize.value()      if self.page.dsbSize.value()      >  0 else None
+		self.pcb.channels     = self.page.sbChannels.value()   if self.page.sbChannels.value()   >  0 else None
+		self.pcb.onModuleID   = self.page.sbOnModule.value()   if self.page.sbOnModule.value()   >= 0 else None
+		
+		self.pcb.save()
 		self.mode = 'view'
 		self.update_info()
 

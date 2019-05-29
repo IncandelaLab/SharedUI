@@ -148,7 +148,7 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 		self.func_view_module      = cls_func_view_module(      self.fm, self.page_view_module     , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_baseplate   = cls_func_view_baseplate(        fm, self.page_view_baseplate  , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_sensor      = cls_func_view_sensor(           fm, self.page_view_sensor     , self.setUIPage, self.setSwitchingEnabled)
-		self.func_view_PCB         = cls_func_view_PCB(         self.fm, self.page_view_PCB        , self.setUIPage, self.setSwitchingEnabled)
+		self.func_view_PCB         = cls_func_view_PCB(              fm, self.page_view_PCB        , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_kapton_step = cls_func_view_kapton_step( self.fm, self.page_view_kapton_step, self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_sensor_step = cls_func_view_sensor_step( self.fm, self.page_view_sensor_step, self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_pcb_step    = cls_func_view_pcb_step(    self.fm, self.page_view_pcb_step   , self.setUIPage, self.setSwitchingEnabled)
