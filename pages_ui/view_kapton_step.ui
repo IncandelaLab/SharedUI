@@ -425,12 +425,12 @@
     <rect>
      <x>10</x>
      <y>400</y>
-     <width>91</width>
+     <width>131</width>
      <height>21</height>
     </rect>
    </property>
    <property name="text">
-    <string>Araldite batch</string>
+    <string>araldite batch</string>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -462,7 +462,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>tool ID</string>
+    <string>sensor tool ID</string>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -478,7 +478,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Baseplate ID</string>
+    <string>baseplate ID</string>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -679,7 +679,7 @@
   <widget class="QSpinBox" name="sbBatchAraldite">
    <property name="geometry">
     <rect>
-     <x>100</x>
+     <x>140</x>
      <y>400</y>
      <width>71</width>
      <height>21</height>
@@ -805,12 +805,12 @@
     <rect>
      <x>10</x>
      <y>380</y>
-     <width>91</width>
+     <width>131</width>
      <height>21</height>
     </rect>
    </property>
    <property name="text">
-    <string>Assembly Tray</string>
+    <string>assembly tray</string>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -821,12 +821,12 @@
     <rect>
      <x>10</x>
      <y>360</y>
-     <width>91</width>
+     <width>131</width>
      <height>21</height>
     </rect>
    </property>
    <property name="text">
-    <string>Component Tray</string>
+    <string>component tray (sensor)</string>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -835,7 +835,7 @@
   <widget class="QSpinBox" name="sbTrayAssembly">
    <property name="geometry">
     <rect>
-     <x>100</x>
+     <x>140</x>
      <y>380</y>
      <width>71</width>
      <height>21</height>
@@ -851,7 +851,7 @@
   <widget class="QSpinBox" name="sbTrayComponent">
    <property name="geometry">
     <rect>
-     <x>100</x>
+     <x>140</x>
      <y>360</y>
      <width>71</width>
      <height>21</height>
@@ -867,7 +867,7 @@
   <widget class="QPushButton" name="pbGoTrayAssembly">
    <property name="geometry">
     <rect>
-     <x>170</x>
+     <x>210</x>
      <y>380</y>
      <width>51</width>
      <height>21</height>
@@ -880,7 +880,7 @@
   <widget class="QPushButton" name="pbGoTrayComponent">
    <property name="geometry">
     <rect>
-     <x>170</x>
+     <x>210</x>
      <y>360</y>
      <width>51</width>
      <height>21</height>
@@ -893,7 +893,7 @@
   <widget class="QPushButton" name="pbGoBatchAraldite">
    <property name="geometry">
     <rect>
-     <x>170</x>
+     <x>210</x>
      <y>400</y>
      <width>51</width>
      <height>21</height>

@@ -150,7 +150,7 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 		self.func_view_sensor      = cls_func_view_sensor(           fm, self.page_view_sensor     , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_PCB         = cls_func_view_PCB(              fm, self.page_view_PCB        , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_kapton_step = cls_func_view_kapton_step(      fm, self.page_view_kapton_step, self.setUIPage, self.setSwitchingEnabled)
-		self.func_view_sensor_step = cls_func_view_sensor_step( self.fm, self.page_view_sensor_step, self.setUIPage, self.setSwitchingEnabled)
+		self.func_view_sensor_step = cls_func_view_sensor_step(      fm, self.page_view_sensor_step, self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_pcb_step    = cls_func_view_pcb_step(    self.fm, self.page_view_pcb_step   , self.setUIPage, self.setSwitchingEnabled)
 		self.func_routine_iv       = cls_func_routine_iv(       self.fm, self.page_routine_iv      , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_tooling     = cls_func_view_tooling(          fm, self.page_view_tooling    , self.setUIPage, self.setSwitchingEnabled)

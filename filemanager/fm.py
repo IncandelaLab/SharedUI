@@ -240,8 +240,9 @@ class step_sensor(fsobj):
 	FILEDIR    = os.sep.join(['steps','sensor','{century}'])
 	FILENAME   = 'sensor_assembly_step_{ID:0>5}.json'
 	PROPERTIES = [
-		'user',             # name of person who performed step
-		'step_start',       # unix time @ start of step
+		'user_performed', # name of user who performed step
+		'date_performed', # date step was performed
+		
 		'cure_start',       # unix time @ start of curing
 		'cure_stop',        # unix time @ end of curing
 		'cure_temperature', # Average temperature during curing (centigrade)
@@ -252,16 +253,10 @@ class step_sensor(fsobj):
 		'baseplates',   # list of baseplate   IDs, ordered by assembly tray position
 		'protomodules', # list of protomodule IDs assigned to new modules, by assembly tray position
 
-		'tool_pickups',         # tool locations           visited by pick-and-places, in the order that pick-and-places were performed
-		'component_pickups',    # component tray locations visited by pick-and-places, in the order that pick-and-places were performed
-		'component_placements', # assembly tray locations  visited by pick-and-places, in the order that pick-and-places were performed
-		                        # If the first pick-and-places takes the tool from tool location 1, picks up the component at location 1,
-		                        # and puts it on the protomodule at location 1 (etc.,) then each of these will be [1, 2, 3, ... ]
-
 		'tray_component_sensor', # ID of component tray used
 		'tray_assembly',         # ID of assembly tray used
 		'batch_araldite',        # ID of araldite batch used
-		'batch_silver',          # ID of silver epoxy batch used
+		'batch_loctite',         # ID of silver epoxy batch used
 	]
 
 	@property

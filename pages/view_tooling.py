@@ -247,19 +247,19 @@ class func(object):
 
 	@enforce_mode(['view','editing_sensor_tool','editing_sensor_tray','editing_pcb_tray','editing_assembly_tray'])
 	def update_info_pcb_tool(self,ID=None,*args,**kwargs):
-		self.tool_pcb.update_info()
+		self.tool_pcb.update_info(ID)
 
 	@enforce_mode(['view','editing_sensor_tool','editing_pcb_tool','editing_pcb_tray','editing_assembly_tray'])
 	def update_info_sensor_tray(self,ID=None,*args,**kwargs):
-		self.tray_component_sensor.update_info()
+		self.tray_component_sensor.update_info(ID)
 
 	@enforce_mode(['view','editing_sensor_tool','editing_pcb_tool','editing_sensor_tray','editing_assembly_tray'])
 	def update_info_pcb_tray(self,ID=None,*args,**kwargs):
-		self.tray_component_pcb.update_info()
+		self.tray_component_pcb.update_info(ID)
 
 	@enforce_mode(['view','editing_sensor_tool','editing_pcb_tool','editing_sensor_tray','editing_pcb_tray'])
 	def update_info_assembly_tray(self,ID=None,*args,**kwargs):
-		self.tray_assembly.update_info()
+		self.tray_assembly.update_info(ID)
 
 	@enforce_mode('view')
 	def update_info(self,*args,**kwargs):
@@ -476,17 +476,16 @@ class func(object):
 	@enforce_mode('view')
 	def load_kwargs(self,kwargs):
 		keys = kwargs.keys()
-
-		if "sensor_tool" in keys:
-			self.update_info_sensor_tool(kwargs['sensor_tool'])
-		if "pcb_tool" in keys:
-			self.update_info_pcb_tool(kwargs['pcb_tool'])
-		if "sensor_tray" in keys:
-			self.update_info_sensor_tray(kwargs['sensor_tray'])
-		if "pcb_tray" in keys:
-			self.update_info_pcb_tray(kwargs['pcb_tray'])
-		if "assembly_tray" in keys:
-			self.update_info_assembly_tray(kwargs['assembly_tray'])
+		if "tool_sensor" in keys:
+			self.update_info_sensor_tool(kwargs['tool_sensor'])
+		if "tool_pcb" in keys:
+			self.update_info_pcb_tool(kwargs['tool_pcb'])
+		if "tray_component_sensor" in keys:
+			self.update_info_sensor_tray(kwargs['tray_component_sensor'])
+		if "tray_component_pcb" in keys:
+			self.update_info_pcb_tray(kwargs['tray_component_pcb'])
+		if "tray_assembly" in keys:
+			self.update_info_assembly_tray(kwargs['tray_assembly'])
 
 	@enforce_mode('view')
 	def changed_to(self):

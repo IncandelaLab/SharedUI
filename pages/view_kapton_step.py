@@ -77,6 +77,7 @@ class func(object):
 			self.page.pbGoTool5,
 			self.page.pbGoTool6,
 		]
+
 		self.sb_baseplates = [
 			self.page.sbBaseplate1,
 			self.page.sbBaseplate2,
@@ -105,6 +106,13 @@ class func(object):
 		self.page.pbSave.clicked.connect(self.saveEditing)
 		self.page.pbCancel.clicked.connect(self.cancelEditing)
 
+		self.page.pbGoBatchAraldite.clicked.connect(self.goBatchAraldite)
+		self.page.pbGoTrayAssembly.clicked.connect(self.goTrayAssembly)
+		self.page.pbGoTrayComponent.clicked.connect(self.goTrayComponent)
+
+		self.page.pbDatePerformedNow.clicked.connect(self.setDatePerformedNow)
+		self.page.pbCureStartNow    .clicked.connect(self.setCureStartNow)
+		self.page.pbCureStopNow     .clicked.connect(self.setCureStopNow)
 
 	@enforce_mode('view')
 	def update_info(self,ID=None,*args,**kwargs):
@@ -203,6 +211,10 @@ class func(object):
 		self.setMainSwitchingEnabled(mode_view)
 		self.page.sbID.setEnabled(mode_view)
 
+		self.page.pbDatePerformedNow.setEnabled(mode_creating or mode_editing)
+		self.page.pbCureStartNow    .setEnabled(mode_creating or mode_editing)
+		self.page.pbCureStopNow     .setEnabled(mode_creating or mode_editing)
+
 		self.page.leUserPerformed  .setReadOnly(mode_view)
 		self.page.dPerformed       .setReadOnly(mode_view)
 		self.page.dtCureStart      .setReadOnly(mode_view)
@@ -292,17 +304,42 @@ class func(object):
 		self.update_info()
 
 	def goTool(self,*args,**kwargs):
-		pass
+		sender_name = str(self.page.sender().objectName())
+		which = int(sender_name[-1]) - 1 # last character of sender name is integer 1 through 6; subtract one for zero index
+		tool = self.sb_tools[which].value()
+		self.setUIPage('tooling',tool_sensor=tool)
 
 	def goBaseplate(self,*args,**kwargs):
-		pass
+		sender_name = str(self.page.sender().objectName())
+		which = int(sender_name[-1]) - 1
+		baseplate = self.sb_baseplates[which].value()
+		self.setUIPage('baseplates',ID=baseplate)
 
-	# TODO
-	# implement go... functions
-	# including those above, plus component tray, assembly tray, araldite batch
-	# look at https://stackoverflow.com/questions/13050810/pyqt-button-clicked-name
-	# 
-	# add functions for pb...Now buttons
+	def goBatchAraldite(self,*args,**kwargs):
+		batch_araldite = self.page.sbBatchAraldite.value()
+		self.setUIPage('supplies',batch_araldite=batch_araldite)
+
+	def goTrayComponent(self,*args,**kwargs):
+		tray_component_sensor = self.page.sbTrayComponent.value()
+		self.setUIPage('tooling',tray_component_sensor=tray_component_sensor)
+
+	def goTrayAssembly(self,*args,**kwargs):
+		tray_assembly = self.page.sbTrayAssembly.value()
+		print(tray_assembly)
+		self.setUIPage('tooling',tray_assembly=tray_assembly)
+
+	def setDatePerformedNow(self, *args, **kwargs):
+		self.page.dPerformed.setDate(QtCore.QDate(*time.localtime()[:3]))
+
+	def setCureStartNow(self, *args, **kwargs):
+		localtime = time.localtime()
+		self.page.dtCureStart.setDate(QtCore.QDate(*localtime[0:3]))
+		self.page.dtCureStart.setTime(QtCore.QTime(*localtime[3:6]))
+
+	def setCureStopNow(self, *args, **kwargs):
+		localtime = time.localtime()
+		self.page.dtCureStop.setDate(QtCore.QDate(*localtime[0:3]))
+		self.page.dtCureStop.setTime(QtCore.QTime(*localtime[3:6]))
 
 	@enforce_mode('view')
 	def load_kwargs(self,kwargs):
