@@ -18,7 +18,7 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>91</width>
+     <width>81</width>
      <height>21</height>
     </rect>
    </property>
@@ -29,12 +29,12 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QSpinBox" name="sbKaptonStepID">
+  <widget class="QSpinBox" name="sbID">
    <property name="geometry">
     <rect>
-     <x>100</x>
+     <x>90</x>
      <y>10</y>
-     <width>61</width>
+     <width>71</width>
      <height>21</height>
     </rect>
    </property>
@@ -44,12 +44,12 @@
     <rect>
      <x>10</x>
      <y>40</y>
-     <width>81</width>
+     <width>111</width>
      <height>21</height>
     </rect>
    </property>
    <property name="text">
-    <string>who</string>
+    <string>who performed step</string>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -60,28 +60,12 @@
     <rect>
      <x>10</x>
      <y>60</y>
-     <width>81</width>
+     <width>111</width>
      <height>21</height>
     </rect>
    </property>
    <property name="text">
-    <string>date</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_4">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>80</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>time</string>
+    <string>date performed</string>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -92,7 +76,7 @@
     <rect>
      <x>10</x>
      <y>100</y>
-     <width>81</width>
+     <width>91</width>
      <height>21</height>
     </rect>
    </property>
@@ -108,7 +92,7 @@
     <rect>
      <x>10</x>
      <y>120</y>
-     <width>81</width>
+     <width>91</width>
      <height>21</height>
     </rect>
    </property>
@@ -124,7 +108,7 @@
     <rect>
      <x>10</x>
      <y>140</y>
-     <width>81</width>
+     <width>91</width>
      <height>21</height>
     </rect>
    </property>
@@ -140,12 +124,12 @@
     <rect>
      <x>10</x>
      <y>160</y>
-     <width>81</width>
+     <width>91</width>
      <height>21</height>
     </rect>
    </property>
    <property name="text">
-    <string>cure temp</string>
+    <string>cure temperature</string>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -156,7 +140,7 @@
     <rect>
      <x>10</x>
      <y>180</y>
-     <width>81</width>
+     <width>91</width>
      <height>21</height>
     </rect>
    </property>
@@ -167,10 +151,10 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QSpinBox" name="sbModule1">
+  <widget class="QSpinBox" name="sbBaseplate1">
    <property name="geometry">
     <rect>
-     <x>130</x>
+     <x>180</x>
      <y>230</y>
      <width>71</width>
      <height>22</height>
@@ -183,10 +167,10 @@
     <number>2147483647</number>
    </property>
   </widget>
-  <widget class="QPushButton" name="pbGoModule1">
+  <widget class="QPushButton" name="pbGoBaseplate1">
    <property name="geometry">
     <rect>
-     <x>200</x>
+     <x>250</x>
      <y>230</y>
      <width>51</width>
      <height>21</height>
@@ -196,10 +180,10 @@
     <string>go to</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pbGoModule2">
+  <widget class="QPushButton" name="pbGoBaseplate2">
    <property name="geometry">
     <rect>
-     <x>200</x>
+     <x>250</x>
      <y>250</y>
      <width>51</width>
      <height>21</height>
@@ -209,10 +193,10 @@
     <string>go to</string>
    </property>
   </widget>
-  <widget class="QSpinBox" name="sbModule2">
+  <widget class="QSpinBox" name="sbBaseplate2">
    <property name="geometry">
     <rect>
-     <x>130</x>
+     <x>180</x>
      <y>250</y>
      <width>71</width>
      <height>22</height>
@@ -225,10 +209,10 @@
     <number>2147483647</number>
    </property>
   </widget>
-  <widget class="QSpinBox" name="sbModule3">
+  <widget class="QSpinBox" name="sbBaseplate3">
    <property name="geometry">
     <rect>
-     <x>130</x>
+     <x>180</x>
      <y>270</y>
      <width>71</width>
      <height>22</height>
@@ -241,10 +225,10 @@
     <number>2147483647</number>
    </property>
   </widget>
-  <widget class="QPushButton" name="pbGoModule3">
+  <widget class="QPushButton" name="pbGoBaseplate3">
    <property name="geometry">
     <rect>
-     <x>200</x>
+     <x>250</x>
      <y>270</y>
      <width>51</width>
      <height>21</height>
@@ -254,10 +238,10 @@
     <string>go to</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pbGoModule4">
+  <widget class="QPushButton" name="pbGoBaseplate6">
    <property name="geometry">
     <rect>
-     <x>200</x>
+     <x>250</x>
      <y>330</y>
      <width>51</width>
      <height>21</height>
@@ -267,10 +251,10 @@
     <string>go to</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pbGoModule5">
+  <widget class="QPushButton" name="pbGoBaseplate4">
    <property name="geometry">
     <rect>
-     <x>200</x>
+     <x>250</x>
      <y>290</y>
      <width>51</width>
      <height>21</height>
@@ -280,10 +264,10 @@
     <string>go to</string>
    </property>
   </widget>
-  <widget class="QSpinBox" name="sbModule4">
+  <widget class="QSpinBox" name="sbBaseplate6">
    <property name="geometry">
     <rect>
-     <x>130</x>
+     <x>180</x>
      <y>330</y>
      <width>71</width>
      <height>21</height>
@@ -296,10 +280,10 @@
     <number>2147483647</number>
    </property>
   </widget>
-  <widget class="QPushButton" name="pbGoModule6">
+  <widget class="QPushButton" name="pbGoBaseplate5">
    <property name="geometry">
     <rect>
-     <x>200</x>
+     <x>250</x>
      <y>310</y>
      <width>51</width>
      <height>21</height>
@@ -309,10 +293,10 @@
     <string>go to</string>
    </property>
   </widget>
-  <widget class="QSpinBox" name="sbModule5">
+  <widget class="QSpinBox" name="sbBaseplate4">
    <property name="geometry">
     <rect>
-     <x>130</x>
+     <x>180</x>
      <y>290</y>
      <width>71</width>
      <height>22</height>
@@ -325,10 +309,10 @@
     <number>2147483647</number>
    </property>
   </widget>
-  <widget class="QSpinBox" name="sbModule6">
+  <widget class="QSpinBox" name="sbBaseplate5">
    <property name="geometry">
     <rect>
-     <x>130</x>
+     <x>180</x>
      <y>310</y>
      <width>71</width>
      <height>21</height>
@@ -341,52 +325,12 @@
     <number>2147483647</number>
    </property>
   </widget>
-  <widget class="QLineEdit" name="leWho">
+  <widget class="QLineEdit" name="leUserPerformed">
    <property name="geometry">
     <rect>
-     <x>90</x>
+     <x>120</x>
      <y>40</y>
-     <width>71</width>
-     <height>20</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="leDate">
-   <property name="geometry">
-    <rect>
-     <x>90</x>
-     <y>60</y>
-     <width>71</width>
-     <height>20</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="leTime">
-   <property name="geometry">
-    <rect>
-     <x>90</x>
-     <y>80</y>
-     <width>71</width>
-     <height>20</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="leCureStart">
-   <property name="geometry">
-    <rect>
-     <x>90</x>
-     <y>100</y>
-     <width>71</width>
-     <height>20</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="leCureStop">
-   <property name="geometry">
-    <rect>
-     <x>90</x>
-     <y>120</y>
-     <width>71</width>
+     <width>111</width>
      <height>20</height>
     </rect>
    </property>
@@ -394,19 +338,22 @@
   <widget class="QLineEdit" name="leCureDuration">
    <property name="geometry">
     <rect>
-     <x>90</x>
+     <x>100</x>
      <y>140</y>
-     <width>71</width>
+     <width>131</width>
      <height>20</height>
     </rect>
    </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
   </widget>
-  <widget class="QLineEdit" name="leCureTemp">
+  <widget class="QLineEdit" name="leCureTemperature">
    <property name="geometry">
     <rect>
-     <x>90</x>
+     <x>100</x>
      <y>160</y>
-     <width>71</width>
+     <width>131</width>
      <height>20</height>
     </rect>
    </property>
@@ -414,18 +361,18 @@
   <widget class="QLineEdit" name="leCureHumidity">
    <property name="geometry">
     <rect>
-     <x>90</x>
+     <x>100</x>
      <y>180</y>
-     <width>71</width>
+     <width>131</width>
      <height>21</height>
     </rect>
    </property>
   </widget>
-  <widget class="QPushButton" name="pbKaptonStepNew">
+  <widget class="QPushButton" name="pbNew">
    <property name="geometry">
     <rect>
-     <x>200</x>
-     <y>12</y>
+     <x>310</x>
+     <y>2</y>
      <width>71</width>
      <height>21</height>
     </rect>
@@ -434,11 +381,11 @@
     <string>New</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pbKaptonStepEdit">
+  <widget class="QPushButton" name="pbEdit">
    <property name="geometry">
     <rect>
-     <x>280</x>
-     <y>10</y>
+     <x>390</x>
+     <y>0</y>
      <width>71</width>
      <height>21</height>
     </rect>
@@ -447,11 +394,11 @@
     <string>Edit</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pbKaptonStepCancel">
+  <widget class="QPushButton" name="pbCancel">
    <property name="geometry">
     <rect>
-     <x>280</x>
-     <y>40</y>
+     <x>390</x>
+     <y>30</y>
      <width>71</width>
      <height>21</height>
     </rect>
@@ -460,11 +407,11 @@
     <string>Cancel</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pbKaptonStepSave">
+  <widget class="QPushButton" name="pbSave">
    <property name="geometry">
     <rect>
-     <x>200</x>
-     <y>40</y>
+     <x>310</x>
+     <y>30</y>
      <width>71</width>
      <height>21</height>
     </rect>
@@ -473,27 +420,17 @@
     <string>Save</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="leAralditeBatch">
-   <property name="geometry">
-    <rect>
-     <x>90</x>
-     <y>360</y>
-     <width>71</width>
-     <height>20</height>
-    </rect>
-   </property>
-  </widget>
   <widget class="QLineEdit" name="lineEdit_11">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>360</y>
-     <width>81</width>
+     <y>400</y>
+     <width>91</width>
      <height>21</height>
     </rect>
    </property>
    <property name="text">
-    <string>Araldite batch#</string>
+    <string>Araldite batch</string>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -518,9 +455,9 @@
   <widget class="QLineEdit" name="lineEdit_13">
    <property name="geometry">
     <rect>
-     <x>60</x>
+     <x>70</x>
      <y>210</y>
-     <width>71</width>
+     <width>101</width>
      <height>20</height>
     </rect>
    </property>
@@ -534,14 +471,14 @@
   <widget class="QLineEdit" name="lineEdit_14">
    <property name="geometry">
     <rect>
-     <x>130</x>
+     <x>180</x>
      <y>210</y>
      <width>121</width>
      <height>20</height>
     </rect>
    </property>
    <property name="text">
-    <string>Module ID</string>
+    <string>Baseplate ID</string>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -646,9 +583,9 @@
   <widget class="QSpinBox" name="sbTool5">
    <property name="geometry">
     <rect>
-     <x>60</x>
+     <x>70</x>
      <y>310</y>
-     <width>71</width>
+     <width>51</width>
      <height>22</height>
     </rect>
    </property>
@@ -662,9 +599,9 @@
   <widget class="QSpinBox" name="sbTool1">
    <property name="geometry">
     <rect>
-     <x>60</x>
+     <x>70</x>
      <y>230</y>
-     <width>71</width>
+     <width>51</width>
      <height>22</height>
     </rect>
    </property>
@@ -678,9 +615,9 @@
   <widget class="QSpinBox" name="sbTool3">
    <property name="geometry">
     <rect>
-     <x>60</x>
+     <x>70</x>
      <y>270</y>
-     <width>71</width>
+     <width>51</width>
      <height>22</height>
     </rect>
    </property>
@@ -694,9 +631,9 @@
   <widget class="QSpinBox" name="sbTool4">
    <property name="geometry">
     <rect>
-     <x>60</x>
+     <x>70</x>
      <y>290</y>
-     <width>71</width>
+     <width>51</width>
      <height>22</height>
     </rect>
    </property>
@@ -710,9 +647,9 @@
   <widget class="QSpinBox" name="sbTool2">
    <property name="geometry">
     <rect>
-     <x>60</x>
+     <x>70</x>
      <y>250</y>
-     <width>71</width>
+     <width>51</width>
      <height>22</height>
     </rect>
    </property>
@@ -726,9 +663,9 @@
   <widget class="QSpinBox" name="sbTool6">
    <property name="geometry">
     <rect>
-     <x>60</x>
+     <x>70</x>
      <y>330</y>
-     <width>71</width>
+     <width>51</width>
      <height>21</height>
     </rect>
    </property>
@@ -737,6 +674,272 @@
    </property>
    <property name="maximum">
     <number>2147483647</number>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="sbBatchAraldite">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>400</y>
+     <width>71</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="minimum">
+    <number>-1</number>
+   </property>
+   <property name="maximum">
+    <number>999999</number>
+   </property>
+  </widget>
+  <widget class="QDateTimeEdit" name="dtCureStart">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>100</y>
+     <width>131</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QDateTimeEdit" name="dtCureStop">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>120</y>
+     <width>131</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QDateEdit" name="dPerformed">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>60</y>
+     <width>111</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pbGoTool5">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>310</y>
+     <width>51</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>go to</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pbGoTool4">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>290</y>
+     <width>51</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>go to</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pbGoTool1">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>230</y>
+     <width>51</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>go to</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pbGoTool2">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>250</y>
+     <width>51</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>go to</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pbGoTool6">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>330</y>
+     <width>51</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>go to</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pbGoTool3">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>270</y>
+     <width>51</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>go to</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_21">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>380</y>
+     <width>91</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Assembly Tray</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_22">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>360</y>
+     <width>91</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Component Tray</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="sbTrayAssembly">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>380</y>
+     <width>71</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="minimum">
+    <number>-1</number>
+   </property>
+   <property name="maximum">
+    <number>999999</number>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="sbTrayComponent">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>360</y>
+     <width>71</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="minimum">
+    <number>-1</number>
+   </property>
+   <property name="maximum">
+    <number>999999</number>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pbGoTrayAssembly">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>380</y>
+     <width>51</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>go to</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pbGoTrayComponent">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>360</y>
+     <width>51</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>go to</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pbGoBatchAraldite">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>400</y>
+     <width>51</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>go to</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pbDatePerformedNow">
+   <property name="geometry">
+    <rect>
+     <x>230</x>
+     <y>60</y>
+     <width>75</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>set to today</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pbCureStartNow">
+   <property name="geometry">
+    <rect>
+     <x>230</x>
+     <y>100</y>
+     <width>75</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>set to now</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pbCureStopNow">
+   <property name="geometry">
+    <rect>
+     <x>230</x>
+     <y>120</y>
+     <width>75</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>set to now</string>
    </property>
   </widget>
  </widget>

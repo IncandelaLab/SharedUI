@@ -212,22 +212,16 @@ class step_kapton(fsobj):
 	FILEDIR    = os.sep.join(['steps','kapton','{century}'])
 	FILENAME   = 'kapton_assembly_step_{ID:0>5}.json'
 	PROPERTIES = [
-		'user',             # name of person who performed step
-		'step_start',       # unix time @ start of step
+		'user_performed', # name of user who performed step
+		'date_performed', # date step was performed
+		
 		'cure_start',       # unix time @ start of curing
 		'cure_stop',        # unix time @ end of curing
 		'cure_temperature', # Average temperature during curing (centigrade)
 		'cure_humidity',    # Average humidity during curing (percent)
 
 		'tools',        # list of pickup tool IDs, ordered by pickup tool location
-		'kaptons',      # list of kapton      IDs, ordered by component tray position
 		'baseplates',   # list of baseplate   IDs, ordered by assembly tray position
-
-		'locs_tool',      # tool locations           visited by each pick-and-place, in the order that pick-and-places were performed
-		'locs_component', # component tray locations visited by each pick-and-place, in the order that pick-and-places were performed
-		'locs_assembly',  # assembly tray locations  visited by each pick-and-place, in the order that pick-and-places were performed
-		                  # If the first pick-and-places takes the tool from tool location 1, picks up the component at location 1,
-		                  # and puts it on the baseplate at location 1 (etc.,) then each of these will be [1, 2, 3, ... ]
 
 		'tray_component_sensor', # ID of component tray used
 		'tray_assembly',         # ID of assembly tray used

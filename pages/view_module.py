@@ -198,7 +198,7 @@ class func(object):
 	@enforce_mode('view')
 	def startCreating(self,*args,**kwargs):
 		if not self.module_exists:
-			ID = sle.page.sbModuleID.value()
+			ID = self.page.sbModuleID.value()
 			self.mode = 'creating'
 			self.module.new(ID)
 			self.updateElements()
