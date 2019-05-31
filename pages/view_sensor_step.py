@@ -157,7 +157,7 @@ class func(object):
 		if ID is None:
 			ID = self.page.sbID.value()
 		else:
-			ID = self.page.sbID.setValue(ID)
+			self.page.sbID.setValue(ID)
 
 		self.step_sensor_exists = self.step_sensor.load(ID)
 
