@@ -251,12 +251,12 @@ class step_sensor(fsobj):
 		'tools',        # list of pickup tool IDs, ordered by pickup tool location
 		'sensors',      # list of sensor      IDs, ordered by component tray position
 		'baseplates',   # list of baseplate   IDs, ordered by assembly tray position
-		'protomodules', # list of protomodule IDs assigned to new modules, by assembly tray position
+		'protomodules', # list of protomodule IDs assigned to new protomodules, by assembly tray location
 
 		'tray_component_sensor', # ID of component tray used
-		'tray_assembly',         # ID of assembly tray used
+		'tray_assembly',         # ID of assembly  tray used
 		'batch_araldite',        # ID of araldite batch used
-		'batch_loctite',         # ID of silver epoxy batch used
+		'batch_loctite',         # ID of loctite  batch used
 	]
 
 	@property
@@ -268,8 +268,33 @@ class step_sensor(fsobj):
 
 	
 class step_pcb(fsobj):
-	...
+	FILEDIR = os.sep.join(['steps','pcb','{century}'])
+	FILENAME = 'pcb_assembly_step_{ID:0>5}.json'
+	PROPERTIES = [
+		'user_performed', # name of user who performed step
+		'date_performed', # date step was performed
+		
+		'cure_start',       # unix time @ start of curing
+		'cure_stop',        # unix time @ end of curing
+		'cure_temperature', # Average temperature during curing (centigrade)
+		'cure_humidity',    # Average humidity during curing (percent)
 
+		'tools',        # list of pickup tool IDs, ordered by pickup tool location
+		'pcbs',         # list of pcb         IDs, ordered by component tray location
+		'protomodules', # list of protomodule IDs, ordered by assembly tray location
+		'modules',      # list of module      IDs assigned to new modules, by assembly tray location
+
+		'tray_component_pcb', # ID of component tray used
+		'tray_assembly',      # ID of assembly  tray used
+		'batch_araldite',     # ID of araldite batch used
+	]
+
+	@property
+	def cure_duration(self):
+		if (self.cure_stop is None) or (self.cure_start is None):
+			return None
+		else:
+			return self.cure_stop - self.cure_start
 
 ###############################################
 #####  components, protomodules, modules  #####

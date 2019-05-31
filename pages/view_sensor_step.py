@@ -9,12 +9,9 @@ DEBUG = False
 
 class func(object):
 	def __init__(self,fm,page,setUIPage,setSwitchingEnabled):
-		# self.fm        = fm
 		self.page      = page
 		self.setUIPage = setUIPage
 		self.setMainSwitchingEnabled = setSwitchingEnabled
-
-		# self.info = None
 
 		self.step_sensor = fm.step_sensor()
 		self.step_sensor_exists = None
@@ -133,9 +130,9 @@ class func(object):
 		]
 
 		for i in range(6):
-			self.pb_go_tools[i].clicked.connect(self.goTool)
-			self.pb_go_sensors[i].clicked.connect(self.goSensor)
-			self.pb_go_baseplates[i].clicked.connect(self.goBaseplate)
+			self.pb_go_tools[i].clicked.connect(       self.goTool       )
+			self.pb_go_sensors[i].clicked.connect(     self.goSensor     )
+			self.pb_go_baseplates[i].clicked.connect(  self.goBaseplate  )
 			self.pb_go_protomodules[i].clicked.connect(self.goProtomodule)
 
 		self.page.sbID.valueChanged.connect(self.update_info)
@@ -318,14 +315,10 @@ class func(object):
 			self.mode = 'creating'
 			self.step_sensor.new(ID)
 			self.updateElements()
-		else:
-			pass
 
 	@enforce_mode('view')
 	def startEditing(self,*args,**kwargs):
-		if not self.step_sensor_exists:
-			pass
-		else:
+		if self.step_sensor_exists:
 			self.mode = 'editing'
 			self.updateElements()
 
