@@ -1,4 +1,3 @@
-from filemanager import manager
 from filemanager import fm
 from main_ui.mainwindow import Ui_MainWindow
 from PyQt4 import QtGui as gui, QtCore as core
@@ -114,7 +113,6 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 		self.setupUi(self)
 		print("Finished setting up main UI.")
 		print("Initializing file manager...")
-		self.fm = manager.manager()
 		print("Finished initializing file manager.")
 		print("Setting up pages' UI...")
 		self.setupPagesUI()
