@@ -29,13 +29,12 @@ PAGE_ID_MODULE = "modules"
 
 class func(object):
 	def __init__(self,fm,page,setUIPage,setSwitchingEnabled):
-		self.fm        = fm
 		self.page      = page
 		self.setUIPage = setUIPage
 		self.setMainSwitchingEnabled = setSwitchingEnabled
 
-		self.moduleInfo = None
-		self.moduleIV   = None
+		self.module = fm.module()
+		self.module_exists = None
 
 
 		self.routine_stage    = None
@@ -127,7 +126,7 @@ class func(object):
 	@enforce_mode('routine_setup')
 	def updateModuleInfo(self,*args,**kwargs):
 		moduleID = self.page.sbModuleID.value()
-		self.moduleInfo, self.moduleIV = self.fm.loadObjectDetails(OBJ_MODULE,moduleID)
+		self.module_exists = self.module.load(moduleID)
 		self.updateElements(change='moduleID')
 
 
@@ -149,14 +148,15 @@ class func(object):
 			# based on module existence & status
 			# update dict on setup issues
 			# then call function that refreshes pteConsole
-			if self.moduleInfo is None:
-				self.page.leModuleExists.setText(MSG_MODULE_EXISTS_FALSE)
-				self.page.leModuleReady.clear()
-			else:
+			if self.module_exists:
 				self.page.leModuleExists.setText(MSG_MODULE_EXISTS_TRUE)
-				self.page.leModuleReady.setText(MSG_MODULE_READY_FALSE if self.moduleInfo['PCB'] == -1 else MSG_MODULE_READY_TRUE)
+				pcb = -1 if self.module.pcb is None else self.module.pcb
+				self.page.leModuleReady.setText(MSG_MODULE_READY_FALSE if pcb == -1 else MSG_MODULE_READY_TRUE)
 				# :TODO:
 				# When wirebonding and curing status is added: change this to check if the module is bonded, encapsulated, and cured
+			else:
+				self.page.leModuleExists.setText(MSG_MODULE_EXISTS_FALSE)
+				self.page.leModuleReady.clear()
 
 		if change == 'mode' or change == 'all':
 			self.page.sbModuleID.setEnabled( self.mode == 'routine_setup' ) # :TODO: and no issues with routine_setup
