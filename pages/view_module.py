@@ -220,13 +220,13 @@ class func(object):
 
 	@enforce_mode(['editing','creating'])
 	def saveEditing(self,*args,**kwargs):
-		self.module.baseplate  = self.page.sbBaseplateID.value() if self.page.sbBaseplateID.value() >= 0 else None
-		self.module.sensor     = self.page.sbSensorID.value()    if self.page.sbSensorID.value()    >= 0 else None
-		self.module.pcb        = self.page.sbPCBID.value()       if self.page.sbPCBID.value()       >= 0 else None
-		self.module.thickness  = self.page.dsbThickness.value()  if self.page.dsbThickness.value()  >  0 else None
-		self.module.kaptonstep = self.page.sbKaptonStep.value()  if self.page.sbKaptonStep.value()  >= 0 else None
-		self.module.sensorstep = self.page.sbSensorStep.value()  if self.page.sbSensorStep.value()  >= 0 else None
-		self.module.PCBstep    = self.page.sbPCBStep.value()     if self.page.sbPCBStep.value()     >= 0 else None
+		self.module.baseplate   = self.page.sbBaseplateID.value() if self.page.sbBaseplateID.value() >= 0 else None
+		self.module.sensor      = self.page.sbSensorID.value()    if self.page.sbSensorID.value()    >= 0 else None
+		self.module.pcb         = self.page.sbPCBID.value()       if self.page.sbPCBID.value()       >= 0 else None
+		self.module.thickness   = self.page.dsbThickness.value()  if self.page.dsbThickness.value()  >  0 else None
+		self.module.step_kapton = self.page.sbKaptonStep.value()  if self.page.sbKaptonStep.value()  >= 0 else None
+		self.module.step_sensor = self.page.sbSensorStep.value()  if self.page.sbSensorStep.value()  >= 0 else None
+		self.module.step_pcb    = self.page.sbPCBStep.value()     if self.page.sbPCBStep.value()     >= 0 else None
 		
 		self.module.save()
 		self.mode = 'view'

@@ -126,20 +126,8 @@ class func(object):
 			# same for protomodule
 
 			if not (self.baseplate.corner_heights is None):
-				self.page.dsbC0.setValue(self.baseplate.corner_heights[0])
-				self.page.dsbC1.setValue(self.baseplate.corner_heights[1])
-				self.page.dsbC2.setValue(self.baseplate.corner_heights[2])
-				self.page.dsbC3.setValue(self.baseplate.corner_heights[3])
-				self.page.dsbC4.setValue(self.baseplate.corner_heights[4])
-				self.page.dsbC5.setValue(self.baseplate.corner_heights[5])
-
-			else:
-				self.page.dsbC0.setValue(0.0); self.page.dsbC0.clear()
-				self.page.dsbC1.setValue(0.0); self.page.dsbC1.clear()
-				self.page.dsbC2.setValue(0.0); self.page.dsbC2.clear()
-				self.page.dsbC3.setValue(0.0); self.page.dsbC3.clear()
-				self.page.dsbC4.setValue(0.0); self.page.dsbC4.clear()
-				self.page.dsbC5.setValue(0.0); self.page.dsbC5.clear()
+				for i in range(6):
+					self.corners[i].setValue(self.baseplate.corner_heights[i] if not (self.baseplate.corner_heights[i] is None) else -1)
 
 		else:
 			self.currentBaseplateExists = False
@@ -154,12 +142,11 @@ class func(object):
 			self.page.leManufacturer.setText('')
 			self.page.sbOnModule.setValue(-1)
 			self.page.sbOnModule.clear()
-			self.page.dsbC0.setValue(0.0); self.page.dsbC0.clear()
-			self.page.dsbC1.setValue(0.0); self.page.dsbC1.clear()
-			self.page.dsbC2.setValue(0.0); self.page.dsbC2.clear()
-			self.page.dsbC3.setValue(0.0); self.page.dsbC3.clear()
-			self.page.dsbC4.setValue(0.0); self.page.dsbC4.clear()
-			self.page.dsbC5.setValue(0.0); self.page.dsbC5.clear()
+			for i in range(6):
+				self.corners[i].setValue(-1)
+
+		for i in range(6):
+			if self.corners[i].value() < 0:self.corners[i].clear()
 
 		self.updateElements()
 
@@ -214,7 +201,8 @@ class func(object):
 
 	@enforce_mode('editing_corners')
 	def saveEditingCorners(self,*args,**kwargs):
-		self.baseplate.corner_heights = [_.value() for _ in self.corners]
+		corner_heights = [_.value() for _ in self.corners]
+		self.baseplate.corner_heights = [None if _<0 else _ for _ in corner_heights]
 		self.baseplate.save()
 
 		self.mode='view'
@@ -245,7 +233,9 @@ class func(object):
 
 	@enforce_mode(['editing','creating'])
 	def saveEditing(self,*args,**kwargs):
-		self.baseplate.corner_heights = [_.value() for _ in self.corners]
+		corner_heights = [_.value() for _ in self.corners]
+		self.baseplate.corner_heights = [None if _<0 else _ for _ in corner_heights]
+
 		self.baseplate.identifier   = str(self.page.leIdentifier.text())
 		self.baseplate.material     = str(self.page.leMaterial.text())
 

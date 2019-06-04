@@ -2,6 +2,8 @@ import os
 import json
 import numpy
 
+BASEPLATE_MATERIALS_NO_KAPTON = ['pcb']
+
 CENTURY = '{:0>3}__'
 
 CFG_FILE = 'cfg.json'
@@ -170,6 +172,7 @@ class tray_assembly(fsobj):
 	FILENAME = 'tray_assembly_{ID:0>5}.json'
 	PROPERTIES = [
 		'size',
+		'num_sites',
 	]
 
 
@@ -178,6 +181,7 @@ class tray_component_sensor(fsobj):
 	FILENAME = 'tray_component_sensor_{ID:0>5}.json'
 	PROPERTIES = [
 		'size',
+		'num_sites',
 	]
 
 
@@ -185,7 +189,8 @@ class tray_component_pcb(fsobj):
 	FILEDIR = os.sep.join(['tooling','tray_component_pcb'])
 	FILENAME = 'tray_component_pcb_{ID:0>5}.json'
 	PROPERTIES = [
-		'size'
+		'size',
+		'num_sites',
 	]
 
 
@@ -196,105 +201,24 @@ class tray_component_pcb(fsobj):
 ###############################################
 
 class shipment(fsobj):
-	...
-
-
-class reception(fsobj):
-	...
-
-
-
-###############################################
-###############  assembly steps  ##############
-###############################################
-
-class step_kapton(fsobj):
-	FILEDIR    = os.sep.join(['steps','kapton','{century}'])
-	FILENAME   = 'kapton_assembly_step_{ID:0>5}.json'
+	FILEDIR = os.sep.join(['shipments'])
+	FILENAME = "shipment_{ID:0>5}.json"
 	PROPERTIES = [
-		'user_performed', # name of user who performed step
-		'date_performed', # date step was performed
-		
-		'cure_start',       # unix time @ start of curing
-		'cure_stop',        # unix time @ end of curing
-		'cure_temperature', # Average temperature during curing (centigrade)
-		'cure_humidity',    # Average humidity during curing (percent)
+		"sender",
+		"receiver",
+		"date_sent",
+		"date_received",
 
-		'tools',        # list of pickup tool IDs, ordered by pickup tool location
-		'baseplates',   # list of baseplate   IDs, ordered by assembly tray position
-
-		'tray_component_sensor', # ID of component tray used
-		'tray_assembly',         # ID of assembly tray used
-		'batch_araldite',        # ID of araldite batch used
+		"kaptons",
+		"baseplates",
+		"sensors",
+		"pcbs",
+		"protomodules",
+		"modules",
 	]
+	# associations: creates all objects received if they don't exist yet
+	# associations: all objects in shipment, append self.ID to shipments
 
-	@property
-	def cure_duration(self):
-		if (self.cure_stop is None) or (self.cure_start is None):
-			return None
-		else:
-			return self.cure_stop - self.cure_start
-
-
-class step_sensor(fsobj):
-	FILEDIR    = os.sep.join(['steps','sensor','{century}'])
-	FILENAME   = 'sensor_assembly_step_{ID:0>5}.json'
-	PROPERTIES = [
-		'user_performed', # name of user who performed step
-		'date_performed', # date step was performed
-		
-		'cure_start',       # unix time @ start of curing
-		'cure_stop',        # unix time @ end of curing
-		'cure_temperature', # Average temperature during curing (centigrade)
-		'cure_humidity',    # Average humidity during curing (percent)
-
-		'tools',        # list of pickup tool IDs, ordered by pickup tool location
-		'sensors',      # list of sensor      IDs, ordered by component tray position
-		'baseplates',   # list of baseplate   IDs, ordered by assembly tray position
-		'protomodules', # list of protomodule IDs assigned to new protomodules, by assembly tray location
-
-		'tray_component_sensor', # ID of component tray used
-		'tray_assembly',         # ID of assembly  tray used
-		'batch_araldite',        # ID of araldite batch used
-		'batch_loctite',         # ID of loctite  batch used
-	]
-
-	@property
-	def cure_duration(self):
-		if (self.cure_stop is None) or (self.cure_start is None):
-			return None
-		else:
-			return self.cure_stop - self.cure_start
-
-	
-class step_pcb(fsobj):
-	FILEDIR = os.sep.join(['steps','pcb','{century}'])
-	FILENAME = 'pcb_assembly_step_{ID:0>5}.json'
-	PROPERTIES = [
-		'user_performed', # name of user who performed step
-		'date_performed', # date step was performed
-		
-		'cure_start',       # unix time @ start of curing
-		'cure_stop',        # unix time @ end of curing
-		'cure_temperature', # Average temperature during curing (centigrade)
-		'cure_humidity',    # Average humidity during curing (percent)
-
-		'tools',        # list of pickup tool IDs, ordered by pickup tool location
-		'pcbs',         # list of pcb         IDs, ordered by component tray location
-		'protomodules', # list of protomodule IDs, ordered by assembly tray location
-		'modules',      # list of module      IDs assigned to new modules, by assembly tray location
-
-		'tray_component_pcb', # ID of component tray used
-		'tray_assembly',      # ID of assembly  tray used
-		'batch_araldite',     # ID of araldite batch used
-	]
-
-	@property
-	def cure_duration(self):
-		if (self.cure_stop is None) or (self.cure_start is None):
-			return None
-		else:
-			return self.cure_stop - self.cure_start
 
 ###############################################
 #####  components, protomodules, modules  #####
@@ -304,16 +228,35 @@ class baseplate(fsobj):
 	FILEDIR = os.sep.join(['baseplates','{century}'])
 	FILENAME = "baseplate_{ID:0>5}.json"
 	PROPERTIES = [
-		"identifier",   # idenfitier given by manufacturer or distributor. not the same as ID!
-		"material",     #
-		"nomthickness", # nominal thickness
-		"size",         # hexagon width, numerical. 6 or 8 (integers) for 6-inch or 8-inch
-		"manufacturer", # 
+		# details / measurements / characteristics
+		"identifier",     # idenfitier given by manufacturer or distributor.
+		"manufacturer",   # name of company that manufactured this part
+		"material",       # physical material
+		"nomthickness",   # nominal thickness
+		"size",           # hexagon width, numerical. 6 or 8 (integers) for 6-inch or 8-inch
+		"shape",          # 
+		"chirality",      # 
+		"rotation",       # 
+		"location",       # physical location of part
+		"shipments",      # list of shipments that this part has been in 
 
-		"protomodule",  # what protomodule (ID) it's a part of; None if not part of any
-		"module",       # what module      (ID) it's a part of; None if not part of any
+		# pre kapton application
+		"corner_heights",      # list of corner heights
+		"kapton_tape_applied", # True if kapton tape has been applied
+		"thickness",           # measure thickness of baseplate
 
-		"corner_heights", # list of corner heights
+		# post kapton application / pre sensor application
+		"check_leakage",       # None if not checked yet; True if passed; False if failed
+		"check_bumps_grooves", # None if not checked yet; True if passed; False if failed
+		"check_edges_firm",    # None if not checked yet; True if passed; False if failed
+		"check_glue_spill",    # None if not checked yet; True if passed; False if failed
+		"kapton_flatness",     # flatness of kapton layer after curing
+
+		# Associations to other objects
+		"step_kapton", # which step_kapton applied a kapton to it
+		"step_sensor", # which step_sensor used it
+		"protomodule", # what protomodule (ID) it's a part of; None if not part of any
+		"module",      # what module      (ID) it's a part of; None if not part of any
 	]
 
 	@property
@@ -321,20 +264,58 @@ class baseplate(fsobj):
 		if self.corner_heights is None:
 			return None
 		else:
-			return max(self.corner_heights) - min(self.corner_heights)
+			if None in self.corner_heights:
+				return None
+			else:
+				return max(self.corner_heights) - min(self.corner_heights)
+
+	def ready_step_kapton(self, step_kapton = None, max_flatness = None):
+		...
+
+	def ready_step_sensor(self, step_sensor = None, max_flatness = None):
+		...
+
+	# def ready_step_kapton(self, step_kapton=None):
+	# 	if not (step_kapton is None):
+	# 		if step_kapton == self.step_kapton:
+	# 			return True, "baseplate {} already associated with step_kapton {}".format(self.ID, step_kapton)
+	# 		else:
+	# 			return False, "baseplate {} associated with step_kapton {}; cannot associate with step_kapton {}".format(self.ID, step_kapton, self.step_kapton)
+
+	# 	if self.material is None:
+	# 		return False, "baseplate {} material not set".format(self.ID)
+
+	# 	if self.material in BASEPLATE_MATERIALS_NO_KAPTON:
+	# 		return False, "baseplate {} material is {}; does not need kapton".format(self.ID, self.material)
+
+	# 	if self.corner_heights is None:
+	# 		return False, 
+
+	# def ready_step_sensor(self):
 
 
 class sensor(fsobj):
 	FILEDIR = os.sep.join(['sensors','{century}'])
 	FILENAME = "sensor_{ID:0>5}.json"
 	PROPERTIES = [
-		"identifier",
-		"type",
-		"size",
-		"channels",
-		"manufacturer",
-		"protomodule",
-		"module",
+		# details / measurements / characteristics
+		"identifier",   # 
+		"manufacturer", # 
+		"type",         # 
+		"size",         # 
+		"channels",     # 
+		"shape",        # 
+		"rotation",     # 
+		"location",     # physical location of part
+		"shipments",    # list of shipments that this part has been in 
+
+		# pre sensor application
+		"inspection", # None if not inspected yet; True if passed; False if failed
+
+		# Associations to other objects
+		"step_sensor", # which step_sensor placed this sensor
+		"protomodule", # which protomodule this sensor is a part of
+		"module",      # which module this sensor is a part of
 	]
 
 
@@ -342,14 +323,30 @@ class pcb(fsobj):
 	FILEDIR = os.sep.join(['pcbs','{century}','pcb_{ID:0>5}'])
 	FILENAME = "pcb_{ID:0>5}.json"
 	PROPERTIES = [
-		"identifier",
-		"thickness",
-		"flatness",
-		"size",
-		"channels",
-		"manufacturer",
-		"module",
-		"daq_data"
+		# details / measurements / characteristics
+		"identifier",   # 
+		"manufacturer", # 
+		"thickness",    # 
+		"flatness",     # 
+		"size",         # 
+		"channels",     # 
+		"shape",        # 
+		"chirality",    # 
+		"rotation",     # 
+		"location",     # physical location of part
+		"shipments",    # list of shipments that this part has been in 
+
+		# Associations to other objects
+		"step_pcb", # which step_pcb placed this pcb
+		"module",   # which module this pcb is a part of
+
+		# pre pcb application
+		"daq_ok",     # None if no DAQ yet; True if DAQ is good; False if it's bad
+		"inspection", # Check for exposed gold on backside. None if not inspected yet; True if passed; False if failed
+		"thickness",  # 
+		
+		# Associations to datasets
+		"daq_data", # list of all DAQ datasets
 	]
 
 	PROPERTIES_DO_NOT_SAVE = [
@@ -393,27 +390,108 @@ class pcb(fsobj):
 
 
 class protomodule(fsobj):
-	...
+	FILEDIR = os.sep.join(['protomodules','{century}'])
+	FILENAME = 'protomodule_{ID:0>5}.json'
+	PROPERTIES = [
+		# details / measurements / characteristics
+		"thickness",  # 
+		"kaptontype", # 
+		"channels",   # 
+		"size",       # 
+		"shape",      # 
+		"chirality",  # 
+		"rotation",   # 
+		"location",   # physical location of part
+		"shipments",  # list of shipments that this part has been in 
+
+		# post sensor application
+		"offset_translation", # translational offset of placement
+		"offset_rotation",    # rotation offset of placement
+		"flatness",           # flatness of sensor surface after curing
+		"check_cracks",       # None if not yet checked; True if passed; False if failed
+		"check_glue_spill",   # None if not yet checked; True if passed; False if failed
+
+		# Associations to other objects
+		"baseplate",   # 
+		"sensor",      # 
+		"step_sensor", # 
+		"step_pcb",    # 
+		"module",      # 
+	]
 
 
 class module(fsobj):
 	FILEDIR    = os.sep.join(['modules','{century}','module_{ID:0>5}'])
 	FILENAME   = 'module_{ID:0>5}.json'
 	PROPERTIES = [
-		"baseplate",
-		"sensor",
-		"protomodule",
-		"pcb",
+		# details / measurements / characteristics
+		"thickness",  # physical thickness
+		"kaptontype", # type of kapton (single, double, pcb)
+		"channels",   # 
+		"size",       # 
+		"shape",      # 
+		"chirality",  # 
+		"rotation",   # 
+		"location",   # physical location of part
+		"shipments",  # list of shipments that this part has been in 
 
-		"step_kapton",
-		"step_sensor",
-		"step_pcb",
+		# post pcb application
+		"check_glue_spill",        # None if not yet checked; True if passed; False if failed
+		"check_glue_edge_contact", # None if not yet checked; True if passed; False if failed
 
-		"thickness",
-		"kaptontype",
+		# pre wirebonding
+		"unbonded_daq",      # name of dataset
+		"unbonded_daq_user", # who performed test
+		"unbonded_daq_ok",   # whether the output passes muster
 
-		"iv_data",
-		"daq_data",
+		# wirebonding
+		"wirebonding",                # has wirebonding been done
+		"wirebonding_unbonded_sites", # list of sites that were not wirebonded
+		"wirebonding_user",           # who performed wirebonding
+		"test_bonds_pulled",      # have test bonds been pulled
+		"test_bonds_pulled_user", # who pulled test bonds
+		"test_bonds_pulled_ok",   # is result of test bond pulling ok
+		"test_bonds_rebonded",      # have test bonds been rebonded
+		"test_bonds_rebonded_user", # who rebonded test bonds
+		"test_bonds_rebonded_ok",   # is result of rebonding test bonds ok
+		"wirebonds_inspected",     # None if not yet inspected; else, list of damaged bonds (can be empty list [])
+		"wirebonds_repaired",      # list of wirebonds succesfully repaired
+		"wirebonds_repaired_user", # who repaired bonds
+
+		# encapsulation
+		"encapsulation",             # has encapsulation been done
+		"encapsulation_user",        # who performed encapsulation
+		"encapsulation_cure_start", # (unix) time at start of encapsulation
+		"encapsulation_cure_stop",  # (unix) time at end of encapsulation
+		"encapsulation_inspection", # None if not yet inspected; True if pased; False if failed
+
+		# pre high voltage tests
+		"hv_cables_attached",      # have HV cables been attached
+		"hv_cables_attached_user", # who attached HV cables
+
+		# high voltage tests
+		"unbiased_daq",      # name of dataset
+		"unbiased_daq_user", # who took dataset
+		"unbiased_daq_ok",   # whether result is ok
+		"iv",      # name of dataset
+		"iv_user", # who took dataset
+		"iv_ok",   # whether result is ok
+		"biased_daq",         # name of dataset
+		"biased_daq_voltage", # voltage at which data was taken
+		"biased_daq_ok",      # whether result is ok
+
+		# Associations to other objects
+		"baseplate",   # 
+		"sensor",      # 
+		"protomodule", # 
+		"pcb",         # 
+		"step_kapton", # 
+		"step_sensor", # 
+		"step_pcb",    # 
+
+		# Associations to datasets
+		"iv_data",  #
+		"daq_data", #
 	]
 	PROPERTIES_DO_NOT_SAVE = [
 		"iv_data",
@@ -574,6 +652,178 @@ class module(fsobj):
 		numpy.savetxt(bd_filename, db_mean)
 
 
+
+
+###############################################
+###############  assembly steps  ##############
+###############################################
+
+class step_kapton(fsobj):
+	FILEDIR    = os.sep.join(['steps','kapton','{century}'])
+	FILENAME   = 'kapton_assembly_step_{ID:0>5}.json'
+	PROPERTIES = [
+		'user_performed', # name of user who performed step
+		'date_performed', # date step was performed
+		
+		'cure_start',       # unix time @ start of curing
+		'cure_stop',        # unix time @ end of curing
+		'cure_temperature', # Average temperature during curing (centigrade)
+		'cure_humidity',    # Average humidity during curing (percent)
+
+		'kaptons_inspected', # list of kapton inspection results, ordered by component tray location. should all be True (don't use a kapton if it doesn't pass)
+		'tools',        # list of pickup tool IDs, ordered by pickup tool location
+		'baseplates',   # list of baseplate   IDs, ordered by assembly tray position
+
+		'tray_component_sensor', # ID of component tray used
+		'tray_assembly',         # ID of assembly tray used
+		'batch_araldite',        # ID of araldite batch used
+	]
+
+	@property
+	def cure_duration(self):
+		if (self.cure_stop is None) or (self.cure_start is None):
+			return None
+		else:
+			return self.cure_stop - self.cure_start
+
+	def save(self):
+		super(step_kapton, self).save()
+		bp = baseplate()
+		
+		for i in range(6):
+
+			if not (self.baseplates[i] is None):
+				bp_exists = bp.load(self.baseplates[i])
+				if bp_exists:
+					bp.step_kapton = self.ID
+					bp.save()
+					bp.clear()
+				else:
+					print("cannot write property to baseplate {}: does not exist".format(self.baseplates[i]))
+
+
+class step_sensor(fsobj):
+	FILEDIR    = os.sep.join(['steps','sensor','{century}'])
+	FILENAME   = 'sensor_assembly_step_{ID:0>5}.json'
+	PROPERTIES = [
+		'user_performed', # name of user who performed step
+		'date_performed', # date step was performed
+		
+		'cure_start',       # unix time @ start of curing
+		'cure_stop',        # unix time @ end of curing
+		'cure_temperature', # Average temperature during curing (centigrade)
+		'cure_humidity',    # Average humidity during curing (percent)
+
+		'tools',        # list of pickup tool IDs, ordered by pickup tool location
+		'sensors',      # list of sensor      IDs, ordered by component tray position
+		'baseplates',   # list of baseplate   IDs, ordered by assembly tray position
+		'protomodules', # list of protomodule IDs assigned to new protomodules, by assembly tray location
+
+		'tray_component_sensor', # ID of component tray used
+		'tray_assembly',         # ID of assembly  tray used
+		'batch_araldite',        # ID of araldite batch used
+		'batch_loctite',         # ID of loctite  batch used
+	]
+
+	# ASSOCIATIONS = [
+	# 	['baseplate'  ,'baseplates'  ,'step_sensor','','','ID'          ], # give baseplates   association with this step_sensor
+	# 	['sensor'     ,'sensors'     ,'step_sensor','','','ID'          ], # give sensors      association with this step_sensor
+	# 	['protomodule','protomodules','step_sensor','','','ID'          ], # give protomodules association with this step_sensor
+	# 	['baseplate'  ,'baseplates'  ,'protomodule','','','protomodules'], # give baseplates   association with protomodules
+	# 	['sensor'     ,'sensors'     ,'protomodule','','','protomodules'], # give sensors      association with protomodules
+	# 	['protomodule','protomodules','baseplate'  ,'','','baseplates'  ], # give protomodules association with baseplates
+	# 	['protomodule','protomodules','sensor'     ,'','','sensors'     ], # give protomodules association with sensors
+	# ]
+
+	@property
+	def cure_duration(self):
+		if (self.cure_stop is None) or (self.cure_start is None):
+			return None
+		else:
+			return self.cure_stop - self.cure_start
+
+	def save(self):
+		super(step_sensor, self).save()
+		bp = baseplate()
+		sr = sensor()
+		pm = protomodule()
+
+		for i in range(6):
+
+			if not (self.baseplates[i] is None):
+				bp_exists = bp.load(self.baseplates[i])
+				if bp_exists:
+					bp.step_sensor = self.ID
+					bp.protomodule = self.protomodules[i]
+					bp.save()
+					bp.clear()
+				else:
+					print("cannot write property to baseplate {}: does not exist".format(self.baseplates[i]))
+
+			if not (self.sensors[i] is None):
+				sr_exists = sr.load(self.sensors[i])
+				if sr_exists:
+					sr.step_sensor = self.ID
+					sr.protomodule = self.protomodules[i]
+					sr.save()
+					sr.clear()
+				else:
+					print("cannot write property to sensor {}: does not exist".format(self.sensors[i]))
+
+			if not (self.protomodules[i] is None):
+				pm_exists = pm.load(self.protomodules[i])
+				if pm_exists:
+					pm.step_sensor = self.ID
+					pm.baseplate   = self.baseplates[i]
+					pm.sensor      = self.sensors[i]
+					pm.save()
+					pm.clear()
+				else:
+					print("cannot write property to protomodule {}: does not exist".format(self.protomodules[i]))
+
+
+class step_pcb(fsobj):
+	FILEDIR = os.sep.join(['steps','pcb','{century}'])
+	FILENAME = 'pcb_assembly_step_{ID:0>5}.json'
+	PROPERTIES = [
+		'user_performed', # name of user who performed step
+		'date_performed', # date step was performed
+		
+		'cure_start',       # unix time @ start of curing
+		'cure_stop',        # unix time @ end of curing
+		'cure_temperature', # Average temperature during curing (centigrade)
+		'cure_humidity',    # Average humidity during curing (percent)
+
+		'tools',        # list of pickup tool IDs, ordered by pickup tool location
+		'pcbs',         # list of pcb         IDs, ordered by component tray location
+		'protomodules', # list of protomodule IDs, ordered by assembly tray location
+		'modules',      # list of module      IDs assigned to new modules, by assembly tray location
+
+		'tray_component_pcb', # ID of component tray used
+		'tray_assembly',      # ID of assembly  tray used
+		'batch_araldite',     # ID of araldite batch used
+	]
+
+	ASSOCIATIONS = [
+		['pcb'        ,'pcbs'        ,'step_pcb'   ,'','','ID'          ],
+		['protomodule','protomodules','step_pcb'   ,'','','ID'          ],
+		['module'     ,'modules'     ,'step_pcb'   ,'','','ID'          ],
+		['pcb'        ,'pcbs'        ,'module'     ,'','','modules'     ],
+		['protomodule','protomodules','module'     ,'','','modules'     ],
+		['module'     ,'modules'     ,'pcb'        ,'','','pcbs'        ],
+		['module'     ,'modules'     ,'protomodule','','','protomodules'],
+	]
+
+	@property
+	def cure_duration(self):
+		if (self.cure_stop is None) or (self.cure_start is None):
+			return None
+		else:
+			return self.cure_stop - self.cure_start
+
+
+
+
 ###############################################
 ##################  supplies  #################
 ###############################################
@@ -623,33 +873,4 @@ class batch_bond_wire(fsobj):
 
 
 if __name__ == '__main__':
-
-	m = module()
-	m.load(0)
-	f = m.load_iv(0)
-	print(f[0], f[10])
-
-	a, d = m.load_iv_bins(0)
-	print(a[3], d[3])
-
-	# ts = tool_sensor()
-	# ts.load(0)
-	# ts.comments = ['comment 1', 'comment 2', 'spam and eggs']
-	# ts.save()
-
-	# tp = tool_pcb()
-	# tp.load(0)
-	# tp.comments = ['pcb comment 1','spam egg sausage and spam','ni','nu']
-	# tp.save()
-
-	# ta = tray_assembly()
-	# ta.new(0)
-	# ta.save()
-
-	# tcs = tray_component_sensor()
-	# tcs.new(0)
-	# tcs.save()
-
-	# tcp = tray_component_pcb()
-	# tcp.new(0)
-	# tcp.save()
+	pass
