@@ -216,8 +216,90 @@ class shipment(fsobj):
 		"protomodules",
 		"modules",
 	]
-	# associations: creates all objects received if they don't exist yet
-	# associations: all objects in shipment, append self.ID to shipments
+
+	def save(self):
+		super(shipment,self).save()
+
+		if not (self.kaptons is None):
+			pass
+			# kaptons are not given ID or tracked as objects
+
+		if not (self.baseplates is None):
+			inst_baseplate = baseplate()
+			for ID in self.baseplates:
+				success = inst_baseplate.load(ID)
+				if success:
+					if inst_baseplate.shipments is None:
+						inst_baseplate.shipments = []
+					if not (self.ID in inst_baseplate.shipments):
+						inst_baseplate.shipments.append(self.ID)
+						inst_baseplate.save()
+					inst_baseplate.clear()
+				else:
+					... # create objects?
+			del inst_baseplate
+
+		if not (self.sensors is None):
+			inst_sensor = sensor()
+			for ID in self.sensors:
+				success = inst_sensor.load(ID)
+				if success:
+					if inst_sensor.shipments is None:
+						inst_sensor.shipments = []
+					if not (self.ID in inst_sensor.shipments):
+						inst_sensor.shipments.append(self.ID)
+						inst_sensor.save()
+					inst_sensor.clear()
+				else:
+					... # create objects?
+			del inst_sensor
+
+		if not (self.pcbs is None):
+			inst_pcb = pcb()
+			for ID in self.pcbs:
+				success = inst_pcb.load(ID)
+				if success:
+					if inst_pcb.shipments is None:
+						inst_pcb.shipments = []
+					if not (self.ID in inst_pcb.shipments):
+						inst_pcb.shipments.append(self.ID)
+						inst_pcb.save()
+					inst_pcb.clear()
+				else:
+					... # create objects?
+			del inst_pcb
+
+		if not (self.protomodules is None):
+			inst_protomodule = protomodule()
+			for ID in self.protomodules:
+				success = inst_protomodule.load(ID)
+				if success:
+					if inst_protomodule.shipments is None:
+						inst_protomodule.shipments = []
+					if not (self.ID in inst_protomodule.shipments):
+						inst_protomodule.shipments.append(self.ID)
+						inst_protomodule.save()
+					inst_protomodule.clear()
+				else:
+					... # create objects?
+			del inst_protomodule
+
+		if not (self.modules is None):
+			inst_module = module()
+			for ID in self.modules:
+				success = inst_module.load(ID)
+				if success:
+					if inst_module.shipments is None:
+						inst_module.shipments = []
+					if not (self.ID in inst_module.shipments):
+						inst_module.shipments.append(self.ID)
+						inst_module.save()
+					inst_module.clear()
+				else:
+					... # create objects?
+			del m
+
+
 
 
 ###############################################
@@ -233,12 +315,12 @@ class baseplate(fsobj):
 		"manufacturer",   # name of company that manufactured this part
 		"material",       # physical material
 		"nomthickness",   # nominal thickness
+		"kaptontype",     # 
 		"size",           # hexagon width, numerical. 6 or 8 (integers) for 6-inch or 8-inch
 		"shape",          # 
 		"chirality",      # 
 		"rotation",       # 
 		"location",       # physical location of part
-		"shipments",      # list of shipments that this part has been in 
 
 		# pre kapton application
 		"corner_heights",      # list of corner heights
@@ -257,7 +339,12 @@ class baseplate(fsobj):
 		"step_sensor", # which step_sensor used it
 		"protomodule", # what protomodule (ID) it's a part of; None if not part of any
 		"module",      # what module      (ID) it's a part of; None if not part of any
+		"shipments",   # list of shipments that this part has been in 
 	]
+
+	DEFAULTS = {
+		"shipments":[],
+	}
 
 	@property
 	def flatness(self):
@@ -307,7 +394,6 @@ class sensor(fsobj):
 		"shape",        # 
 		"rotation",     # 
 		"location",     # physical location of part
-		"shipments",    # list of shipments that this part has been in 
 
 		# pre sensor application
 		"inspection", # None if not inspected yet; True if passed; False if failed
@@ -316,7 +402,12 @@ class sensor(fsobj):
 		"step_sensor", # which step_sensor placed this sensor
 		"protomodule", # which protomodule this sensor is a part of
 		"module",      # which module this sensor is a part of
+		"shipments",   # list of shipments that this part has been in 
 	]
+
+	DEFAULTS = {
+		"shipments":[],
+	}
 
 
 class pcb(fsobj):
@@ -334,17 +425,17 @@ class pcb(fsobj):
 		"chirality",    # 
 		"rotation",     # 
 		"location",     # physical location of part
-		"shipments",    # list of shipments that this part has been in 
-
-		# Associations to other objects
-		"step_pcb", # which step_pcb placed this pcb
-		"module",   # which module this pcb is a part of
 
 		# pre pcb application
 		"daq_ok",     # None if no DAQ yet; True if DAQ is good; False if it's bad
 		"inspection", # Check for exposed gold on backside. None if not inspected yet; True if passed; False if failed
 		"thickness",  # 
 		
+		# Associations to other objects
+		"step_pcb", # which step_pcb placed this pcb
+		"module",   # which module this pcb is a part of
+		"shipments",# list of shipments that this part has been in 
+
 		# Associations to datasets
 		"daq_data", # list of all DAQ datasets
 	]
@@ -352,6 +443,10 @@ class pcb(fsobj):
 	PROPERTIES_DO_NOT_SAVE = [
 		"daq_data",
 	]
+
+	DEFAULTS = {
+		"shipments":[],
+	}
 
 	DAQ_DATADIR = 'daq'
 
@@ -402,7 +497,6 @@ class protomodule(fsobj):
 		"chirality",  # 
 		"rotation",   # 
 		"location",   # physical location of part
-		"shipments",  # list of shipments that this part has been in 
 
 		# post sensor application
 		"offset_translation", # translational offset of placement
@@ -417,7 +511,12 @@ class protomodule(fsobj):
 		"step_sensor", # 
 		"step_pcb",    # 
 		"module",      # 
+		"shipments",   # list of shipments that this part has been in 
 	]
+
+	DEFAULTS = {
+		"shipments":[],
+	}
 
 
 class module(fsobj):
@@ -433,7 +532,6 @@ class module(fsobj):
 		"chirality",  # 
 		"rotation",   # 
 		"location",   # physical location of part
-		"shipments",  # list of shipments that this part has been in 
 
 		# post pcb application
 		"check_glue_spill",        # None if not yet checked; True if passed; False if failed
@@ -488,15 +586,21 @@ class module(fsobj):
 		"step_kapton", # 
 		"step_sensor", # 
 		"step_pcb",    # 
+		"shipments",   # list of shipments that this part has been in 
 
 		# Associations to datasets
 		"iv_data",  #
 		"daq_data", #
 	]
+	
 	PROPERTIES_DO_NOT_SAVE = [
 		"iv_data",
 		"daq_data",
 	]
+
+	DEFAULTS = {
+		"shipments":[],
+	}
 
 	IV_DATADIR      = 'iv'
 	IV_BINS_DATADIR = 'bins'
@@ -504,7 +608,6 @@ class module(fsobj):
 
 	BA_FILENAME = 'ba {which}'
 	BD_FILENAME = 'bd {which}'
-
 
 	def fetch_datasets(self):
 		if self.ID is None:
@@ -523,13 +626,11 @@ class module(fsobj):
 		else:
 			self.daq_data = []
 
-
 	def load(self, ID):
 		success = super(module, self).load(ID)
 		if success:
 			self.fetch_datasets()
 		return success
-
 
 	def save(self):
 		super(module, self).save()
@@ -539,7 +640,6 @@ class module(fsobj):
 		if not os.path.exists(os.sep.join([filedir, self.DAQ_DATADIR])):
 			os.makedirs(os.sep.join([filedir, self.DAQ_DATADIR]))
 		self.fetch_datasets()
-
 
 	def load_iv(self, which):
 		if isinstance(which, int):
@@ -552,7 +652,6 @@ class module(fsobj):
 
 		else:
 			return None
-
 
 	def load_iv_bins(self, which, direction='ad'):
 		if isinstance(which, int):
@@ -586,7 +685,6 @@ class module(fsobj):
 
 		return to_return
 
-
 	def load_daq(self, which):
 		if isinstance(which, int):
 			which = self.daq_data[which]
@@ -594,7 +692,6 @@ class module(fsobj):
 		filedir, filename = self.get_filedir_filename(self.ID)
 		file = os.sep.join([filedir, self.DAQ_DATADIR, which])
 		print('load {}'.format(file))
-
 
 	def make_iv_bins(self, which, force=False):
 		"""Creates bins for specified dataset. Won't overwrite unless force = True"""
@@ -688,18 +785,20 @@ class step_kapton(fsobj):
 
 	def save(self):
 		super(step_kapton, self).save()
-		bp = baseplate()
+		inst_baseplate = baseplate()
 		
 		for i in range(6):
+			baseplate_exists = False if self.baseplates[i] is None else inst_baseplate.load(self.baseplates[i])
+			if baseplate_exists:
+				if inst_baseplate.step_kapton != self.ID:
+					inst_baseplate.step_kapton = self.ID
+					inst_baseplate.save()
+					inst_baseplate.clear()
+			else:
+				if not (self.baseplates[i] is None):
+					print("step_kapton {} cannot write to baseplate {}: does not exist".format(self.ID, self.baseplates[i]))
 
-			if not (self.baseplates[i] is None):
-				bp_exists = bp.load(self.baseplates[i])
-				if bp_exists:
-					bp.step_kapton = self.ID
-					bp.save()
-					bp.clear()
-				else:
-					print("cannot write property to baseplate {}: does not exist".format(self.baseplates[i]))
+
 
 
 class step_sensor(fsobj):
@@ -725,16 +824,6 @@ class step_sensor(fsobj):
 		'batch_loctite',         # ID of loctite  batch used
 	]
 
-	# ASSOCIATIONS = [
-	# 	['baseplate'  ,'baseplates'  ,'step_sensor','','','ID'          ], # give baseplates   association with this step_sensor
-	# 	['sensor'     ,'sensors'     ,'step_sensor','','','ID'          ], # give sensors      association with this step_sensor
-	# 	['protomodule','protomodules','step_sensor','','','ID'          ], # give protomodules association with this step_sensor
-	# 	['baseplate'  ,'baseplates'  ,'protomodule','','','protomodules'], # give baseplates   association with protomodules
-	# 	['sensor'     ,'sensors'     ,'protomodule','','','protomodules'], # give sensors      association with protomodules
-	# 	['protomodule','protomodules','baseplate'  ,'','','baseplates'  ], # give protomodules association with baseplates
-	# 	['protomodule','protomodules','sensor'     ,'','','sensors'     ], # give protomodules association with sensors
-	# ]
-
 	@property
 	def cure_duration(self):
 		if (self.cure_stop is None) or (self.cure_start is None):
@@ -744,42 +833,56 @@ class step_sensor(fsobj):
 
 	def save(self):
 		super(step_sensor, self).save()
-		bp = baseplate()
-		sr = sensor()
-		pm = protomodule()
+		inst_baseplate   = baseplate()
+		inst_sensor      = sensor()
+		inst_protomodule = protomodule()
 
 		for i in range(6):
 
-			if not (self.baseplates[i] is None):
-				bp_exists = bp.load(self.baseplates[i])
-				if bp_exists:
-					bp.step_sensor = self.ID
-					bp.protomodule = self.protomodules[i]
-					bp.save()
-					bp.clear()
-				else:
+			baseplate_exists   = False if self.baseplates[i]   is None else inst_baseplate.load(  self.baseplates[i]  )
+			sensor_exists      = False if self.sensors[i]      is None else inst_sensor.load(     self.sensors[i]     )
+			protomodule_exists = False if self.protomodules[i] is None else inst_protomodule.load(self.protomodules[i])
+
+			if baseplate_exists:
+				inst_baseplate.step_sensor = self.ID
+				inst_baseplate.protomodule = self.protomodules[i]
+				inst_baseplate.save()
+			else:
+				if not (self.baseplates[i] is None):
 					print("cannot write property to baseplate {}: does not exist".format(self.baseplates[i]))
 
-			if not (self.sensors[i] is None):
-				sr_exists = sr.load(self.sensors[i])
-				if sr_exists:
-					sr.step_sensor = self.ID
-					sr.protomodule = self.protomodules[i]
-					sr.save()
-					sr.clear()
-				else:
+			if sensor_exists:
+				inst_sensor.step_sensor = self.ID
+				inst_sensor.protomodule = self.protomodules[i]
+				inst_sensor.save()
+			else:
+				if not (self.sensors[i] is None):
 					print("cannot write property to sensor {}: does not exist".format(self.sensors[i]))
 
 			if not (self.protomodules[i] is None):
-				pm_exists = pm.load(self.protomodules[i])
-				if pm_exists:
-					pm.step_sensor = self.ID
-					pm.baseplate   = self.baseplates[i]
-					pm.sensor      = self.sensors[i]
-					pm.save()
-					pm.clear()
-				else:
-					print("cannot write property to protomodule {}: does not exist".format(self.protomodules[i]))
+				if not protomodule_exists:
+					inst_protomodule.new(self.protomodules[i])
+				inst_protomodule.kaptontype  = inst_baseplate.kaptontype if baseplate_exists else None
+				inst_protomodule.channels    = inst_sensor.channels      if sensor_exists    else None
+				inst_protomodule.size        = inst_baseplate.size       if baseplate_exists else None
+				inst_protomodule.shape       = inst_baseplate.shape      if baseplate_exists else None
+				inst_protomodule.chirality   = inst_baseplate.chirality  if baseplate_exists else None
+				inst_protomodule.rotation    = inst_baseplate.rotation   if baseplate_exists else None
+				inst_protomodule.location    = MAC
+				inst_protomodule.step_sensor = self.ID
+				inst_protomodule.baseplate   = self.baseplates[i]
+				inst_protomodule.sensor      = self.sensors[i]
+				inst_protomodule.save()
+
+				if not all([baseplate_exists,sensor_exists]):
+					print("WARNING: trying to save step_sensor {}. Some parts do not exist. Could not create all associations.")
+					print("baseplate:{} sensor:{}".format(inst_baseplate.ID,inst_sensor.ID))
+			
+			inst_baseplate.clear()
+			inst_sensor.clear()
+			inst_protomodule.clear()
+
+
 
 
 class step_pcb(fsobj):
@@ -804,22 +907,74 @@ class step_pcb(fsobj):
 		'batch_araldite',     # ID of araldite batch used
 	]
 
-	ASSOCIATIONS = [
-		['pcb'        ,'pcbs'        ,'step_pcb'   ,'','','ID'          ],
-		['protomodule','protomodules','step_pcb'   ,'','','ID'          ],
-		['module'     ,'modules'     ,'step_pcb'   ,'','','ID'          ],
-		['pcb'        ,'pcbs'        ,'module'     ,'','','modules'     ],
-		['protomodule','protomodules','module'     ,'','','modules'     ],
-		['module'     ,'modules'     ,'pcb'        ,'','','pcbs'        ],
-		['module'     ,'modules'     ,'protomodule','','','protomodules'],
-	]
-
 	@property
 	def cure_duration(self):
 		if (self.cure_stop is None) or (self.cure_start is None):
 			return None
 		else:
 			return self.cure_stop - self.cure_start
+
+	def save(self):
+		super(step_pcb,self).save()
+		
+		inst_baseplate   = baseplate()
+		inst_sensor      = sensor()
+		inst_pcb         = pcb()
+		inst_protomodule = protomodule()
+		inst_module      = module()
+
+		for i in range(6):
+
+			pcb_exists         = False if (self.pcbs[i]         is None) else inst_pcb.load(         self.pcbs[i]         )
+			protomodule_exists = False if (self.protomodules[i] is None) else inst_protomodule.load( self.protomodules[i] )
+			module_exists      = False if (self.modules[i]      is None) else inst_module.load(      self.modules[i]      )
+
+			if pcb_exists:
+				inst_pcb.step_pcb = self.ID
+				inst_pcb.module = self.modules[i]
+				inst_pcb.save()
+
+			if protomodule_exists:
+				inst_protomodule.step_pcb = self.ID
+				inst_protomodule.module = self.modules[i]
+				inst_protomodule.save()
+
+				baseplate_exists = False if (inst_protomodule.baseplate is None) else inst_baseplate.load(inst_protomodule.baseplate)
+				sensor_exists    = False if (inst_protomodule.sensor    is None) else inst_sensor.load(   inst_protomodule.sensor   )
+
+				if baseplate_exists:
+					inst_baseplate.module = self.modules[i]
+					inst_baseplate.save()
+
+				if sensor_exists:
+					inst_sensor.module = self.modules[i]
+					inst_sensor.save()
+			else:
+				baseplate_exists = False
+				sensor_exists    = False
+
+			if not (self.modules[i] is None):
+				if not module_exists:
+					inst_module.new(self.modules[i])
+				inst_module.baseplate   = inst_baseplate.ID   if baseplate_exists   else None
+				inst_module.sensor      = inst_sensor.ID      if sensor_exists      else None
+				inst_module.pcb         = inst_pcb.ID         if pcb_exists         else None
+				inst_module.protomodule = inst_protomodule.ID if protomodule_exists else None
+				inst_module.step_kapton = inst_baseplate.step_kapton   if baseplate_exists   else None
+				inst_module.step_sensor = inst_protomodule.step_sensor if protomodule_exists else None
+				inst_module.step_pcb    = self.ID
+				inst_module.kaptontype  = inst_baseplate.kaptontype if baseplate_exists else None
+				inst_module.channels    = inst_sensor.channels      if sensor_exists    else None
+				inst_module.size        = inst_pcb.size             if pcb_exists       else None
+				inst_module.shape       = inst_pcb.shape            if pcb_exists       else None
+				inst_module.chirality   = inst_pcb.chirality        if pcb_exists       else None
+				inst_module.rotation    = inst_pcb.rotation         if pcb_exists       else None
+				inst_module.location    = MAC
+				inst_module.save()
+
+				if not all([baseplate_exists, sensor_exists, pcb_exists, protomodule_exists]):
+					print("WARNING: trying to save step_pcb {}. Some parts do not exist. Could not create all associations.".format(self.ID))
+					print("baseplate:{} sensor:{} pcb:{} protomodule:{} module:{}".format(inst_baseplate.ID,inst_sensor.ID,inst_pcb.ID,inst_protomodule.ID,inst_module.ID))
 
 
 
@@ -873,4 +1028,4 @@ class batch_bond_wire(fsobj):
 
 
 if __name__ == '__main__':
-	pass
+	...

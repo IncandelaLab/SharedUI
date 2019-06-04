@@ -100,10 +100,10 @@ class func(object):
 
 			module = self.sensor.module
 			if not (module is None):
-				self.page.sbOnModule.setValue(module)
+				self.page.sbModule.setValue(module)
 			else:
-				self.page.sbOnModule.setValue(-1)
-				self.page.sbOnModule.clear()
+				self.page.sbModule.setValue(-1)
+				self.page.sbModule.clear()
 
 		else:
 			self.page.leIdentifier.setText("")
@@ -113,8 +113,8 @@ class func(object):
 			self.page.sbChannels.setValue(0)
 			self.page.sbChannels.clear()
 			self.page.leManufacturer.setText("")
-			self.page.sbOnModule.setValue(-1)
-			self.page.sbOnModule.clear()
+			self.page.sbModule.setValue(-1)
+			self.page.sbModule.clear()
 
 		self.updateElements()
 
@@ -123,7 +123,7 @@ class func(object):
 		mode_view     = self.mode == 'view'
 		mode_editing  = self.mode == 'editing'
 		mode_creating = self.mode == 'creating'
-		module_exists = self.page.sbOnModule.value() >= 0
+		module_exists = self.page.sbModule.value() >= 0
 		sensor_exists = self.sensor_exists
 		#protomodule_exists
 
@@ -140,7 +140,7 @@ class func(object):
 		self.page.dsbSize.setReadOnly(        not (mode_creating or mode_editing))
 		self.page.sbChannels.setReadOnly(     not (mode_creating or mode_editing))
 		self.page.leManufacturer.setReadOnly( not (mode_creating or mode_editing))
-		self.page.sbOnModule.setReadOnly(     not (mode_creating or mode_editing))
+		self.page.sbModule.setReadOnly(     not (mode_creating or mode_editing))
 
 	@enforce_mode('view')
 	def startCreating(self,*args,**kwargs):
@@ -173,7 +173,7 @@ class func(object):
 
 		self.sensor.size     = self.page.dsbSize.value()    if self.page.dsbSize.value()    >  0 else None
 		self.sensor.channels = self.page.sbChannels.value() if self.page.sbChannels.value() >  0 else None
-		self.sensor.module   = self.page.sbOnModule.value() if self.page.sbOnModule.value() >= 0 else None
+		self.sensor.module   = self.page.sbModule.value() if self.page.sbModule.value() >= 0 else None
 		
 		self.sensor.save()
 		self.mode = 'view'
@@ -181,7 +181,7 @@ class func(object):
 
 	@enforce_mode('view')
 	def goModule(self,*args,**kwargs):
-		ID = self.page.sbOnModule.value()
+		ID = self.page.sbModule.value()
 		if ID >= 0:
 			self.setUIPage('modules',ID=ID)
 		else:
