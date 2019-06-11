@@ -50,7 +50,7 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="pbGoShipment">
     <property name="geometry">
      <rect>
       <x>90</x>
@@ -143,7 +143,7 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QLineEdit" name="leIdentifier_2">
+   <widget class="QLineEdit" name="leLocation">
     <property name="geometry">
      <rect>
       <x>90</x>
@@ -159,7 +159,7 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QListWidget" name="listWidget">
+   <widget class="QListWidget" name="listShipments">
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -196,7 +196,27 @@
     </item>
     <item>
      <property name="text">
-      <string>...</string>
+      <string>five</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>three</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>semi</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>semi(-)</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>choptwo</string>
      </property>
     </item>
    </widget>
@@ -435,7 +455,7 @@
    <property name="frameShadow">
     <enum>QFrame::Plain</enum>
    </property>
-   <widget class="QPushButton" name="pbSensorSave">
+   <widget class="QPushButton" name="pbSave">
     <property name="geometry">
      <rect>
       <x>80</x>
@@ -448,7 +468,7 @@
      <string>Save</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pbSensorEdit">
+   <widget class="QPushButton" name="pbEdit">
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -461,7 +481,7 @@
      <string>Edit</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pbSensorCancel">
+   <widget class="QPushButton" name="pbCancel">
     <property name="geometry">
      <rect>
       <x>150</x>
@@ -490,7 +510,7 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QPushButton" name="pbSensorNew">
+   <widget class="QPushButton" name="pbNew">
     <property name="geometry">
      <rect>
       <x>0</x>

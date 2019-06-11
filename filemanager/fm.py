@@ -142,8 +142,9 @@ class fsobj(object):
 	def clear(self):
 		self.ID = None
 		PROPERTIES = self.PROPERTIES + self.PROPERTIES_COMMON
+		DEFAULTS   = {**self.DEFAULTS, **self.DEFAULTS_COMMON}
 		for prop in PROPERTIES:
-			setattr(self, prop, None)
+			setattr(self, prop, DEFAULTS.get(prop, None))
 		# For clearing, we don't check or set defaults
 		# All properties, including ID, are set to None
 		# Attempts to use an object when it has been cleared are meant to produce errors
@@ -599,7 +600,8 @@ class module(fsobj):
 		"test_bonds_rebonded",      # have test bonds been rebonded
 		"test_bonds_rebonded_user", # who rebonded test bonds
 		"test_bonds_rebonded_ok",   # is result of rebonding test bonds ok
-		"wirebonds_inspected",     # None if not yet inspected; else, list of damaged bonds (can be empty list [])
+		"wirebonds_inspected",     # whether inspection has happened
+		"wirebonds_damaged",       # list of damaged bonds found during inspection
 		"wirebonds_repaired",      # list of wirebonds succesfully repaired
 		"wirebonds_repaired_user", # who repaired bonds
 

@@ -4,28 +4,30 @@ from PyQt4 import QtGui as gui, QtCore as core
 import sys
 import time
 
+
+
+
 # Import page functionality classes
-from pages.view_module      import func as cls_func_view_module
 from pages.view_baseplate   import func as cls_func_view_baseplate
 from pages.view_sensor      import func as cls_func_view_sensor
-from pages.view_PCB         import func as cls_func_view_PCB
-from pages.view_kapton_step import func as cls_func_view_kapton_step
-from pages.view_sensor_step import func as cls_func_view_sensor_step
-from pages.view_pcb_step    import func as cls_func_view_pcb_step
+# from pages.view_PCB         import func as cls_func_view_PCB
+# from pages.view_protomodule import func as cls_func_view_protomodule
+# from pages.view_module      import func as cls_func_view_module
 
-from pages.routine_iv       import func as cls_func_routine_iv
+# from pages.view_kapton_step import func as cls_func_view_kapton_step
+# from pages.view_sensor_step import func as cls_func_view_sensor_step
+# from pages.view_pcb_step    import func as cls_func_view_pcb_step
 
-from pages.view_tooling     import func as cls_func_view_tooling
-from pages.view_supplies    import func as cls_func_view_supplies
+# from pages.view_tooling     import func as cls_func_view_tooling
+# from pages.view_supplies    import func as cls_func_view_supplies
+
+# from pages.routine_iv       import func as cls_func_routine_iv
+# from pages.shipment         import func as cls_func_shipment
+
+
 
 
 # Set up page widgets
-from pages_ui.view_module import Ui_Form as form_view_module
-class widget_view_module(gui.QWidget,form_view_module):
-	def __init__(self,parent):
-		super(widget_view_module,self).__init__(parent)
-		self.setupUi(self)
-
 from pages_ui.view_baseplate import Ui_Form as form_view_baseplate
 class widget_view_baseplate(gui.QWidget,form_view_baseplate):
 	def __init__(self,parent):
@@ -38,64 +40,92 @@ class widget_view_sensor(gui.QWidget,form_view_sensor):
 		super(widget_view_sensor,self).__init__(parent)
 		self.setupUi(self)
 
-from pages_ui.view_PCB import Ui_Form as form_view_PCB
-class widget_view_PCB(gui.QWidget,form_view_PCB):
-	def __init__(self,parent):
-		super(widget_view_PCB,self).__init__(parent)
-		self.setupUi(self)
+# from pages_ui.view_PCB import Ui_Form as form_view_PCB
+# class widget_view_PCB(gui.QWidget,form_view_PCB):
+# 	def __init__(self,parent):
+# 		super(widget_view_PCB,self).__init__(parent)
+# 		self.setupUi(self)
 
-from pages_ui.view_kapton_step import Ui_Form as form_view_kapton_step
-class widget_view_kapton_step(gui.QWidget,form_view_kapton_step):
-	def __init__(self,parent):
-		super(widget_view_kapton_step,self).__init__(parent)
-		self.setupUi(self)
 
-from pages_ui.view_sensor_step import Ui_Form as form_view_sensor_step
-class widget_view_sensor_step(gui.QWidget,form_view_sensor_step):
-	def __init__(self,parent):
-		super(widget_view_sensor_step,self).__init__(parent)
-		self.setupUi(self)
+# from pages_ui.view_protomodule import Ui_Form as form_view_protomodule
+# class widget_view_protomodule(gui.QWidget,form_view_protomodule):
+# 	def __init__(self,parent):
+# 		super(widget_view_protomodule,self).__init__(parent)
+# 		self.setupUi(self)
 
-from pages_ui.view_pcb_step import Ui_Form as form_view_pcb_step
-class widget_view_pcb_step(gui.QWidget, form_view_pcb_step):
-	def __init__(self,parent):
-		super(widget_view_pcb_step,self).__init__(parent)
-		self.setupUi(self)
+# from pages_ui.view_module import Ui_Form as form_view_module
+# class widget_view_module(gui.QWidget,form_view_module):
+# 	def __init__(self,parent):
+# 		super(widget_view_module,self).__init__(parent)
+# 		self.setupUi(self)
 
-from pages_ui.routine_iv import Ui_Form as form_routine_iv
-class widget_routine_iv(gui.QWidget, form_routine_iv):
-	def __init__(self,parent):
-		super(widget_routine_iv,self).__init__(parent)
-		self.setupUi(self)
 
-from pages_ui.view_tooling import Ui_Form as form_view_tooling
-class widget_view_tooling(gui.QWidget, form_view_tooling):
-	def __init__(self,parent):
-		super(widget_view_tooling,self).__init__(parent)
-		self.setupUi(self)
+# from pages_ui.view_kapton_step import Ui_Form as form_view_kapton_step
+# class widget_view_kapton_step(gui.QWidget,form_view_kapton_step):
+# 	def __init__(self,parent):
+# 		super(widget_view_kapton_step,self).__init__(parent)
+# 		self.setupUi(self)
 
-from pages_ui.view_supplies import Ui_Form as form_view_supplies
-class widget_view_supplies(gui.QWidget, form_view_supplies):
-	def __init__(self,parent):
-		super(widget_view_supplies,self).__init__(parent)
-		self.setupUi(self)
+# from pages_ui.view_sensor_step import Ui_Form as form_view_sensor_step
+# class widget_view_sensor_step(gui.QWidget,form_view_sensor_step):
+# 	def __init__(self,parent):
+# 		super(widget_view_sensor_step,self).__init__(parent)
+# 		self.setupUi(self)
+
+# from pages_ui.view_pcb_step import Ui_Form as form_view_pcb_step
+# class widget_view_pcb_step(gui.QWidget, form_view_pcb_step):
+# 	def __init__(self,parent):
+# 		super(widget_view_pcb_step,self).__init__(parent)
+# 		self.setupUi(self)
+
+
+# from pages_ui.view_tooling import Ui_Form as form_view_tooling
+# class widget_view_tooling(gui.QWidget, form_view_tooling):
+# 	def __init__(self,parent):
+# 		super(widget_view_tooling,self).__init__(parent)
+# 		self.setupUi(self)
+
+# from pages_ui.view_supplies import Ui_Form as form_view_supplies
+# class widget_view_supplies(gui.QWidget, form_view_supplies):
+# 	def __init__(self,parent):
+# 		super(widget_view_supplies,self).__init__(parent)
+# 		self.setupUi(self)
+
+
+# from pages_ui.routine_iv import Ui_Form as form_routine_iv
+# class widget_routine_iv(gui.QWidget, form_routine_iv):
+# 	def __init__(self,parent):
+# 		super(widget_routine_iv,self).__init__(parent)
+# 		self.setupUi(self)
+
+# from pages_ui.shipment import Ui_Form as form_shipment
+# class widget_shipment(gui.QWidget, form_shipment):
+# 	def __init__(self,parent):
+# 		super(widget_shipment,self).__init__(parent)
+# 		self.setupUi(self)
+
+
 
 
 # Dict of page IDs by name (as the name shows up in the page list widgets)
 PAGE_IDS = {
-	'modules':0,
-	'baseplates':1,
-	'sensors':2,
-	'PCBs':3,
-	'kapton placement steps':4,
-	'sensor placement steps':5,
-	'PCB placement steps':6,
-	'IV curve':7,
-	'tooling':8,
-	'supplies':9,
+	'baseplates'             : 0,
+	'sensors'                : 1,
+	# 'PCBs'                   : 2,
+	# 'protomodules'           : 3,
+	# 'modules'                : 4,
+
+	# 'kapton placement steps' : 5,
+	# 'sensor placement steps' : 6,
+	# 'PCB placement steps'    : 7,
+
+	# 'tooling'                : 8,
+	# 'supplies'               : 9,
+
+	# 'IV curve'               :10,
+	# 'shipment'               :11,
 }
 
-	
 
 def id_generator():
 	"""creates a generator for unique ID values"""
@@ -123,7 +153,7 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 		print("Rigging UI...")
 		self.rig()
 		print("Finished rigging UI.")
-		self.setUIPage('modules')
+		self.setUIPage('baseplates')
 
 		self.setWindowTitle("Module Production User Interface")
 	
@@ -131,43 +161,60 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 
 
 	def setupPagesUI(self):
-		self.page_view_module      = widget_view_module(None)      ; self.swPages.addWidget(self.page_view_module)
 		self.page_view_baseplate   = widget_view_baseplate(None)   ; self.swPages.addWidget(self.page_view_baseplate)
 		self.page_view_sensor      = widget_view_sensor(None)      ; self.swPages.addWidget(self.page_view_sensor)
-		self.page_view_PCB         = widget_view_PCB(None)         ; self.swPages.addWidget(self.page_view_PCB)
-		self.page_view_kapton_step = widget_view_kapton_step(None) ; self.swPages.addWidget(self.page_view_kapton_step)
-		self.page_view_sensor_step = widget_view_sensor_step(None) ; self.swPages.addWidget(self.page_view_sensor_step)
-		self.page_view_pcb_step    = widget_view_pcb_step(None)    ; self.swPages.addWidget(self.page_view_pcb_step)
-		self.page_routine_iv       = widget_routine_iv(None)       ; self.swPages.addWidget(self.page_routine_iv)
-		self.page_view_tooling     = widget_view_tooling(None)     ; self.swPages.addWidget(self.page_view_tooling)
-		self.page_view_supplies    = widget_view_supplies(None)    ; self.swPages.addWidget(self.page_view_supplies)
+		# self.page_view_PCB         = widget_view_PCB(None)         ; self.swPages.addWidget(self.page_view_PCB)
+		# self.page_view_protomodule = widget_view_protomodule(None) ; self.swPages.addWidget(self.page_view_protomodule)
+		# self.page_view_module      = widget_view_module(None)      ; self.swPages.addWidget(self.page_view_module)
+
+		# self.page_view_kapton_step = widget_view_kapton_step(None) ; self.swPages.addWidget(self.page_view_kapton_step)
+		# self.page_view_sensor_step = widget_view_sensor_step(None) ; self.swPages.addWidget(self.page_view_sensor_step)
+		# self.page_view_pcb_step    = widget_view_pcb_step(None)    ; self.swPages.addWidget(self.page_view_pcb_step)
+
+		# self.page_view_tooling     = widget_view_tooling(None)     ; self.swPages.addWidget(self.page_view_tooling)
+		# self.page_view_supplies    = widget_view_supplies(None)    ; self.swPages.addWidget(self.page_view_supplies)
+
+		# self.page_routine_iv       = widget_routine_iv(None)       ; self.swPages.addWidget(self.page_routine_iv)
+		# self.page_shipment         = widget_shipment(None)         ; self.swPages.addWidget(self.page_shipment)
+
 
 	def initPages(self):
-		self.func_view_module      = cls_func_view_module(           fm, self.page_view_module     , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_baseplate   = cls_func_view_baseplate(        fm, self.page_view_baseplate  , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_sensor      = cls_func_view_sensor(           fm, self.page_view_sensor     , self.setUIPage, self.setSwitchingEnabled)
-		self.func_view_PCB         = cls_func_view_PCB(              fm, self.page_view_PCB        , self.setUIPage, self.setSwitchingEnabled)
-		self.func_view_kapton_step = cls_func_view_kapton_step(      fm, self.page_view_kapton_step, self.setUIPage, self.setSwitchingEnabled)
-		self.func_view_sensor_step = cls_func_view_sensor_step(      fm, self.page_view_sensor_step, self.setUIPage, self.setSwitchingEnabled)
-		self.func_view_pcb_step    = cls_func_view_pcb_step(         fm, self.page_view_pcb_step   , self.setUIPage, self.setSwitchingEnabled)
-		self.func_routine_iv       = cls_func_routine_iv(            fm, self.page_routine_iv      , self.setUIPage, self.setSwitchingEnabled)
-		self.func_view_tooling     = cls_func_view_tooling(          fm, self.page_view_tooling    , self.setUIPage, self.setSwitchingEnabled)
-		self.func_view_supplies    = cls_func_view_supplies(         fm, self.page_view_supplies   , self.setUIPage, self.setSwitchingEnabled)
+		# self.func_view_PCB         = cls_func_view_PCB(              fm, self.page_view_PCB        , self.setUIPage, self.setSwitchingEnabled)
+		# self.func_view_protomodule = cls_func_view_protomodule(      fm, self.page_view_protomodule, self.setUIPage, self.setSwitchingEnabled)
+		# self.func_view_module      = cls_func_view_module(           fm, self.page_view_module     , self.setUIPage, self.setSwitchingEnabled)
+
+		# self.func_view_kapton_step = cls_func_view_kapton_step(      fm, self.page_view_kapton_step, self.setUIPage, self.setSwitchingEnabled)
+		# self.func_view_sensor_step = cls_func_view_sensor_step(      fm, self.page_view_sensor_step, self.setUIPage, self.setSwitchingEnabled)
+		# self.func_view_pcb_step    = cls_func_view_pcb_step(         fm, self.page_view_pcb_step   , self.setUIPage, self.setSwitchingEnabled)
+
+		# self.func_view_tooling     = cls_func_view_tooling(          fm, self.page_view_tooling    , self.setUIPage, self.setSwitchingEnabled)
+		# self.func_view_supplies    = cls_func_view_supplies(         fm, self.page_view_supplies   , self.setUIPage, self.setSwitchingEnabled)
+
+		# self.func_routine_iv       = cls_func_routine_iv(            fm, self.page_routine_iv      , self.setUIPage, self.setSwitchingEnabled)
+		# self.func_shipment         = cls_func_shipment(              fm, self.page_shipment        , self.setUIPage, self.setSwitchingEnabled)
 
 		# This list must be in the same order that the pages are in in the stackedWidget in the main UI file.
 		# This is the same order as in the dict PAGE_IDS
 		self.func_list = [
-			self.func_view_module,
 			self.func_view_baseplate,
 			self.func_view_sensor,
-			self.func_view_PCB,
-			self.func_view_kapton_step,
-			self.func_view_sensor_step,
-			self.func_view_pcb_step,
-			self.func_routine_iv,
-			self.func_view_tooling,
-			self.func_view_supplies,
+			# self.func_view_PCB,
+			# self.func_view_protomodule,
+			# self.func_view_module,
+
+			# self.func_view_kapton_step,
+			# self.func_view_sensor_step,
+			# self.func_view_pcb_step,
+
+			# self.func_view_tooling,
+			# self.func_view_supplies,
+
+			# self.func_routine_iv,
+			# self.func_shipment,
 			]
+
 
 	def rig(self):
 		self.listInformation.itemActivated.connect(self.changeUIPage)
@@ -175,13 +222,10 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 		self.listShippingAndReceiving.itemActivated.connect(self.changeUIPage)
 		self.swPages.currentChanged.connect(self.pageChanged)
 
-		# later: add forward/back keyboard shortcuts (along with history support)
 
 	def timer_setup(self):
 		self.timer_id_gen = id_generator() # unique ID generator for timers
 		self.timers = {} # dict of timers {ID:timer}
-
-
 
 	def timer_add(self,interval=None,cxn=None,start=False):
 		timer = core.QTimer(self)
@@ -262,7 +306,7 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 			if len(kwargs) > 0:
 				self.func_list[PAGE_IDS[which_page]].load_kwargs(kwargs)
 		else:
-			print("Page <{}> not supported yet".format(which_page))
+			print("Page <{}> not supported yet. Tried to load with kwargs {}".format(which_page,kwargs))
 
 	def setSwitchingEnabled(self,enabled):
 		self.listInformation.setEnabled(enabled)

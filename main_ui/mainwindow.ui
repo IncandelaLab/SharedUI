@@ -21,7 +21,7 @@
        <number>0</number>
       </property>
       <item>
-       <layout class="QVBoxLayout" name="vlUISelect" stretch="1,7,1,1,11,1,1,4">
+       <layout class="QVBoxLayout" name="vlUISelect" stretch="1,6,1,1,5,1,1,2,12">
         <property name="spacing">
          <number>0</number>
         </property>
@@ -31,7 +31,7 @@
         <item>
          <widget class="QLineEdit" name="leInformation">
           <property name="text">
-           <string>Information</string>
+           <string>Parts, tooling, supplies</string>
           </property>
           <property name="readOnly">
            <bool>true</bool>
@@ -43,11 +43,6 @@
           <property name="currentRow">
            <number>-1</number>
           </property>
-          <item>
-           <property name="text">
-            <string>modules</string>
-           </property>
-          </item>
           <item>
            <property name="text">
             <string>baseplates</string>
@@ -65,27 +60,22 @@
           </item>
           <item>
            <property name="text">
-            <string>kapton placement steps</string>
+            <string>protomodules</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>sensor placement steps</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>PCB placement steps</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>supplies</string>
+            <string>modules</string>
            </property>
           </item>
           <item>
            <property name="text">
             <string>tooling</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>supplies</string>
            </property>
           </item>
          </widget>
@@ -106,7 +96,7 @@
         <item>
          <widget class="QLineEdit" name="lineEdit">
           <property name="text">
-           <string>Production and testing routines</string>
+           <string>Production steps and testing routines</string>
           </property>
          </widget>
         </item>
@@ -114,32 +104,27 @@
          <widget class="QListWidget" name="listAssembly">
           <item>
            <property name="text">
-            <string>baseplate height measurement</string>
+            <string>kapton placement steps</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>kapton insulation test</string>
+            <string>sensor placement steps</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>wirebonding</string>
+            <string>PCB placement steps</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>DAQ (unbiased)</string>
+            <string>unbiased DAQ</string>
            </property>
           </item>
           <item>
            <property name="text">
             <string>IV curve</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>encapsulation</string>
            </property>
           </item>
          </widget>
@@ -168,25 +153,23 @@
          <widget class="QListWidget" name="listShippingAndReceiving">
           <item>
            <property name="text">
-            <string>Receiving baseplates</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Receiving sensors</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Receiving PCBs</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Shipping</string>
+            <string>shipments</string>
            </property>
           </item>
          </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
         </item>
        </layout>
       </item>

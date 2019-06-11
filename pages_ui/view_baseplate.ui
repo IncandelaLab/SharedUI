@@ -225,11 +225,31 @@
     </item>
     <item>
      <property name="text">
-      <string>...</string>
+      <string>five</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>three</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>semi</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>semi(-)</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>choptwo</string>
      </property>
     </item>
    </widget>
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="pbGoShipment">
     <property name="geometry">
      <rect>
       <x>90</x>
@@ -319,7 +339,7 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QLineEdit" name="leIdentifier_2">
+   <widget class="QLineEdit" name="leLocation">
     <property name="geometry">
      <rect>
       <x>90</x>
@@ -335,7 +355,7 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QListWidget" name="listWidget">
+   <widget class="QListWidget" name="listShipments">
     <property name="geometry">
      <rect>
       <x>1</x>
@@ -347,11 +367,6 @@
     <property name="toolTip">
      <string>ID (date sent) (SENDER to RECEIVER)</string>
     </property>
-    <item>
-     <property name="text">
-      <string>541 (2019-06-04) (UCSB to CERN)</string>
-     </property>
-    </item>
    </widget>
    <widget class="QLineEdit" name="lineEdit_13">
     <property name="geometry">
@@ -561,7 +576,7 @@
      </property>
     </widget>
    </widget>
-   <widget class="QLineEdit" name="leKaptonType">
+   <widget class="QLineEdit" name="leNumKaptons">
     <property name="geometry">
      <rect>
       <x>130</x>
@@ -664,6 +679,9 @@
      <height>21</height>
     </rect>
    </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
    <property name="minimum">
     <number>-1</number>
    </property>
@@ -708,6 +726,9 @@
      <width>81</width>
      <height>21</height>
     </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
    </property>
    <property name="minimum">
     <number>-1</number>
@@ -756,6 +777,9 @@
      <width>81</width>
      <height>21</height>
     </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
    </property>
    <property name="minimum">
     <number>-1</number>
@@ -1240,7 +1264,7 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QComboBox" name="cbCheckLeakageCurrent_2">
+   <widget class="QComboBox" name="cbCheckLeakage_2">
     <property name="geometry">
      <rect>
       <x>120</x>
@@ -1305,7 +1329,7 @@
      </property>
     </item>
    </widget>
-   <widget class="QComboBox" name="cbCheckGlueSpillage_2">
+   <widget class="QComboBox" name="cbCheckGlueSpill_2">
     <property name="geometry">
      <rect>
       <x>120</x>
@@ -1336,6 +1360,9 @@
       <width>81</width>
       <height>21</height>
      </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
     </property>
     <property name="minimum">
      <number>-1</number>
@@ -1814,7 +1841,7 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QComboBox" name="cbCheckLeakageCurrent">
+   <widget class="QComboBox" name="cbCheckLeakage">
     <property name="geometry">
      <rect>
       <x>120</x>
@@ -1893,6 +1920,9 @@
       <width>81</width>
       <height>19</height>
      </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
     </property>
     <property name="minimum">
      <number>-1</number>
