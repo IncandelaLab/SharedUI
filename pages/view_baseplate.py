@@ -118,10 +118,10 @@ class func(object):
 			self.page.leManufacturer.setText(   self.baseplate.manufacturer )
 			
 			if not (self.baseplate.module is None):
-				self.page.sbOnModule.setValue(self.baseplate.module)
+				self.page.sbModule.setValue(self.baseplate.module)
 			else:
-				self.page.sbOnModule.setValue(-1)
-				self.page.sbOnModule.clear()
+				self.page.sbModule.setValue(-1)
+				self.page.sbModule.clear()
 
 			# same for protomodule
 
@@ -140,8 +140,8 @@ class func(object):
 			self.page.dsbSize.setValue(-1.0)
 			self.page.dsbSize.clear()
 			self.page.leManufacturer.setText('')
-			self.page.sbOnModule.setValue(-1)
-			self.page.sbOnModule.clear()
+			self.page.sbModule.setValue(-1)
+			self.page.sbModule.clear()
 			for i in range(6):
 				self.corners[i].setValue(-1)
 
@@ -154,7 +154,7 @@ class func(object):
 	def updateElements(self):
 
 		exists               = self.currentBaseplateExists
-		module_exists        = self.page.sbOnModule.value()>=0
+		module_exists        = self.page.sbModule.value()>=0
 		#protomodule_exists   = 
 		mode_view            = self.mode == 'view'
 		mode_editing_corners = self.mode == 'editing_corners'
@@ -185,7 +185,7 @@ class func(object):
 		# self.page.dsbFlatness.setReadOnly(     not (mode_creating or mode_editing) )
 		self.page.dsbSize.setReadOnly(         not (mode_creating or mode_editing) )
 		self.page.leManufacturer.setReadOnly(  not (mode_creating or mode_editing) )
-		self.page.sbOnModule.setReadOnly(      not (mode_creating or mode_editing) )
+		self.page.sbModule.setReadOnly(      not (mode_creating or mode_editing) )
 
 	@enforce_mode('view')
 	def startEditingCorners(self,*args,**kwargs):
@@ -253,7 +253,7 @@ class func(object):
 
 		self.baseplate.manufacturer = str(self.page.leManufacturer.text())
 
-		module = self.page.sbOnModule.value()
+		module = self.page.sbModule.value()
 		if module >= 0:
 			self.baseplate.module = module
 		else:
@@ -265,7 +265,7 @@ class func(object):
 
 	@enforce_mode('view')
 	def goModule(self,*args,**kwargs):
-		ID = self.page.sbOnModule.value()
+		ID = self.page.sbModule.value()
 		if ID >= 0:
 			self.setUIPage('modules',ID=ID)
 		else:

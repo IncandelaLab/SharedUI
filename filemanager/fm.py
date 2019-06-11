@@ -28,6 +28,10 @@ loadconfig()
 
 
 
+###############################################
+############## fsobj base class ###############
+###############################################
+
 class fsobj(object):
 	PROPERTIES_COMMON = [
 		'comments',
@@ -310,36 +314,55 @@ class baseplate(fsobj):
 	FILEDIR = os.sep.join(['baseplates','{century}'])
 	FILENAME = "baseplate_{ID:0>5}.json"
 	PROPERTIES = [
-		# details / measurements / characteristics
-		"identifier",     # idenfitier given by manufacturer or distributor.
-		"manufacturer",   # name of company that manufactured this part
-		"material",       # physical material
-		"nomthickness",   # nominal thickness
-		"kaptontype",     # 
-		"size",           # hexagon width, numerical. 6 or 8 (integers) for 6-inch or 8-inch
-		"shape",          # 
-		"chirality",      # 
-		"rotation",       # 
-		"location",       # physical location of part
+		# shipments and location
+		"location",  # physical location of part
+		"shipments", # list of shipments that this part has been in
 
-		# pre kapton application
+		# characteristics (defined upon reception)
+		"identifier",   # idenfitier given by manufacturer or distributor.
+		"manufacturer", # name of company that manufactured this part
+		"material",     # physical material
+		"nomthickness", # nominal thickness
+		"size",         # hexagon width, numerical. 6 or 8 (integers) for 6-inch or 8-inch
+		"shape",        # 
+		"chirality",    # 
+		"rotation",     # 
+
+		# kapton number
+		"num_kaptons", # number of kaptons; 0/None for pcb baseplates, 0/None 1 or 2 for metal baseplates
+
+		# baseplate qualification 
 		"corner_heights",      # list of corner heights
-		"kapton_tape_applied", # True if kapton tape has been applied
+		"kapton_tape_applied", # only for metal baseplates (not pcb baseplates)
+		                       # True if kapton tape has been applied
 		"thickness",           # measure thickness of baseplate
 
-		# post kapton application / pre sensor application
-		"check_leakage",       # None if not checked yet; True if passed; False if failed
-		"check_bumps_grooves", # None if not checked yet; True if passed; False if failed
-		"check_edges_firm",    # None if not checked yet; True if passed; False if failed
-		"check_glue_spill",    # None if not checked yet; True if passed; False if failed
-		"kapton_flatness",     # flatness of kapton layer after curing
+		# kapton application (1)
+		"step_kapton", # ID of step_kapton that applied the kapton to it
 
-		# Associations to other objects
-		"step_kapton", # which step_kapton applied a kapton to it
+		# kaptonized baseplate qualification (1)
+		"check_leakage",    # None if not checked yet; True if passed; False if failed
+		"check_surface",    # None if not checked yet; True if passed; False if failed
+		"check_edges_firm", # None if not checked yet; True if passed; False if failed
+		"check_glue_spill", # None if not checked yet; True if passed; False if failed
+		"kapton_flatness",  # flatness of kapton layer after curing
+
+		# kapton application (2) - for double kapton baseplates
+		"step_kapton_2", # ID of the step_kapton that applied the second kapton
+
+		# kaptonized baseplate qualification (2) - for double kapton baseplates
+		"check_leakage_2",    # None if not checked yet; True if passed; False if failed
+		"check_surface_2",    # None if not checked yet; True if passed; False if failed
+		"check_edges_firm_2", # None if not checked yet; True if passed; False if failed
+		"check_glue_spill_2", # None if not checked yet; True if passed; False if failed
+		"kapton_flatness_2",  # flatness of kapton layer after curing
+
+		# sensor application
 		"step_sensor", # which step_sensor used it
 		"protomodule", # what protomodule (ID) it's a part of; None if not part of any
-		"module",      # what module      (ID) it's a part of; None if not part of any
-		"shipments",   # list of shipments that this part has been in 
+
+		# Associations to other objects
+		"module", # what module (ID) it's a part of; None if not part of any
 	]
 
 	DEFAULTS = {
@@ -385,7 +408,11 @@ class sensor(fsobj):
 	FILEDIR = os.sep.join(['sensors','{century}'])
 	FILENAME = "sensor_{ID:0>5}.json"
 	PROPERTIES = [
-		# details / measurements / characteristics
+		# shipments and location
+		"location",  # physical location of part
+		"shipments", # list of shipments that this part has been in
+
+		# characteristics (defined upon reception)
 		"identifier",   # 
 		"manufacturer", # 
 		"type",         # 
@@ -393,16 +420,16 @@ class sensor(fsobj):
 		"channels",     # 
 		"shape",        # 
 		"rotation",     # 
-		"location",     # physical location of part
 
-		# pre sensor application
+		# sensor qualification
 		"inspection", # None if not inspected yet; True if passed; False if failed
 
-		# Associations to other objects
+		# sensor step
 		"step_sensor", # which step_sensor placed this sensor
 		"protomodule", # which protomodule this sensor is a part of
-		"module",      # which module this sensor is a part of
-		"shipments",   # list of shipments that this part has been in 
+
+		# associations to other objects
+		"module", # which module this sensor is a part of
 	]
 
 	DEFAULTS = {
@@ -414,27 +441,29 @@ class pcb(fsobj):
 	FILEDIR = os.sep.join(['pcbs','{century}','pcb_{ID:0>5}'])
 	FILENAME = "pcb_{ID:0>5}.json"
 	PROPERTIES = [
+		# shipments and location
+		"location",  # physical location of part
+		"shipments", # list of shipments that this part has been in
+
 		# details / measurements / characteristics
 		"identifier",   # 
 		"manufacturer", # 
-		"thickness",    # 
-		"flatness",     # 
 		"size",         # 
 		"channels",     # 
 		"shape",        # 
 		"chirality",    # 
 		"rotation",     # 
-		"location",     # physical location of part
 
-		# pre pcb application
+		# pcb qualification
+		"daq"         # name of dataset
 		"daq_ok",     # None if no DAQ yet; True if DAQ is good; False if it's bad
 		"inspection", # Check for exposed gold on backside. None if not inspected yet; True if passed; False if failed
 		"thickness",  # 
+		"flatness",   # 
 		
-		# Associations to other objects
+		# pcb step
 		"step_pcb", # which step_pcb placed this pcb
 		"module",   # which module this pcb is a part of
-		"shipments",# list of shipments that this part has been in 
 
 		# Associations to datasets
 		"daq_data", # list of all DAQ datasets
@@ -488,30 +517,35 @@ class protomodule(fsobj):
 	FILEDIR = os.sep.join(['protomodules','{century}'])
 	FILENAME = 'protomodule_{ID:0>5}.json'
 	PROPERTIES = [
-		# details / measurements / characteristics
-		"thickness",  # 
-		"kaptontype", # 
-		"channels",   # 
-		"size",       # 
-		"shape",      # 
-		"chirality",  # 
-		"rotation",   # 
-		"location",   # physical location of part
+		# shipments and location
+		"location",  # physical location of part
+		"shipments", # list of shipments that this part has been in
 
-		# post sensor application
+		# characteristics - taken from child parts upon creation of protomodule
+		"thickness",   # sum of baseplate and sensor, plus glue gap
+		"num_kaptons", # from baseplate
+		"channels",    # from sensor
+		"size",        # from baseplate or sensor (identical)
+		"shape",       # from baseplate or sensor (identical)
+		"chirality",   # from baseplate
+		"rotation",    # from baseplate or sensor (identical)
+		# initial location is also filled from child parts
+
+		# sensor step - filled upon creation
+		"step_sensor", # ID of sensor step
+		"baseplate",   # ID of baseplate
+		"sensor",      # ID of sensor
+
+		# protomodule qualification
 		"offset_translation", # translational offset of placement
 		"offset_rotation",    # rotation offset of placement
 		"flatness",           # flatness of sensor surface after curing
 		"check_cracks",       # None if not yet checked; True if passed; False if failed
 		"check_glue_spill",   # None if not yet checked; True if passed; False if failed
 
-		# Associations to other objects
-		"baseplate",   # 
-		"sensor",      # 
-		"step_sensor", # 
-		"step_pcb",    # 
-		"module",      # 
-		"shipments",   # list of shipments that this part has been in 
+		# pcb step
+		"step_pcb", # ID of pcb step
+		"module",   # ID of module
 	]
 
 	DEFAULTS = {
@@ -523,21 +557,33 @@ class module(fsobj):
 	FILEDIR    = os.sep.join(['modules','{century}','module_{ID:0>5}'])
 	FILENAME   = 'module_{ID:0>5}.json'
 	PROPERTIES = [
-		# details / measurements / characteristics
-		"thickness",  # physical thickness
-		"kaptontype", # type of kapton (single, double, pcb)
-		"channels",   # 
-		"size",       # 
-		"shape",      # 
-		"chirality",  # 
-		"rotation",   # 
-		"location",   # physical location of part
+		# shipments and location
+		"location",  # physical location of part
+		"shipments", # list of shipments that this part has been in
 
-		# post pcb application
+		# characteristics - taken from child parts upon creation of module
+		"thickness",   # sum of protomodule and sensor, plus glue gap
+		"num_kaptons", # from protomodule
+		"channels",    # from protomodule or pcb (identical)
+		"size",        # from protomodule or pcb (identical)
+		"shape",       # from protomodule or pcb (identical)
+		"chirality",   # from protomodule or pcb (identical)
+		"rotation",    # from protomodule or pcb (identical)
+		# initial location is also filled from child parts
+
+		# components and steps - filled upon creation
+		"baseplate",     # 
+		"sensor",        # 
+		"protomodule",   # 
+		"pcb",           # 
+		"step_kapton",   # 
+		"step_kapton_2", # 
+		"step_sensor",   # 
+		"step_pcb",      # 
+
+		# module qualification
 		"check_glue_spill",        # None if not yet checked; True if passed; False if failed
 		"check_glue_edge_contact", # None if not yet checked; True if passed; False if failed
-
-		# pre wirebonding
 		"unbonded_daq",      # name of dataset
 		"unbonded_daq_user", # who performed test
 		"unbonded_daq_ok",   # whether the output passes muster
@@ -546,6 +592,7 @@ class module(fsobj):
 		"wirebonding",                # has wirebonding been done
 		"wirebonding_unbonded_sites", # list of sites that were not wirebonded
 		"wirebonding_user",           # who performed wirebonding
+		"test_bonds",             # is this a module for which test bonds will be done?
 		"test_bonds_pulled",      # have test bonds been pulled
 		"test_bonds_pulled_user", # who pulled test bonds
 		"test_bonds_pulled_ok",   # is result of test bond pulling ok
@@ -556,6 +603,11 @@ class module(fsobj):
 		"wirebonds_repaired",      # list of wirebonds succesfully repaired
 		"wirebonds_repaired_user", # who repaired bonds
 
+		# wirebonding qualification
+		"wirebonding_final_inspection",
+		"wirebonding_final_inspection_user",
+		"wirebonding_final_inspection_ok",
+
 		# encapsulation
 		"encapsulation",             # has encapsulation been done
 		"encapsulation_user",        # who performed encapsulation
@@ -563,11 +615,9 @@ class module(fsobj):
 		"encapsulation_cure_stop",  # (unix) time at end of encapsulation
 		"encapsulation_inspection", # None if not yet inspected; True if pased; False if failed
 
-		# pre high voltage tests
+		# module qualification (final)
 		"hv_cables_attached",      # have HV cables been attached
 		"hv_cables_attached_user", # who attached HV cables
-
-		# high voltage tests
 		"unbiased_daq",      # name of dataset
 		"unbiased_daq_user", # who took dataset
 		"unbiased_daq_ok",   # whether result is ok
@@ -578,17 +628,7 @@ class module(fsobj):
 		"biased_daq_voltage", # voltage at which data was taken
 		"biased_daq_ok",      # whether result is ok
 
-		# Associations to other objects
-		"baseplate",   # 
-		"sensor",      # 
-		"protomodule", # 
-		"pcb",         # 
-		"step_kapton", # 
-		"step_sensor", # 
-		"step_pcb",    # 
-		"shipments",   # list of shipments that this part has been in 
-
-		# Associations to datasets
+		# datasets
 		"iv_data",  #
 		"daq_data", #
 	]
@@ -768,8 +808,8 @@ class step_kapton(fsobj):
 		'cure_humidity',    # Average humidity during curing (percent)
 
 		'kaptons_inspected', # list of kapton inspection results, ordered by component tray location. should all be True (don't use a kapton if it doesn't pass)
-		'tools',        # list of pickup tool IDs, ordered by pickup tool location
-		'baseplates',   # list of baseplate   IDs, ordered by assembly tray position
+		'tools',      # list of pickup tool IDs, ordered by pickup tool location
+		'baseplates', # list of baseplate   IDs, ordered by assembly tray position
 
 		'tray_component_sensor', # ID of component tray used
 		'tray_assembly',         # ID of assembly tray used
@@ -1028,4 +1068,5 @@ class batch_bond_wire(fsobj):
 
 
 if __name__ == '__main__':
+	# test features without UI here
 	...

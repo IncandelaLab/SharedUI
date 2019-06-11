@@ -84,7 +84,7 @@ class func(object):
 			self.page.dsbFlatness .setValue(self.pcb.flatness  if not (self.pcb.flatness is None) else -1)
 			self.page.dsbSize     .setValue(self.pcb.size      if      self.pcb.size              else  0)
 			self.page.sbChannels  .setValue(self.pcb.channels  if      self.pcb.channels          else  0)
-			self.page.sbOnModule  .setValue(self.pcb.module    if not (self.pcb.module   is None) else -1)
+			self.page.sbModule  .setValue(self.pcb.module    if not (self.pcb.module   is None) else -1)
 
 		else:
 			self.page.leIdentifier  .setText("")
@@ -93,13 +93,13 @@ class func(object):
 			self.page.dsbFlatness .setValue(-1)
 			self.page.dsbSize     .setValue( 0)
 			self.page.sbChannels  .setValue( 0)
-			self.page.sbOnModule  .setValue(-1)
+			self.page.sbModule  .setValue(-1)
 
 		if self.page.dsbThickness.value() ==  0: self.page.dsbThickness.clear()
 		if self.page.dsbFlatness .value() == -1: self.page.dsbFlatness .clear()
 		if self.page.dsbSize     .value() ==  0: self.page.dsbSize     .clear()
 		if self.page.sbChannels  .value() ==  0: self.page.sbChannels  .clear()
-		if self.page.sbOnModule  .value() == -1: self.page.sbOnModule  .clear()
+		if self.page.sbModule  .value() == -1: self.page.sbModule  .clear()
 
 		self.updateElements()
 
@@ -110,7 +110,7 @@ class func(object):
 		mode_editing  = self.mode == 'editing'
 		mode_creating = self.mode == 'creating'
 		pcb_exists    = self.pcb_exists
-		module_exists = self.page.sbOnModule.value() >= 0
+		module_exists = self.page.sbModule.value() >= 0
 		#protomodul exists
 
 		self.setMainSwitchingEnabled(mode_view)
@@ -128,7 +128,7 @@ class func(object):
 		self.page.dsbSize.setReadOnly(        not (mode_editing or mode_creating) )
 		self.page.sbChannels.setReadOnly(     not (mode_editing or mode_creating) )
 		self.page.leManufacturer.setReadOnly( not (mode_editing or mode_creating) )
-		self.page.sbOnModule.setReadOnly(     not (mode_editing or mode_creating) )
+		self.page.sbModule.setReadOnly(     not (mode_editing or mode_creating) )
 
 	@enforce_mode('view')
 	def startCreating(self,*args,**kwargs):
@@ -161,7 +161,7 @@ class func(object):
 		self.pcb.flatness     = self.page.dsbFlatness.value()  if self.page.dsbFlatness.value()  >= 0 else None
 		self.pcb.size         = self.page.dsbSize.value()      if self.page.dsbSize.value()      >  0 else None
 		self.pcb.channels     = self.page.sbChannels.value()   if self.page.sbChannels.value()   >  0 else None
-		self.pcb.module       = self.page.sbOnModule.value()   if self.page.sbOnModule.value()   >= 0 else None
+		self.pcb.module       = self.page.sbModule.value()   if self.page.sbModule.value()   >= 0 else None
 		
 		self.pcb.save()
 		self.mode = 'view'
@@ -169,7 +169,7 @@ class func(object):
 
 	@enforce_mode('view')
 	def goModule(self,*args,**kwargs):
-		ID = self.page.sbOnModule.value()
+		ID = self.page.sbModule.value()
 		if ID >= 0:
 			self.setUIPage('modules',ID=ID)
 		else:
