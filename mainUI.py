@@ -12,7 +12,7 @@ from pages.view_baseplate   import func as cls_func_view_baseplate
 from pages.view_sensor      import func as cls_func_view_sensor
 from pages.view_PCB         import func as cls_func_view_PCB
 from pages.view_protomodule import func as cls_func_view_protomodule
-# from pages.view_module      import func as cls_func_view_module
+from pages.view_module      import func as cls_func_view_module
 
 # from pages.view_kapton_step import func as cls_func_view_kapton_step
 # from pages.view_sensor_step import func as cls_func_view_sensor_step
@@ -53,11 +53,11 @@ class widget_view_protomodule(gui.QWidget,form_view_protomodule):
 		super(widget_view_protomodule,self).__init__(parent)
 		self.setupUi(self)
 
-# from pages_ui.view_module import Ui_Form as form_view_module
-# class widget_view_module(gui.QWidget,form_view_module):
-# 	def __init__(self,parent):
-# 		super(widget_view_module,self).__init__(parent)
-# 		self.setupUi(self)
+from pages_ui.view_module import Ui_Form as form_view_module
+class widget_view_module(gui.QWidget,form_view_module):
+	def __init__(self,parent):
+		super(widget_view_module,self).__init__(parent)
+		self.setupUi(self)
 
 
 # from pages_ui.view_kapton_step import Ui_Form as form_view_kapton_step
@@ -113,7 +113,7 @@ PAGE_IDS = {
 	'sensors'                : 1,
 	'PCBs'                   : 2,
 	'protomodules'           : 3,
-	# 'modules'                : 4,
+	'modules'                : 4,
 
 	# 'kapton placement steps' : 5,
 	# 'sensor placement steps' : 6,
@@ -165,7 +165,7 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 		self.page_view_sensor      = widget_view_sensor(None)      ; self.swPages.addWidget(self.page_view_sensor)
 		self.page_view_PCB         = widget_view_PCB(None)         ; self.swPages.addWidget(self.page_view_PCB)
 		self.page_view_protomodule = widget_view_protomodule(None) ; self.swPages.addWidget(self.page_view_protomodule)
-		# self.page_view_module      = widget_view_module(None)      ; self.swPages.addWidget(self.page_view_module)
+		self.page_view_module      = widget_view_module(None)      ; self.swPages.addWidget(self.page_view_module)
 
 		# self.page_view_kapton_step = widget_view_kapton_step(None) ; self.swPages.addWidget(self.page_view_kapton_step)
 		# self.page_view_sensor_step = widget_view_sensor_step(None) ; self.swPages.addWidget(self.page_view_sensor_step)
@@ -183,7 +183,7 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 		self.func_view_sensor      = cls_func_view_sensor(           fm, self.page_view_sensor     , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_PCB         = cls_func_view_PCB(              fm, self.page_view_PCB        , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_protomodule = cls_func_view_protomodule(      fm, self.page_view_protomodule, self.setUIPage, self.setSwitchingEnabled)
-		# self.func_view_module      = cls_func_view_module(           fm, self.page_view_module     , self.setUIPage, self.setSwitchingEnabled)
+		self.func_view_module      = cls_func_view_module(           fm, self.page_view_module     , self.setUIPage, self.setSwitchingEnabled)
 
 		# self.func_view_kapton_step = cls_func_view_kapton_step(      fm, self.page_view_kapton_step, self.setUIPage, self.setSwitchingEnabled)
 		# self.func_view_sensor_step = cls_func_view_sensor_step(      fm, self.page_view_sensor_step, self.setUIPage, self.setSwitchingEnabled)
@@ -202,7 +202,7 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 			self.func_view_sensor,
 			self.func_view_PCB,
 			self.func_view_protomodule,
-			# self.func_view_module,
+			self.func_view_module,
 
 			# self.func_view_kapton_step,
 			# self.func_view_sensor_step,

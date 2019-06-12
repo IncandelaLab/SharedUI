@@ -603,7 +603,8 @@ class module(fsobj):
 		"test_bonds_rebonded_ok",   # is result of rebonding test bonds ok
 		"wirebonds_inspected",     # whether inspection has happened
 		"wirebonds_damaged",       # list of damaged bonds found during inspection
-		"wirebonds_repaired",      # list of wirebonds succesfully repaired
+		"wirebonds_repaired",      # have wirebonds been repaired
+		"wirebonds_repaired_list", # list of wirebonds succesfully repaired
 		"wirebonds_repaired_user", # who repaired bonds
 
 		# wirebonding qualification
@@ -643,6 +644,8 @@ class module(fsobj):
 
 	DEFAULTS = {
 		"shipments":[],
+		'iv_data':[],
+		'daq_data':[],
 	}
 
 	IV_DATADIR      = 'iv'

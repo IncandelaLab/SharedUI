@@ -83,7 +83,7 @@ class func(object):
 
 	@enforce_mode('setup')
 	def rig(self):
-		self.page.sbSensorID.valueChanged.connect(self.update_info)
+		self.page.sbID.valueChanged.connect(self.update_info)
 
 		self.page.pbNew.clicked.connect(self.startCreating)
 		self.page.pbEdit.clicked.connect(self.startEditing)
@@ -104,9 +104,9 @@ class func(object):
 	@enforce_mode('view')
 	def update_info(self,ID=None,*args,**kwargs):
 		if ID is None:
-			ID = self.page.sbSensorID.value()
+			ID = self.page.sbID.value()
 		else:
-			self.page.sbSensorID.setValue(ID)
+			self.page.sbID.setValue(ID)
 
 		self.sensor_exists = self.sensor.load(ID)
 
@@ -155,6 +155,7 @@ class func(object):
 		module_exists      = self.page.sbModule.value() >= 0
 
 		self.setMainSwitchingEnabled(mode_view)
+		self.page.sbID.setEnabled(mode_view)
 
 		self.page.pbNew.setEnabled(     mode_view and not sensor_exists )
 		self.page.pbEdit.setEnabled(    mode_view and     sensor_exists )
@@ -184,7 +185,7 @@ class func(object):
 	@enforce_mode('view')
 	def startCreating(self,*args,**kwargs):
 		if not self.sensor_exists:
-			ID = self.page.sbSensorID.value()
+			ID = self.page.sbID.value()
 			self.mode = 'creating'
 			self.sensor.new(ID)
 			self.updateElements()
@@ -277,7 +278,7 @@ class func(object):
 				raise TypeError("Expected type <int> for ID; got <{}>".format(type(ID)))
 			if ID < 0:
 				raise ValueError("ID cannot be negative")
-			self.page.sbSensorID.setValue(ID)
+			self.page.sbID.setValue(ID)
 
 	@enforce_mode('view')
 	def changed_to(self):

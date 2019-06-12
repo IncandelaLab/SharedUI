@@ -96,12 +96,12 @@ class func(object):
 
 	@enforce_mode('setup')
 	def rig(self):
-		self.page.sbBaseplateID.valueChanged.connect(self.update_info)
+		self.page.sbID.valueChanged.connect(self.update_info)
 
-		self.page.pbBaseplateNew.clicked.connect(self.startCreating)
-		self.page.pbBaseplateEdit.clicked.connect(self.startEditing)
-		self.page.pbBaseplateSave.clicked.connect(self.saveEditing)
-		self.page.pbBaseplateCancel.clicked.connect(self.cancelEditing)
+		self.page.pbNew.clicked.connect(self.startCreating)
+		self.page.pbEdit.clicked.connect(self.startEditing)
+		self.page.pbSave.clicked.connect(self.saveEditing)
+		self.page.pbCancel.clicked.connect(self.cancelEditing)
 
 		self.page.pbGoShipment.clicked.connect(self.goShipment)
 
@@ -131,9 +131,9 @@ class func(object):
 	def update_info(self,ID=None):
 		"""Loads info on the selected baseplate ID and updates UI elements accordingly"""
 		if ID is None:
-			ID = self.page.sbBaseplateID.value()
+			ID = self.page.sbID.value()
 		else:
-			self.page.sbBaseplateID.setValue(ID)
+			self.page.sbID.setValue(ID)
 
 		self.baseplate_exists = self.baseplate.load(ID)
 
@@ -218,11 +218,12 @@ class func(object):
 		mode_creating = self.mode == 'creating'
 
 		self.setMainSwitchingEnabled(mode_view)
+		self.page.sbID.setEnabled(mode_view)
 
-		self.page.pbBaseplateNew.setEnabled(    mode_view and not exists )
-		self.page.pbBaseplateEdit.setEnabled(   mode_view and     exists )
-		self.page.pbBaseplateSave.setEnabled(   mode_creating or mode_editing )
-		self.page.pbBaseplateCancel.setEnabled( mode_creating or mode_editing )
+		self.page.pbNew.setEnabled(    mode_view and not exists )
+		self.page.pbEdit.setEnabled(   mode_view and     exists )
+		self.page.pbSave.setEnabled(   mode_creating or mode_editing )
+		self.page.pbCancel.setEnabled( mode_creating or mode_editing )
 
 		self.page.pbGoShipment.setEnabled(mode_view and shipments_exist)
 
@@ -268,7 +269,7 @@ class func(object):
 	@enforce_mode('view')
 	def startCreating(self,*args,**kwargs):
 		if not self.baseplate_exists:
-			ID = self.page.sbBaseplateID.value()
+			ID = self.page.sbID.value()
 			self.mode = 'creating'
 			self.baseplate.new(ID)
 			self.updateElements()
@@ -386,7 +387,7 @@ class func(object):
 				raise TypeError("Expected type <int> for ID; got <{}>".format(type(ID)))
 			if ID < 0:
 				raise ValueError("ID cannot be negative")
-			self.page.sbBaseplateID.setValue(ID)
+			self.page.sbID.setValue(ID)
 
 	@enforce_mode('view')
 	def changed_to(self):

@@ -44,7 +44,7 @@
    <property name="frameShadow">
     <enum>QFrame::Plain</enum>
    </property>
-   <widget class="QPushButton" name="pbBaseplateSave">
+   <widget class="QPushButton" name="pbSave">
     <property name="geometry">
      <rect>
       <x>80</x>
@@ -73,7 +73,7 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QSpinBox" name="sbBaseplateID">
+   <widget class="QSpinBox" name="sbID">
     <property name="geometry">
      <rect>
       <x>80</x>
@@ -86,7 +86,7 @@
      <number>65535</number>
     </property>
    </widget>
-   <widget class="QPushButton" name="pbBaseplateCancel">
+   <widget class="QPushButton" name="pbCancel">
     <property name="geometry">
      <rect>
       <x>150</x>
@@ -99,7 +99,7 @@
      <string>Cancel</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pbBaseplateNew">
+   <widget class="QPushButton" name="pbNew">
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -112,7 +112,7 @@
      <string>New</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pbBaseplateEdit">
+   <widget class="QPushButton" name="pbEdit">
     <property name="geometry">
      <rect>
       <x>0</x>

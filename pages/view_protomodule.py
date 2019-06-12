@@ -178,6 +178,7 @@ class func(object):
 		mode_creating = self.mode == 'creating'
 		
 		self.setMainSwitchingEnabled(mode_view)
+		self.page.sbID.setEnabled(mode_view)
 
 		self.page.pbNew.setEnabled(     mode_view and not sensor_exists )
 		self.page.pbEdit.setEnabled(    mode_view and     sensor_exists )

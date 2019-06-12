@@ -523,7 +523,7 @@
      <string>New</string>
     </property>
    </widget>
-   <widget class="QSpinBox" name="sbSensorID">
+   <widget class="QSpinBox" name="sbID">
     <property name="geometry">
      <rect>
       <x>80</x>

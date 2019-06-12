@@ -172,6 +172,7 @@ class func(object):
 		mode_creating = self.mode == 'creating'
 
 		self.setMainSwitchingEnabled(mode_view)
+		self.page.sbID.setEnabled(mode_view)
 				
 		self.page.pbNew.setEnabled(    mode_view and not pcb_exists  )
 		self.page.pbEdit.setEnabled(   mode_view and     pcb_exists  )
@@ -217,9 +218,7 @@ class func(object):
 
 	@enforce_mode('view')
 	def startEditing(self,*args,**kwargs):
-		if not self.pcb_exists:
-			pass
-		else:
+		if self.pcb_exists:
 			self.mode = 'editing'
 			self.updateElements()
 
@@ -295,7 +294,6 @@ class func(object):
 	def goPlotter(self,*args,**kwargs):
 		self.setUIPage('plotter',which='daq')
 
-	
 
 
 
