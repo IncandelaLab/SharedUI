@@ -456,7 +456,7 @@ class pcb(fsobj):
 		"rotation",     # 
 
 		# pcb qualification
-		"daq"         # name of dataset
+		"daq",        # name of dataset
 		"daq_ok",     # None if no DAQ yet; True if DAQ is good; False if it's bad
 		"inspection", # Check for exposed gold on backside. None if not inspected yet; True if passed; False if failed
 		"thickness",  # 
@@ -476,6 +476,7 @@ class pcb(fsobj):
 
 	DEFAULTS = {
 		"shipments":[],
+		"daq_data":[],
 	}
 
 	DAQ_DATADIR = 'daq'

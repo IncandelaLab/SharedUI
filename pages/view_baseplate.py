@@ -41,18 +41,15 @@ INDEX_CHECK = {
 }
 
 class func(object):
-	
 	def __init__(self,fm,page,setUIPage,setSwitchingEnabled):
 		self.page      = page
 		self.setUIPage = setUIPage
 		self.setMainSwitchingEnabled = setSwitchingEnabled
 
-		self.currentBaseplateExists = None
-
+		self.baseplate_exists = None
 		self.baseplate = fm.baseplate()
 
 		self.mode = 'setup'
-
 
 
 	def enforce_mode(mode):
@@ -130,7 +127,6 @@ class func(object):
 			]
 
 
-
 	@enforce_mode('view')
 	def update_info(self,ID=None):
 		"""Loads info on the selected baseplate ID and updates UI elements accordingly"""
@@ -139,7 +135,7 @@ class func(object):
 		else:
 			self.page.sbBaseplateID.setValue(ID)
 
-		self.currentBaseplateExists = self.baseplate.load(ID)
+		self.baseplate_exists = self.baseplate.load(ID)
 
 		self.page.listShipments.clear()
 		for shipment in self.baseplate.shipments:
@@ -208,8 +204,7 @@ class func(object):
 
 	@enforce_mode(['view','editing_corners','editing','creating'])
 	def updateElements(self):
-		exists = self.currentBaseplateExists
-
+		exists = self.baseplate_exists
 		shipments_exist = self.page.listShipments.count() > 0
 
 		step_kapton_exists   = self.page.sbStepKapton.value()   >=0
@@ -222,6 +217,8 @@ class func(object):
 		mode_editing  = self.mode == 'editing'
 		mode_creating = self.mode == 'creating'
 
+		self.setMainSwitchingEnabled(mode_view)
+
 		self.page.pbBaseplateNew.setEnabled(    mode_view and not exists )
 		self.page.pbBaseplateEdit.setEnabled(   mode_view and     exists )
 		self.page.pbBaseplateSave.setEnabled(   mode_creating or mode_editing )
@@ -229,10 +226,10 @@ class func(object):
 
 		self.page.pbGoShipment.setEnabled(mode_view and shipments_exist)
 
-		self.page.cbSize.setEnabled(               mode_creating or mode_editing  )
-		self.page.cbShape.setEnabled(              mode_creating or mode_editing  )
-		self.page.cbChirality.setEnabled(          mode_creating or mode_editing  )
-		self.page.cbMaterial.setEnabled(           mode_creating or mode_editing  )
+		self.page.cbSize.setEnabled(                mode_creating or mode_editing  )
+		self.page.cbShape.setEnabled(               mode_creating or mode_editing  )
+		self.page.cbChirality.setEnabled(           mode_creating or mode_editing  )
+		self.page.cbMaterial.setEnabled(            mode_creating or mode_editing  )
 		self.page.leLocation.setReadOnly(      not (mode_creating or mode_editing) )
 		self.page.leManufacturer.setReadOnly(  not (mode_creating or mode_editing) )
 		self.page.dsbNomThickness.setReadOnly( not (mode_creating or mode_editing) )
@@ -270,7 +267,7 @@ class func(object):
 
 	@enforce_mode('view')
 	def startCreating(self,*args,**kwargs):
-		if not self.currentBaseplateExists:
+		if not self.baseplate_exists:
 			ID = self.page.sbBaseplateID.value()
 			self.mode = 'creating'
 			self.baseplate.new(ID)
@@ -280,7 +277,7 @@ class func(object):
 
 	@enforce_mode('view')
 	def startEditing(self,*args,**kwargs):
-		if not self.currentBaseplateExists:
+		if not self.baseplate_exists:
 			pass
 		else:
 			self.mode = 'editing'
@@ -381,9 +378,6 @@ class func(object):
 
 
 
-
-
-
 	@enforce_mode('view')
 	def load_kwargs(self,kwargs):
 		if 'ID' in kwargs.keys():
@@ -398,4 +392,3 @@ class func(object):
 	def changed_to(self):
 		print("changed to view_baseplate")
 		self.update_info()
-		# later change this to only update if the baseplate loaded has changed

@@ -141,7 +141,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QSpinBox" name="sbPCBID">
+  <widget class="QSpinBox" name="sbID">
    <property name="geometry">
     <rect>
      <x>90</x>
@@ -199,7 +199,7 @@
     <string>Go to</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pbPCBCancel">
+  <widget class="QPushButton" name="pbCancel">
    <property name="geometry">
     <rect>
      <x>160</x>
@@ -212,7 +212,7 @@
     <string>Cancel</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pbPCBEdit">
+  <widget class="QPushButton" name="pbEdit">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -225,7 +225,7 @@
     <string>Edit</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pbPCBNew">
+  <widget class="QPushButton" name="pbNew">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -238,7 +238,7 @@
     <string>New</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pbPCBSave">
+  <widget class="QPushButton" name="pbSave">
    <property name="geometry">
     <rect>
      <x>90</x>
@@ -399,34 +399,6 @@
    <property name="maximum">
     <number>5</number>
    </property>
-  </widget>
-  <widget class="QComboBox" name="cbShape">
-   <property name="geometry">
-    <rect>
-     <x>140</x>
-     <y>320</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="currentIndex">
-    <number>-1</number>
-   </property>
-   <item>
-    <property name="text">
-     <string>full</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>half</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>...</string>
-    </property>
-   </item>
   </widget>
   <widget class="QComboBox" name="cbChirality">
    <property name="geometry">
@@ -672,7 +644,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Data Acquisitoin OK?</string>
+    <string>Data Acquisition OK?</string>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -853,6 +825,54 @@
    <property name="text">
     <string>PCB placement step</string>
    </property>
+  </widget>
+  <widget class="QComboBox" name="cbShape">
+   <property name="geometry">
+    <rect>
+     <x>140</x>
+     <y>320</y>
+     <width>80</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="currentIndex">
+    <number>-1</number>
+   </property>
+   <item>
+    <property name="text">
+     <string>full</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>half</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>five</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>three</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>semi</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>semi(-)</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>choptwo</string>
+    </property>
+   </item>
   </widget>
  </widget>
  <resources/>

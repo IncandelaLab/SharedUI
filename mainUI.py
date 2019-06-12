@@ -10,7 +10,7 @@ import time
 # Import page functionality classes
 from pages.view_baseplate   import func as cls_func_view_baseplate
 from pages.view_sensor      import func as cls_func_view_sensor
-# from pages.view_PCB         import func as cls_func_view_PCB
+from pages.view_PCB         import func as cls_func_view_PCB
 # from pages.view_protomodule import func as cls_func_view_protomodule
 # from pages.view_module      import func as cls_func_view_module
 
@@ -40,11 +40,11 @@ class widget_view_sensor(gui.QWidget,form_view_sensor):
 		super(widget_view_sensor,self).__init__(parent)
 		self.setupUi(self)
 
-# from pages_ui.view_PCB import Ui_Form as form_view_PCB
-# class widget_view_PCB(gui.QWidget,form_view_PCB):
-# 	def __init__(self,parent):
-# 		super(widget_view_PCB,self).__init__(parent)
-# 		self.setupUi(self)
+from pages_ui.view_PCB import Ui_Form as form_view_PCB
+class widget_view_PCB(gui.QWidget,form_view_PCB):
+	def __init__(self,parent):
+		super(widget_view_PCB,self).__init__(parent)
+		self.setupUi(self)
 
 
 # from pages_ui.view_protomodule import Ui_Form as form_view_protomodule
@@ -111,7 +111,7 @@ class widget_view_sensor(gui.QWidget,form_view_sensor):
 PAGE_IDS = {
 	'baseplates'             : 0,
 	'sensors'                : 1,
-	# 'PCBs'                   : 2,
+	'PCBs'                   : 2,
 	# 'protomodules'           : 3,
 	# 'modules'                : 4,
 
@@ -163,7 +163,7 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 	def setupPagesUI(self):
 		self.page_view_baseplate   = widget_view_baseplate(None)   ; self.swPages.addWidget(self.page_view_baseplate)
 		self.page_view_sensor      = widget_view_sensor(None)      ; self.swPages.addWidget(self.page_view_sensor)
-		# self.page_view_PCB         = widget_view_PCB(None)         ; self.swPages.addWidget(self.page_view_PCB)
+		self.page_view_PCB         = widget_view_PCB(None)         ; self.swPages.addWidget(self.page_view_PCB)
 		# self.page_view_protomodule = widget_view_protomodule(None) ; self.swPages.addWidget(self.page_view_protomodule)
 		# self.page_view_module      = widget_view_module(None)      ; self.swPages.addWidget(self.page_view_module)
 
@@ -181,7 +181,7 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 	def initPages(self):
 		self.func_view_baseplate   = cls_func_view_baseplate(        fm, self.page_view_baseplate  , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_sensor      = cls_func_view_sensor(           fm, self.page_view_sensor     , self.setUIPage, self.setSwitchingEnabled)
-		# self.func_view_PCB         = cls_func_view_PCB(              fm, self.page_view_PCB        , self.setUIPage, self.setSwitchingEnabled)
+		self.func_view_PCB         = cls_func_view_PCB(              fm, self.page_view_PCB        , self.setUIPage, self.setSwitchingEnabled)
 		# self.func_view_protomodule = cls_func_view_protomodule(      fm, self.page_view_protomodule, self.setUIPage, self.setSwitchingEnabled)
 		# self.func_view_module      = cls_func_view_module(           fm, self.page_view_module     , self.setUIPage, self.setSwitchingEnabled)
 
@@ -200,7 +200,7 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 		self.func_list = [
 			self.func_view_baseplate,
 			self.func_view_sensor,
-			# self.func_view_PCB,
+			self.func_view_PCB,
 			# self.func_view_protomodule,
 			# self.func_view_module,
 
@@ -294,15 +294,17 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 	def changeUIPage(self,*args,**kwargs):
 		self.setUIPage(args[0].text())
 
-	def setUIPage(self,which_page,**kwargs):
+	def setUIPage(self, which_page, switch_to_page=True, **kwargs):
 		if which_page in PAGE_IDS.keys():
 
 			if self.func_list[PAGE_IDS[which_page]].mode == 'setup':
 				print("page {} not yet setup; doing setup".format(which_page))
 				self.func_list[PAGE_IDS[which_page]].setup()
 
-			self.swPages.setCurrentIndex(PAGE_IDS[which_page])
-			self.func_list[PAGE_IDS[which_page]].changed_to() # notify page function that page has been changed to
+			if switch_to_page:
+				self.swPages.setCurrentIndex(PAGE_IDS[which_page])
+				self.func_list[PAGE_IDS[which_page]].changed_to() # notify page function that page has been changed to
+
 			if len(kwargs) > 0:
 				self.func_list[PAGE_IDS[which_page]].load_kwargs(kwargs)
 		else:
