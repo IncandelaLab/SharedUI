@@ -34,7 +34,7 @@
    <property name="midLineWidth">
     <number>2</number>
    </property>
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="pbGoShipment">
     <property name="geometry">
      <rect>
       <x>90</x>
@@ -79,7 +79,7 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QLineEdit" name="leIdentifier_2">
+   <widget class="QLineEdit" name="leLocation">
     <property name="geometry">
      <rect>
       <x>90</x>
@@ -95,7 +95,7 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QListWidget" name="listWidget">
+   <widget class="QListWidget" name="listShipments">
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -107,34 +107,6 @@
     <property name="toolTip">
      <string>ID (date sent) (SENDER to RECEIVER)</string>
     </property>
-   </widget>
-   <widget class="QComboBox" name="cbShape">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>230</y>
-      <width>81</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="currentIndex">
-     <number>-1</number>
-    </property>
-    <item>
-     <property name="text">
-      <string>full</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>half</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>...</string>
-     </property>
-    </item>
    </widget>
    <widget class="QLineEdit" name="lineEdit_10">
     <property name="geometry">
@@ -421,7 +393,7 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QLineEdit" name="leKaptonType">
+   <widget class="QLineEdit" name="leNumKaptons">
     <property name="geometry">
      <rect>
       <x>129</x>
@@ -433,6 +405,54 @@
     <property name="readOnly">
      <bool>true</bool>
     </property>
+   </widget>
+   <widget class="QComboBox" name="cbShape">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>230</y>
+      <width>80</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>-1</number>
+    </property>
+    <item>
+     <property name="text">
+      <string>full</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>half</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>five</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>three</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>semi</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>semi(-)</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>choptwo</string>
+     </property>
+    </item>
    </widget>
   </widget>
   <widget class="QFrame" name="frame_3">
@@ -450,7 +470,7 @@
    <property name="frameShadow">
     <enum>QFrame::Plain</enum>
    </property>
-   <widget class="QPushButton" name="pbSensorSave">
+   <widget class="QPushButton" name="pbSave">
     <property name="geometry">
      <rect>
       <x>80</x>
@@ -463,7 +483,7 @@
      <string>Save</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pbSensorEdit">
+   <widget class="QPushButton" name="pbEdit">
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -476,7 +496,7 @@
      <string>Edit</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pbSensorCancel">
+   <widget class="QPushButton" name="pbCancel">
     <property name="geometry">
      <rect>
       <x>150</x>
@@ -505,7 +525,7 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QPushButton" name="pbSensorNew">
+   <widget class="QPushButton" name="pbNew">
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -518,7 +538,7 @@
      <string>New</string>
     </property>
    </widget>
-   <widget class="QSpinBox" name="sbSensorID">
+   <widget class="QSpinBox" name="sbID">
     <property name="geometry">
      <rect>
       <x>80</x>
