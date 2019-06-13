@@ -37,6 +37,10 @@ class fsobj(object):
 		'comments',
 		]
 
+	DEFAULTS ={
+	
+	}
+
 	DEFAULTS_COMMON = {
 		'comments':[],
 	}
@@ -822,6 +826,7 @@ class step_kapton(fsobj):
 		'batch_araldite',        # ID of araldite batch used
 	]
 
+
 	@property
 	def cure_duration(self):
 		if (self.cure_stop is None) or (self.cure_start is None):
@@ -836,10 +841,33 @@ class step_kapton(fsobj):
 		for i in range(6):
 			baseplate_exists = False if self.baseplates[i] is None else inst_baseplate.load(self.baseplates[i])
 			if baseplate_exists:
-				if inst_baseplate.step_kapton != self.ID:
-					inst_baseplate.step_kapton = self.ID
+
+				which_kapton_layer = None
+
+				if (inst_baseplate.step_kapton is None) or (inst_baseplate.step_kapton == self.ID):
+					which_kapton_layer = 1
+
+				else:
+					if (inst_baseplate.step_kapton_2 is None) or (inst_baseplate.step_kapton_2 == self.ID):
+						which_kapton_layer = 2
+
+				if which_kapton_layer is None:
+					print("step_kapton cannot write ID {} to baseplate {}: already has two kapton steps")
+
+				else:
+					if which_kapton_layer == 1:
+						inst_baseplate.step_kapton = self.ID
+					elif which_kapton_layer == 2:
+						inst_baseplate.step_kapton_2 = self.ID
+
+					num_kaptons = 0
+					if not (inst_baseplate.step_kapton   is None): num_kaptons += 1
+					if not (inst_baseplate.step_kapton_2 is None): num_kaptons += 1
+					inst_baseplate.num_kaptons = num_kaptons
+
 					inst_baseplate.save()
 					inst_baseplate.clear()
+
 			else:
 				if not (self.baseplates[i] is None):
 					print("step_kapton {} cannot write to baseplate {}: does not exist".format(self.ID, self.baseplates[i]))
@@ -869,6 +897,7 @@ class step_sensor(fsobj):
 		'batch_araldite',        # ID of araldite batch used
 		'batch_loctite',         # ID of loctite  batch used
 	]
+
 
 	@property
 	def cure_duration(self):
@@ -908,12 +937,12 @@ class step_sensor(fsobj):
 			if not (self.protomodules[i] is None):
 				if not protomodule_exists:
 					inst_protomodule.new(self.protomodules[i])
-				inst_protomodule.kaptontype  = inst_baseplate.kaptontype if baseplate_exists else None
-				inst_protomodule.channels    = inst_sensor.channels      if sensor_exists    else None
-				inst_protomodule.size        = inst_baseplate.size       if baseplate_exists else None
-				inst_protomodule.shape       = inst_baseplate.shape      if baseplate_exists else None
-				inst_protomodule.chirality   = inst_baseplate.chirality  if baseplate_exists else None
-				inst_protomodule.rotation    = inst_baseplate.rotation   if baseplate_exists else None
+				inst_protomodule.num_kaptons = inst_baseplate.num_kaptons if baseplate_exists else None
+				inst_protomodule.channels    = inst_sensor.channels       if sensor_exists    else None
+				inst_protomodule.size        = inst_baseplate.size        if baseplate_exists else None
+				inst_protomodule.shape       = inst_baseplate.shape       if baseplate_exists else None
+				inst_protomodule.chirality   = inst_baseplate.chirality   if baseplate_exists else None
+				inst_protomodule.rotation    = inst_baseplate.rotation    if baseplate_exists else None
 				inst_protomodule.location    = MAC
 				inst_protomodule.step_sensor = self.ID
 				inst_protomodule.baseplate   = self.baseplates[i]
@@ -953,6 +982,7 @@ class step_pcb(fsobj):
 		'batch_araldite',     # ID of araldite batch used
 	]
 
+
 	@property
 	def cure_duration(self):
 		if (self.cure_stop is None) or (self.cure_start is None):
@@ -976,11 +1006,13 @@ class step_pcb(fsobj):
 			module_exists      = False if (self.modules[i]      is None) else inst_module.load(      self.modules[i]      )
 
 			if pcb_exists:
+				print("PCB EXISTS")
 				inst_pcb.step_pcb = self.ID
 				inst_pcb.module = self.modules[i]
 				inst_pcb.save()
 
 			if protomodule_exists:
+				print("PROTOMODULE EXISTS")
 				inst_protomodule.step_pcb = self.ID
 				inst_protomodule.module = self.modules[i]
 				inst_protomodule.save()
@@ -989,10 +1021,12 @@ class step_pcb(fsobj):
 				sensor_exists    = False if (inst_protomodule.sensor    is None) else inst_sensor.load(   inst_protomodule.sensor   )
 
 				if baseplate_exists:
+					print("BASEPLATE EXISTS")
 					inst_baseplate.module = self.modules[i]
 					inst_baseplate.save()
 
 				if sensor_exists:
+					print("SENSOR EXISTS")
 					inst_sensor.module = self.modules[i]
 					inst_sensor.save()
 			else:
@@ -1006,15 +1040,16 @@ class step_pcb(fsobj):
 				inst_module.sensor      = inst_sensor.ID      if sensor_exists      else None
 				inst_module.pcb         = inst_pcb.ID         if pcb_exists         else None
 				inst_module.protomodule = inst_protomodule.ID if protomodule_exists else None
-				inst_module.step_kapton = inst_baseplate.step_kapton   if baseplate_exists   else None
+				inst_module.step_kapton   = inst_baseplate.step_kapton   if baseplate_exists   else None
+				inst_module.step_kapton_2 = inst_baseplate.step_kapton_2 if baseplate_exists   else None
 				inst_module.step_sensor = inst_protomodule.step_sensor if protomodule_exists else None
 				inst_module.step_pcb    = self.ID
-				inst_module.kaptontype  = inst_baseplate.kaptontype if baseplate_exists else None
-				inst_module.channels    = inst_sensor.channels      if sensor_exists    else None
-				inst_module.size        = inst_pcb.size             if pcb_exists       else None
-				inst_module.shape       = inst_pcb.shape            if pcb_exists       else None
-				inst_module.chirality   = inst_pcb.chirality        if pcb_exists       else None
-				inst_module.rotation    = inst_pcb.rotation         if pcb_exists       else None
+				inst_module.num_kaptons = inst_baseplate.num_kaptons if baseplate_exists else None
+				inst_module.channels    = inst_sensor.channels       if sensor_exists    else None
+				inst_module.size        = inst_pcb.size              if pcb_exists       else None
+				inst_module.shape       = inst_pcb.shape             if pcb_exists       else None
+				inst_module.chirality   = inst_pcb.chirality         if pcb_exists       else None
+				inst_module.rotation    = inst_pcb.rotation          if pcb_exists       else None
 				inst_module.location    = MAC
 				inst_module.save()
 
@@ -1037,6 +1072,7 @@ class batch_araldite(fsobj):
 		'date_expires',
 	]
 
+
 class batch_loctite(fsobj):
 	FILEDIR = os.sep.join(['supplies','batch_loctite','{century}'])
 	FILENAME = 'batch_loctite_{ID:0>5}.json'
@@ -1044,6 +1080,7 @@ class batch_loctite(fsobj):
 		'date_received',
 		'date_expires',
 	]
+
 
 class batch_sylgard_thick(fsobj):
 	FILEDIR = os.sep.join(['supplies','batch_sylgard_thick','{century}'])
@@ -1053,6 +1090,7 @@ class batch_sylgard_thick(fsobj):
 		'date_expires',
 	]
 
+
 class batch_sylgard_thin(fsobj):
 	FILEDIR = os.sep.join(['supplies','batch_sylgard_thin','{century}'])
 	FILENAME = 'batch_sylgard_thin_{ID:0>5}.json'
@@ -1061,6 +1099,7 @@ class batch_sylgard_thin(fsobj):
 		'date_expires',
 	]
 
+
 class batch_bond_wire(fsobj):
 	FILEDIR = os.sep.join(['supplies','batch_bond_wire','{century}'])
 	FILENAME = 'batch_bond_wire_{ID:0>5}.json'
@@ -1068,6 +1107,7 @@ class batch_bond_wire(fsobj):
 		'date_received',
 		'date_expires',
 	]
+
 
 
 

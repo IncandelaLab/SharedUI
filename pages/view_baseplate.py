@@ -231,7 +231,7 @@ class func(object):
 		self.page.cbShape.setEnabled(               mode_creating or mode_editing  )
 		self.page.cbChirality.setEnabled(           mode_creating or mode_editing  )
 		self.page.cbMaterial.setEnabled(            mode_creating or mode_editing  )
-		self.page.leLocation.setReadOnly(      not (mode_creating or mode_editing) )
+		self.page.leIdentifier.setReadOnly(    not (mode_creating or mode_editing) )
 		self.page.leManufacturer.setReadOnly(  not (mode_creating or mode_editing) )
 		self.page.dsbNomThickness.setReadOnly( not (mode_creating or mode_editing) )
 		self.page.sbRotation.setReadOnly(      not (mode_creating or mode_editing) )
@@ -296,8 +296,8 @@ class func(object):
 		self.baseplate.shape        = str(self.page.cbShape.currentText())     if str(self.page.cbShape.currentText())     else None
 		self.baseplate.chirality    = str(self.page.cbChirality.currentText()) if str(self.page.cbChirality.currentText()) else None
 		self.baseplate.material     = str(self.page.cbMaterial.currentText())  if str(self.page.cbMaterial.currentText())  else None
-		self.baseplate.location     = str(self.page.leLocation.text())         if str(self.page.leLocation.text())         else None
 		self.baseplate.manufacturer = str(self.page.leManufacturer.text())     if str(self.page.leManufacturer.text())     else None
+		self.baseplate.identifier   = str(self.page.leIdentifier.text())       if str(self.page.leIdentifier.text())       else None
 		self.baseplate.nomthickness =     self.page.dsbNomThickness.value()    if self.page.dsbNomThickness.value() >=0    else None
 		self.baseplate.rotation     =     self.page.sbRotation.value()         if self.page.sbRotation.value()      >=0    else None
 

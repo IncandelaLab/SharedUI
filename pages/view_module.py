@@ -149,7 +149,7 @@ class func(object):
 			self.page.listShipments.addItem(str(shipment))
 
 		# characteristics
-		self.page.leNumKaptons.setText( "" if self.module.num_kaptons is None else self.module.num_kaptons)
+		self.page.leNumKaptons.setText( "" if self.module.num_kaptons is None else str(self.module.num_kaptons))
 		self.page.sbChannels.setValue(  -1 if self.module.channels    is None else self.module.channels   )
 		self.page.dsbThickness.setValue(-1 if self.module.thickness   is None else self.module.thickness  )
 		self.page.sbRotation.setValue(  -1 if self.module.rotation    is None else self.module.rotation   )
@@ -579,3 +579,4 @@ class func(object):
 	@enforce_mode('view')
 	def changed_to(self):
 		print("changed to {}".format(PAGE_NAME))
+		self.update_info()

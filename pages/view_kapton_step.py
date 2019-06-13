@@ -354,3 +354,4 @@ class func(object):
 	@enforce_mode('view')
 	def changed_to(self):
 		print("changed to {}".format(PAGE_NAME))
+		self.update_info()
