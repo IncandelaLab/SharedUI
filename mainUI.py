@@ -155,7 +155,7 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 		print("Finished rigging UI.")
 		self.setUIPage('baseplates')
 
-		self.setWindowTitle("Module Production User Interface")
+		self.setWindowTitle("Module Assembly User Interface")
 	
 		self.timer_setup()
 

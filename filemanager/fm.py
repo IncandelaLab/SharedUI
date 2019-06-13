@@ -4,6 +4,17 @@ import numpy
 
 BASEPLATE_MATERIALS_NO_KAPTON = ['pcb']
 
+MAC_ID_RANGES = {
+
+	"UCSB" : [10000,19999],
+	"CMU"  : [20000,29999],
+	"TTU"  : [30000,39999],
+	"NTU"  : [40000,49999],
+	"IHEP" : [50000,59999],
+	"BARC" : [60000,69999],
+
+}
+
 CENTURY = '{:0>3}__'
 
 CFG_FILE = 'cfg.json'
@@ -21,8 +32,15 @@ def loadconfig(file=None):
 	global DATADIR
 	global MAC
 
-	DATADIR = data['datadir']
-	MAC     = data['MAC']
+	DATADIR  = data['datadir']
+	MAC      = data['MAC']
+	ID_RANGE = MAC_ID_RANGES.get(MAC,[90000,99999])
+
+	if not MAC in MAC_ID_RANGES.keys():
+		print("Warning: MAC ({}) not in list of MAC names ({})".format(
+			MAC,
+			', '.join(MAC_ID_RANGES.keys())
+			))
 
 loadconfig()
 
