@@ -94,6 +94,14 @@ class func(object):
 			self.page.pbGoBaseplate5,
 			self.page.pbGoBaseplate6,
 		]
+		self.ck_kaptons_inspected = [
+			self.page.ckKaptonInspected1,
+			self.page.ckKaptonInspected2,
+			self.page.ckKaptonInspected3,
+			self.page.ckKaptonInspected4,
+			self.page.ckKaptonInspected5,
+			self.page.ckKaptonInspected6,
+			]
 
 		for i in range(6):
 			self.pb_go_tools[i].clicked.connect(self.goTool)
@@ -172,6 +180,13 @@ class func(object):
 				for i in range(6):
 					self.sb_baseplates[i].setValue(-1)
 
+			if not (self.step_kapton.kaptons_inspected is None):
+				for i in range(6):
+					self.ck_kaptons_inspected[i].setChecked(False if self.step_kapton.kaptons_inspected[i] is None else self.step_kapton.kaptons_inspected[i])
+			else:
+				for i in range(6):
+					self.ck_kaptons_inspected[i].setChecked(False)
+
 		else:
 			self.page.leUserPerformed.setText("")
 			self.page.dPerformed.setDate(QtCore.QDate(*NO_DATE))
@@ -188,6 +203,7 @@ class func(object):
 			for i in range(6):
 				self.sb_tools[i].setValue(-1)
 				self.sb_baseplates[i].setValue(-1)
+				self.ck_kaptons_inspected[i].setChecked(False)
 
 		for i in range(6):
 			if self.sb_tools[i].value() == -1:self.sb_tools[i].clear()
@@ -234,6 +250,7 @@ class func(object):
 			self.sb_baseplates[i].setReadOnly(mode_view)
 			self.pb_go_tools[i].setEnabled(     mode_view and tools_exist[i]     )
 			self.pb_go_baseplates[i].setEnabled(mode_view and baseplates_exist[i])
+			self.ck_kaptons_inspected[i].setEnabled(mode_creating or mode_editing)
 
 		self.page.pbNew.setEnabled(    mode_view and not step_kapton_exists )
 		self.page.pbEdit.setEnabled(   mode_view and     step_kapton_exists )
@@ -289,11 +306,14 @@ class func(object):
 
 		tools = []
 		baseplates = []
+		kaptons_inspected = []
 		for i in range(6):
 			tools.append(self.sb_tools[i].value() if self.sb_tools[i].value() >= 0 else None)
 			baseplates.append(self.sb_baseplates[i].value() if self.sb_baseplates[i].value() >= 0 else None)
+			kaptons_inspected.append(self.ck_kaptons_inspected[i].isChecked() if self.sb_baseplates[i].value() >= 0 else None)
 		self.step_kapton.tools = tools
 		self.step_kapton.baseplates = baseplates
+		self.step_kapton.kaptons_inspected = kaptons_inspected
 
 		self.step_kapton.tray_component_sensor = self.page.sbTrayComponent.value() if self.page.sbTrayComponent.value() >= 0 else None
 		self.step_kapton.tray_assembly         = self.page.sbTrayAssembly.value()  if self.page.sbTrayAssembly.value()  >= 0 else None
