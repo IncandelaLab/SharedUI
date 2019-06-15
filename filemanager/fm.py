@@ -55,18 +55,21 @@ class fsobj(object):
 		'comments',
 		]
 
-	DEFAULTS ={
-	
+	DEFAULTS = {
 	}
 
 	DEFAULTS_COMMON = {
 		'comments':[],
 	}
 
+	OBJECTNAME = "fsobj"
+
 	def __init__(self):
 		super(fsobj, self).__init__()
 		self.clear() # sets attributes to None
 
+	def __str__(self):
+		return "<{} {}>".format(self.OBJECTNAME, self.ID)
 
 	def get_filedir_filename(self, ID = None):
 		if ID is None:
@@ -93,6 +96,10 @@ class fsobj(object):
 
 
 	def load(self, ID, on_property_missing = "warn"):
+		if ID == -1:
+			self.clear()
+			return False
+
 		filedir, filename = self.get_filedir_filename(ID)
 		file = os.sep.join([filedir, filename])
 
@@ -179,6 +186,7 @@ class fsobj(object):
 ###############################################
 
 class tool_sensor(fsobj):
+	OBJECTNAME = "sensor tool"
 	FILEDIR = os.sep.join(['tooling','tool_sensor'])
 	FILENAME = 'tool_sensor_{ID:0>5}.json'
 	PROPERTIES = [
@@ -187,6 +195,7 @@ class tool_sensor(fsobj):
 
 
 class tool_pcb(fsobj):
+	OBJECTNAME = "PCB tool"
 	FILEDIR = os.sep.join(['tooling','tool_pcb'])
 	FILENAME = 'tool_pcb_{ID:0>5}.json'
 	PROPERTIES = [
@@ -195,29 +204,29 @@ class tool_pcb(fsobj):
 
 
 class tray_assembly(fsobj):
+	OBJECTNAME = "assembly tray"
 	FILEDIR = os.sep.join(['tooling','tray_assembly'])
 	FILENAME = 'tray_assembly_{ID:0>5}.json'
 	PROPERTIES = [
 		'size',
-		'num_sites',
 	]
 
 
 class tray_component_sensor(fsobj):
+	OBJECTNAME = "sensor tray"
 	FILEDIR = os.sep.join(['tooling','tray_component_sensor'])
 	FILENAME = 'tray_component_sensor_{ID:0>5}.json'
 	PROPERTIES = [
 		'size',
-		'num_sites',
 	]
 
 
 class tray_component_pcb(fsobj):
+	OBJECTNAME = "pcb tray"
 	FILEDIR = os.sep.join(['tooling','tray_component_pcb'])
 	FILENAME = 'tray_component_pcb_{ID:0>5}.json'
 	PROPERTIES = [
 		'size',
-		'num_sites',
 	]
 
 
@@ -228,6 +237,7 @@ class tray_component_pcb(fsobj):
 ###############################################
 
 class shipment(fsobj):
+	OBJECTNAME = "shipment"
 	FILEDIR = os.sep.join(['shipments'])
 	FILENAME = "shipment_{ID:0>5}.json"
 	PROPERTIES = [
@@ -334,6 +344,7 @@ class shipment(fsobj):
 ###############################################
 
 class baseplate(fsobj):
+	OBJECTNAME = "baseplate"
 	FILEDIR = os.sep.join(['baseplates','{century}'])
 	FILENAME = "baseplate_{ID:0>5}.json"
 	PROPERTIES = [
@@ -403,31 +414,53 @@ class baseplate(fsobj):
 				return max(self.corner_heights) - min(self.corner_heights)
 
 	def ready_step_kapton(self, step_kapton = None, max_flatness = None):
-		...
+		if step_kapton in [self.step_kapton, self.step_kapton_2]:
+			return True, "already part associated with this kapton step"
+
+		if not (self.step_sensor is None):
+			return False, "already part of a protomodule"
+
+		if self.num_kaptons == 2:
+			return False, "already has two kaptons"
+
+		if self.num_kaptons == 1:
+			checks = [
+				self.check_leakage    == "pass",
+				self.check_surface    == "pass",
+				self.check_edges_firm == "pass",
+				self.check_glue_spill == "pass",
+				]
+			if self.kapton_flatness is None:
+				checks.append(False)
+			elif not (max_flatness is None):
+				checks.append(self.kapton_flatness < max_flatness)
+			
+			if not all(checks):
+				return False, "kaptonized baseplate qualification failed or incomplete"
+			else:
+				return True, ""
+
+		if self.num_kaptons == 0:
+			checks = []
+			if not self.kapton_tape_applied:
+				checks.append(False)
+			if not self.thickness:
+				checks.append(False)
+			if self.flatness is None:
+				checks.append(False)
+			if not (max_flatness is None):
+				checks.append(max_flatness > self.flatness)
+			if not all(checks):
+				return False, "baseplate qualification failed or incomplete"
+			else:
+				return True, ""
+
 
 	def ready_step_sensor(self, step_sensor = None, max_flatness = None):
 		...
 
-	# def ready_step_kapton(self, step_kapton=None):
-	# 	if not (step_kapton is None):
-	# 		if step_kapton == self.step_kapton:
-	# 			return True, "baseplate {} already associated with step_kapton {}".format(self.ID, step_kapton)
-	# 		else:
-	# 			return False, "baseplate {} associated with step_kapton {}; cannot associate with step_kapton {}".format(self.ID, step_kapton, self.step_kapton)
-
-	# 	if self.material is None:
-	# 		return False, "baseplate {} material not set".format(self.ID)
-
-	# 	if self.material in BASEPLATE_MATERIALS_NO_KAPTON:
-	# 		return False, "baseplate {} material is {}; does not need kapton".format(self.ID, self.material)
-
-	# 	if self.corner_heights is None:
-	# 		return False, 
-
-	# def ready_step_sensor(self):
-
-
 class sensor(fsobj):
+	OBJECTNAME = "sensor"
 	FILEDIR = os.sep.join(['sensors','{century}'])
 	FILENAME = "sensor_{ID:0>5}.json"
 	PROPERTIES = [
@@ -461,6 +494,7 @@ class sensor(fsobj):
 
 
 class pcb(fsobj):
+	OBJECTNAME = "PCB"
 	FILEDIR = os.sep.join(['pcbs','{century}','pcb_{ID:0>5}'])
 	FILENAME = "pcb_{ID:0>5}.json"
 	PROPERTIES = [
@@ -538,6 +572,7 @@ class pcb(fsobj):
 
 
 class protomodule(fsobj):
+	OBJECTNAME = "protomodule"
 	FILEDIR = os.sep.join(['protomodules','{century}'])
 	FILENAME = 'protomodule_{ID:0>5}.json'
 	PROPERTIES = [
@@ -578,6 +613,7 @@ class protomodule(fsobj):
 
 
 class module(fsobj):
+	OBJECTNAME = "module"
 	FILEDIR    = os.sep.join(['modules','{century}','module_{ID:0>5}'])
 	FILENAME   = 'module_{ID:0>5}.json'
 	PROPERTIES = [
@@ -824,6 +860,7 @@ class module(fsobj):
 ###############################################
 
 class step_kapton(fsobj):
+	OBJECTNAME = "kapton step"
 	FILEDIR    = os.sep.join(['steps','kapton','{century}'])
 	FILENAME   = 'kapton_assembly_step_{ID:0>5}.json'
 	PROPERTIES = [
@@ -894,6 +931,7 @@ class step_kapton(fsobj):
 
 
 class step_sensor(fsobj):
+	OBJECTNAME = "sensor step"
 	FILEDIR    = os.sep.join(['steps','sensor','{century}'])
 	FILENAME   = 'sensor_assembly_step_{ID:0>5}.json'
 	PROPERTIES = [
@@ -979,6 +1017,7 @@ class step_sensor(fsobj):
 
 
 class step_pcb(fsobj):
+	OBJECTNAME = "PCB step"
 	FILEDIR = os.sep.join(['steps','pcb','{century}'])
 	FILENAME = 'pcb_assembly_step_{ID:0>5}.json'
 	PROPERTIES = [
@@ -1083,6 +1122,7 @@ class step_pcb(fsobj):
 ###############################################
 
 class batch_araldite(fsobj):
+	OBJECTNAME = "araldite batch"
 	FILEDIR = os.sep.join(['supplies','batch_araldite','{century}'])
 	FILENAME = 'batch_araldite_{ID:0>5}.json'
 	PROPERTIES = [
@@ -1092,6 +1132,7 @@ class batch_araldite(fsobj):
 
 
 class batch_loctite(fsobj):
+	OBJECTNAME = "loctite batch"
 	FILEDIR = os.sep.join(['supplies','batch_loctite','{century}'])
 	FILENAME = 'batch_loctite_{ID:0>5}.json'
 	PROPERTIES = [
@@ -1101,6 +1142,7 @@ class batch_loctite(fsobj):
 
 
 class batch_sylgard_thick(fsobj):
+	OBJECTNAME = "sylgard (thick) batch"
 	FILEDIR = os.sep.join(['supplies','batch_sylgard_thick','{century}'])
 	FILENAME = 'batch_sylgard_thick_{ID:0>5}.json'
 	PROPERTIES = [
@@ -1110,6 +1152,7 @@ class batch_sylgard_thick(fsobj):
 
 
 class batch_sylgard_thin(fsobj):
+	OBJECTNAME = "sylgard (thin) batch"
 	FILEDIR = os.sep.join(['supplies','batch_sylgard_thin','{century}'])
 	FILENAME = 'batch_sylgard_thin_{ID:0>5}.json'
 	PROPERTIES = [
@@ -1119,6 +1162,7 @@ class batch_sylgard_thin(fsobj):
 
 
 class batch_bond_wire(fsobj):
+	OBJECTNAME = "bond wire batch"
 	FILEDIR = os.sep.join(['supplies','batch_bond_wire','{century}'])
 	FILENAME = 'batch_bond_wire_{ID:0>5}.json'
 	PROPERTIES = [

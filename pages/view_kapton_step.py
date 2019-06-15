@@ -1,5 +1,6 @@
 from PyQt4 import QtCore
 import time
+import datetime
 
 NO_DATE = [2000,1,1]
 
@@ -7,14 +8,54 @@ PAGE_NAME = "view_kapton_step"
 OBJECTTYPE = "kapton_step"
 DEBUG = False
 
+STATUS_NO_ISSUES = "valid (no issues)"
+STATUS_ISSUES    = "invalid (issues present)"
+
+# tooling and supplies
+I_TRAY_COMPONENT_DNE = "sensor component tray does not exist or is not selected"
+I_TRAY_ASSEMBLY_DNE  = "assembly tray does not exist or is not selected"
+I_BATCH_ARALDITE_DNE     = "araldite batch does not exist or is not selected"
+I_BATCH_ARALDITE_EXPIRED = "araldite batch has expired"
+
+# baseplates
+I_BASEPLATE_NOT_READY  = "baseplate(s) in position(s) {} is not ready for kapton application. reason: {}"
+
+# kapton inspection
+I_KAPTON_INSPECTION_NOT_DONE = "kapton inspection not done for position(s) {}"
+I_KAPTON_INSPECTION_ON_EMPTY = "kapton inspection checked for empty position(s) {}"
+
+# rows / positions
+I_NO_PARTS_SELECTED = "no parts have been selected"
+I_ROWS_INCOMPLETE   = "positions {} are partially filled"
+I_TOOL_SENSOR_DNE      = "sensor tool(s) in position(s) {} do not exist"
+I_BASEPLATE_DNE        = "baseplate(s) in position(s) {} do not exist"
+I_TOOL_SENSOR_DUPLICATE = "same sensor tool is selected on multiple positions: {}"
+I_BASEPLATE_DUPLICATE   = "same baseplate is selected on multiple positions: {}"
+
+# compatibility
+I_SIZE_MISMATCH = "size mismatch between some selected objects"
+I_SIZE_MISMATCH_6 = "* list of 6-inch objects selected: {}"
+I_SIZE_MISMATCH_8 = "* list of 8-inch objects selected: {}"
+
+# location
+I_LOCATION = "some selected objects are not at this location: {}"
+
 class func(object):
 	def __init__(self,fm,page,setUIPage,setSwitchingEnabled):
 		self.page      = page
 		self.setUIPage = setUIPage
 		self.setMainSwitchingEnabled = setSwitchingEnabled
 
+		self.tools_sensor = [fm.tool_sensor() for _ in range(6)]
+		self.baseplates   = [fm.baseplate()   for _ in range(6)]
+		self.tray_component_sensor = fm.tray_component_sensor()
+		self.tray_assembly         = fm.tray_assembly()
+		self.batch_araldite        = fm.batch_araldite()
+
 		self.step_kapton = fm.step_kapton()
 		self.step_kapton_exists = None
+
+		self.MAC = fm.MAC
 
 		self.mode = 'setup'
 
@@ -107,20 +148,28 @@ class func(object):
 			self.pb_go_tools[i].clicked.connect(self.goTool)
 			self.pb_go_baseplates[i].clicked.connect(self.goBaseplate)
 
+			self.sb_tools[i].editingFinished.connect(             self.loadToolSensor )
+			self.sb_baseplates[i].editingFinished.connect(        self.loadBaseplate  )
+			self.ck_kaptons_inspected[i].clicked.connect( self.updateIssues   )
+
+		self.page.sbTrayComponent.editingFinished.connect( self.loadTrayComponentSensor )
+		self.page.sbTrayAssembly.editingFinished.connect(  self.loadTrayAssembly        )
+		self.page.sbBatchAraldite.editingFinished.connect( self.loadBatchAraldite       )
+
 		self.page.sbID.valueChanged.connect(self.update_info)
 
-		self.page.pbNew.clicked.connect(self.startCreating)
-		self.page.pbEdit.clicked.connect(self.startEditing)
-		self.page.pbSave.clicked.connect(self.saveEditing)
-		self.page.pbCancel.clicked.connect(self.cancelEditing)
+		self.page.pbNew.clicked.connect(    self.startCreating )
+		self.page.pbEdit.clicked.connect(   self.startEditing  )
+		self.page.pbSave.clicked.connect(   self.saveEditing   )
+		self.page.pbCancel.clicked.connect( self.cancelEditing )
 
-		self.page.pbGoBatchAraldite.clicked.connect(self.goBatchAraldite)
-		self.page.pbGoTrayAssembly.clicked.connect(self.goTrayAssembly)
-		self.page.pbGoTrayComponent.clicked.connect(self.goTrayComponent)
+		self.page.pbGoBatchAraldite.clicked.connect( self.goBatchAraldite )
+		self.page.pbGoTrayAssembly.clicked.connect(  self.goTrayAssembly  )
+		self.page.pbGoTrayComponent.clicked.connect( self.goTrayComponent )
 
-		self.page.pbDatePerformedNow.clicked.connect(self.setDatePerformedNow)
-		self.page.pbCureStartNow    .clicked.connect(self.setCureStartNow)
-		self.page.pbCureStopNow     .clicked.connect(self.setCureStopNow)
+		self.page.pbDatePerformedNow.clicked.connect( self.setDatePerformedNow )
+		self.page.pbCureStartNow.clicked.connect(     self.setCureStartNow     )
+		self.page.pbCureStopNow.clicked.connect(      self.setCureStopNow      )
 
 	@enforce_mode('view')
 	def update_info(self,ID=None,*args,**kwargs):
@@ -130,6 +179,9 @@ class func(object):
 			self.page.sbID.setValue(ID)
 
 		self.step_kapton_exists = self.step_kapton.load(ID)
+
+		self.page.listIssues.clear()
+		self.page.leStatus.clear()
 
 		if self.step_kapton_exists:
 			self.page.leUserPerformed.setText(self.step_kapton.user_performed)
@@ -257,6 +309,188 @@ class func(object):
 		self.page.pbSave.setEnabled(   mode_creating or mode_editing        )
 		self.page.pbCancel.setEnabled( mode_creating or mode_editing        )
 
+	@enforce_mode(['editing','creating'])
+	def loadAllObjects(self,*args,**kwargs):
+		for i in range(6):
+			self.tools_sensor[i].load(self.sb_tools[i].value()     )
+			self.baseplates[i].load(  self.sb_baseplates[i].value())
+		self.tray_component_sensor.load(self.page.sbTrayComponent.value())
+		self.tray_assembly.load(        self.page.sbTrayAssembly.value() )
+		self.batch_araldite.load(       self.page.sbBatchAraldite.value())
+		self.updateIssues()
+
+	@enforce_mode(['editing','creating'])
+	def unloadAllObjects(self,*args,**kwargs):
+		for i in range(6):
+			self.tools_sensor[i].clear()
+			self.baseplates[i].clear()
+		self.tray_component_sensor.clear()
+		self.tray_assembly.clear()
+		self.batch_araldite.clear()
+		
+	@enforce_mode(['editing','creating'])
+	def loadToolSensor(self, *args, **kwargs):
+		sender_name = str(self.page.sender().objectName())
+		which = int(sender_name[-1]) - 1
+		self.tools_sensor[which].load(self.sb_tools[which].value())
+		self.updateIssues()
+
+	@enforce_mode(['editing','creating'])
+	def loadBaseplate(self, *args, **kwargs):
+		sender_name = str(self.page.sender().objectName())
+		which = int(sender_name[-1]) - 1
+		self.baseplates[which].load(self.sb_baseplates[which].value())
+		self.updateIssues()
+
+	@enforce_mode(['editing','creating'])
+	def loadTrayComponentSensor(self, *args, **kwargs):
+		self.tray_component_sensor.load(self.page.sbTrayComponent.value())
+		self.updateIssues()
+
+	@enforce_mode(['editing','creating'])
+	def loadTrayAssembly(self, *args, **kwargs):
+		self.tray_assembly.load(self.page.sbTrayAssembly.value() )
+		self.updateIssues()
+
+	@enforce_mode(['editing','creating'])
+	def loadBatchAraldite(self, *args, **kwargs):
+		self.batch_araldite.load(self.page.sbBatchAraldite.value())
+		self.updateIssues()
+
+
+	@enforce_mode(['editing','creating'])
+	def updateIssues(self,*args,**kwargs):
+		issues = []
+		objects = []
+
+		# tooling and supplies
+		if self.tray_component_sensor.ID is None:
+			issues.append(I_TRAY_COMPONENT_DNE)
+		else:
+			objects.append(self.tray_component_sensor)
+
+		if self.tray_assembly.ID is None:
+			issues.append(I_TRAY_ASSEMBLY_DNE)
+		else:
+			objects.append(self.tray_assembly)
+
+		if self.batch_araldite.ID is None:
+			issues.append(I_BATCH_ARALDITE_DNE)
+		else:
+			objects.append(self.batch_araldite)
+			if not (self.batch_araldite.date_expires is None):
+				expires = datetime.date(*self.batch_araldite.date_expires)
+				today = datetime.date(*time.localtime()[:3])
+				if today > expires:
+					issues.append(I_BATCH_ARALDITE_EXPIRED)
+		
+
+		# rows
+		sensor_tools_selected = [_.value()     for _ in self.sb_tools            ]
+		baseplates_selected   = [_.value()     for _ in self.sb_baseplates       ]
+		kaptons_inspected     = [_.isChecked() for _ in self.ck_kaptons_inspected]
+
+		sensor_tool_duplicates = [_ for _ in range(6) if sensor_tools_selected[_] >= 0 and sensor_tools_selected.count(sensor_tools_selected[_])>1]
+		baseplate_duplicates   = [_ for _ in range(6) if baseplates_selected[_]   >= 0 and baseplates_selected.count(  baseplates_selected[_]  )>1]
+
+		if sensor_tool_duplicates:
+			issues.append(I_TOOL_SENSOR_DUPLICATE.format(', '.join([str(_+1) for _ in sensor_tool_duplicates])))
+		if baseplate_duplicates:
+			issues.append(I_BASEPLATE_DUPLICATE.format(', '.join([str(_+1) for _ in baseplate_duplicates])))
+
+		rows_empty = []
+		rows_full = []
+		rows_incomplete = []
+		rows_kapton_inspection_on_empty = []
+		rows_kapton_inspection_not_done = []
+		rows_baseplate_dne = []
+		rows_tool_sensor_dne = []
+
+		for i in range(6):
+			num_parts = 0
+
+			if sensor_tools_selected[i] >= 0:
+				num_parts += 1
+				objects.append(self.tools_sensor[i])
+				if self.tools_sensor[i].ID is None:
+					rows_tool_sensor_dne.append(i)
+
+			if baseplates_selected[i] >= 0:
+				num_parts += 1
+				objects.append(self.baseplates[i])
+				if self.baseplates[i].ID is None:
+					rows_baseplate_dne.append(i)
+				else:
+					ready, reason = self.baseplates[i].ready_step_kapton(self.page.sbID.value())
+					if not ready:
+						issues.append(I_BASEPLATE_NOT_READY.format(i,reason))
+
+			if num_parts == 0:
+				rows_empty.append(i)
+				if kaptons_inspected[i]:
+					rows_kapton_inspection_on_empty.append(i)
+
+			elif num_parts == 2:
+				rows_full.append(i)
+				if not kaptons_inspected[i]:
+					rows_kapton_inspection_not_done.append(i)
+			else:
+				rows_incomplete.append(i)
+
+		if not (len(rows_full) or len(rows_incomplete)):
+			issues.append(I_NO_PARTS_SELECTED)
+
+		if rows_incomplete:
+			issues.append(I_ROWS_INCOMPLETE.format(', '.join(map(str,rows_incomplete))))
+
+		if rows_kapton_inspection_on_empty:
+			issues.append(I_KAPTON_INSPECTION_ON_EMPTY.format(', '.join([str(_+1) for _ in rows_kapton_inspection_on_empty])))
+		if rows_kapton_inspection_not_done:
+			issues.append(I_KAPTON_INSPECTION_NOT_DONE.format(', '.join([str(_+1) for _ in rows_kapton_inspection_not_done])))
+
+		if rows_baseplate_dne:
+			issues.append(I_BASEPLATE_DNE.format(', '.join([str(_+1) for _ in rows_baseplate_dne])))
+		if rows_tool_sensor_dne:
+			issues.append(I_TOOL_SENSOR_DNE.format(', '.join([str(_+1) for _ in rows_tool_sensor_dne])))
+
+
+		objects_6in = []
+		objects_8in = []
+		objects_not_here = []
+
+		for obj in objects:
+
+			size = getattr(obj, "size", None)
+			if size in [6.0, 6, '6']:
+				objects_6in.append(obj)
+			if size in [8.0, 8, '8']:
+				objects_8in.append(obj)
+
+			location = getattr(obj, "location", None)
+			if not (location in [None, self.MAC]):
+				objects_not_here.append(obj)
+
+		if len(objects_6in) and len(objects_8in):
+			issues.append(I_SIZE_MISMATCH)
+			issues.append(I_SIZE_MISMATCH_6.format(', '.join([str(_) for _ in objects_6in])))
+			issues.append(I_SIZE_MISMATCH_8.format(', '.join([str(_) for _ in objects_8in])))
+
+		if objects_not_here:
+			issues.append(I_LOCATION.format([str(_) for _ in objects_not_here]))
+
+
+		self.page.listIssues.clear()
+		for issue in issues:
+			self.page.listIssues.addItem(issue)
+
+		if issues:
+			self.page.leStatus.setText(STATUS_ISSUES)
+			self.page.pbSave.setEnabled(False)
+
+		else:
+			self.page.leStatus.setText(STATUS_NO_ISSUES)
+			self.page.pbSave.setEnabled(True)
+
 
 	@enforce_mode('view')
 	def startCreating(self,*args,**kwargs):
@@ -265,19 +499,18 @@ class func(object):
 			self.mode = 'creating'
 			self.step_kapton.new(ID)
 			self.updateElements()
-		else:
-			pass
+			self.loadAllObjects()
 
 	@enforce_mode('view')
 	def startEditing(self,*args,**kwargs):
-		if not self.step_kapton_exists:
-			pass
-		else:
+		if self.step_kapton_exists:
 			self.mode = 'editing'
 			self.updateElements()
+			self.loadAllObjects()
 
 	@enforce_mode(['editing','creating'])
 	def cancelEditing(self,*args,**kwargs):
+		self.unloadAllObjects()
 		self.mode = 'view'
 		self.update_info()
 
@@ -319,7 +552,8 @@ class func(object):
 		self.step_kapton.tray_assembly         = self.page.sbTrayAssembly.value()  if self.page.sbTrayAssembly.value()  >= 0 else None
 		self.step_kapton.batch_araldite        = self.page.sbBatchAraldite.value() if self.page.sbBatchAraldite.value() >= 0 else None
 
-		self.step_kapton.save()		
+		self.step_kapton.save()
+		self.unloadAllObjects()
 		self.mode = 'view'
 		self.update_info()
 
@@ -345,7 +579,6 @@ class func(object):
 
 	def goTrayAssembly(self,*args,**kwargs):
 		tray_assembly = self.page.sbTrayAssembly.value()
-		print(tray_assembly)
 		self.setUIPage('tooling',tray_assembly=tray_assembly)
 
 	def setDatePerformedNow(self, *args, **kwargs):
