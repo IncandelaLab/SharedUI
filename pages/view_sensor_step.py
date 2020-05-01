@@ -1,5 +1,6 @@
-from PyQt4 import QtCore
+from PyQt5 import QtCore
 import time
+import datetime
 
 NO_DATE = [2000,1,1]
 
@@ -7,14 +8,66 @@ PAGE_NAME = "view_sensor_step"
 OBJECTTYPE = "sensor_step"
 DEBUG = False
 
+STATUS_NO_ISSUES = "valid (no issues)"
+STATUS_ISSUES    = "invalid (issues present)"
+
+# tooling and supplies
+I_TRAY_COMPONENT_DNE = "sensor component tray does not exist or is not selected"
+I_TRAY_ASSEMBLY_DNE  = "assembly tray does not exist or is not selected"
+I_BATCH_ARALDITE_DNE     = "araldite batch does not exist or is not selected"
+I_BATCH_ARALDITE_EXPIRED = "araldite batch has expired"
+I_BATCH_LOCTITE_DNE      = "loctite batch does not exist or is not selected"
+I_BATCH_LOCTITE_EXPIRED  = "loctite batch has expired"
+
+# baseplates
+I_BASEPLATE_NOT_READY  = "baseplate(s) in position(s) {} is not ready for sensor application. reason: {}"
+
+# kapton inspection
+#I_KAPTON_INSPECTION_NOT_DONE = "kapton inspection not done for position(s) {}"
+#I_KAPTON_INSPECTION_ON_EMPTY = "kapton inspection checked for empty position(s) {}"
+
+# rows / positions
+I_NO_PARTS_SELECTED = "no parts have been selected"
+I_ROWS_INCOMPLETE   = "positions {} are partially filled"
+I_TOOL_SENSOR_DNE      = "sensor tool(s) in position(s) {} do not exist"
+I_BASEPLATE_DNE        = "baseplate(s) in position(s) {} do not exist"
+I_SENSOR_DNE           = "sensor(s) in position(s) {} do not exist"
+I_TOOL_SENSOR_DUPLICATE = "same sensor tool is selected on multiple positions: {}"
+I_BASEPLATE_DUPLICATE   = "same baseplate is selected on multiple positions: {}"
+I_SENSOR_DUPLICATE      = "same sensor is selected on multiple positions: {}"
+
+# compatibility
+I_SIZE_MISMATCH = "size mismatch between some selected objects"
+I_SIZE_MISMATCH_6 = "* list of 6-inch objects selected: {}"
+I_SIZE_MISMATCH_8 = "* list of 8-inch objects selected: {}"
+
+# semiconductor type
+I_SEMI_TYPE_DNE = "semiconductor type for position(s) {} has not been selected"
+
+# location
+I_LOCATION = "some selected objects are not at this location: {}"
+
+
 class func(object):
 	def __init__(self,fm,page,setUIPage,setSwitchingEnabled):
 		self.page      = page
 		self.setUIPage = setUIPage
 		self.setMainSwitchingEnabled = setSwitchingEnabled
 
+		#New stuff here...fm object is the same for this and view_kapton, so should be fine.
+		self.tools_sensor = [fm.tool_sensor() for _ in range(6)]
+		self.baseplates   = [fm.baseplate()   for _ in range(6)]
+		self.sensors      = [fm.sensor()      for _ in range(6)]
+		#self.types        = [fm.type()        for _ in range(6)]
+		self.tray_component_sensor = fm.tray_component_sensor()
+		self.tray_assembly         = fm.tray_assembly()
+		self.batch_araldite        = fm.batch_araldite()
+		self.batch_loctite         = fm.batch_loctite()
+
 		self.step_sensor = fm.step_sensor()
 		self.step_sensor_exists = None
+
+		self.MAC = fm.MAC
 
 		self.mode = 'setup'
 
@@ -29,6 +82,7 @@ class func(object):
 					valid_mode = self.mode in mode
 				else:
 					valid_mode = False
+
 				if valid_mode:
 					if DEBUG:
 						print("page {} with mode {} req {} calling function {} with args {} kwargs {}".format(
@@ -129,11 +183,32 @@ class func(object):
 			self.page.pbGoProtoModule6,
 		]
 
+		#NEW:  Semiconductor type.  Does NOT have a corresp type object.
+		self.cb_types = [
+			self.page.cbType1,
+			self.page.cbType2,
+			self.page.cbType3,
+			self.page.cbType4,
+			self.page.cbType5,
+			self.page.cbType6,
+		]
+
 		for i in range(6):
 			self.pb_go_tools[i].clicked.connect(       self.goTool       )
 			self.pb_go_sensors[i].clicked.connect(     self.goSensor     )
 			self.pb_go_baseplates[i].clicked.connect(  self.goBaseplate  )
 			self.pb_go_protomodules[i].clicked.connect(self.goProtomodule)
+			#NEW:  Unsure about whether any of the above will get replaced (specifically baseplate)
+			self.sb_tools[i].editingFinished.connect(      self.loadToolSensor)
+			self.sb_baseplates[i].editingFinished.connect( self.loadBaseplate )
+			self.sb_sensors[i].editingFinished.connect(    self.loadSensor    )
+			self.cb_types[i].activated.connect(            self.loadType      )
+
+
+		self.page.sbTrayComponent.editingFinished.connect( self.loadTrayComponentSensor )
+		self.page.sbTrayAssembly.editingFinished.connect(  self.loadTrayAssembly        )
+		self.page.sbBatchAraldite.editingFinished.connect( self.loadBatchAraldite       )
+		self.page.sbBatchLoctite.editingFinished.connect(  self.loadBatchLoctite        )
 
 		self.page.sbID.valueChanged.connect(self.update_info)
 
@@ -160,6 +235,10 @@ class func(object):
 			self.page.sbID.setValue(ID)
 
 		self.step_sensor_exists = self.step_sensor.load(ID)
+
+		#NEW:
+		self.page.listIssues.clear()
+		self.page.leStatus.clear()
 
 		if self.step_sensor_exists:
 			self.page.leUserPerformed.setText(self.step_sensor.user_performed)
@@ -308,6 +387,244 @@ class func(object):
 		self.page.pbCancel.setEnabled( mode_creating or mode_editing        )
 
 
+
+	#NEW:  Add all load() functions
+	@enforce_mode(['editing','creating'])
+	def loadAllObjects(self,*args,**kwargs):
+		for i in range(6):
+			self.tools_sensor[i].load(self.sb_tools[i].value()     )
+			self.baseplates[i].load(  self.sb_baseplates[i].value())
+			self.sensors[i].load(     self.sb_sensors[i].value()   )
+
+		self.tray_component_sensor.load(self.page.sbTrayComponent.value())
+		self.tray_assembly.load(        self.page.sbTrayAssembly.value() )
+		self.batch_araldite.load(       self.page.sbBatchAraldite.value())
+		self.batch_loctite.load(        self.page.sbBatchLoctite.value() )
+		self.updateIssues()
+
+	@enforce_mode(['editing','creating'])
+	def unloadAllObjects(self,*args,**kwargs):
+		for i in range(6):
+			self.tools_sensor[i].clear()
+			self.baseplates[i].clear()
+			self.sensors[i].clear()
+
+		self.tray_component_sensor.clear()
+		self.tray_assembly.clear()
+		self.batch_araldite.clear()
+		self.batch_loctite.clear()
+
+	@enforce_mode(['editing','creating'])
+	def loadToolSensor(self, *args, **kwargs):
+		sender_name = str(self.page.sender().objectName())
+		which = int(sender_name[-1]) - 1
+		self.tools_sensor[which].load(self.sb_tools[which].value())
+		self.updateIssues()
+
+	@enforce_mode(['editing','creating'])
+	def loadBaseplate(self, *args, **kwargs):
+		sender_name = str(self.page.sender().objectName())
+		which = int(sender_name[-1]) - 1
+		self.baseplates[which].load(self.sb_baseplates[which].value())
+		self.updateIssues()
+
+	@enforce_mode(['editing','creating'])
+	def loadSensor(self, *args, **kwargs):
+		sender_name = str(self.page.sender().objectName())
+		which = int(sender_name[-1]) - 1
+		self.sensors[which].load(self.sb_sensors[which].value())
+		self.updateIssues()
+
+	#NEW, may require modification
+	@enforce_mode(['editing','creating'])
+	def loadType(self, *args, **kwargs):
+		sender_name = str(self.page.sender().objectName())
+		which = int(sender_name[-1]) - 1
+		#Data transfer should be tested/checked...but currentText() works.
+		setattr(self.sensors[which], "semi_type", self.cb_types[which].currentText())
+		self.updateIssues()
+
+	@enforce_mode(['editing','creating'])
+	def loadTrayComponentSensor(self, *args, **kwargs):
+		self.tray_component_sensor.load(self.page.sbTrayComponent.value())
+		self.updateIssues()
+
+	@enforce_mode(['editing','creating'])
+	def loadTrayAssembly(self, *args, **kwargs):
+		self.tray_assembly.load(self.page.sbTrayAssembly.value() )
+		self.updateIssues()
+
+	@enforce_mode(['editing','creating'])
+	def loadBatchAraldite(self, *args, **kwargs):
+		self.batch_araldite.load(self.page.sbBatchAraldite.value())
+		self.updateIssues()
+
+	@enforce_mode(['editing','creating'])
+	def loadBatchLoctite(self, *args, **kwargs):
+		self.batch_loctite.load(self.page.sbBatchLoctite.value())
+		self.updateIssues()
+
+
+
+	#NEW:  Add updateIssues and modify conditions accordingly
+	@enforce_mode(['editing', 'creating'])
+	def updateIssues(self,*args,**kwargs):
+		issues = []
+		objects = []
+
+		# tooling and supplies--copied over
+		if self.tray_component_sensor.ID is None:
+			issues.append(I_TRAY_COMPONENT_DNE)
+		else:
+			objects.append(self.tray_component_sensor)
+
+		if self.tray_assembly.ID is None:
+			issues.append(I_TRAY_ASSEMBLY_DNE)
+		else:
+			objects.append(self.tray_assembly)
+
+		if self.batch_araldite.ID is None:
+			issues.append(I_BATCH_ARALDITE_DNE)
+		else:
+			objects.append(self.batch_araldite)
+			if not (self.batch_araldite.date_expires is None):
+				expires = datetime.date(*self.batch_araldite.date_expires)
+				today = datetime.date(*time.localtime()[:3])
+				if today > expires:
+					issues.append(I_BATCH_ARALDITE_EXPIRED)
+
+		#New
+		if self.batch_loctite.ID is None:
+			issues.append(I_BATCH_LOCTITE_DNE)
+		else:
+			objects.append(self.batch_loctite)
+			if not (self.batch_loctite.date_expires is None):
+				expires = datetime.date(*self.batch_loctite.date_expires)
+				today = datetime.date(*time.localtime()[:3])
+				if today > expires:
+					issues.append(I_BATCH_LOCTITE_EXPIRED)
+
+		# rows
+		sensor_tools_selected = [_.value() for _ in self.sb_tools     ]
+		baseplates_selected   = [_.value() for _ in self.sb_baseplates]
+		sensors_selected      = [_.value() for _ in self.sb_sensors   ]
+
+		sensor_tool_duplicates = [_ for _ in range(6) if sensor_tools_selected[_] >= 0 and sensor_tools_selected.count(sensor_tools_selected[_])>1]
+		baseplate_duplicates   = [_ for _ in range(6) if baseplates_selected[_]   >= 0 and baseplates_selected.count(  baseplates_selected[_]  )>1]
+		sensor_duplicates      = [_ for _ in range(6) if sensors_selected[_]      >= 0 and sensors_selected.count(     sensors_selected[_]     )>1]
+
+		if sensor_tool_duplicates:
+			issues.append(I_TOOL_SENSOR_DUPLICATE.format(', '.join([str(_+1) for _ in sensor_tool_duplicates])))
+		if baseplate_duplicates:
+			issues.append(I_BASEPLATE_DUPLICATE.format(', '.join([str(_+1) for _ in baseplate_duplicates])))
+		if sensor_duplicates:
+			issues.append(I_SENSOR_DUPLICATE.format(', '.join([str(_+1) for _ in sensor_duplicates])))
+
+		rows_empty           = []
+		rows_full            = []
+		rows_incomplete      = []
+		rows_baseplate_dne   = []
+		rows_tool_sensor_dne = []
+		rows_sensor_dne      = []
+		rows_semi_type_dne   = []  #NEW
+
+		for i in range(6):
+			num_parts = 0
+
+			if sensor_tools_selected[i] >= 0:
+				num_parts += 1
+				objects.append(self.tools_sensor[i])
+				if self.tools_sensor[i].ID is None:
+					rows_tool_sensor_dne.append(i)
+
+			if baseplates_selected[i] >= 0:
+				num_parts += 1
+				objects.append(self.baseplates[i])
+				if self.baseplates[i].ID is None:
+					rows_baseplate_dne.append(i)
+				else:
+					ready, reason = self.baseplates[i].ready_step_sensor(self.page.sbID.value())
+					if not ready:
+						issues.append(I_BASEPLATE_NOT_READY.format(i,reason))
+
+			if sensors_selected[i] >= 0:
+				num_parts += 1
+				objects.append(self.sensors[i])
+				if self.sensors[i].ID is None:
+					rows_sensor_dne.append(i)
+				try:  #NEW
+					if self.sensors[i].semi_type in [None, ""]:
+						rows_semi_type_dne.append(i)
+				except AttributeError:
+					#This shouldn't happen
+					rows_semi_type_dne.append(i)
+			#print("num_parts is "+str(num_parts))
+			if num_parts == 0:
+				rows_empty.append(i)
+			elif num_parts == 3:  #NOTE:  Was 2...
+				rows_full.append(i)
+			else:
+				rows_incomplete.append(i)
+
+
+		if not (len(rows_full) or len(rows_incomplete)):
+			issues.append(I_NO_PARTS_SELECTED)
+
+		if rows_incomplete:
+			issues.append(I_ROWS_INCOMPLETE.format(', '.join(map(str,rows_incomplete))))
+
+
+		if rows_baseplate_dne:
+			issues.append(I_BASEPLATE_DNE.format(', '.join([str(_+1) for _ in rows_baseplate_dne])))
+		if rows_tool_sensor_dne:
+			issues.append(I_TOOL_SENSOR_DNE.format(', '.join([str(_+1) for _ in rows_tool_sensor_dne])))
+		if rows_sensor_dne:
+			issues.append(I_SENSOR_DNE.format(', '.join([str(_+1) for _ in rows_sensor_dne])))
+		if rows_semi_type_dne:
+			print("Semi DNE")
+			issues.append(I_SEMI_TYPE_DNE.format(', '.join([str(_+1) for _ in rows_semi_type_dne])))
+
+
+		objects_6in = []
+		objects_8in = []
+		objects_not_here = []
+
+		for obj in objects:
+
+			size = getattr(obj, "size", None)
+			if size in [6.0, 6, '6']:
+				objects_6in.append(obj)
+			if size in [8.0, 8, '8']:
+				objects_8in.append(obj)
+
+			location = getattr(obj, "location", None)
+			if not (location in [None, self.MAC]):
+				objects_not_here.append(obj)
+
+		if len(objects_6in) and len(objects_8in):
+			issues.append(I_SIZE_MISMATCH)
+			issues.append(I_SIZE_MISMATCH_6.format(', '.join([str(_) for _ in objects_6in])))
+			issues.append(I_SIZE_MISMATCH_8.format(', '.join([str(_) for _ in objects_8in])))
+
+		if objects_not_here:
+			issues.append(I_LOCATION.format([str(_) for _ in objects_not_here]))
+
+
+		self.page.listIssues.clear()
+		for issue in issues:
+			self.page.listIssues.addItem(issue)
+
+		if issues:
+			self.page.leStatus.setText(STATUS_ISSUES)
+			self.page.pbSave.setEnabled(False)
+
+		else:
+			self.page.leStatus.setText(STATUS_NO_ISSUES)
+			self.page.pbSave.setEnabled(True)
+
+
+
+
 	@enforce_mode('view')
 	def startCreating(self,*args,**kwargs):
 		if not self.step_sensor_exists:
@@ -315,15 +632,18 @@ class func(object):
 			self.mode = 'creating'
 			self.step_sensor.new(ID)
 			self.updateElements()
+			self.loadAllObjects()
 
 	@enforce_mode('view')
 	def startEditing(self,*args,**kwargs):
 		if self.step_sensor_exists:
 			self.mode = 'editing'
 			self.updateElements()
+			self.loadAllObjects()
 
 	@enforce_mode(['editing','creating'])
 	def cancelEditing(self,*args,**kwargs):
+		self.unloadAllObjects()
 		self.mode = 'view'
 		self.update_info()
 
@@ -370,6 +690,7 @@ class func(object):
 		self.step_sensor.batch_loctite         = self.page.sbBatchLoctite.value()  if self.page.sbBatchLoctite.value()  >= 0 else None
 
 		self.step_sensor.save()
+		self.unloadAllObjects()
 		self.mode = 'view'
 		self.update_info()
 

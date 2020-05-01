@@ -1,6 +1,7 @@
 from filemanager import fm
 from main_ui.mainwindow import Ui_MainWindow
-from PyQt4 import QtGui as gui, QtCore as core
+#from PyQt4 import QtGui as gui, QtCore as core
+from PyQt5 import QtGui as gui, QtCore as core, QtWidgets as wdgt
 import sys
 import time
 
@@ -22,87 +23,87 @@ from pages.view_tooling     import func as cls_func_view_tooling
 from pages.view_supplies    import func as cls_func_view_supplies
 
 # from pages.routine_iv       import func as cls_func_routine_iv
-# from pages.shipment         import func as cls_func_shipment
+from pages.view_shipment    import func as cls_func_shipment
 
 
 
 
 # Set up page widgets
 from pages_ui.view_baseplate import Ui_Form as form_view_baseplate
-class widget_view_baseplate(gui.QWidget,form_view_baseplate):
+class widget_view_baseplate(wdgt.QWidget,form_view_baseplate):  #was gui.QWidget, etc
 	def __init__(self,parent):
 		super(widget_view_baseplate,self).__init__(parent)
 		self.setupUi(self)
 
 from pages_ui.view_sensor import Ui_Form as form_view_sensor
-class widget_view_sensor(gui.QWidget,form_view_sensor):
+class widget_view_sensor(wdgt.QWidget,form_view_sensor):
 	def __init__(self,parent):
 		super(widget_view_sensor,self).__init__(parent)
 		self.setupUi(self)
 
 from pages_ui.view_PCB import Ui_Form as form_view_PCB
-class widget_view_PCB(gui.QWidget,form_view_PCB):
+class widget_view_PCB(wdgt.QWidget,form_view_PCB):
 	def __init__(self,parent):
 		super(widget_view_PCB,self).__init__(parent)
 		self.setupUi(self)
 
 
 from pages_ui.view_protomodule import Ui_Form as form_view_protomodule
-class widget_view_protomodule(gui.QWidget,form_view_protomodule):
+class widget_view_protomodule(wdgt.QWidget,form_view_protomodule):
 	def __init__(self,parent):
 		super(widget_view_protomodule,self).__init__(parent)
 		self.setupUi(self)
 
 from pages_ui.view_module import Ui_Form as form_view_module
-class widget_view_module(gui.QWidget,form_view_module):
+class widget_view_module(wdgt.QWidget,form_view_module):
 	def __init__(self,parent):
 		super(widget_view_module,self).__init__(parent)
 		self.setupUi(self)
 
 
 from pages_ui.view_kapton_step import Ui_Form as form_view_kapton_step
-class widget_view_kapton_step(gui.QWidget,form_view_kapton_step):
+class widget_view_kapton_step(wdgt.QWidget,form_view_kapton_step):
 	def __init__(self,parent):
 		super(widget_view_kapton_step,self).__init__(parent)
 		self.setupUi(self)
 
 from pages_ui.view_sensor_step import Ui_Form as form_view_sensor_step
-class widget_view_sensor_step(gui.QWidget,form_view_sensor_step):
+class widget_view_sensor_step(wdgt.QWidget,form_view_sensor_step):
 	def __init__(self,parent):
 		super(widget_view_sensor_step,self).__init__(parent)
 		self.setupUi(self)
 
 from pages_ui.view_pcb_step import Ui_Form as form_view_pcb_step
-class widget_view_pcb_step(gui.QWidget, form_view_pcb_step):
+class widget_view_pcb_step(wdgt.QWidget, form_view_pcb_step):
 	def __init__(self,parent):
 		super(widget_view_pcb_step,self).__init__(parent)
 		self.setupUi(self)
 
 
 from pages_ui.view_tooling import Ui_Form as form_view_tooling
-class widget_view_tooling(gui.QWidget, form_view_tooling):
+class widget_view_tooling(wdgt.QWidget, form_view_tooling):
 	def __init__(self,parent):
 		super(widget_view_tooling,self).__init__(parent)
 		self.setupUi(self)
 
 from pages_ui.view_supplies import Ui_Form as form_view_supplies
-class widget_view_supplies(gui.QWidget, form_view_supplies):
+class widget_view_supplies(wdgt.QWidget, form_view_supplies):
 	def __init__(self,parent):
 		super(widget_view_supplies,self).__init__(parent)
 		self.setupUi(self)
 
 
 # from pages_ui.routine_iv import Ui_Form as form_routine_iv
-# class widget_routine_iv(gui.QWidget, form_routine_iv):
+# class widget_routine_iv(wdgt.QWidget, form_routine_iv):
 # 	def __init__(self,parent):
 # 		super(widget_routine_iv,self).__init__(parent)
 # 		self.setupUi(self)
 
-# from pages_ui.shipment import Ui_Form as form_shipment
-# class widget_shipment(gui.QWidget, form_shipment):
-# 	def __init__(self,parent):
-# 		super(widget_shipment,self).__init__(parent)
-# 		self.setupUi(self)
+from pages_ui.view_shipment import Ui_Form as form_shipment
+class widget_shipment(wdgt.QWidget, form_shipment):
+	def __init__(self,parent):
+		super(widget_shipment,self).__init__(parent)
+		self.setupUi(self)
 
 
 
@@ -122,8 +123,8 @@ PAGE_IDS = {
 	'tooling'                : 8,
 	'supplies'               : 9,
 
-	# 'IV curve'               :10,
-	# 'shipment'               :11,
+	'shipments'               :10, #WARNING:  Order has been switched
+	# 'IV curve'               :11,
 }
 
 
@@ -135,7 +136,7 @@ def id_generator():
 		next_id += 1
 
 
-class mainDesigner(gui.QMainWindow,Ui_MainWindow):
+class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 
 	def __init__(self):
 		super(mainDesigner,self).__init__(None)
@@ -175,7 +176,7 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 		self.page_view_supplies    = widget_view_supplies(None)    ; self.swPages.addWidget(self.page_view_supplies)
 
 		# self.page_routine_iv       = widget_routine_iv(None)       ; self.swPages.addWidget(self.page_routine_iv)
-		# self.page_shipment         = widget_shipment(None)         ; self.swPages.addWidget(self.page_shipment)
+		self.page_shipment         = widget_shipment(None)         ; self.swPages.addWidget(self.page_shipment)
 
 
 	def initPages(self):
@@ -193,7 +194,7 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 		self.func_view_supplies    = cls_func_view_supplies(         fm, self.page_view_supplies   , self.setUIPage, self.setSwitchingEnabled)
 
 		# self.func_routine_iv       = cls_func_routine_iv(            fm, self.page_routine_iv      , self.setUIPage, self.setSwitchingEnabled)
-		# self.func_shipment         = cls_func_shipment(              fm, self.page_shipment        , self.setUIPage, self.setSwitchingEnabled)
+		self.func_shipment         = cls_func_shipment(              fm, self.page_shipment        , self.setUIPage, self.setSwitchingEnabled)
 
 		# This list must be in the same order that the pages are in in the stackedWidget in the main UI file.
 		# This is the same order as in the dict PAGE_IDS
@@ -211,8 +212,8 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 			self.func_view_tooling,
 			self.func_view_supplies,
 
+			self.func_shipment,  #WARNING:  Order has been switched.
 			# self.func_routine_iv,
-			# self.func_shipment,
 			]
 
 
@@ -319,7 +320,7 @@ class mainDesigner(gui.QMainWindow,Ui_MainWindow):
 
 
 if __name__ == '__main__':
-	app = gui.QApplication(sys.argv)
+	app = wdgt.QApplication(sys.argv)
 	m=mainDesigner()
 	m.resize(1366,768)
 	m.show()

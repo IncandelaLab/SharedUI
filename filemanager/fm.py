@@ -82,7 +82,6 @@ class fsobj(object):
 	def save(self):
 		filedir, filename = self.get_filedir_filename(self.ID)
 		file = os.sep.join([filedir, filename])
-
 		if not os.path.exists(filedir):
 			os.makedirs(filedir)
 
@@ -96,6 +95,7 @@ class fsobj(object):
 
 
 	def load(self, ID, on_property_missing = "warn"):
+
 		if ID == -1:
 			self.clear()
 			return False
@@ -115,6 +115,7 @@ class fsobj(object):
 			raise ValueError(err)
 
 		self.ID = ID
+
 		data_keys = data.keys()
 		PROPERTIES = self.PROPERTIES + self.PROPERTIES_COMMON
 		DEFAULTS = {**self.DEFAULTS_COMMON, **getattr(self, 'DEFAULTS', {})}
@@ -230,6 +231,15 @@ class tray_component_pcb(fsobj):
 	]
 
 
+#NEW:  Doesn't really fit in any section...
+#WARNING:  May want to just add a new PCB property for the semiconductor type??
+"""class type(fsobj):
+	OBJECTNAME = "semiconductor type"
+	FILEDIR = os.sep.join(['tooling','semicon_type'])
+	FILENAME = ''
+	PROPERTIES = [  #unnecessary?
+		'size',
+	]"""
 
 
 ###############################################
@@ -245,6 +255,9 @@ class shipment(fsobj):
 		"receiver",
 		"date_sent",
 		"date_received",
+
+		"sendOrReceive",  #NEW, may be unnecessary
+		#= "send" or "receive"
 
 		"kaptons",
 		"baseplates",
@@ -273,7 +286,10 @@ class shipment(fsobj):
 						inst_baseplate.save()
 					inst_baseplate.clear()
 				else:
-					... # create objects?
+					print("Baseplate not initialized.  DANGER:  This message indicates a bug is present (see fm.py).")
+					# create objects?
+					# IN THEORY, this should never be necessary.  If the object doesn't exist, an error message 
+					# should pop up in the shipment step, and save() should not be callable...
 			del inst_baseplate
 
 		if not (self.sensors is None):
@@ -334,7 +350,7 @@ class shipment(fsobj):
 					inst_module.clear()
 				else:
 					... # create objects?
-			del m
+			del inst_module
 
 
 
@@ -414,11 +430,17 @@ class baseplate(fsobj):
 				return max(self.corner_heights) - min(self.corner_heights)
 
 	def ready_step_kapton(self, step_kapton = None, max_flatness = None):
+		print("num_kaptons is "+str(self.num_kaptons))
 		if step_kapton in [self.step_kapton, self.step_kapton_2]:
 			return True, "already part associated with this kapton step"
 
 		if not (self.step_sensor is None):
 			return False, "already part of a protomodule"
+
+		if self.num_kaptons is None:
+			#This is presumably acceptable...
+			#return False, "num_kaptons is None; something's wrong?"
+			self.num_kaptons = 0  #This is probably okay
 
 		if self.num_kaptons == 2:
 			return False, "already has two kaptons"
@@ -442,6 +464,86 @@ class baseplate(fsobj):
 
 		if self.num_kaptons == 0:
 			checks = []
+			errstr = ""
+			if not self.kapton_tape_applied:
+				errstr+=" kapton tape not applied."
+				checks.append(False)
+			if not self.thickness:
+				errstr+=" thickness doesn't exist."
+				checks.append(False)
+			if self.flatness is None:
+				errstr+=" flatness doesn't exist."
+				checks.append(False)
+			if not (max_flatness is None):
+				if max_flatness<self.flatness:  errstr+="kapton flatness "+str(self.flatness)+" exceeds max "+str(max_flatness)+"."
+				checks.append(max_flatness > self.flatness)
+
+			if not all(checks):
+				return False, "baseplate qualification failed or incomplete: "+errstr
+			else:
+				return True, ""
+
+
+	def ready_step_sensor(self, step_sensor = None, max_flatness = None):
+		if step_sensor == self.step_sensor:
+			return True, "already part associated with this sensor step"
+	
+		#if self.num_sensors == 0:  #num_sensors doesn't exist...so just ignore this?
+		#	return False, "no sensors found"
+
+		checks = [
+			self.check_edges_firm == "pass",
+			self.check_glue_spill == "pass",
+			]
+		if self.kapton_flatness is None:
+			print("No kapton flatness")  #Currently not set...
+			checks.append(False)
+		elif not (max_flatness is None):
+			if self.kapton_flatness < max_flatness:  print("kapton flat")
+			else:  print("kapton not flat")
+			checks.append(self.kapton_flatness < max_flatness)
+		if not self.thickness:
+			print("thickness false")
+			checks.append(False)
+		if self.flatness is None:  #This one seems a little iffy...
+			print("flatness is none")
+			checks.append(False)
+
+		if not all(checks):
+			return False, "kaptonized baseplate qualification failed or incomplete"
+		else:
+			return True, ""
+
+
+	#CURRENTLY WIP
+
+	def ready_step_pcb(self, step_pcb = None, max_flatness = None):
+		if step_pcb == self.step_pcb:
+			return True, "already part associated with this pcb step"
+
+		if not (self.step_pcb is None):
+			return False, "already part of a protomodule"
+
+		"""if self.num_kaptons == 1:
+			checks = [
+				self.check_leakage    == "pass",
+				self.check_surface    == "pass",
+				self.check_edges_firm == "pass",
+				self.check_glue_spill == "pass",
+			]
+			if self.kapton_flatness is None:
+				checks.append(False)
+			elif not (max_flatness is None):
+				checks.append(self.kapton_flatness < max_flatness)
+
+			if not all(checks):
+				return False, "kaptonized baseplate qualification failed or incomplete"
+			else:
+				return True, ""
+		"""
+
+		"""if self.num_kaptons == 0:
+			checks = []
 			if not self.kapton_tape_applied:
 				checks.append(False)
 			if not self.thickness:
@@ -450,14 +552,14 @@ class baseplate(fsobj):
 				checks.append(False)
 			if not (max_flatness is None):
 				checks.append(max_flatness > self.flatness)
+
 			if not all(checks):
 				return False, "baseplate qualification failed or incomplete"
 			else:
 				return True, ""
+		"""
+		return True, ""
 
-
-	def ready_step_sensor(self, step_sensor = None, max_flatness = None):
-		...
 
 class sensor(fsobj):
 	OBJECTNAME = "sensor"
@@ -483,6 +585,8 @@ class sensor(fsobj):
 		# sensor step
 		"step_sensor", # which step_sensor placed this sensor
 		"protomodule", # which protomodule this sensor is a part of
+		#NEW, WIP
+		"semi_type",   #semiconductor type--either P or N
 
 		# associations to other objects
 		"module", # which module this sensor is a part of
@@ -569,6 +673,7 @@ class pcb(fsobj):
 		file = os.sep.join([filedir, self.DAQ_DATADIR, which])
 
 		print('load {}'.format(file))
+
 
 
 class protomodule(fsobj):
@@ -890,12 +995,14 @@ class step_kapton(fsobj):
 			return self.cure_stop - self.cure_start
 
 	def save(self):
+		print("Saving step_kapton")
 		super(step_kapton, self).save()
 		inst_baseplate = baseplate()
 		
 		for i in range(6):
 			baseplate_exists = False if self.baseplates[i] is None else inst_baseplate.load(self.baseplates[i])
 			if baseplate_exists:
+				print("Baseplate "+str(i)+" exists")
 
 				which_kapton_layer = None
 
@@ -911,17 +1018,20 @@ class step_kapton(fsobj):
 
 				else:
 					if which_kapton_layer == 1:
+						if self.ID==None:  print("self.ID is none, handed to step_kapton!")
+						else:  print("self.ID is NOT None, handed to step_kapton!")
 						inst_baseplate.step_kapton = self.ID
 					elif which_kapton_layer == 2:
+						if self.ID==None:  print("self.ID is none, handed to step_kapton_2!")
 						inst_baseplate.step_kapton_2 = self.ID
-
+					print("**Initializing num_kaptons**")
 					num_kaptons = 0
 					if not (inst_baseplate.step_kapton   is None): num_kaptons += 1
 					if not (inst_baseplate.step_kapton_2 is None): num_kaptons += 1
 					inst_baseplate.num_kaptons = num_kaptons
 
 					inst_baseplate.save()
-					inst_baseplate.clear()
+					inst_baseplate.clear()  #This is okay...
 
 			else:
 				if not (self.baseplates[i] is None):
@@ -1063,13 +1173,11 @@ class step_pcb(fsobj):
 			module_exists      = False if (self.modules[i]      is None) else inst_module.load(      self.modules[i]      )
 
 			if pcb_exists:
-				print("PCB EXISTS")
 				inst_pcb.step_pcb = self.ID
 				inst_pcb.module = self.modules[i]
 				inst_pcb.save()
 
 			if protomodule_exists:
-				print("PROTOMODULE EXISTS")
 				inst_protomodule.step_pcb = self.ID
 				inst_protomodule.module = self.modules[i]
 				inst_protomodule.save()
@@ -1078,12 +1186,10 @@ class step_pcb(fsobj):
 				sensor_exists    = False if (inst_protomodule.sensor    is None) else inst_sensor.load(   inst_protomodule.sensor   )
 
 				if baseplate_exists:
-					print("BASEPLATE EXISTS")
 					inst_baseplate.module = self.modules[i]
 					inst_baseplate.save()
 
 				if sensor_exists:
-					print("SENSOR EXISTS")
 					inst_sensor.module = self.modules[i]
 					inst_sensor.save()
 			else:

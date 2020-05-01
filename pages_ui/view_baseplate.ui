@@ -34,7 +34,7 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>211</width>
+     <width>261</width>
      <height>71</height>
     </rect>
    </property>
@@ -47,9 +47,9 @@
    <widget class="QPushButton" name="pbSave">
     <property name="geometry">
      <rect>
-      <x>80</x>
+      <x>90</x>
       <y>30</y>
-      <width>61</width>
+      <width>71</width>
       <height>21</height>
      </rect>
     </property>
@@ -62,7 +62,7 @@
      <rect>
       <x>1</x>
       <y>1</y>
-      <width>80</width>
+      <width>171</width>
       <height>20</height>
      </rect>
     </property>
@@ -76,9 +76,9 @@
    <widget class="QSpinBox" name="sbID">
     <property name="geometry">
      <rect>
-      <x>80</x>
-      <y>1</y>
-      <width>130</width>
+      <x>170</x>
+      <y>0</y>
+      <width>91</width>
       <height>21</height>
      </rect>
     </property>
@@ -89,9 +89,9 @@
    <widget class="QPushButton" name="pbCancel">
     <property name="geometry">
      <rect>
-      <x>150</x>
+      <x>170</x>
       <y>30</y>
-      <width>61</width>
+      <width>71</width>
       <height>21</height>
      </rect>
     </property>
@@ -104,7 +104,7 @@
      <rect>
       <x>0</x>
       <y>30</y>
-      <width>71</width>
+      <width>81</width>
       <height>21</height>
      </rect>
     </property>
@@ -117,7 +117,7 @@
      <rect>
       <x>0</x>
       <y>50</y>
-      <width>71</width>
+      <width>81</width>
       <height>21</height>
      </rect>
     </property>
@@ -131,7 +131,7 @@
     <rect>
      <x>10</x>
      <y>100</y>
-     <width>211</width>
+     <width>261</width>
      <height>571</height>
     </rect>
    </property>
@@ -144,7 +144,7 @@
    <widget class="QComboBox" name="cbChirality">
     <property name="geometry">
      <rect>
-      <x>130</x>
+      <x>180</x>
       <y>261</y>
       <width>80</width>
       <height>20</height>
@@ -174,12 +174,12 @@
      <rect>
       <x>1</x>
       <y>200</y>
-      <width>130</width>
+      <width>181</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>Nominal Thickness (mm)</string>
+     <string>Nominal thickness (mm)</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -190,7 +190,7 @@
      <rect>
       <x>1</x>
       <y>1</y>
-      <width>90</width>
+      <width>141</width>
       <height>20</height>
      </rect>
     </property>
@@ -204,7 +204,7 @@
    <widget class="QComboBox" name="cbShape">
     <property name="geometry">
      <rect>
-      <x>130</x>
+      <x>180</x>
       <y>241</y>
       <width>80</width>
       <height>20</height>
@@ -252,7 +252,7 @@
    <widget class="QPushButton" name="pbGoShipment">
     <property name="geometry">
      <rect>
-      <x>90</x>
+      <x>140</x>
       <y>20</y>
       <width>121</width>
       <height>21</height>
@@ -265,7 +265,7 @@
    <widget class="QLineEdit" name="leManufacturer">
     <property name="geometry">
      <rect>
-      <x>130</x>
+      <x>180</x>
       <y>160</y>
       <width>80</width>
       <height>20</height>
@@ -280,7 +280,7 @@
      <rect>
       <x>1</x>
       <y>140</y>
-      <width>130</width>
+      <width>181</width>
       <height>21</height>
      </rect>
     </property>
@@ -296,7 +296,7 @@
      <rect>
       <x>1</x>
       <y>20</y>
-      <width>90</width>
+      <width>141</width>
       <height>20</height>
      </rect>
     </property>
@@ -312,7 +312,7 @@
      <rect>
       <x>1</x>
       <y>160</y>
-      <width>130</width>
+      <width>181</width>
       <height>21</height>
      </rect>
     </property>
@@ -328,7 +328,7 @@
      <rect>
       <x>1</x>
       <y>180</y>
-      <width>130</width>
+      <width>181</width>
       <height>21</height>
      </rect>
     </property>
@@ -342,7 +342,7 @@
    <widget class="QLineEdit" name="leLocation">
     <property name="geometry">
      <rect>
-      <x>90</x>
+      <x>140</x>
       <y>1</y>
       <width>120</width>
       <height>20</height>
@@ -358,9 +358,9 @@
    <widget class="QListWidget" name="listShipments">
     <property name="geometry">
      <rect>
-      <x>1</x>
+      <x>0</x>
       <y>40</y>
-      <width>209</width>
+      <width>261</width>
       <height>91</height>
      </rect>
     </property>
@@ -373,7 +373,7 @@
      <rect>
       <x>1</x>
       <y>261</y>
-      <width>130</width>
+      <width>181</width>
       <height>20</height>
      </rect>
     </property>
@@ -389,7 +389,7 @@
      <rect>
       <x>1</x>
       <y>280</y>
-      <width>130</width>
+      <width>181</width>
       <height>21</height>
      </rect>
     </property>
@@ -403,7 +403,7 @@
    <widget class="QDoubleSpinBox" name="dsbNomThickness">
     <property name="geometry">
      <rect>
-      <x>130</x>
+      <x>180</x>
       <y>200</y>
       <width>80</width>
       <height>21</height>
@@ -425,7 +425,7 @@
    <widget class="QLineEdit" name="leIdentifier">
     <property name="geometry">
      <rect>
-      <x>130</x>
+      <x>180</x>
       <y>140</y>
       <width>80</width>
       <height>20</height>
@@ -440,7 +440,7 @@
      <rect>
       <x>1</x>
       <y>241</y>
-      <width>130</width>
+      <width>181</width>
       <height>20</height>
      </rect>
     </property>
@@ -456,7 +456,7 @@
      <rect>
       <x>1</x>
       <y>221</y>
-      <width>130</width>
+      <width>181</width>
       <height>20</height>
      </rect>
     </property>
@@ -470,7 +470,7 @@
    <widget class="QSpinBox" name="sbRotation">
     <property name="geometry">
      <rect>
-      <x>130</x>
+      <x>180</x>
       <y>280</y>
       <width>80</width>
       <height>21</height>
@@ -491,7 +491,7 @@
      <rect>
       <x>0</x>
       <y>330</y>
-      <width>211</width>
+      <width>261</width>
       <height>241</height>
      </rect>
     </property>
@@ -515,7 +515,7 @@
       <rect>
        <x>0</x>
        <y>220</y>
-       <width>81</width>
+       <width>111</width>
        <height>21</height>
       </rect>
      </property>
@@ -526,9 +526,9 @@
     <widget class="QPlainTextEdit" name="pteWriteComment">
      <property name="geometry">
       <rect>
-       <x>1</x>
+       <x>0</x>
        <y>150</y>
-       <width>209</width>
+       <width>261</width>
        <height>71</height>
       </rect>
      </property>
@@ -541,7 +541,7 @@
       <rect>
        <x>1</x>
        <y>0</y>
-       <width>100</width>
+       <width>141</width>
        <height>21</height>
       </rect>
      </property>
@@ -557,7 +557,7 @@
       <rect>
        <x>0</x>
        <y>20</y>
-       <width>211</width>
+       <width>261</width>
        <height>121</height>
       </rect>
      </property>
@@ -565,9 +565,9 @@
     <widget class="QPushButton" name="pbDeleteComment">
      <property name="geometry">
       <rect>
-       <x>100</x>
+       <x>140</x>
        <y>0</y>
-       <width>111</width>
+       <width>121</width>
        <height>21</height>
       </rect>
      </property>
@@ -579,7 +579,7 @@
    <widget class="QLineEdit" name="leNumKaptons">
     <property name="geometry">
      <rect>
-      <x>130</x>
+      <x>180</x>
       <y>300</y>
       <width>80</width>
       <height>21</height>
@@ -594,7 +594,7 @@
      <rect>
       <x>1</x>
       <y>300</y>
-      <width>130</width>
+      <width>181</width>
       <height>21</height>
      </rect>
     </property>
@@ -608,7 +608,7 @@
    <widget class="QComboBox" name="cbSize">
     <property name="geometry">
      <rect>
-      <x>130</x>
+      <x>180</x>
       <y>220</y>
       <width>80</width>
       <height>21</height>
@@ -631,7 +631,7 @@
    <widget class="QComboBox" name="cbMaterial">
     <property name="geometry">
      <rect>
-      <x>130</x>
+      <x>180</x>
       <y>180</y>
       <width>81</width>
       <height>21</height>
@@ -656,13 +656,37 @@
      </property>
     </item>
    </widget>
+   <zorder>lineEdit_4</zorder>
+   <zorder>lineEdit_11</zorder>
+   <zorder>lineEdit_2</zorder>
+   <zorder>lineEdit_10</zorder>
+   <zorder>lineEdit_7</zorder>
+   <zorder>lineEdit_3</zorder>
+   <zorder>leLocation</zorder>
+   <zorder>listShipments</zorder>
+   <zorder>lineEdit_13</zorder>
+   <zorder>lineEdit_16</zorder>
+   <zorder>dsbNomThickness</zorder>
+   <zorder>leIdentifier</zorder>
+   <zorder>lineEdit_15</zorder>
+   <zorder>lineEdit_6</zorder>
+   <zorder>sbRotation</zorder>
+   <zorder>frame</zorder>
+   <zorder>lineEdit_12</zorder>
+   <zorder>cbSize</zorder>
+   <zorder>cbMaterial</zorder>
+   <zorder>pbGoShipment</zorder>
+   <zorder>leManufacturer</zorder>
+   <zorder>cbShape</zorder>
+   <zorder>cbChirality</zorder>
+   <zorder>leNumKaptons</zorder>
   </widget>
   <widget class="QPushButton" name="pbGoProtomodule">
    <property name="geometry">
     <rect>
-     <x>680</x>
+     <x>780</x>
      <y>50</y>
-     <width>41</width>
+     <width>51</width>
      <height>21</height>
     </rect>
    </property>
@@ -673,7 +697,7 @@
   <widget class="QSpinBox" name="sbProtomodule">
    <property name="geometry">
     <rect>
-     <x>600</x>
+     <x>700</x>
      <y>50</y>
      <width>81</width>
      <height>21</height>
@@ -692,9 +716,9 @@
   <widget class="QPushButton" name="pbGoStepSensor">
    <property name="geometry">
     <rect>
-     <x>680</x>
+     <x>780</x>
      <y>30</y>
-     <width>41</width>
+     <width>51</width>
      <height>21</height>
     </rect>
    </property>
@@ -705,9 +729,9 @@
   <widget class="QLineEdit" name="lineEdit_17">
    <property name="geometry">
     <rect>
-     <x>510</x>
+     <x>580</x>
      <y>50</y>
-     <width>91</width>
+     <width>121</width>
      <height>21</height>
     </rect>
    </property>
@@ -721,7 +745,7 @@
   <widget class="QSpinBox" name="sbModule">
    <property name="geometry">
     <rect>
-     <x>600</x>
+     <x>700</x>
      <y>120</y>
      <width>81</width>
      <height>21</height>
@@ -740,9 +764,9 @@
   <widget class="QLineEdit" name="lineEdit_8">
    <property name="geometry">
     <rect>
-     <x>510</x>
+     <x>580</x>
      <y>120</y>
-     <width>91</width>
+     <width>121</width>
      <height>21</height>
     </rect>
    </property>
@@ -756,9 +780,9 @@
   <widget class="QLineEdit" name="lineEdit_19">
    <property name="geometry">
     <rect>
-     <x>510</x>
+     <x>580</x>
      <y>30</y>
-     <width>91</width>
+     <width>121</width>
      <height>21</height>
     </rect>
    </property>
@@ -772,7 +796,7 @@
   <widget class="QSpinBox" name="sbStepSensor">
    <property name="geometry">
     <rect>
-     <x>600</x>
+     <x>700</x>
      <y>30</y>
      <width>81</width>
      <height>21</height>
@@ -791,9 +815,9 @@
   <widget class="QPushButton" name="pbGoModule">
    <property name="geometry">
     <rect>
-     <x>680</x>
+     <x>780</x>
      <y>120</y>
-     <width>41</width>
+     <width>51</width>
      <height>21</height>
     </rect>
    </property>
@@ -804,9 +828,9 @@
   <widget class="QFrame" name="frame_4">
    <property name="geometry">
     <rect>
-     <x>260</x>
+     <x>305</x>
      <y>30</y>
-     <width>211</width>
+     <width>241</width>
      <height>191</height>
     </rect>
    </property>
@@ -819,7 +843,7 @@
    <widget class="QDoubleSpinBox" name="dsbThickness">
     <property name="geometry">
      <rect>
-      <x>130</x>
+      <x>160</x>
       <y>170</y>
       <width>79</width>
       <height>20</height>
@@ -843,7 +867,7 @@
      <rect>
       <x>1</x>
       <y>121</y>
-      <width>130</width>
+      <width>161</width>
       <height>20</height>
      </rect>
     </property>
@@ -862,7 +886,7 @@
      <rect>
       <x>1</x>
       <y>41</y>
-      <width>130</width>
+      <width>161</width>
       <height>20</height>
      </rect>
     </property>
@@ -881,7 +905,7 @@
      <rect>
       <x>1</x>
       <y>81</y>
-      <width>130</width>
+      <width>161</width>
       <height>20</height>
      </rect>
     </property>
@@ -900,7 +924,7 @@
      <rect>
       <x>1</x>
       <y>101</y>
-      <width>130</width>
+      <width>161</width>
       <height>20</height>
      </rect>
     </property>
@@ -920,7 +944,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>131</x>
+      <x>160</x>
       <y>41</y>
       <width>79</width>
       <height>20</height>
@@ -947,7 +971,7 @@
      <rect>
       <x>1</x>
       <y>1</y>
-      <width>130</width>
+      <width>161</width>
       <height>20</height>
      </rect>
     </property>
@@ -966,7 +990,7 @@
      <rect>
       <x>1</x>
       <y>21</y>
-      <width>130</width>
+      <width>161</width>
       <height>20</height>
      </rect>
     </property>
@@ -986,7 +1010,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>131</x>
+      <x>160</x>
       <y>101</y>
       <width>79</width>
       <height>20</height>
@@ -1013,7 +1037,7 @@
      <rect>
       <x>1</x>
       <y>61</y>
-      <width>130</width>
+      <width>161</width>
       <height>20</height>
      </rect>
     </property>
@@ -1033,7 +1057,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>131</x>
+      <x>160</x>
       <y>21</y>
       <width>79</width>
       <height>20</height>
@@ -1061,7 +1085,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>131</x>
+      <x>160</x>
       <y>1</y>
       <width>79</width>
       <height>20</height>
@@ -1089,7 +1113,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>131</x>
+      <x>160</x>
       <y>60</y>
       <width>79</width>
       <height>21</height>
@@ -1136,7 +1160,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>131</x>
+      <x>160</x>
       <y>80</y>
       <width>79</width>
       <height>21</height>
@@ -1163,7 +1187,7 @@
      <rect>
       <x>1</x>
       <y>150</y>
-      <width>121</width>
+      <width>161</width>
       <height>17</height>
      </rect>
     </property>
@@ -1174,7 +1198,7 @@
    <widget class="QLineEdit" name="leFlatness">
     <property name="geometry">
      <rect>
-      <x>130</x>
+      <x>160</x>
       <y>121</y>
       <width>80</width>
       <height>20</height>
@@ -1188,9 +1212,9 @@
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>260</x>
+     <x>305</x>
      <y>10</y>
-     <width>211</width>
+     <width>261</width>
      <height>16</height>
     </rect>
    </property>
@@ -1201,7 +1225,7 @@
   <widget class="QLabel" name="label_3">
    <property name="geometry">
     <rect>
-     <x>260</x>
+     <x>305</x>
      <y>240</y>
      <width>211</width>
      <height>16</height>
@@ -1214,9 +1238,9 @@
   <widget class="QLabel" name="label_4">
    <property name="geometry">
     <rect>
-     <x>260</x>
+     <x>305</x>
      <y>300</y>
-     <width>211</width>
+     <width>241</width>
      <height>16</height>
     </rect>
    </property>
@@ -1227,9 +1251,9 @@
   <widget class="QFrame" name="frame_5">
    <property name="geometry">
     <rect>
-     <x>260</x>
+     <x>305</x>
      <y>500</y>
-     <width>211</width>
+     <width>261</width>
      <height>171</height>
     </rect>
    </property>
@@ -1250,7 +1274,7 @@
      <rect>
       <x>1</x>
       <y>70</y>
-      <width>120</width>
+      <width>171</width>
       <height>21</height>
      </rect>
     </property>
@@ -1267,7 +1291,7 @@
    <widget class="QComboBox" name="cbCheckLeakage_2">
     <property name="geometry">
      <rect>
-      <x>120</x>
+      <x>170</x>
       <y>70</y>
       <width>91</width>
       <height>20</height>
@@ -1292,7 +1316,7 @@
      <rect>
       <x>1</x>
       <y>130</y>
-      <width>120</width>
+      <width>171</width>
       <height>21</height>
      </rect>
     </property>
@@ -1309,7 +1333,7 @@
    <widget class="QComboBox" name="cbCheckEdgesFirm_2">
     <property name="geometry">
      <rect>
-      <x>120</x>
+      <x>170</x>
       <y>110</y>
       <width>91</width>
       <height>20</height>
@@ -1332,7 +1356,7 @@
    <widget class="QComboBox" name="cbCheckGlueSpill_2">
     <property name="geometry">
      <rect>
-      <x>120</x>
+      <x>170</x>
       <y>130</y>
       <width>91</width>
       <height>20</height>
@@ -1355,7 +1379,7 @@
    <widget class="QSpinBox" name="sbStepKapton_2">
     <property name="geometry">
      <rect>
-      <x>90</x>
+      <x>130</x>
       <y>20</y>
       <width>81</width>
       <height>21</height>
@@ -1376,7 +1400,7 @@
      <rect>
       <x>1</x>
       <y>110</y>
-      <width>119</width>
+      <width>171</width>
       <height>21</height>
      </rect>
     </property>
@@ -1393,7 +1417,7 @@
    <widget class="QComboBox" name="cbCheckSurface_2">
     <property name="geometry">
      <rect>
-      <x>120</x>
+      <x>170</x>
       <y>90</y>
       <width>91</width>
       <height>20</height>
@@ -1418,7 +1442,7 @@
      <rect>
       <x>1</x>
       <y>20</y>
-      <width>90</width>
+      <width>131</width>
       <height>21</height>
      </rect>
     </property>
@@ -1432,7 +1456,7 @@
    <widget class="QDoubleSpinBox" name="dsbKaptonFlatness_2">
     <property name="geometry">
      <rect>
-      <x>120</x>
+      <x>170</x>
       <y>150</y>
       <width>90</width>
       <height>20</height>
@@ -1456,7 +1480,7 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>131</width>
+      <width>191</width>
       <height>16</height>
      </rect>
     </property>
@@ -1469,7 +1493,7 @@
      <rect>
       <x>1</x>
       <y>90</y>
-      <width>120</width>
+      <width>171</width>
       <height>21</height>
      </rect>
     </property>
@@ -1488,7 +1512,7 @@
      <rect>
       <x>1</x>
       <y>150</y>
-      <width>120</width>
+      <width>171</width>
       <height>20</height>
      </rect>
     </property>
@@ -1507,7 +1531,7 @@
      <rect>
       <x>0</x>
       <y>50</y>
-      <width>191</width>
+      <width>261</width>
       <height>16</height>
      </rect>
     </property>
@@ -1518,9 +1542,9 @@
    <widget class="QPushButton" name="pbGoStepKapton_2">
     <property name="geometry">
      <rect>
-      <x>170</x>
+      <x>210</x>
       <y>20</y>
-      <width>41</width>
+      <width>51</width>
       <height>21</height>
      </rect>
     </property>
@@ -1528,11 +1552,26 @@
      <string>Go to</string>
     </property>
    </widget>
+   <zorder>lineEdit_37</zorder>
+   <zorder>cbCheckLeakage_2</zorder>
+   <zorder>lineEdit_32</zorder>
+   <zorder>cbCheckGlueSpill_2</zorder>
+   <zorder>sbStepKapton_2</zorder>
+   <zorder>lineEdit_34</zorder>
+   <zorder>lineEdit_35</zorder>
+   <zorder>label_5</zorder>
+   <zorder>lineEdit_33</zorder>
+   <zorder>lineEdit_36</zorder>
+   <zorder>label_6</zorder>
+   <zorder>pbGoStepKapton_2</zorder>
+   <zorder>cbCheckSurface_2</zorder>
+   <zorder>cbCheckEdgesFirm_2</zorder>
+   <zorder>dsbKaptonFlatness_2</zorder>
   </widget>
   <widget class="QLabel" name="label_7">
    <property name="geometry">
     <rect>
-     <x>260</x>
+     <x>305</x>
      <y>480</y>
      <width>211</width>
      <height>16</height>
@@ -1545,7 +1584,7 @@
   <widget class="QLabel" name="label_8">
    <property name="geometry">
     <rect>
-     <x>510</x>
+     <x>580</x>
      <y>10</y>
      <width>211</width>
      <height>16</height>
@@ -1558,7 +1597,7 @@
   <widget class="QLabel" name="label_9">
    <property name="geometry">
     <rect>
-     <x>510</x>
+     <x>580</x>
      <y>100</y>
      <width>211</width>
      <height>16</height>
@@ -1571,9 +1610,9 @@
   <widget class="QLabel" name="label_10">
    <property name="geometry">
     <rect>
-     <x>760</x>
+     <x>740</x>
      <y>460</y>
-     <width>141</width>
+     <width>201</width>
      <height>16</height>
     </rect>
    </property>
@@ -1623,7 +1662,7 @@
   <widget class="QLabel" name="label_14">
    <property name="geometry">
     <rect>
-     <x>630</x>
+     <x>675</x>
      <y>460</y>
      <width>16</width>
      <height>16</height>
@@ -1662,9 +1701,9 @@
   <widget class="QFrame" name="frame_6">
    <property name="geometry">
     <rect>
-     <x>260</x>
+     <x>305</x>
      <y>321</y>
-     <width>211</width>
+     <width>241</width>
      <height>101</height>
     </rect>
    </property>
@@ -1677,9 +1716,9 @@
    <widget class="QDoubleSpinBox" name="dsbKaptonFlatness">
     <property name="geometry">
      <rect>
-      <x>120</x>
+      <x>159</x>
       <y>80</y>
-      <width>90</width>
+      <width>81</width>
       <height>20</height>
      </rect>
     </property>
@@ -1701,7 +1740,7 @@
      <rect>
       <x>1</x>
       <y>60</y>
-      <width>120</width>
+      <width>161</width>
       <height>20</height>
      </rect>
     </property>
@@ -1718,9 +1757,9 @@
    <widget class="QComboBox" name="cbCheckEdgesFirm">
     <property name="geometry">
      <rect>
-      <x>120</x>
+      <x>159</x>
       <y>40</y>
-      <width>90</width>
+      <width>81</width>
       <height>20</height>
      </rect>
     </property>
@@ -1743,7 +1782,7 @@
      <rect>
       <x>1</x>
       <y>20</y>
-      <width>120</width>
+      <width>161</width>
       <height>20</height>
      </rect>
     </property>
@@ -1762,7 +1801,7 @@
      <rect>
       <x>1</x>
       <y>40</y>
-      <width>119</width>
+      <width>161</width>
       <height>20</height>
      </rect>
     </property>
@@ -1779,9 +1818,9 @@
    <widget class="QComboBox" name="cbCheckSurface">
     <property name="geometry">
      <rect>
-      <x>120</x>
+      <x>159</x>
       <y>20</y>
-      <width>90</width>
+      <width>81</width>
       <height>20</height>
      </rect>
     </property>
@@ -1802,9 +1841,9 @@
    <widget class="QComboBox" name="cbCheckGlueSpill">
     <property name="geometry">
      <rect>
-      <x>120</x>
+      <x>159</x>
       <y>60</y>
-      <width>90</width>
+      <width>81</width>
       <height>20</height>
      </rect>
     </property>
@@ -1827,7 +1866,7 @@
      <rect>
       <x>1</x>
       <y>80</y>
-      <width>120</width>
+      <width>161</width>
       <height>20</height>
      </rect>
     </property>
@@ -1844,10 +1883,10 @@
    <widget class="QComboBox" name="cbCheckLeakage">
     <property name="geometry">
      <rect>
-      <x>120</x>
+      <x>159</x>
       <y>1</y>
-      <width>90</width>
-      <height>19</height>
+      <width>81</width>
+      <height>20</height>
      </rect>
     </property>
     <property name="currentIndex">
@@ -1869,7 +1908,7 @@
      <rect>
       <x>1</x>
       <y>1</y>
-      <width>119</width>
+      <width>161</width>
       <height>19</height>
      </rect>
     </property>
@@ -1883,13 +1922,23 @@
      <bool>true</bool>
     </property>
    </widget>
+   <zorder>lineEdit_29</zorder>
+   <zorder>lineEdit_28</zorder>
+   <zorder>lineEdit_30</zorder>
+   <zorder>cbCheckSurface</zorder>
+   <zorder>cbCheckGlueSpill</zorder>
+   <zorder>lineEdit_31</zorder>
+   <zorder>lineEdit_27</zorder>
+   <zorder>cbCheckLeakage</zorder>
+   <zorder>cbCheckEdgesFirm</zorder>
+   <zorder>dsbKaptonFlatness</zorder>
   </widget>
   <widget class="QFrame" name="frame_7">
    <property name="geometry">
     <rect>
-     <x>260</x>
+     <x>305</x>
      <y>260</y>
-     <width>211</width>
+     <width>241</width>
      <height>21</height>
     </rect>
    </property>
@@ -1902,9 +1951,9 @@
    <widget class="QPushButton" name="pbGoStepKapton">
     <property name="geometry">
      <rect>
-      <x>170</x>
+      <x>190</x>
       <y>0</y>
-      <width>41</width>
+      <width>51</width>
       <height>21</height>
      </rect>
     </property>
@@ -1915,7 +1964,7 @@
    <widget class="QSpinBox" name="sbStepKapton">
     <property name="geometry">
      <rect>
-      <x>90</x>
+      <x>110</x>
       <y>1</y>
       <width>81</width>
       <height>19</height>
@@ -1936,7 +1985,7 @@
      <rect>
       <x>1</x>
       <y>1</y>
-      <width>90</width>
+      <width>111</width>
       <height>19</height>
      </rect>
     </property>

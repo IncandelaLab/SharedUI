@@ -1,4 +1,4 @@
-from PyQt4 import QtCore
+from PyQt5 import QtCore
 
 PAGE_NAME = "view_tooling"
 #OBJECTTYPE = "sensor_step"

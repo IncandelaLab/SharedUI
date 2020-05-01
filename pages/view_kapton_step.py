@@ -1,4 +1,4 @@
-from PyQt4 import QtCore
+from PyQt5 import QtCore
 import time
 import datetime
 
@@ -309,6 +309,31 @@ class func(object):
 		self.page.pbSave.setEnabled(   mode_creating or mode_editing        )
 		self.page.pbCancel.setEnabled( mode_creating or mode_editing        )
 
+		#NEW:  May resolve the num_kapton issue...should at least init num_kaptons to 0.
+		#baseplates = []
+		#print("Initializing num_kaptons")
+		for i in range(6):
+			if self.baseplates[i].num_kaptons == None:
+				#print("Baseplate "+str(i)+" was None")
+				self.baseplates[i].num_kaptons = 0
+			#initializes only...maybe this will work.
+			#The below was commented until recently...
+			self.baseplates.append(self.sb_baseplates[i].value() if self.sb_baseplates[i].value() >= 0 else None)
+			if not self.baseplates[i] == None:
+				which_kapton_layer = None
+				if (self.baseplates[i].step_kapton is None) or (self.baseplates[i].step_kapton == self.ID):
+					which_kapton_layer = 1
+					#print("kapton layer 1...")
+				elif (baseplates[i].step_kapton_2 is None) or (self.baseplates[i].step_kapton_2 == self.ID):
+					which_kapton_layer = 2
+					#print("kapton layer 2...")
+				num_kaptons = 0
+				if not self.baseplates[i].step_kapton   is None: num_kaptons += 1
+				if not self.baseplates[i].step_kapton_2 is None: num_kaptons += 1
+				self.baseplates[i].num_kaptons = num_kaptons
+
+
+
 	@enforce_mode(['editing','creating'])
 	def loadAllObjects(self,*args,**kwargs):
 		for i in range(6):
@@ -344,11 +369,14 @@ class func(object):
 
 	@enforce_mode(['editing','creating'])
 	def loadTrayComponentSensor(self, *args, **kwargs):
+		print("LOADING TRAY COMPONENT SENSOR")
+		print("value = "+str(self.page.sbTrayComponent.value()))
 		self.tray_component_sensor.load(self.page.sbTrayComponent.value())
 		self.updateIssues()
 
 	@enforce_mode(['editing','creating'])
 	def loadTrayAssembly(self, *args, **kwargs):
+		print("Loading tray assembly")
 		self.tray_assembly.load(self.page.sbTrayAssembly.value() )
 		self.updateIssues()
 
@@ -363,8 +391,12 @@ class func(object):
 		issues = []
 		objects = []
 
+		print("Calling updateIssues")
+
 		# tooling and supplies
+		#NOT WORKING:
 		if self.tray_component_sensor.ID is None:
+			print("tray comp ID is None")
 			issues.append(I_TRAY_COMPONENT_DNE)
 		else:
 			objects.append(self.tray_component_sensor)
@@ -421,7 +453,9 @@ class func(object):
 				if self.baseplates[i].ID is None:
 					rows_baseplate_dne.append(i)
 				else:
-					ready, reason = self.baseplates[i].ready_step_kapton(self.page.sbID.value())
+					#NOTE:  Max flatness is 250 um.  I think.
+					print("calling ready_step "+str(i)+", num_k is "+str(self.baseplates[i].num_kaptons))
+					ready, reason = self.baseplates[i].ready_step_kapton(self.page.sbID.value(), .250)
 					if not ready:
 						issues.append(I_BASEPLATE_NOT_READY.format(i,reason))
 
@@ -552,6 +586,7 @@ class func(object):
 		self.step_kapton.tray_assembly         = self.page.sbTrayAssembly.value()  if self.page.sbTrayAssembly.value()  >= 0 else None
 		self.step_kapton.batch_araldite        = self.page.sbBatchAraldite.value() if self.page.sbBatchAraldite.value() >= 0 else None
 
+		print("Saving kapton step")
 		self.step_kapton.save()
 		self.unloadAllObjects()
 		self.mode = 'view'

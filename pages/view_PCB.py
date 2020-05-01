@@ -120,6 +120,7 @@ class func(object):
 
 		self.page.listShipments.clear()
 		for shipment in self.pcb.shipments:
+			print(self.pcb.shipments)
 			self.page.listShipments.addItem(str(shipment))
 
 		self.page.leLocation.setText(    "" if self.pcb.location     is None else self.pcb.location    )
