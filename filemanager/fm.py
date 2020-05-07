@@ -2,6 +2,14 @@ import os
 import json
 import numpy
 
+#NEW for xml file generation:
+from PyQt5 import QtCore
+import datetime
+import xml.etree.ElementTree as etree
+from xml.etree.ElementTree import ElementTree
+from xml.etree.ElementTree import Element
+import csv
+
 BASEPLATE_MATERIALS_NO_KAPTON = ['pcb']
 
 MAC_ID_RANGES = {
@@ -85,6 +93,9 @@ class fsobj(object):
 		if not os.path.exists(filedir):
 			os.makedirs(filedir)
 
+		print("CURRENTLY TESTING")
+		print(filename)
+
 		with open(file, 'w') as opfl:
 			if hasattr(self, 'PROPERTIES_DO_NOT_SAVE'):
 				contents = vars(self)
@@ -92,6 +103,52 @@ class fsobj(object):
 				json.dump(filtered_contents, opfl, indent=4)
 			else:
 				json.dump(vars(self), opfl, indent=4)
+
+		print("Create xml file:")
+		#NOTE:  Currently testing a direct xml dump
+		root = Element('ROOT')
+		tree = ElementTree(root)
+		root.set('xmlns:xsi','http://www.w3.org/2001/XMLSchema-instance')
+		parts = Element('PARTS')
+		root.append(parts)
+		part = Element('PART')  #This tree structure is subject to change
+		part.set('mode','auto')
+		parts.append(part)
+
+		contents = vars(self)
+		if hasattr(self, 'PROPERTIES_DO_NOT_SAVE'):
+			contents = {_:contents[_] for _ in contents.keys() if _ not in self.PROPERTIES_DO_NOT_SAVE}
+		else:
+			contents = vars(self)
+		for varname, value in contents.items():
+			# Need to handle lists separately
+			# AND make sure that only lists and strs/ints are stored!
+			print("Saving", varname)
+			print("Value =", value)
+			"""if isinstance(value, QtCore.QDate):
+				#If date:
+				print("Found date")
+				vr = Element(varname)
+				vr.text = value.toString()
+				part.append(vr)"""
+			#WARNING:  Dates are currently being saved as [day, month, year] list...may need to reformat.
+			if isinstance(value, list):
+				# Load entire list into xml tree
+				# No structure for now, just make each item a separate <thingy>thing1</thingy>, etc.
+				for item in value:
+					vr = Element(varname)
+					vr.text = str(item)
+					part.append(vr)
+			else:
+				vr = Element(varname)
+				vr.text = str(value)
+				part.append(vr)
+
+		#Store in same directory as .json files, w/ same name:
+		filename = self.FILENAME.format(ID=self.ID)  #Copied from get_filedir_filename()
+		print("Saving file to ", filedir+'/'+filename.replace('.json', '.xml'))
+		tree.write(open(filedir+'/'+filename.replace('.json', '.xml'), 'wb'))
+
 
 
 	def load(self, ID, on_property_missing = "warn"):
