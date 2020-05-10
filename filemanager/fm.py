@@ -8,6 +8,7 @@ import datetime
 import xml.etree.ElementTree as etree
 from xml.etree.ElementTree import ElementTree
 from xml.etree.ElementTree import Element
+from xml.etree.ElementTree import parse
 import csv
 
 BASEPLATE_MATERIALS_NO_KAPTON = ['pcb']
@@ -149,9 +150,21 @@ class fsobj(object):
 		print("Saving file to ", filedir+'/'+filename.replace('.json', '.xml'))
 		tree.write(open(filedir+'/'+filename.replace('.json', '.xml'), 'wb'))
 
+		# TESTING:  Load XML file and try to read it
+		print("File saved.  Reading...")
+		tree = parse(filedir+'/'+filename.replace('.json', '.xml'))
+		root = tree.getroot()
+		parts = root[0][0]
+		for child in parts:
+			print(child.tag, child.text)
+		# To add to load():  Need to convert parts to fixed dictionary
+		# - Convert strings to numbers
+		# - Restore all lists PLUS dates
+
 
 
 	def load(self, ID, on_property_missing = "warn"):
+		# NOTE:  May have to be redone for XML.
 
 		if ID == -1:
 			self.clear()
@@ -166,6 +179,9 @@ class fsobj(object):
 
 		with open(file, 'r') as opfl:
 			data = json.load(opfl)
+
+		# TEMP
+		print(data)
 
 		if not (data['ID'] == ID):
 			err = "ID in data file ({}) does not match ID of filename ({})".format(data['ID'],ID)
