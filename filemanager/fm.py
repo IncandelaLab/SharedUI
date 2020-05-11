@@ -112,7 +112,7 @@ class fsobj(object):
 			else:
 				json.dump(vars(self), opfl, indent=4)
 
-		"""
+		"""  THIS IS OLD, IGNORE IT
 		print("Create xml file:")
 		#NOTE:  Currently testing a direct xml dump
 		root = Element('ROOT')
@@ -512,10 +512,12 @@ class baseplate(fsobj):
 		"shipments":[],
 	}
 
-	#NEW:  List of vars that receive special treatment in save() and are not saved automatically
+	#NEW:  List of vars that are manually given to the XML file via Akshay's script and 
+	#      should not be saved automatically by the loop over PROPERTIES
 	PROPERTIES_SAVED_MANUALLY = [
 		"identifier",
 		"comments",
+		"insertion_user",
 	]
 
 
@@ -695,35 +697,33 @@ class baseplate(fsobj):
 		location.text = self.location
 
 		contents = vars(self)
-		if hasattr(self, 'PROPERTIES_DO_NOT_SAVE'):
+		if hasattr(self, 'PROPERTIES_DO_NOT_SAVE'):  # If a property is in the "DO_NOT_SAVE" list defined above, don't save it in the XML file (this chunk of code removes those vars from consideration)
 			contents = {_:contents[_] for _ in contents.keys() if _ not in self.PROPERTIES_DO_NOT_SAVE}
 		else:
 			contents = vars(self)
 		#NEW:  Need to ensure that properties added to the XML manually above aren't added *again* as separate elements in this section
 		contents = {_:contents[_] for _ in contents.keys() if _ not in self.PROPERTIES_SAVED_MANUALLY}
 		for varname, value in contents.items():  #Iterate through dictionary containing all of the class' variables, minus the vars in PROPERTIES_DO_NOT_SAVE and PROPERTIES_SAVED_MANUALLY
-			# Need to handle lists separately
-			# AND make sure that only lists and strs/ints are stored!
+			# varname = string containing name of variable, value = actual contents of variable
 			print("Saving", varname)  #Output for testing only
 			print("Value =", value)
-			# WARNING:  Dates are currently being saved as [day, month, year] list, in that order...will need to reformat this for other objects (baseplate doesn't have any).
-			if isinstance(value, list):  # If list, every element becomes a new XML element
-				# Load entire list into xml tree
+			# WARNING:  Dates are currently being treated as a [day, month, year] list, in that order...will need to reformat this for other objects (baseplate doesn't have any).
+			if isinstance(value, list):  # If variable is list, generate a new XML element for every item in the list
 				# No structure for now, just make each item a separate <thingy>thing1</thingy>, etc.
 				for item in value:
 					vr = Element(varname)
 					vr.text = str(item)
 					part.append(vr)
-			else:  # If not a list:
+			else:  # If not a list, create a single XML element for it:
 				vr = Element(varname)
 				vr.text = str(value)
 				part.append(vr)
 
-		# Save .json file:
+		# Save .json file using the old save() function:
 		super(baseplate, self).save()
 
 		# Save .xml file:
-		#Store in same directory as .json files, w/ same name:
+		# Store in same directory as .json files, w/ same name:
 		filedir, filename = self.get_filedir_filename(self.ID)
 		#filename = self.FILENAME.format(ID=self.ID)  #Copied from get_filedir_filename()
 		print("Saving file to ", filedir+'/'+filename.replace('.json', '.xml'))
