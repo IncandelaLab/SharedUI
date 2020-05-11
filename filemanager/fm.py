@@ -73,6 +73,16 @@ class fsobj(object):
 
 	OBJECTNAME = "fsobj"
 
+	# NEW:
+	VARS_TO_RENAME = {  # store list of corrected variable names
+		
+	}
+
+	OBJ_NAME_DICT = {  #store list of corrected object names
+		'baseplate':'HGC Six Inch Plate',  #COMPLICATION
+	}
+
+
 	def __init__(self):
 		super(fsobj, self).__init__()
 		self.clear() # sets attributes to None
@@ -88,14 +98,11 @@ class fsobj(object):
 		return filedir, filename
 
 
-	def save(self):
+	def save(self, objname = 'fsobj'):  #NOTE:  objname param is new
 		filedir, filename = self.get_filedir_filename(self.ID)
 		file = os.sep.join([filedir, filename])
 		if not os.path.exists(filedir):
 			os.makedirs(filedir)
-
-		print("CURRENTLY TESTING")
-		print(filename)
 
 		with open(file, 'w') as opfl:
 			if hasattr(self, 'PROPERTIES_DO_NOT_SAVE'):
@@ -105,6 +112,7 @@ class fsobj(object):
 			else:
 				json.dump(vars(self), opfl, indent=4)
 
+		"""
 		print("Create xml file:")
 		#NOTE:  Currently testing a direct xml dump
 		root = Element('ROOT')
@@ -116,6 +124,12 @@ class fsobj(object):
 		part.set('mode','auto')
 		parts.append(part)
 
+		# Add part name separately, since the parent class can't access it directly
+		nameobj = Element('KIND_OF_PART')
+		# Get corrected name from dictionary
+		nameobj.text = OBJ_NAME_DICT[OBJECTNAME]
+		part.append(nameobj)
+
 		contents = vars(self)
 		if hasattr(self, 'PROPERTIES_DO_NOT_SAVE'):
 			contents = {_:contents[_] for _ in contents.keys() if _ not in self.PROPERTIES_DO_NOT_SAVE}
@@ -126,12 +140,12 @@ class fsobj(object):
 			# AND make sure that only lists and strs/ints are stored!
 			print("Saving", varname)
 			print("Value =", value)
-			"""if isinstance(value, QtCore.QDate):
-				#If date:
-				print("Found date")
-				vr = Element(varname)
-				vr.text = value.toString()
-				part.append(vr)"""
+			#if isinstance(value, QtCore.QDate):
+			#	#If date:i
+			#	print("Found date")
+			#	vr = Element(varname)
+			#	vr.text = value.toString()
+			#	part.append(vr)
 			#WARNING:  Dates are currently being saved as [day, month, year] list...may need to reformat.
 			if isinstance(value, list):
 				# Load entire list into xml tree
@@ -149,7 +163,9 @@ class fsobj(object):
 		filename = self.FILENAME.format(ID=self.ID)  #Copied from get_filedir_filename()
 		print("Saving file to ", filedir+'/'+filename.replace('.json', '.xml'))
 		tree.write(open(filedir+'/'+filename.replace('.json', '.xml'), 'wb'))
+		"""
 
+		"""
 		# TESTING:  Load XML file and try to read it
 		print("File saved.  Reading...")
 		tree = parse(filedir+'/'+filename.replace('.json', '.xml'))
@@ -160,6 +176,7 @@ class fsobj(object):
 		# To add to load():  Need to convert parts to fixed dictionary
 		# - Convert strings to numbers
 		# - Restore all lists PLUS dates
+		"""
 
 
 
@@ -486,11 +503,21 @@ class baseplate(fsobj):
 
 		# Associations to other objects
 		"module", # what module (ID) it's a part of; None if not part of any
+
+		# NEW to match XML script
+		"insertion_user",
 	]
 
 	DEFAULTS = {
 		"shipments":[],
 	}
+
+	#NEW:  List of vars that receive special treatment in save() and are not saved automatically
+	PROPERTIES_SAVED_MANUALLY = [
+		"identifier",
+		"comments",
+	]
+
 
 	@property
 	def flatness(self):
@@ -632,6 +659,77 @@ class baseplate(fsobj):
 				return True, ""
 		"""
 		return True, ""
+
+
+	def save(self):  #NEW for XML generation
+		
+		# Directly copied from Akshay's script:
+		root = Element('ROOT')
+		tree = ElementTree(root)
+		root.set('xmlns:xsi','http://www.w3.org/2001/XMLSchema-instance')
+		parts = Element('PARTS')
+		root.append(parts)
+		part = Element('PART')
+		part.set('mode','auto')
+		parts.append(part)
+		# Customize name to match part size:
+		# NOTE:  See PROPERTIES array (defined at the start of each class) for the full list of usable variables/properties
+		kindOfPart = Element('KIND_OF_PART')
+		size_str = 'Six' if self.size==6 else 'Eight'   #May need to convert from string
+		kindOfPart.text = 'HGC {} Inch Plate'.format(size_str)
+		part.append(kindOfPart)
+		user = Element('RECORD_INSERTION_USER')
+		part.append(user)
+		# Note:  Recently added insertion_user to baseplate GUI page
+		user.text = self.insertion_user # self.my_name
+		serialNumber = Element('SERIAL_NUMBER')
+		serialNumber.text = self.identifier  #WARNING:  Need to double check that this is in fact the serial number
+		part.append(serialNumber)
+		#Multiple comments are allowed per part, so iterate through self.comments list and create a COMMENT_DESCRIPTION for each:
+		for cmt in self.comments:
+			comment = Element('COMMENT_DESCRIPTION')
+			comment.text = cmt
+			part.append(comment)
+		location = Element('LOCATION')
+		part.append(location)
+		location.text = self.location
+
+		contents = vars(self)
+		if hasattr(self, 'PROPERTIES_DO_NOT_SAVE'):
+			contents = {_:contents[_] for _ in contents.keys() if _ not in self.PROPERTIES_DO_NOT_SAVE}
+		else:
+			contents = vars(self)
+		#NEW:  Need to ensure that properties added to the XML manually above aren't added *again* as separate elements in this section
+		contents = {_:contents[_] for _ in contents.keys() if _ not in self.PROPERTIES_SAVED_MANUALLY}
+		for varname, value in contents.items():  #Iterate through dictionary containing all of the class' variables, minus the vars in PROPERTIES_DO_NOT_SAVE and PROPERTIES_SAVED_MANUALLY
+			# Need to handle lists separately
+			# AND make sure that only lists and strs/ints are stored!
+			print("Saving", varname)  #Output for testing only
+			print("Value =", value)
+			# WARNING:  Dates are currently being saved as [day, month, year] list, in that order...will need to reformat this for other objects (baseplate doesn't have any).
+			if isinstance(value, list):  # If list, every element becomes a new XML element
+				# Load entire list into xml tree
+				# No structure for now, just make each item a separate <thingy>thing1</thingy>, etc.
+				for item in value:
+					vr = Element(varname)
+					vr.text = str(item)
+					part.append(vr)
+			else:  # If not a list:
+				vr = Element(varname)
+				vr.text = str(value)
+				part.append(vr)
+
+		# Save .json file:
+		super(baseplate, self).save()
+
+		# Save .xml file:
+		#Store in same directory as .json files, w/ same name:
+		filedir, filename = self.get_filedir_filename(self.ID)
+		#filename = self.FILENAME.format(ID=self.ID)  #Copied from get_filedir_filename()
+		print("Saving file to ", filedir+'/'+filename.replace('.json', '.xml'))
+		tree.write(open(filedir+'/'+filename.replace('.json', '.xml'), 'wb'))
+		print('Created baseplate XML file')
+
 
 
 class sensor(fsobj):
