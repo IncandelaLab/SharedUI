@@ -18,7 +18,7 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>101</width>
+     <width>131</width>
      <height>21</height>
     </rect>
    </property>
@@ -32,7 +32,7 @@
   <widget class="QSpinBox" name="sbSensorToolID">
    <property name="geometry">
     <rect>
-     <x>110</x>
+     <x>140</x>
      <y>10</y>
      <width>51</width>
      <height>21</height>
@@ -57,7 +57,7 @@
     <rect>
      <x>10</x>
      <y>30</y>
-     <width>101</width>
+     <width>131</width>
      <height>21</height>
     </rect>
    </property>
@@ -71,7 +71,7 @@
   <widget class="QDoubleSpinBox" name="dsbSensorToolSize">
    <property name="geometry">
     <rect>
-     <x>110</x>
+     <x>140</x>
      <y>30</y>
      <width>51</width>
      <height>21</height>
@@ -149,7 +149,7 @@
   <widget class="QDoubleSpinBox" name="dsbPcbToolSize">
    <property name="geometry">
     <rect>
-     <x>100</x>
+     <x>140</x>
      <y>390</y>
      <width>51</width>
      <height>21</height>
@@ -190,7 +190,7 @@
     <rect>
      <x>10</x>
      <y>370</y>
-     <width>91</width>
+     <width>131</width>
      <height>21</height>
     </rect>
    </property>
@@ -204,7 +204,7 @@
   <widget class="QSpinBox" name="sbPcbToolID">
    <property name="geometry">
     <rect>
-     <x>100</x>
+     <x>140</x>
      <y>370</y>
      <width>51</width>
      <height>21</height>
@@ -232,7 +232,7 @@
     <rect>
      <x>10</x>
      <y>390</y>
-     <width>91</width>
+     <width>131</width>
      <height>21</height>
     </rect>
    </property>
@@ -496,7 +496,7 @@
   <widget class="QDoubleSpinBox" name="dsbAssemblyTraySize">
    <property name="geometry">
     <rect>
-     <x>760</x>
+     <x>780</x>
      <y>30</y>
      <width>51</width>
      <height>21</height>
@@ -548,7 +548,7 @@
   <widget class="QSpinBox" name="sbAssemblyTrayID">
    <property name="geometry">
     <rect>
-     <x>760</x>
+     <x>780</x>
      <y>10</y>
      <width>51</width>
      <height>21</height>
@@ -576,7 +576,7 @@
     <rect>
      <x>650</x>
      <y>30</y>
-     <width>111</width>
+     <width>131</width>
      <height>21</height>
     </rect>
    </property>
@@ -602,7 +602,7 @@
     <rect>
      <x>650</x>
      <y>10</y>
-     <width>111</width>
+     <width>131</width>
      <height>21</height>
     </rect>
    </property>
@@ -806,6 +806,136 @@
    </property>
    <property name="text">
     <string>save</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="leSensorToolLocation">
+   <property name="geometry">
+    <rect>
+     <x>110</x>
+     <y>50</y>
+     <width>81</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_16">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>50</y>
+     <width>101</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Location</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_17">
+   <property name="geometry">
+    <rect>
+     <x>310</x>
+     <y>50</y>
+     <width>141</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Location</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="leSensorTrayLocation">
+   <property name="geometry">
+    <rect>
+     <x>450</x>
+     <y>50</y>
+     <width>81</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="leAssemblyTrayLocation">
+   <property name="geometry">
+    <rect>
+     <x>750</x>
+     <y>50</y>
+     <width>81</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_18">
+   <property name="geometry">
+    <rect>
+     <x>650</x>
+     <y>50</y>
+     <width>121</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Location</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_19">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>410</y>
+     <width>101</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Location</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lePcbToolLocation">
+   <property name="geometry">
+    <rect>
+     <x>110</x>
+     <y>410</y>
+     <width>81</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_20">
+   <property name="geometry">
+    <rect>
+     <x>310</x>
+     <y>410</y>
+     <width>141</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Location</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lePcbTrayLocation">
+   <property name="geometry">
+    <rect>
+     <x>450</x>
+     <y>410</y>
+     <width>81</width>
+     <height>20</height>
+    </rect>
    </property>
   </widget>
  </widget>

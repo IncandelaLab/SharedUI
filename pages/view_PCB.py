@@ -182,6 +182,7 @@ class func(object):
 
 		self.page.pbGoShipment.setEnabled(mode_view and shipments_exist)
 
+		self.page.leLocation.setReadOnly(     not (mode_creating or mode_editing) )
 		self.page.leIdentifier.setReadOnly(   not (mode_creating or mode_editing) )
 		self.page.leManufacturer.setReadOnly( not (mode_creating or mode_editing) )
 		self.page.cbSize.setEnabled(               mode_creating or mode_editing  )
@@ -231,6 +232,7 @@ class func(object):
 	@enforce_mode(['editing','creating'])
 	def saveEditing(self,*args,**kwargs):
 
+		self.pcb.location     = str(self.page.leLocation.text()        ) if str(self.page.leLocation.text()        ) else None
 		self.pcb.identifier   = str(self.page.leIdentifier.text()      ) if str(self.page.leIdentifier.text()      ) else None
 		self.pcb.manufacturer = str(self.page.leManufacturer.text()    ) if str(self.page.leManufacturer.text()    ) else None
 		self.pcb.size         = str(self.page.cbSize.currentText()     ) if str(self.page.cbSize.currentText()     ) else None

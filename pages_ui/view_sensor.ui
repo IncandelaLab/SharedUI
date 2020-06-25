@@ -19,7 +19,7 @@
      <x>10</x>
      <y>90</y>
      <width>261</width>
-     <height>551</height>
+     <height>571</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -358,7 +358,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>530</y>
+      <y>550</y>
       <width>111</width>
       <height>21</height>
      </rect>
@@ -371,7 +371,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>310</y>
+      <y>330</y>
       <width>141</width>
       <height>21</height>
      </rect>
@@ -387,7 +387,7 @@
     <property name="geometry">
      <rect>
       <x>140</x>
-      <y>310</y>
+      <y>330</y>
       <width>121</width>
       <height>21</height>
      </rect>
@@ -400,7 +400,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>460</y>
+      <y>480</y>
       <width>261</width>
       <height>71</height>
      </rect>
@@ -410,7 +410,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>330</y>
+      <y>350</y>
       <width>261</width>
       <height>121</height>
      </rect>
@@ -439,6 +439,45 @@
      </property>
     </item>
    </widget>
+   <widget class="QComboBox" name="cbSemiType">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>290</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
+    <item>
+     <property name="text">
+      <string>P-type</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>N-type</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_16">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>290</y>
+      <width>181</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Semiconductor type</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
    <zorder>lineEdit_9</zorder>
    <zorder>lineEdit_2</zorder>
    <zorder>lineEdit_3</zorder>
@@ -463,6 +502,8 @@
    <zorder>sbChannels</zorder>
    <zorder>leType</zorder>
    <zorder>leManufacturer</zorder>
+   <zorder>cbSemiType</zorder>
+   <zorder>lineEdit_16</zorder>
   </widget>
   <widget class="QFrame" name="frame_3">
    <property name="geometry">

@@ -290,6 +290,7 @@ class func(object):
 		self.page.pbGoShipment.setEnabled(mode_view and shipments_exist)
 
 		# characteristics
+		self.page.leLocation.setReadOnly(   not (mode_creating or mode_editing) )
 		self.page.sbChannels.setReadOnly(   not (mode_creating or mode_editing) )
 		self.page.dsbThickness.setReadOnly( not (mode_creating or mode_editing) )
 		self.page.sbRotation.setReadOnly(   not (mode_creating or mode_editing) )

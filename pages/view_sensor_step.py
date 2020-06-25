@@ -183,16 +183,6 @@ class func(object):
 			self.page.pbGoProtoModule6,
 		]
 
-		#NEW:  Semiconductor type.  Does NOT have a corresp type object.
-		self.cb_types = [
-			self.page.cbType1,
-			self.page.cbType2,
-			self.page.cbType3,
-			self.page.cbType4,
-			self.page.cbType5,
-			self.page.cbType6,
-		]
-
 		for i in range(6):
 			self.pb_go_tools[i].clicked.connect(       self.goTool       )
 			self.pb_go_sensors[i].clicked.connect(     self.goSensor     )
@@ -202,7 +192,6 @@ class func(object):
 			self.sb_tools[i].editingFinished.connect(      self.loadToolSensor)
 			self.sb_baseplates[i].editingFinished.connect( self.loadBaseplate )
 			self.sb_sensors[i].editingFinished.connect(    self.loadSensor    )
-			self.cb_types[i].activated.connect(            self.loadType      )
 
 
 		self.page.sbTrayComponent.editingFinished.connect( self.loadTrayComponentSensor )
@@ -222,9 +211,13 @@ class func(object):
 		self.page.pbGoTrayAssembly.clicked.connect(self.goTrayAssembly)
 		self.page.pbGoTrayComponent.clicked.connect(self.goTrayComponent)
 
-		self.page.pbDatePerformedNow.clicked.connect(self.setDatePerformedNow)
+		# NOTE:  Date no longer necessary?
+		#self.page.pbDatePerformedNow.clicked.connect(self.setDatePerformedNow)
 		self.page.pbCureStartNow    .clicked.connect(self.setCureStartNow)
 		self.page.pbCureStopNow     .clicked.connect(self.setCureStopNow)
+		# New
+		self.page.pbRunStartNow     .clicked.connect(self.setRunStartNow)
+		self.page.pbRunStopNow      .clicked.connect(self.setRunStopNow)
 
 
 	@enforce_mode('view')
@@ -242,15 +235,19 @@ class func(object):
 
 		if self.step_sensor_exists:
 			self.page.leUserPerformed.setText(self.step_sensor.user_performed)
+			self.page.leLocation.setText(self.step_sensor.location)
 
-			date_performed = self.step_sensor.date_performed
-			if not (date_performed is None):
-				self.page.dPerformed.setDate(QtCore.QDate(*self.step_sensor.date_performed))
-			else:
-				self.page.dPerformed.setDate(QtCore.QDate(*NO_DATE))
+			#date_performed = self.step_sensor.date_performed  #Redundant
+			#if not (date_performed is None):
+			#	self.page.dPerformed.setDate(QtCore.QDate(*self.step_sensor.date_performed))
+			#else:
+			#	self.page.dPerformed.setDate(QtCore.QDate(*NO_DATE))
 
 			cure_start = self.step_sensor.cure_start
 			cure_stop  = self.step_sensor.cure_stop
+			# New
+			run_start  = self.step_sensor.run_start
+			run_stop   = self.step_sensor.run_stop
 			if cure_start is None:
 				self.page.dtCureStart.setDate(QtCore.QDate(*NO_DATE))
 				self.page.dtCureStart.setTime(QtCore.QTime(0,0,0))
@@ -266,6 +263,23 @@ class func(object):
 				localtime = list(time.localtime(cure_stop))
 				self.page.dtCureStop.setDate(QtCore.QDate(*localtime[0:3]))
 				self.page.dtCureStop.setTime(QtCore.QTime(*localtime[3:6]))
+			# New
+			if run_start is None:
+				self.page.dtRunStart.setDate(QtCore.QDate(*NO_DATE))
+				self.page.dtRunStart.setTime(QtCore.QTime(0,0,0))
+			else:
+				localtime = list(time.localtime(run_start))
+				self.page.dtRunStart.setDate(QtCore.QDate(*localtime[0:3]))
+				self.page.dtRunStart.setTime(QtCore.QTime(*localtime[3:6]))
+			if run_stop is None:
+				self.page.dtRunStop.setDate(QtCore.QDate(*NO_DATE))
+				self.page.dtRunStop.setTime(QtCore.QTime(0,0,0))
+			else:
+				localtime = list(time.localtime(run_stop))
+				self.page.dtRunStop.setDate(QtCore.QDate(*localtime[0:3]))
+				self.page.dtRunStop.setTime(QtCore.QTime(*localtime[3:6]))
+
+
 
 			self.page.leCureDuration.setText(str(int(self.step_sensor.cure_duration)) if not (self.step_sensor.cure_duration is None) else "")
 			self.page.leCureTemperature.setText(self.step_sensor.cure_temperature)
@@ -304,13 +318,21 @@ class func(object):
 				for i in range(6):
 					self.sb_protomodules[i].setValue(-1)
 
+
 		else:
 			self.page.leUserPerformed.setText("")
-			self.page.dPerformed.setDate(QtCore.QDate(*NO_DATE))
+			self.page.leLocation.setText("")
+			#self.page.dPerformed.setDate(QtCore.QDate(*NO_DATE)) #Redundant
 			self.page.dtCureStart.setDate(QtCore.QDate(*NO_DATE))
 			self.page.dtCureStart.setTime(QtCore.QTime(0,0,0))
 			self.page.dtCureStop.setDate(QtCore.QDate(*NO_DATE))
 			self.page.dtCureStop.setTime(QtCore.QTime(0,0,0))
+			# New
+			self.page.dtRunStart.setDate(QtCore.QDate(*NO_DATE))
+			self.page.dtRunStart.setTime(QtCore.QTime(0,0,0))
+			self.page.dtRunStop.setDate(QtCore.QDate(*NO_DATE))
+			self.page.dtRunStop.setTime(QtCore.QTime(0,0,0))
+
 			self.page.leCureDuration.setText("")
 			self.page.leCureTemperature.setText("")
 			self.page.leCureHumidity.setText("")
@@ -351,14 +373,21 @@ class func(object):
 		self.setMainSwitchingEnabled(mode_view)
 		self.page.sbID.setEnabled(mode_view)
 
-		self.page.pbDatePerformedNow.setEnabled(mode_creating or mode_editing)
+		#self.page.pbDatePerformedNow.setEnabled(mode_creating or mode_editing) #Redundant
 		self.page.pbCureStartNow    .setEnabled(mode_creating or mode_editing)
 		self.page.pbCureStopNow     .setEnabled(mode_creating or mode_editing)
+		# New
+		self.page.pbRunStartNow     .setEnabled(mode_creating or mode_editing)
+		self.page.pbRunStopNow      .setEnabled(mode_creating or mode_editing)
 
 		self.page.leUserPerformed  .setReadOnly(mode_view)
-		self.page.dPerformed       .setReadOnly(mode_view)
+		self.page.leLocation       .setReadOnly(mode_view)
+		#self.page.dPerformed       .setReadOnly(mode_view) #Redundant
 		self.page.dtCureStart      .setReadOnly(mode_view)
 		self.page.dtCureStop       .setReadOnly(mode_view)
+		# New
+		self.page.dtRunStart       .setReadOnly(mode_view)
+		self.page.dtRunStop        .setReadOnly(mode_view)
 		self.page.leCureTemperature.setReadOnly(mode_view)
 		self.page.leCureHumidity   .setReadOnly(mode_view)
 		self.page.sbTrayComponent  .setReadOnly(mode_view)
@@ -433,15 +462,6 @@ class func(object):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
 		self.sensors[which].load(self.sb_sensors[which].value())
-		self.updateIssues()
-
-	#NEW, may require modification
-	@enforce_mode(['editing','creating'])
-	def loadType(self, *args, **kwargs):
-		sender_name = str(self.page.sender().objectName())
-		which = int(sender_name[-1]) - 1
-		#Data transfer should be tested/checked...but currentText() works.
-		setattr(self.sensors[which], "semi_type", self.cb_types[which].currentText())
 		self.updateIssues()
 
 	@enforce_mode(['editing','creating'])
@@ -651,11 +671,12 @@ class func(object):
 	def saveEditing(self,*args,**kwargs):
 		
 		self.step_sensor.user_performed = str( self.page.leUserPerformed.text() )
+		self.step_sensor.location = str( self.page.leLocation.text() )
 
-		if self.page.dPerformed.date().year() == NO_DATE[0]:
-			self.step_sensor.date_performed = None
-		else:
-			self.step_sensor.date_performed = [*self.page.dPerformed.date().getDate()]
+		#if self.page.dPerformed.date().year() == NO_DATE[0]:  #Redundant
+		#	self.step_sensor.date_performed = None
+		#else:
+		#	self.step_sensor.date_performed = [*self.page.dPerformed.date().getDate()]
 
 		if self.page.dtCureStart.date().year() == NO_DATE[0]:
 			self.step_sensor.cure_start = None
@@ -666,6 +687,17 @@ class func(object):
 			self.step_sensor.cure_stop = None
 		else:
 			self.step_sensor.cure_stop  = self.page.dtCureStop.dateTime().toTime_t()
+		# New
+		if self.page.dtRunStart.date().year() == NO_DATE[0]:
+			self.step_sensor.run_start = None
+		else:
+			self.step_sensor.run_start = self.page.dtRunStart.dateTime().toTime_t()
+
+		if self.page.dtRunStop.date().year() == NO_DATE[0]:
+			self.step_sensor.run_stop = None
+		else:
+			self.step_sensor.run_stop  = self.page.dtRunStop.dateTime().toTime_t()
+
 
 		self.step_sensor.cure_humidity    = str(self.page.leCureHumidity.text())
 		self.step_sensor.cure_temperature = str(self.page.leCureTemperature.text())
@@ -735,8 +767,8 @@ class func(object):
 		print(tray_assembly)
 		self.setUIPage('tooling',tray_assembly=tray_assembly)
 
-	def setDatePerformedNow(self, *args, **kwargs):
-		self.page.dPerformed.setDate(QtCore.QDate(*time.localtime()[:3]))
+	#def setDatePerformedNow(self, *args, **kwargs):   #Redundant
+	#	self.page.dPerformed.setDate(QtCore.QDate(*time.localtime()[:3]))
 
 	def setCureStartNow(self, *args, **kwargs):
 		localtime = time.localtime()
@@ -747,6 +779,19 @@ class func(object):
 		localtime = time.localtime()
 		self.page.dtCureStop.setDate(QtCore.QDate(*localtime[0:3]))
 		self.page.dtCureStop.setTime(QtCore.QTime(*localtime[3:6]))
+
+	# New
+	def setRunStartNow(self, *args, **kwargs):
+		localtime = time.localtime()
+		self.page.dtRunStart.setDate(QtCore.QDate(*localtime[0:3]))
+		self.page.dtRunStart.setTime(QtCore.QTime(*localtime[3:6]))
+
+	def setRunStopNow(self, *args, **kwargs):
+		localtime = time.localtime()
+		self.page.dtRunStop.setDate(QtCore.QDate(*localtime[0:3]))
+		self.page.dtRunStop.setTime(QtCore.QTime(*localtime[3:6]))
+
+
 
 	@enforce_mode('view')
 	def load_kwargs(self,kwargs):

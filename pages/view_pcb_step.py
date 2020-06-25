@@ -35,7 +35,7 @@ I_SENSOR_DNE            = "sensor(s) in position(s) {} do not exist"
 I_PCB_DNE               = "pcb(s) in position(s) {} do not exist"
 I_PROTO_DNE             = "protomodule(s) in position(s) {} do not exist"
 I_MODULE_DNE            = "module(s) in position(s) {} do not exist"
-I_TOOL_SENSOR_DUPLICATE = "same sensor tool is selected on multiple positions: {}"
+I_TOOL_PCB_DUPLICATE    = "same PCB tool is selected on multiple positions: {}"
 I_BASEPLATE_DUPLICATE   = "same baseplate is selected on multiple positions: {}"
 I_SENSOR_DUPLICATE      = "same sensor is selected on multiple positions: {}"
 I_PCB_DUPLICATE         = "same PCB is selected on multiple positions: {}"
@@ -215,7 +215,9 @@ class func(object):
 		self.page.pbGoTrayAssembly.clicked.connect(self.goTrayAssembly)
 		self.page.pbGoTrayComponent.clicked.connect(self.goTrayComponent)
 
-		self.page.pbDatePerformedNow.clicked.connect(self.setDatePerformedNow)
+		#self.page.pbDatePerformedNow.clicked.connect(self.setDatePerformedNow)
+		self.page.pbRunStartNow     .clicked.connect(self.setRunStartNow)
+		self.page.pbRunStopNow      .clicked.connect(self.setRunStopNow)
 		self.page.pbCureStartNow    .clicked.connect(self.setCureStartNow)
 		self.page.pbCureStopNow     .clicked.connect(self.setCureStopNow)
 
@@ -230,12 +232,31 @@ class func(object):
 
 		if self.step_pcb_exists:
 			self.page.leUserPerformed.setText(self.step_pcb.user_performed)
+			self.page.leLocation.setText(self.step_pcb.location)
 
-			date_performed = self.step_pcb.date_performed
-			if not (date_performed is None):
-				self.page.dPerformed.setDate(QtCore.QDate(*self.step_pcb.date_performed))
+			#date_performed = self.step_pcb.date_performed  #Now redundant
+			#if not (date_performed is None):
+			#	self.page.dPerformed.setDate(QtCore.QDate(*self.step_pcb.date_performed))
+			#else:
+			#	self.page.dPerformed.setDate(QtCore.QDate(*NO_DATE))
+
+			run_start = self.step_pcb.run_start
+			run_stop  = self.step_pcb.run_stop
+			if run_start is None:
+				self.page.dtRunStart.setDate(QtCore.QDate(*NO_DATE))
+				self.page.dtRunStart.setTime(QtCore.QTime(0,0,0))
 			else:
-				self.page.dPerformed.setDate(QtCore.QDate(*NO_DATE))
+				localtime = list(time.localtime(run_start))
+				self.page.dtRunStart.setDate(QtCore.QDate(*localtime[0:3]))
+				self.page.dtRunStart.setTime(QtCore.QTime(*localtime[3:6]))
+			if run_stop is None:
+				self.page.dtRunStop.setDate(QtCore.QDate(*NO_DATE))
+				self.page.dtRunStop.setTime(QtCore.QTime(0,0,0))
+			else:
+				localtime = list(time.localtime(run_stop))
+				self.page.dtRunStop.setDate(QtCore.QDate(*localtime[0:3]))
+				self.page.dtRunStop.setTime(QtCore.QTime(*localtime[3:6]))
+
 
 			cure_start = self.step_pcb.cure_start
 			cure_stop  = self.step_pcb.cure_stop
@@ -293,7 +314,8 @@ class func(object):
 
 		else:
 			self.page.leUserPerformed.setText("")
-			self.page.dPerformed.setDate(QtCore.QDate(*NO_DATE))
+			self.page.leLocation.setText("")
+			#self.page.dPerformed.setDate(QtCore.QDate(*NO_DATE))
 			self.page.dtCureStart.setDate(QtCore.QDate(*NO_DATE))
 			self.page.dtCureStart.setTime(QtCore.QTime(0,0,0))
 			self.page.dtCureStop.setDate(QtCore.QDate(*NO_DATE))
@@ -336,12 +358,15 @@ class func(object):
 		self.setMainSwitchingEnabled(mode_view)
 		self.page.sbID.setEnabled(mode_view)
 
-		self.page.pbDatePerformedNow.setEnabled(mode_creating or mode_editing)
+		#self.page.pbDatePerformedNow.setEnabled(mode_creating or mode_editing)
+		self.page.pbRunStartNow     .setEnabled(mode_creating or mode_editing)
+		self.page.pbRunStopNow      .setEnabled(mode_creating or mode_editing)
 		self.page.pbCureStartNow    .setEnabled(mode_creating or mode_editing)
 		self.page.pbCureStopNow     .setEnabled(mode_creating or mode_editing)
 
 		self.page.leUserPerformed  .setReadOnly(mode_view)
-		self.page.dPerformed       .setReadOnly(mode_view)
+		self.page.leLocation       .setReadOnly(mode_view)
+		#self.page.dPerformed       .setReadOnly(mode_view)
 		self.page.dtCureStart      .setReadOnly(mode_view)
 		self.page.dtCureStop       .setReadOnly(mode_view)
 		self.page.leCureTemperature.setReadOnly(mode_view)
@@ -488,48 +513,31 @@ class func(object):
 					issues.append(I_BATCH_ARALDITE_EXPIRED)
 
 		#New
-		"""if self.batch_loctite.ID is None:
-			issues.append(I_BATCH_LOCTITE_DNE)
-		else:
-			objects.append(self.batch_loctite)
-			if not (self.batch_loctite.date_expires is None):
-				expires = datetime.date(*self.batch_loctite.date_expires)
-				today = datetime.date(*time.localtime()[:3])
-				if today > expires:
-					issues.append(I_BATCH_LOCTITE_EXPIRED)"""
-
-		# rows
-		#sensor_tools_selected = [_.value() for _ in self.sb_tools     ]
-		#baseplates_selected   = [_.value() for _ in self.sb_baseplates]
 		#sb_tools and _baseplates are gone...but pcbs, protomodules, modules aren't.
+		pcb_tools_selected    = [_.value() for _ in self.sb_tools       ]
 		pcbs_selected         = [_.value() for _ in self.sb_pcbs        ]
 		protomodules_selected = [_.value() for _ in self.sb_protomodules]
 		modules_selected      = [_.value() for _ in self.sb_modules     ]
 
-		#sensor_tool_duplicates = [_ for _ in range(6) if sensor_tools_selected[_] >= 0 and sensor_tools_selected.count(sensor_tools_selected[_])>1]
-		#baseplate_duplicates   = [_ for _ in range(6) if baseplates_selected[_]   >= 0 and baseplates_selected.count(  baseplates_selected[_]  )>1]
+		pcb_tool_duplicates    = [_ for _ in range(6) if pcb_tools_selected[_]    >= 0 and pcb_tools_selected.count(   pcb_tools_selected[_]   )>1]
 		pcb_duplicates         = [_ for _ in range(6) if pcbs_selected[_]         >= 0 and pcbs_selected.count(        pcbs_selected[_]        )>1]
 		protomodule_duplicates = [_ for _ in range(6) if protomodules_selected[_] >= 0 and protomodules_selected.count(protomodules_selected[_])>1]
 		module_duplicates      = [_ for _ in range(6) if modules_selected[_]      >= 0 and modules_selected.count(     modules_selected[_]     )>1]
 
-		#if sensor_tool_duplicates:
-		#	issues.append(I_TOOL_SENSOR_DUPLICATE.format(', '.join([str(_+1) for _ in sensor_tool_duplicates])))
-		#if baseplate_duplicates:
-		#	issues.append(I_BASEPLATE_DUPLICATE.format(', '.join([str(_+1) for _ in baseplate_duplicates])))
-		#if sensor_duplicates:
-		#	issues.append(I_PCB_DUPLICATE.format(', '.join([str(_+1) for _ in pcb_duplicates])))
+		if pcb_tool_duplicates:
+			issues.append(I_TOOL_PCB_DUPLICATE.format(', '.join([str(_+1) for _ in pcb_tool_duplicates])))
 		if pcb_duplicates:
-			issues.append(I_PCB_DUPLICATE.format(', '.join([str(_+1) for _ in pcb_duplicates])))
+			issues.append(I_PCB_DUPLICATE.format(', '.join(     [str(_+1) for _ in pcb_duplicates])))
 		if protomodule_duplicates:
-			issues.append(I_PROTO_DUPLICATE.format(', '.join([str(_+1) for _ in protomodule_duplicates])))
+			issues.append(I_PROTO_DUPLICATE.format(', '.join(   [str(_+1) for _ in protomodule_duplicates])))
 		if module_duplicates:
-			issues.append(I_MODULE_DUPLICATE.format(', '.join([str(_+1) for _ in module_duplicates])))
+			issues.append(I_MODULE_DUPLICATE.format(', '.join(  [str(_+1) for _ in module_duplicates])))
 
 		rows_empty           = []
 		rows_full            = []
 		rows_incomplete      = []
-		#rows_baseplate_dne   = []
-		#rows_tool_sensor_dne = []
+
+		rows_tool_dne        = []
 		rows_pcb_dne         = []
 		rows_protomodule_dne = []
 		rows_module_dne      = []
@@ -539,11 +547,11 @@ class func(object):
 		for i in range(6):
 			num_parts = 0
 
-			#if sensor_tools_selected[i] >= 0:
-			#	num_parts += 1
-			#	objects.append(self.tools_sensor[i])
-			#	if self.tools_sensor[i].ID is None:
-			#		rows_tool_sensor_dne.append(i)
+			if pcb_tools_selected[i] >= 0:
+				num_parts += 1
+				objects.append(self.tools_pcb[i])
+				if self.tools_pcb[i].ID is None:
+					rows_tool_dne.append(i)
 
 			"""if baseplates_selected[i] >= 0:
 				num_parts += 1
@@ -581,7 +589,7 @@ class func(object):
 
 			if num_parts == 0:
 				rows_empty.append(i)
-			elif num_parts == 3: #2:
+			elif num_parts == 4: #2:
 				rows_full.append(i)
 			else:
 				rows_incomplete.append(i)
@@ -663,11 +671,23 @@ class func(object):
 	@enforce_mode(['editing','creating'])
 	def saveEditing(self,*args,**kwargs):
 		self.step_pcb.user_performed = str( self.page.leUserPerformed.text() )
+		self.step_pcb.location = str( self.page.leLocation.text() )
 
-		if self.page.dPerformed.date().year() == NO_DATE[0]:
-			self.step_pcb.date_performed = None
+		#if self.page.dPerformed.date().year() == NO_DATE[0]:
+		#	self.step_pcb.date_performed = None
+		#else:
+		#	self.step_pcb.date_performed = [*self.page.dPerformed.date().getDate()]
+
+		if self.page.dtRunStart.date().year() == NO_DATE[0]:
+			self.step_pcb.run_start = None
 		else:
-			self.step_pcb.date_performed = [*self.page.dPerformed.date().getDate()]
+			self.step_pcb.run_start = self.page.dtRunStart.dateTime().toTime_t()
+
+		if self.page.dtRunStop.date().year() == NO_DATE[0]:
+			self.step_pcb.run_stop = None
+		else:
+			self.step_pcb.run_stop  = self.page.dtRunStop.dateTime().toTime_t()
+
 
 		if self.page.dtCureStart.date().year() == NO_DATE[0]:
 			self.step_pcb.cure_start = None
@@ -741,8 +761,18 @@ class func(object):
 		print(tray_assembly)
 		self.setUIPage('tooling',tray_assembly=tray_assembly)
 	
-	def setDatePerformedNow(self, *args, **kwargs):
-		self.page.dPerformed.setDate(QtCore.QDate(*time.localtime()[:3]))
+	#def setDatePerformedNow(self, *args, **kwargs):
+	#	self.page.dPerformed.setDate(QtCore.QDate(*time.localtime()[:3]))
+
+	def setRunStartNow(self, *args, **kwargs):
+		localtime = time.localtime()
+		self.page.dtRunStart.setDate(QtCore.QDate(*localtime[0:3]))
+		self.page.dtRunStart.setTime(QtCore.QTime(*localtime[3:6]))
+
+	def setRunStopNow(self, *args, **kwargs):
+		localtime = time.localtime()
+		self.page.dtRunStop.setDate(QtCore.QDate(*localtime[0:3]))
+		self.page.dtRunStop.setTime(QtCore.QTime(*localtime[3:6]))
 
 	def setCureStartNow(self, *args, **kwargs):
 		localtime = time.localtime()

@@ -180,13 +180,14 @@ class func(object):
 		self.setMainSwitchingEnabled(mode_view)
 		self.page.sbID.setEnabled(mode_view)
 
-		self.page.pbNew.setEnabled(     mode_view and not sensor_exists )
-		self.page.pbEdit.setEnabled(    mode_view and     sensor_exists )
+		self.page.pbNew.setEnabled(     mode_view and not protomodule_exists )
+		self.page.pbEdit.setEnabled(    mode_view and     protomodule_exists )
 		self.page.pbSave.setEnabled(    mode_editing or mode_creating )
 		self.page.pbCancel.setEnabled(  mode_editing or mode_creating )
 
 		self.page.pbGoShipment.setEnabled(mode_view and shipments_exist)
 
+		self.page.leLocation.setReadOnly(  not (mode_creating or mode_editing) )
 		self.page.cbSize.setEnabled(            mode_creating or mode_editing  )
 		self.page.cbShape.setEnabled(           mode_creating or mode_editing  )
 		self.page.cbChirality.setEnabled(       mode_creating or mode_editing  )
@@ -238,6 +239,7 @@ class func(object):
 	@enforce_mode(['editing','creating'])
 	def saveEditing(self,*args,**kwargs):
 
+		self.protomodule.location     = str(self.page.leLocation.text()        ) if str(self.page.leLocation.text()        ) else None
 		self.protomodule.size         = str(self.page.cbSize.currentText()     ) if str(self.page.cbSize.currentText()     ) else None
 		self.protomodule.shape        = str(self.page.cbShape.currentText()    ) if str(self.page.cbShape.currentText()    ) else None
 		self.protomodule.chirality    = str(self.page.cbChirality.currentText()) if str(self.page.cbChirality.currentText()) else None

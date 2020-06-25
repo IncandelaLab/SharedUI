@@ -167,7 +167,9 @@ class func(object):
 		self.page.pbGoTrayAssembly.clicked.connect(  self.goTrayAssembly  )
 		self.page.pbGoTrayComponent.clicked.connect( self.goTrayComponent )
 
-		self.page.pbDatePerformedNow.clicked.connect( self.setDatePerformedNow )
+		#self.page.pbDatePerformedNow.clicked.connect( self.setDatePerformedNow )
+		self.page.pbRunStartNow.clicked.connect(      self.setRunStartNow      )
+		self.page.pbRunStopNow.clicked.connect(       self.setRunStopNow       )
 		self.page.pbCureStartNow.clicked.connect(     self.setCureStartNow     )
 		self.page.pbCureStopNow.clicked.connect(      self.setCureStopNow      )
 
@@ -185,12 +187,32 @@ class func(object):
 
 		if self.step_kapton_exists:
 			self.page.leUserPerformed.setText(self.step_kapton.user_performed)
+			self.page.leLocation.setText(self.step_kapton.location)
 
-			date_performed = self.step_kapton.date_performed
-			if not (date_performed is None):
-				self.page.dPerformed.setDate(QtCore.QDate(*self.step_kapton.date_performed))
+			#date_performed = self.step_kapton.date_performed
+			#if not (date_performed is None):
+			#	self.page.dPerformed.setDate(QtCore.QDate(*self.step_kapton.date_performed))
+			#else:
+			#	self.page.dPerformed.setDate(QtCore.QDate(*NO_DATE))
+
+			run_start = self.step_kapton.run_start
+			run_stop  = self.step_kapton.run_stop
+			if run_start is None:
+				self.page.dtRunStart.setDate(QtCore.QDate(*NO_DATE))
+				self.page.dtRunStart.setTime(QtCore.QTime(0,0,0))
 			else:
-				self.page.dPerformed.setDate(QtCore.QDate(*NO_DATE))
+				localtime = list(time.localtime(run_start))
+				self.page.dtRunStart.setDate(QtCore.QDate(*localtime[0:3]))
+				self.page.dtRunStart.setTime(QtCore.QTime(*localtime[3:6]))
+
+			if cure_stop is None:
+				self.page.dtRunStop.setDate(QtCore.QDate(*NO_DATE))
+				self.page.dtRunStop.setTime(QtCore.QTime(0,0,0))
+			else:
+				localtime = list(time.localtime(run_stop))
+				self.page.dtRunStop.setDate(QtCore.QDate(*localtime[0:3]))
+				self.page.dtRunStop.setTime(QtCore.QTime(*localtime[3:6]))
+
 
 			cure_start = self.step_kapton.cure_start
 			cure_stop  = self.step_kapton.cure_stop
@@ -241,7 +263,12 @@ class func(object):
 
 		else:
 			self.page.leUserPerformed.setText("")
-			self.page.dPerformed.setDate(QtCore.QDate(*NO_DATE))
+			self.page.leLocation.setText("")
+			#self.page.dPerformed.setDate(QtCore.QDate(*NO_DATE))
+			self.page.dtRunStart.setDate(QtCore.QDate(*NO_DATE))
+			self.page.dtRunStart.setTime(QtCore.QTime(0,0,0))
+			self.page.dtRunStop.setDate(QtCore.QDate(*NO_DATE))
+			self.page.dtRunStop.setTime(QtCore.QTime(0,0,0))
 			self.page.dtCureStart.setDate(QtCore.QDate(*NO_DATE))
 			self.page.dtCureStart.setTime(QtCore.QTime(0,0,0))
 			self.page.dtCureStop.setDate(QtCore.QDate(*NO_DATE))
@@ -279,12 +306,17 @@ class func(object):
 		self.setMainSwitchingEnabled(mode_view)
 		self.page.sbID.setEnabled(mode_view)
 
-		self.page.pbDatePerformedNow.setEnabled(mode_creating or mode_editing)
+		#self.page.pbDatePerformedNow.setEnabled(mode_creating or mode_editing)
+		self.page.pbRunStartNow     .setEnabled(mode_creating or mode_editing)
+		self.page.pbRunStopNow      .setEnabled(mode_creating or mode_editing)
 		self.page.pbCureStartNow    .setEnabled(mode_creating or mode_editing)
 		self.page.pbCureStopNow     .setEnabled(mode_creating or mode_editing)
 
 		self.page.leUserPerformed  .setReadOnly(mode_view)
-		self.page.dPerformed       .setReadOnly(mode_view)
+		self.page.leLocation       .setReadOnly(mode_view)
+		#self.page.dPerformed       .setReadOnly(mode_view)
+		self.page.dtRunStart       .setReadOnly(mode_view)
+		self.page.dtRunStop        .setReadOnly(mode_view)
 		self.page.dtCureStart      .setReadOnly(mode_view)
 		self.page.dtCureStop       .setReadOnly(mode_view)
 		self.page.leCureTemperature.setReadOnly(mode_view)
@@ -552,11 +584,23 @@ class func(object):
 	def saveEditing(self,*args,**kwargs):
 
 		self.step_kapton.user_performed = str( self.page.leUserPerformed.text() )
+		self.step_kapton.user_performed = str( self.page.leLocation.text() )
 
-		if self.page.dPerformed.date().year() == NO_DATE[0]:
-			self.step_kapton.date_performed = None
+		#if self.page.dPerformed.date().year() == NO_DATE[0]:
+		#	self.step_kapton.date_performed = None
+		#else:
+		#	self.step_kapton.date_performed = [*self.page.dPerformed.date().getDate()]
+
+		if self.page.dtRunStart.date().year() == NO_DATE[0]:
+			self.step_kapton.run_start = None
 		else:
-			self.step_kapton.date_performed = [*self.page.dPerformed.date().getDate()]
+			self.step_kapton.run_start = self.page.dtRunStart.dateTime().toTime_t()
+
+		if self.page.dtRunStop.date().year() == NO_DATE[0]:
+			self.step_kapton.run_stop = None
+		else:
+			self.step_kapton.run_stop  = self.page.dtRunStop.dateTime().toTime_t()
+
 
 		if self.page.dtCureStart.date().year() == NO_DATE[0]:
 			self.step_kapton.cure_start = None
@@ -616,8 +660,18 @@ class func(object):
 		tray_assembly = self.page.sbTrayAssembly.value()
 		self.setUIPage('tooling',tray_assembly=tray_assembly)
 
-	def setDatePerformedNow(self, *args, **kwargs):
-		self.page.dPerformed.setDate(QtCore.QDate(*time.localtime()[:3]))
+	#def setDatePerformedNow(self, *args, **kwargs):
+	#	self.page.dPerformed.setDate(QtCore.QDate(*time.localtime()[:3]))
+
+	def setRunStartNow(self, *args, **kwargs):
+		localtime = time.localtime()
+		self.page.dtRunStart.setDate(QtCore.QDate(*localtime[0:3]))
+		self.page.dtRunStart.setTime(QtCore.QTime(*localtime[3:6]))
+
+	def setRunStopNow(self, *args, **kwargs):
+		localtime = time.localtime()
+		self.page.dtRunStop.setDate(QtCore.QDate(*localtime[0:3]))
+		self.page.dtRunStop.setTime(QtCore.QTime(*localtime[3:6]))
 
 	def setCureStartNow(self, *args, **kwargs):
 		localtime = time.localtime()

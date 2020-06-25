@@ -215,7 +215,7 @@ class func(object):
 				partTemp = fm.module()
 				partExists = partTemp.load(partID)
 			if not partExists:
-				dneObjects.append(partID)
+				dneObjects.append(partType + " " + str(partID))
 
 			#Next, check for duplicate items.  Remove these quietly.
 			firstOccurrence = True  #Do NOT remove the first occurence of an item--it's the original!

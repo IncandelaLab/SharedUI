@@ -7,6 +7,7 @@ class simple_fsobj_vc(object):
 		fsobj,
 		sbID,
 		dsbSize,
+		leLocation,  #New
 		pbEditNew,
 		pbSave,
 		pbCancel,
@@ -20,6 +21,7 @@ class simple_fsobj_vc(object):
 		self.fsobj           = fsobj
 		self.sbID            = sbID
 		self.dsbSize         = dsbSize
+		self.leLocation      = leLocation
 		self.pbEditNew       = pbEditNew
 		self.pbSave          = pbSave
 		self.pbCancel        = pbCancel
@@ -42,6 +44,11 @@ class simple_fsobj_vc(object):
 				self.dsbSize.clear()
 			else:
 				self.dsbSize.setValue(self.fsobj.size)
+			if self.fsobj.location is None:
+				self.leLocation.setText("")
+			else:
+				self.leLocation.setText(self.fsobj.location)
+
 			self.listComments.clear()
 			for comment in self.fsobj.comments:
 				self.listComments.addItem(comment)
@@ -50,6 +57,7 @@ class simple_fsobj_vc(object):
 		else:
 			self.pbEditNew.setText("new")
 			self.dsbSize.setValue(0)
+			self.leLocation.setText("")
 			self.dsbSize.clear()
 			self.listComments.clear()
 			self.pteWriteComment.clear()
@@ -70,7 +78,8 @@ class simple_fsobj_vc(object):
 		if size == 0.0:
 			size = None
 		self.fsobj.size = size
-		self.fsobj.save()
+		self.fsobj.location = self.leLocation.text()  # New
+		self.fsobj.save_tooling()
 		self.update_info()
 
 	def add_comment(self,*args,**kwargs):
@@ -96,6 +105,7 @@ class func(object):
 			self.fm.tool_sensor(),
 			self.page.sbSensorToolID,
 			self.page.dsbSensorToolSize,
+			self.page.leSensorToolLocation,
 			self.page.pbSensorToolEditNew,
 			self.page.pbSensorToolSave,
 			self.page.pbSensorToolCancel,
@@ -109,6 +119,7 @@ class func(object):
 			self.fm.tool_pcb(),
 			self.page.sbPcbToolID,
 			self.page.dsbPcbToolSize,
+			self.page.lePcbToolLocation,
 			self.page.pbPcbToolEditNew,
 			self.page.pbPcbToolSave,
 			self.page.pbPcbToolCancel,
@@ -122,6 +133,7 @@ class func(object):
 			self.fm.tray_component_sensor(),
 			self.page.sbSensorTrayID,
 			self.page.dsbSensorTraySize,
+			self.page.leSensorTrayLocation,
 			self.page.pbSensorTrayEditNew,
 			self.page.pbSensorTraySave,
 			self.page.pbSensorTrayCancel,
@@ -135,6 +147,7 @@ class func(object):
 			self.fm.tray_component_pcb(),
 			self.page.sbPcbTrayID,
 			self.page.dsbPcbTraySize,
+			self.page.lePcbTrayLocation,
 			self.page.pbPcbTrayEditNew,
 			self.page.pbPcbTraySave,
 			self.page.pbPcbTrayCancel,
@@ -148,6 +161,7 @@ class func(object):
 			self.fm.tray_assembly(),
 			self.page.sbAssemblyTrayID,
 			self.page.dsbAssemblyTraySize,
+			self.page.leAssemblyTrayLocation,
 			self.page.pbAssemblyTrayEditNew,
 			self.page.pbAssemblyTraySave,
 			self.page.pbAssemblyTrayCancel,
@@ -311,6 +325,12 @@ class func(object):
 		self.page.dsbSensorTraySize  .setEnabled(mode_editing_sensor_tray  )
 		self.page.dsbPcbTraySize     .setEnabled(mode_editing_pcb_tray     )
 		self.page.dsbAssemblyTraySize.setEnabled(mode_editing_assembly_tray)
+
+		self.page.leSensorToolLocation  .setEnabled(mode_editing_sensor_tool  )  # New
+		self.page.lePcbToolLocation     .setEnabled(mode_editing_pcb_tool     )
+		self.page.leSensorTrayLocation  .setEnabled(mode_editing_sensor_tray  )
+		self.page.lePcbTrayLocation     .setEnabled(mode_editing_pcb_tray     )
+		self.page.leAssemblyTrayLocation.setEnabled(mode_editing_assembly_tray)
 
 		self.page.pbSensorToolDeleteComment  .setEnabled(mode_editing_sensor_tool  )
 		self.page.pbPcbToolDeleteComment     .setEnabled(mode_editing_pcb_tool     )

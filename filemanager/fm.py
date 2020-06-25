@@ -97,6 +97,20 @@ class fsobj(object):
 		filename = self.FILENAME.format(ID=ID)
 		return filedir, filename
 
+	# NEW--used only for tooling parts.
+	# Will produce an error if used for other objects.
+	def get_filedir_filename_tooling(self, ID = None, location = None):
+		if self.location is None:
+			print("ERROR:  Object needs a location before it can be saved!")
+			return None, None
+		if ID is None:
+			ID = self.ID
+		if location is None:
+			location = self.location
+		filedir  = os.sep.join([ DATADIR, self.FILEDIR.format(ID=ID, century = CENTURY.format(ID//100)) ])
+		filename = self.FILENAME.format(ID=ID, location=location)
+		return filedir, filename
+
 
 	def save(self, objname = 'fsobj'):  #NOTE:  objname param is new
 		filedir, filename = self.get_filedir_filename(self.ID)
@@ -178,6 +192,22 @@ class fsobj(object):
 		# - Restore all lists PLUS dates
 		"""
 
+	# NEW:
+	def save_tooling(self):
+		#NOTE:  Tools require special treatment.
+		#       IDs are NOT unique.  ID+location is unique.  Need to use this instead to name the file.
+		filedir, filename = self.get_filedir_filename_tooling(self.ID, self.location)
+		file = os.sep.join([filedir, filename])
+		if not os.path.exists(filedir):
+			os.makedirs(filedir)
+
+		with open(file, 'w') as opfl:
+			if hasattr(self, 'PROPERTIES_DO_NOT_SAVE'):
+				contents = vars(self)
+				filtered_contents = {_:contents[_] for _ in contents.keys() if _ not in self.PROPERTIES_DO_NOT_SAVE}
+				json.dump(filtered_contents, opfl, indent=4)
+			else:
+				json.dump(vars(self), opfl, indent=4)
 
 
 	def load(self, ID, on_property_missing = "warn"):
@@ -251,6 +281,84 @@ class fsobj(object):
 		return True
 
 
+	# NEW:  Again, tools must be saved and loaded differently.
+	
+	def load_tooling(self, ID, location, on_property_missing = "warn"):
+		# NOTE:  May have to be redone for XML.
+
+		if ID == -1:
+			self.clear()
+			return False
+		if location == None:
+			self.clear()
+			return False
+
+		# Main difference is here:
+		filedir, filename = self.get_filedir_filename(ID, location)
+		file = os.sep.join([filedir, filename])
+
+		if not os.path.exists(file):
+			self.clear()
+			return False
+
+		with open(file, 'r') as opfl:
+			data = json.load(opfl)
+
+		# TEMP
+		print(data)
+
+		if not (data['ID'] == ID):
+			err = "ID in data file ({}) does not match ID of filename ({})".format(data['ID'],ID)
+			raise ValueError(err)
+
+		self.ID = ID
+
+		data_keys = data.keys()
+		PROPERTIES = self.PROPERTIES + self.PROPERTIES_COMMON
+		DEFAULTS = {**self.DEFAULTS_COMMON, **getattr(self, 'DEFAULTS', {})}
+
+		props_in_data = [prop in data_keys for prop in PROPERTIES]
+		if hasattr(self, "PROPERTIES_DO_NOT_SAVE"):
+			props_in_pdns = [prop in self.PROPERTIES_DO_NOT_SAVE for prop in PROPERTIES]
+		else:
+			props_in_pdns = [False for prop in PROPERTIES]
+
+		for i,prop in enumerate(PROPERTIES):
+			prop_in_data = props_in_data[i]
+			prop_in_pdns = props_in_pdns[i]
+
+			if prop_in_data:
+
+				if prop_in_pdns:
+					err = "object {} with ID {} data file {} has property {}, which is in PROPERTIES_DO_NOT_SAVE".format(type(self).__name__, ID, file, prop)
+					raise ValueError(err)
+
+				else:
+					setattr(self, prop, data[prop])
+
+			else:
+				prop_default = DEFAULTS[prop] if prop in DEFAULTS.keys() else None
+
+				if prop_in_pdns:
+					setattr(self, prop, prop_default)
+
+				else:
+					if on_property_missing == "warn":
+						print("Warning: object {} with ID {} missing property {}. Setting to {}.".format(type(self).__name__, ID, prop, prop_default))
+						setattr(self, prop, prop_default)
+					elif on_property_missing == "error":
+						err = "object {} with ID {} missing property {}".format(type(self).__name__, ID, prop)
+						raise ValueError(err)
+					elif on_property_missing == "no_warn":
+						setattr(self, prop, prop_default)
+					else:
+						err = "object {} with ID {} missing property {}. on_property_missing is {}; should be 'warn', 'error', or 'no_warn'".format(type(self).__name__, ID, prop, on_property_missing)
+						raise ValueError(err)
+
+		return True
+
+
+
 	def new(self, ID):
 		self.ID = ID
 		PROPERTIES = self.PROPERTIES + self.PROPERTIES_COMMON
@@ -280,17 +388,23 @@ class tool_sensor(fsobj):
 	OBJECTNAME = "sensor tool"
 	FILEDIR = os.sep.join(['tooling','tool_sensor'])
 	FILENAME = 'tool_sensor_{ID:0>5}.json'
+	#FILENAME = 'tool_sensor_{location}_{ID:0>5}.json'
 	PROPERTIES = [
 		'size',
+		'location',  #NEW, required for unique identifier
 	]
+
+	# NOTE:  This and below objects must be saved with save_tooling(), not save().
 
 
 class tool_pcb(fsobj):
 	OBJECTNAME = "PCB tool"
 	FILEDIR = os.sep.join(['tooling','tool_pcb'])
 	FILENAME = 'tool_pcb_{ID:0>5}.json'
+	#FILENAME = 'tool_pcb_{location}_{ID:0>5}.json'
 	PROPERTIES = [
 		'size',
+		'location',
 	]
 
 
@@ -298,8 +412,10 @@ class tray_assembly(fsobj):
 	OBJECTNAME = "assembly tray"
 	FILEDIR = os.sep.join(['tooling','tray_assembly'])
 	FILENAME = 'tray_assembly_{ID:0>5}.json'
+	#FILENAME = 'tray_assembly_{location}_{ID:0>5}.json'
 	PROPERTIES = [
 		'size',
+		'location',
 	]
 
 
@@ -307,8 +423,10 @@ class tray_component_sensor(fsobj):
 	OBJECTNAME = "sensor tray"
 	FILEDIR = os.sep.join(['tooling','tray_component_sensor'])
 	FILENAME = 'tray_component_sensor_{ID:0>5}.json'
+	#FILENAME = 'tray_component_sensor_{location}_{ID:0>5}.json'
 	PROPERTIES = [
 		'size',
+		'location',
 	]
 
 
@@ -316,20 +434,12 @@ class tray_component_pcb(fsobj):
 	OBJECTNAME = "pcb tray"
 	FILEDIR = os.sep.join(['tooling','tray_component_pcb'])
 	FILENAME = 'tray_component_pcb_{ID:0>5}.json'
+	#FILENAME = 'tray_component_pcb_{location}_{ID:0>5}.json'
 	PROPERTIES = [
 		'size',
+		'location',
 	]
 
-
-#NEW:  Doesn't really fit in any section...
-#WARNING:  May want to just add a new PCB property for the semiconductor type??
-"""class type(fsobj):
-	OBJECTNAME = "semiconductor type"
-	FILEDIR = os.sep.join(['tooling','semicon_type'])
-	FILENAME = ''
-	PROPERTIES = [  #unnecessary?
-		'size',
-	]"""
 
 
 ###############################################
@@ -537,7 +647,7 @@ class baseplate(fsobj):
 			return True, "already part associated with this kapton step"
 
 		if not (self.step_sensor is None):
-			return False, "already part of a protomodule"
+			return False, "already part of a protomodule (has a sensor step)"
 
 		if self.num_kaptons is None:
 			#This is presumably acceptable...
@@ -696,6 +806,7 @@ class baseplate(fsobj):
 		part.append(location)
 		location.text = self.location
 
+		# **** THIS WILL PROBABLY HAVE TO BE REDONE ****
 		contents = vars(self)
 		if hasattr(self, 'PROPERTIES_DO_NOT_SAVE'):  # If a property is in the "DO_NOT_SAVE" list defined above, don't save it in the XML file (this chunk of code removes those vars from consideration)
 			contents = {_:contents[_] for _ in contents.keys() if _ not in self.PROPERTIES_DO_NOT_SAVE}
@@ -725,11 +836,49 @@ class baseplate(fsobj):
 		# Save .xml file:
 		# Store in same directory as .json files, w/ same name:
 		filedir, filename = self.get_filedir_filename(self.ID)
-		#filename = self.FILENAME.format(ID=self.ID)  #Copied from get_filedir_filename()
-		print("Saving file to ", filedir+'/'+filename.replace('.json', '.xml'))
+		filename = filename.replace('.json', '.xml')
+		print("Saving file to ", filedir+'/'+filename)
 		tree.write(open(filedir+'/'+filename.replace('.json', '.xml'), 'wb'))
 		print('Created baseplate XML file')
 
+
+	"""
+	def load(self, ID, on_property_missing = "warn"):
+		#Perform (temporary) json load
+		result = super(baseplate, self).load(ID, on_property_missing)
+		if ID != 0:
+			print("Performed load for baseplate "+str(ID))
+
+			filedir, filename = self.get_filedir_filename(ID)
+			filename = filename.replace('.json', '.xml')
+			#Load XML file
+			tree = etree.parse(filedir+'/'+filename)
+			root = tree.getroot()
+			# For now, just browse through the tree and make sure that all info read out matches the json data.  Testing only.
+			# (Next step is to make sure save() saves *everything* that needs saving, and that the fmt matches the DB...
+			# root's onnly child is PARTS, etc...
+			parts = root[0]
+			part = parts[0]
+			# 'part' contains all elements:  kindOfPart, user, comments, etc...
+			for child in part:
+				if child.tag == "KIND_OF_PART":
+					print("Found part type")
+					if (self.size == 6 and child.text == "HGC Six Inch Plate") or (self.size == 8 and child.attrib == "HGC Eight Inch Plate"):
+						print("All good; size matches")
+					else:  print("PROBLEM, read "+child.text)
+				if child.tag == "RECORD_INSERTION_USER":
+					print("Found insertion user")
+					if child.text == self.insertion_user:  print("All good; username matches")
+					else:  print("PROBLEM, read "+child.text)
+				if child.tag == "SERIAL_NUMBER":
+					print("Found serial number "+child.text)
+				if child.tag == "COMMENT_DESCRIPTION":
+					print("Found comment:")
+					print(child.text)
+			print("Finished load test")
+		
+		return result
+	"""
 
 
 class sensor(fsobj):
@@ -1005,12 +1154,89 @@ class module(fsobj):
 			self.daq_data = [_ for _ in os.listdir(daq_datadir) if os.path.isfile(os.sep.join([daq_datadir,_]))]
 		else:
 			self.daq_data = []
-
+	"""  WIP
 	def load(self, ID):
+		root = Element('ROOT')
+		tree = ElementTree(root)
+		root.set('xmlns:xsi','http://www.w3.org/2001/XMLSchema-instance')
+		header = Element('HEADER')
+		root.append(header)
+		typ = Element('TYPE')
+		header.append(typ)
+		ext = Element('EXTENSION_TABLE_NAME')
+		typ.append(ext)
+		ext.text = 'HGC_PRTO_MOD_ASMBLY'
+		name = Element('NAME')
+		name.text = 'HGC Six Inch Proto Module Assembly'
+		typ.append(name)
+		run = Element('RUN')
+		header.append(run)
+		run_name = Element('RUN_NAME')
+		run_name.text = 'HGC 6inch Proto Module Assembly'
+		run.append(run_name)
+		run_begin = Element('RUN_BEGIN_TIMESTAMP')
+		run_begin.text = 'time'
+		run.append(run_begin)
+		run_end = Element('RUN_END_TIMESTAMP')
+		run_end.text = 'time'
+		run.append(run_end)
+		user = Element('INITIATED_BY_USER')
+		user.text = self.my_name
+		run.append(user)
+		loc = Element('LOCATION')
+		loc.text = self.modules[2]
+		run.append(loc)
+		comment = Element('COMMENT_DESCRIPTION')
+		comment.text = 'Build 6inch proto modules'
+		run.append(comment)
+		dataset = Element('DATA_SET')
+		root.append(dataset)
+		comment2 = Element('COMMENT_DESCRIPTION')
+		dataset.append(comment2)
+		comment2.text = 'Proto-module' + str(self.modules[0]) + 'Assembly'
+		version = Element('VERSION')
+		dataset.append(version)
+		version.text = '1'
+		part = Element('PART')
+		dataset.append(part)
+		kop = Element('KIND_OF_PART')
+		part.append(kop)
+		kop.text = 'HGC Six Inch Silicon Proto Module'
+		SN = Element('SERIAL_NUMBER')
+		part.append(SN)
+		SN.text = 'Proto-module' + str(self.modules[0])
+		data = Element('DATA')
+		dataset.append(data)
+		data_fields = ['ASMBL_TRAY_NAME','PRTO_SER_NUM','PRTO_ASM_COL','PRTO_ASM_ROW','COMP_TRAY_NAME','PCB_SER_NUM','PCB_THKNES_MM',
+						'PCB_CMP_ROW','PCB_CMP_COL','PCB_TOOL_NAME','PCB_TOOL_NAME','PCB_TOOL_HT_SET','PCB_TOOL_HT_CHK','GLUE_TYPE','GLUE_BATCH_NUM']                      
+		data_text = ['UCSB_ASMBLY_TRAY_00','proto-module'+ self.modules[0],'1','1','UCSB_COMP_TRAY_00','pcb'+self.modules[1],
+						'1','1','0.0001','0.0001','0.0002', 'UCSB_PCKUP_TOOL_11','GLUE','Batch1']
+		counter = 0
+		while counter < len(data_fields):
+			elem = Element(data_fields[counter])
+			elem.text = data_text[counter]
+			data.append(elem)
+			counter += 1
+		tree.write(open('module.xml','wb'))
+
+		# Save .json file using the old save() function:
+		super(baseplate, self).save()
+
+		# Save .xml file:
+		# Store in same directory as .json files, w/ same name:
+		filedir, filename = self.get_filedir_filename(self.ID)
+		#filename = self.FILENAME.format(ID=self.ID)  #Copied from get_filedir_filename()
+		print("Saving file to ", filedir+'/'+filename.replace('.json', '.xml'))
+		tree.write(open(filedir+'/'+filename.replace('.json', '.xml'), 'wb'))
+		print('Created baseplate XML file')
+
+
 		success = super(module, self).load(ID)
 		if success:
 			self.fetch_datasets()
 		return success
+	"""
+
 
 	def save(self):
 		super(module, self).save()
@@ -1141,8 +1367,11 @@ class step_kapton(fsobj):
 	FILENAME   = 'kapton_assembly_step_{ID:0>5}.json'
 	PROPERTIES = [
 		'user_performed', # name of user who performed step
-		'date_performed', # date step was performed
-		
+		'location', # institution where step was performed
+		#'date_performed', # date step was performed
+		'run_start',  # unix time @ start of run
+		'run_stop',   # unix time @ end of run
+
 		'cure_start',       # unix time @ start of curing
 		'cure_stop',        # unix time @ end of curing
 		'cure_temperature', # Average temperature during curing (centigrade)
@@ -1169,7 +1398,7 @@ class step_kapton(fsobj):
 		print("Saving step_kapton")
 		super(step_kapton, self).save()
 		inst_baseplate = baseplate()
-		
+
 		for i in range(6):
 			baseplate_exists = False if self.baseplates[i] is None else inst_baseplate.load(self.baseplates[i])
 			if baseplate_exists:
@@ -1217,14 +1446,20 @@ class step_sensor(fsobj):
 	FILENAME   = 'sensor_assembly_step_{ID:0>5}.json'
 	PROPERTIES = [
 		'user_performed', # name of user who performed step
-		'date_performed', # date step was performed
-		
+		#'date_performed', # date step was performed
+		'location', # New--instituition where step was performed
+
+		'run_start',  # New--unix time @ start of run
+		'run_stop',  # New--unix time @ end of run
+
+		# Note:  Semiconductors types are stored in the sensor objects
+
 		'cure_start',       # unix time @ start of curing
 		'cure_stop',        # unix time @ end of curing
 		'cure_temperature', # Average temperature during curing (centigrade)
 		'cure_humidity',    # Average humidity during curing (percent)
 
-		'tools',        # list of pickup tool IDs, ordered by pickup tool location
+		'tools',        # list of pickup (sensor) tool IDs, ordered by pickup tool location
 		'sensors',      # list of sensor      IDs, ordered by component tray position
 		'baseplates',   # list of baseplate   IDs, ordered by assembly tray position
 		'protomodules', # list of protomodule IDs assigned to new protomodules, by assembly tray location
@@ -1243,11 +1478,97 @@ class step_sensor(fsobj):
 		else:
 			return self.cure_stop - self.cure_start
 
+	# WIP
 	def save(self):
+		# Perform ordinary json save
 		super(step_sensor, self).save()
 		inst_baseplate   = baseplate()
 		inst_sensor      = sensor()
 		inst_protomodule = protomodule()
+
+		# Update corresponding baseplates, sensors, etc.
+		# ADDED:  Also save BuildProtoModules, BuldProtoModules_Cond XML files.
+		root = Element('ROOT')
+		root_cond = Element('ROOT')
+		root.set('xmlns:xsi','http://www.w3.org/2001/XMLSchema-instance')
+		# Create headers
+		# New:  Dictionary-based approach.
+		# Grab an arbitrary baseplate to get the size
+		baseplate_ = baseplate()
+		baseplate_.load(self.baseplates[0])
+		type_dict = {
+						'EXTENSION_TABLE_NAME':'HGC_PRTO_MOD_ASMBLY',
+						'NAME':'HGC {} Inch Proto Module Assembly'.format('Six' if baseplate_.size==6 else 'Eight'),
+					}
+		run_dict =  {
+						'RUN_TYPE':'HGC {}inch Proto Module Assembly'.format(baseplate_.size),
+						'RUN_NUMBER':self.ID,
+						'RUN_BEGIN_TIMESTAMP':self.run_start,  #WIP (add to GUI)
+						'RUN_END_TIMESTAMP':self.run_stop,  #WIP
+						'INITIATED_BY_USER':self.user_performed,
+						'LOCATION':self.location,  #WIP (add to GUI)
+						'COMMENT_DESCRIPTION':'Build {}inch proto modules'.format(baseplate_.size),
+					}
+		header_dict = {
+						'TYPE':type_dict,
+						'RUN':run_dict,
+					  }
+		header = Element('HEADER')
+		for key, value_dict in header_dict.items():
+			elem = Element(key)
+			for key_, value_ in value_dict.items():
+				elem_ = Element(key_)
+				elem_.text = value_
+				elem.append(elem_)
+			header.append(elem)
+		root.append(header)
+
+		# COND file:
+		root_cond = Element('ROOT')
+		root_cond.set('xmlns:xsi','http://www.w3.org/2001/XMLSchema-instance')
+		type_dict_cond = {
+						'EXTENSION_TABLE_NAME':'HGC_PRTO_MOD_ASMBLY_COND',
+						'NAME':'HGC {} Inch Proto Module Curing Cond'.format('Six' if baseplate_.size==6 else 'Eight'),
+					}
+		run_dict_cond =  {
+						'RUN_NAME':'HGC {}inch Proto Module Assembly'.format(baseplate_.size),
+						#'RUN_NUMBER':self.ID,
+						'RUN_BEGIN_TIMESTAMP':self.run_start,  #WIP (add to GUI)
+						'RUN_END_TIMESTAMP':self.run_stop,  #WIP
+						'INITIATED_BY_USER':self.user_performed,
+						'LOCATION':self.location,  #WIP (add to GUI)
+						'COMMENT_DESCRIPTION':'Build {}inch proto modules'.format(self.size),
+					}
+		header_dict_cond = {
+						'TYPE':type_dict,
+						'RUN':run_dict,
+					  }
+		header_cond = Element('HEADER')
+		for key, value_dict in header_dict_cond.items():
+			elem = Element(key)
+			for key_, value_ in value_dict.items():
+				elem_ = Element(key_)
+				elem_.text = value_
+				elem.append(elem_)
+			header_condroot_cond.set('xmlns:xsi','http://www.w3.org/2001/XMLSchema-instance').append(elem)
+		root_cond.append(header)
+
+		
+
+		# BODY OF FILE:
+
+		data_set = Element('DATA_SET')
+		data_set_cond = Element('DATA_SET')
+		# Load tray info for later use
+		asmbl_tray = tray_assembly()
+		comp_tray  = tray_component_sensor()
+		glue_batch = batch_araldite()
+		#slvr_epxy  = batch_loctite()
+		asmbl_tray.load(self.tray_assembly)
+		comp_tray.load(self.tray_component_sensor)
+		glue_batch.load(self.batch_araldite)
+		#slvr_epxy.load(self.batch_loctite)
+
 
 		for i in range(6):
 
@@ -1259,6 +1580,7 @@ class step_sensor(fsobj):
 				inst_baseplate.step_sensor = self.ID
 				inst_baseplate.protomodule = self.protomodules[i]
 				inst_baseplate.save()
+
 			else:
 				if not (self.baseplates[i] is None):
 					print("cannot write property to baseplate {}: does not exist".format(self.baseplates[i]))
@@ -1289,7 +1611,99 @@ class step_sensor(fsobj):
 				if not all([baseplate_exists,sensor_exists]):
 					print("WARNING: trying to save step_sensor {}. Some parts do not exist. Could not create all associations.")
 					print("baseplate:{} sensor:{}".format(inst_baseplate.ID,inst_sensor.ID))
-			
+				else:
+					# ** NOTE/NEW: ** Create DATA_SET section of XML file.
+					# Code is streamlined slightly:  Use a dictionary for every element w/ sub-elements.  Key:value is 'VAR_NAME':value...
+					# ...unless value = multiple entries, in which case value = a dict.
+					# Convert 1->1,1; 2->1,2; 3->2,1; etc.
+					snsr_tool = tool_sensor()
+					snsr_tool.load(tools[i])
+					data_dict = {
+								# WIP:
+								'ASMBL_TRAY_NAME':'{}_ASMBLY_TRAY_{}'.format(asmbl_tray.location, asmbl_tray.ID),
+								# Reminder:  PLT==baseplate
+								'PLT_SER_NUM':'NCU {}'.format(inst_baseplate.ID),
+								'PLT_ASM_ROW':(i // 3) + 1, 'PLT_ASM_COL':(i % 2) + 1,
+								# NOTE:  Make sure .flatness() works
+								'PLT_FLTNES_MM':inst_baseplate.flatness(), 'PLT_THKNES_MM':inst_baseplate.thickness,
+								# ADD location to:
+								'COMP_TRAY_NAME':'{}_COMP_TRAY_{}'.format(comp_tray.location, comp_tray.ID),
+								'SNSR_SER_NUM':'NCU {}'.format(self.sensors[i].ID),
+								'SNSR_CMP_ROW':part_row, 'SNSR_CMP_COL':part_col,   #Should == PLT_ASM_ROW, etc above
+								"""
+								# NOTE:  I assume these are measured during the placement step, not taken from view_sensor.ui.  Need to check.
+								'SNSR_X_OFFST':, 'SNSR_Y_OFFSET':, 'SNSR_ANG_OFFSET':,
+								'SNSR_TOOL_NAME':'{}_PCKUP_TOOL_{}'.format(snsr_tool.location, snsr_tool.ID),
+								# NOTE:  I don't know what these are, TEMPORARILY commented
+								'SNSR_TOOL_HT_SET':, 'SNSR_TOOL_HT_CHK':,
+								"""
+								# Need to test QDate.year--should work if type(date_received)==QDate
+								'GLUE_TYPE':'Araldite {}'.format(glue_batch.date_received.year()), 'GLUE_BATCH_NUM':self.batch_araldite.ID,
+								'SLVR_EPXY_TYPE':'Loctite Ablestik', 'SLVR_EXPY_BATCH_NUM':self.batch_loctite.ID,
+								}
+					part_dict = {
+								'KIND_OF_PART':'HGC {} Inch Silicon Proto Module'.format('Six' if self.baseplates[i].size==6 else 'Eight'),
+								'SERIAL_NUMBER':'{}_HGC_TST_PRTMOD_{}'.format(self.location, self.ID),
+								}
+					dataset_dict = {
+								'COMMENT_DESCRIPTION':'{}_HGC_TST_PRTMOD_{} Assembly'.format(self.location, self.ID),
+								'VERSION':1,  # Assumed
+								'PART':part_dict,
+								'DATA':data_dict,
+								}
+
+					for key, value in dataset_dict.items():
+						element = Element(key)
+						if type(value) == dict:
+							for key_, value_ in value.items():
+								element_ = Element(key_)
+								element_.text = value_
+								element.append(element_)
+						else:
+							element.text = value
+						data_set.append(element)
+
+
+					root.append(data_set)
+
+					# COND file:
+					"""
+					data_dict_cond = {
+								# WIP:
+								'CURING_TIME_HRS':,
+								# NOTE:  Need to check the time/date format
+								'TIME_START':self.cure_start,
+								'TIME_END':self.cure_stop,
+								'TEMP_DEGC':self.cure_temperature,
+								'HUMIDITY_PRCNT':self.cure_humidity,
+								}
+					part_dict_cond = {
+								'KIND_OF_PART':'HGC {} Inch Silicon Proto Module'.format('Six' if self.baseplates[i].size==6 else 'Eight'),
+								'SERIAL_NUMBER':'{}_HGC_TST_PRTMOD_{}'.format(self.location, self.ID),
+								}
+					dataset_dict_cond = {
+								'COMMENT_DESCRIPTION':'Proto Module PRTMOD_{:0<3} Assembly'.format(self.ID),
+								'VERSION':1,  # Assumed
+								'PART':part_dict_cond,
+								'DATA':data_dict_cond,
+								}
+
+					for key, value in dataset_dict_cond.items():
+						element = Element(key)
+						if type(value) == dict:
+							for key_, value_ in value.items():
+								element_ = Element(key_)
+								element_.text = value_
+								element.append(element_)
+						else:
+							element.text = value
+						data_set_cond.append(element)
+
+					root_cond.append(data_set_cond)
+					"""
+
+		#WRITE FILES
+
 			inst_baseplate.clear()
 			inst_sensor.clear()
 			inst_protomodule.clear()
@@ -1303,7 +1717,11 @@ class step_pcb(fsobj):
 	FILENAME = 'pcb_assembly_step_{ID:0>5}.json'
 	PROPERTIES = [
 		'user_performed', # name of user who performed step
-		'date_performed', # date step was performed
+		#'date_performed', # date step was performed
+		'location', #Institution where step was performed
+		
+		'run_start',  # unix time @ start of run
+		'run_stop',   # unix time @ start of run
 		
 		'cure_start',       # unix time @ start of curing
 		'cure_stop',        # unix time @ end of curing
