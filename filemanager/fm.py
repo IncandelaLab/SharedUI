@@ -772,9 +772,18 @@ class baseplate(fsobj):
 		"""
 		return True, ""
 
-
+"""
 	def save(self):  #NEW for XML generation
 		
+		# FIRST:  If not all necessary vars are defined, don't save the XML file.
+		contents = vars(self)
+		for vr in contents:
+			if vr is None:
+				# If any undef var found, save the json file only and return
+				super(baseplate, self).save
+				return
+
+
 		# Directly copied from Akshay's script:
 		root = Element('ROOT')
 		tree = ElementTree(root)
@@ -837,10 +846,12 @@ class baseplate(fsobj):
 		# Store in same directory as .json files, w/ same name:
 		filedir, filename = self.get_filedir_filename(self.ID)
 		filename = filename.replace('.json', '.xml')
+		if not os.path.exists(filedir):
+			os.makedirs(filedir)
 		print("Saving file to ", filedir+'/'+filename)
 		tree.write(open(filedir+'/'+filename.replace('.json', '.xml'), 'wb'))
 		print('Created baseplate XML file')
-
+"""
 
 	"""
 	def load(self, ID, on_property_missing = "warn"):
@@ -917,6 +928,76 @@ class sensor(fsobj):
 	}
 
 
+"""
+	def save(self):
+		root = Element('ROOT')
+		tree = ElementTree(root)
+		root.set('xmlns:xsi','http://www.w3.org/2001/XMLSchema-instance')
+
+		# For now, only one part at a time:
+		parts = Element('PARTS')
+		part = Element('PART')
+		part.set('mode', 'auto')
+
+		name_dict = {
+					'NAME':  'HGC Silicon Sensor Type',
+					'VALUE': '200DD',
+					}
+
+		attr_dict = {
+					'ATTRIBUTE': name_dict,
+					}
+
+		part_dict = {
+					'KIND_OF_PART':          'HGC HPK {} Inch Silicon Sensor'.format('Six' if self.size==6 else 'Eight'),
+					'RECORD_INSERTION_USER': '',   # NOTE:  This may have to be redone when XML uploading is implemented!
+					'SERIAL_NUMBER':         self.identifier,
+					'comments':              self.commments,   # Note:  Requires special treatment
+					'LOCATION':              self.location,
+					'MANUFACTURER':          self.manufacturer,
+					'PREDEFINED_ATTRIBUTES': attr_dict,
+					}
+
+		for key, value in part_dict.items():
+			if type(value) is list:  # Comments stored as a list
+				for item in value:
+					comment = Element('COMMENT_DESCRIPTION')
+					comment.text = str(item)
+					part.append(comment)
+			elif type(value) is dict:  # attr_dict
+				elem = Element(key)
+				for key_, value_ in value.items():  # Iterate over attr_dict
+					elem_ = Element(key_)
+					if type(value_) is dict:  # name_dict
+						for key__, value__ in value_.items():  # Iterate over name_dict
+							elem__ = Element(key__)
+							elem__.text = str(value__)
+							elem_.append(elem__)
+					else:  # This should never happen
+						print("ERROR:  expected a dictionary in save()")
+					elem.append(elem_)
+				part.append(elem)
+			else:
+				elem = Element(key)
+				elem.text = str(value)
+				part.append(elem)
+				
+		parts.append(part)
+		root.append(parts)
+
+		# Save json file:
+		super(sensor, self).save()
+		# Save xml file:
+		filedir, filename = self.get_filedir_filename(self.ID)
+		filename = filename.replace('.json', '.xml')
+		if not os.path.exists(filedir):
+			os.makedirs(filedir)
+		print("Saving file to"+filedir+'/'+filename)
+		tree.write(open(filedir+'/'+filename, 'wb'))
+		print("Created sensor XML file")
+"""
+
+
 class pcb(fsobj):
 	OBJECTNAME = "PCB"
 	FILEDIR = os.sep.join(['pcbs','{century}','pcb_{ID:0>5}'])
@@ -978,12 +1059,82 @@ class pcb(fsobj):
 			self.fetch_datasets()
 		return success
 
+
 	def save(self):
+		root = Element('ROOT')
+		tree = ElementTree(root)
+		root.set('xmlns:xsi','http://www.w3.org/2001/XMLSchema-instance')
+
+		# For now, only one part at a time:
+		parts = Element('PARTS')
+		part = Element('PART')
+		part.set('mode', 'auto')
+
+		name_dict = {
+					'NAME':  'HGC Silicon Sensor Type',
+					'VALUE': '200DD',
+					}
+
+		attr_dict = {
+					'ATTRIBUTE': name_dict,
+					}
+
+		part_dict = {
+					'KIND_OF_PART':          'HGC {} Inch {} Channel PCB'.format('Six' if self.size==6 else 'Eight', self.channels),
+					'RECORD_INSERTION_USER': '',   # NOTE:  This may have to be redone when XML uploading is implemented!
+					'SERIAL_NUMBER':         self.identifier,
+					'comments':              self.commments,   # Note:  Requires special treatment
+					'LOCATION':              self.location,
+					'MANUFACTURER':          self.manufacturer,
+					'PREDEFINED_ATTRIBUTES': attr_dict,
+					}
+
+		for key, value in part_dict.items():
+			if type(value) is list:  # Comments stored as a list
+				for item in value:
+					comment = Element('COMMENT_DESCRIPTION')
+					comment.text = str(item)
+					part.append(comment)
+			elif type(value) is dict:  # attr_dict
+				elem = Element(key)
+				for key_, value_ in value.items():  # Iterate over attr_dict
+					elem_ = Element(key_)
+					if type(value_) is dict:  # name_dict
+						for key__, value__ in value_.items():  # Iterate over name_dict
+							elem__ = Element(key__)
+							elem__.text = str(value__)
+							elem_.append(elem__)
+					else:  # This should never happen
+						print("ERROR:  expected a dictionary in save()")
+					elem.append(elem_)
+				part.append(elem)
+			else:
+				elem = Element(key)
+				elem.text = str(value)
+				part.append(elem)
+				
+		parts.append(part)
+		root.append(parts)
+
+		# Save json file:
+		super(pcb, self).save()
+		# Save xml file:
+		filedir, filename = self.get_filedir_filename(self.ID)
+		filename = filename.replace('.json', '.xml')
+		if not os.path.exists(filedir):
+			os.makedirs(filedir)
+		print("Saving file to"+filedir+'/'+filename)
+		tree.write(open(filedir+'/'+filename, 'wb'))
+		print("Created PCB XML file")
+
+
+"""	def save(self):
 		super(pcb,self).save()
 		filedir, filename = self.get_filedir_filename(self.ID)
 		if not os.path.exists(os.sep.join([filedir, self.DAQ_DATADIR])):
 			os.makedirs(os.sep.join([filedir, self.DAQ_DATADIR]))
 		self.fetch_datasets()
+"""
 
 	def load_daq(self,which):
 		if isinstance(which, int):
@@ -1479,6 +1630,7 @@ class step_sensor(fsobj):
 			return self.cure_stop - self.cure_start
 
 	# WIP
+
 	def save(self):
 		# Perform ordinary json save
 		super(step_sensor, self).save()
@@ -1486,10 +1638,14 @@ class step_sensor(fsobj):
 		inst_sensor      = sensor()
 		inst_protomodule = protomodule()
 
+		print("WARNING:  Not supposed to be using this yet!!")
+		"""
 		# Update corresponding baseplates, sensors, etc.
 		# ADDED:  Also save BuildProtoModules, BuldProtoModules_Cond XML files.
 		root = Element('ROOT')
+		tree = ElementTree(root)
 		root_cond = Element('ROOT')
+		tree_cond = ElementTree(root_cond)
 		root.set('xmlns:xsi','http://www.w3.org/2001/XMLSchema-instance')
 		# Create headers
 		# New:  Dictionary-based approach.
@@ -1568,7 +1724,7 @@ class step_sensor(fsobj):
 		comp_tray.load(self.tray_component_sensor)
 		glue_batch.load(self.batch_araldite)
 		#slvr_epxy.load(self.batch_loctite)
-
+		
 
 		for i in range(6):
 
@@ -1611,6 +1767,7 @@ class step_sensor(fsobj):
 				if not all([baseplate_exists,sensor_exists]):
 					print("WARNING: trying to save step_sensor {}. Some parts do not exist. Could not create all associations.")
 					print("baseplate:{} sensor:{}".format(inst_baseplate.ID,inst_sensor.ID))
+				
 				else:
 					# ** NOTE/NEW: ** Create DATA_SET section of XML file.
 					# Code is streamlined slightly:  Use a dictionary for every element w/ sub-elements.  Key:value is 'VAR_NAME':value...
@@ -1667,10 +1824,10 @@ class step_sensor(fsobj):
 					root.append(data_set)
 
 					# COND file:
-					"""
+					
 					data_dict_cond = {
 								# WIP:
-								'CURING_TIME_HRS':,
+								'CURING_TIME_HRS':'',
 								# NOTE:  Need to check the time/date format
 								'TIME_START':self.cure_start,
 								'TIME_END':self.cure_stop,
@@ -1700,15 +1857,23 @@ class step_sensor(fsobj):
 						data_set_cond.append(element)
 
 					root_cond.append(data_set_cond)
-					"""
-
-		#WRITE FILES
-
+					
 			inst_baseplate.clear()
 			inst_sensor.clear()
 			inst_protomodule.clear()
 
+		# SAVE output:
 
+		filedir, filename = self.get_filedir_filename(self.ID)
+		filename_xml = filename.replace('.json', '.xml')
+		filename_xml_cond = filename.replace('.json', '_cond.xml')
+		if not os.path.exists(filedir):
+			os.makedirs(filedir)
+		print("Saving files to "+filedir+'/'+filename_xml+", /"+filename_xml_cond)
+		tree.write(     open(filedir+'/'+filename_xml,      'wb'))
+		tree_cond.write(open(filedir+'/'+filename_xml_cond, 'wb'))
+		print("Created sensor step XML files")
+"""
 
 
 class step_pcb(fsobj):
