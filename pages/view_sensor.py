@@ -31,6 +31,13 @@ INDEX_INSPECTION = {
 	False:1,
 }
 
+INDEX_INSTITUTION = {
+	'CERN':0,
+	'FNAL':1,
+	'UCSB':2,
+	'UMN':3,
+}
+
 
 class func(object):
 	def __init__(self,fm,page,setUIPage,setSwitchingEnabled):
@@ -123,10 +130,13 @@ class func(object):
 		self.page.leIdentifier.setText(  "" if self.sensor.identifier   is None else self.sensor.identifier  )
 		self.page.leManufacturer.setText("" if self.sensor.manufacturer is None else self.sensor.manufacturer)
 		self.page.leType.setText(        "" if self.sensor.type         is None else self.sensor.type        )
-		self.page.cbSize.setCurrentIndex(INDEX_SIZE.get(  self.sensor.size,  -1))
-		self.page.cbShape.setCurrentIndex(INDEX_SHAPE.get(self.sensor.shape, -1))
+		self.page.cbSize.setCurrentIndex(       INDEX_SIZE.get(       self.sensor.size,  -1)      )
+		self.page.cbShape.setCurrentIndex(      INDEX_SHAPE.get(      self.sensor.shape, -1)      )
+		self.page.leInsertUser.setText("" if self.sensor.insertion_user is None else self.sensor.insertion_user)
+		self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.sensor.institution, -1))
 		self.page.sbRotation.setValue(-1 if self.sensor.rotation is None else self.sensor.rotation)
 		self.page.sbChannels.setValue(-1 if self.sensor.channels is None else self.sensor.channels)
+
 		if self.page.sbRotation.value() == -1:self.page.sbRotation.clear()
 		if self.page.sbChannels.value() == -1:self.page.sbChannels.clear()
 		self.page.cbSemiType.setCurrentIndex(INDEX_SEMI.get(self.sensor.semi_type, -1))  # New
@@ -170,12 +180,14 @@ class func(object):
 
 		self.page.pbGoShipment.setEnabled(mode_view and shipments_exist)
 
+		self.page.leInsertUser.setReadOnly(   not (mode_creating or mode_editing) )
 		self.page.leLocation.setReadOnly(     not (mode_creating or mode_editing) )
 		self.page.leIdentifier.setReadOnly(   not (mode_creating or mode_editing) )
 		self.page.leManufacturer.setReadOnly( not (mode_creating or mode_editing) )
 		self.page.leType.setReadOnly(         not (mode_creating or mode_editing) )
 		self.page.cbSize.setEnabled(               mode_creating or mode_editing  )
 		self.page.cbShape.setEnabled(              mode_creating or mode_editing  )
+		self.page.cbInstitution.setEnabled(        mode_creating or mode_editing  )
 		self.page.sbRotation.setReadOnly(     not (mode_creating or mode_editing) )
 		self.page.sbChannels.setReadOnly(     not (mode_creating or mode_editing) )
 		self.page.cbSemiType.setEnabled(           mode_creating or mode_editing  )  # New
@@ -216,15 +228,17 @@ class func(object):
 	@enforce_mode(['editing','creating'])
 	def saveEditing(self,*args,**kwargs):
 
-		self.sensor.location     = str(self.page.leLocation.text()    )   if str(self.page.leLocation.text()    ) else None
-		self.sensor.identifier   = str(self.page.leIdentifier.text()  )   if str(self.page.leIdentifier.text()  ) else None
-		self.sensor.manufacturer = str(self.page.leManufacturer.text())   if str(self.page.leManufacturer.text()) else None
-		self.sensor.type         = str(self.page.leType.text()        )   if str(self.page.leType.text()        ) else None
-		self.sensor.size         = str(self.page.cbSize.currentText() )   if str(self.page.cbSize.currentText() ) else None
-		self.sensor.shape        = str(self.page.cbShape.currentText())   if str(self.page.cbShape.currentText()) else None
-		self.sensor.rotation     =     self.page.sbRotation.value()       if    self.page.sbRotation.value() >=0  else None
-		self.sensor.channels     =     self.page.sbChannels.value()       if    self.page.sbChannels.value() >=0  else None
-		self.sensor.semi_type    =     self.page.cbSemiType.currentText() if self.page.cbSemiType.currentText()   else None  # New
+		self.sensor.insertion_user = str(self.page.leInsertUser.text()      ) if str(self.page.leInsertUser.text()  )       else None
+		self.sensor.location     = str(self.page.leLocation.text()          ) if str(self.page.leLocation.text()    )       else None
+		self.sensor.identifier   = str(self.page.leIdentifier.text()        ) if str(self.page.leIdentifier.text()  )       else None
+		self.sensor.manufacturer = str(self.page.leManufacturer.text()      ) if str(self.page.leManufacturer.text())       else None
+		self.sensor.type         = str(self.page.leType.text()              ) if str(self.page.leType.text()        )       else None
+		self.sensor.size         = str(self.page.cbSize.currentText()       ) if str(self.page.cbSize.currentText() )       else None
+		self.sensor.shape        = str(self.page.cbShape.currentText()      ) if str(self.page.cbShape.currentText())       else None
+		self.sensor.institution  = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
+		self.sensor.rotation     =     self.page.sbRotation.value()           if     self.page.sbRotation.value() >=0       else None
+		self.sensor.channels     =     self.page.sbChannels.value()           if     self.page.sbChannels.value() >=0       else None
+		self.sensor.semi_type    =     self.page.cbSemiType.currentText()     if     self.page.cbSemiType.currentText()     else None
 
 		num_comments = self.page.listComments.count()
 		self.sensor.comments = []

@@ -40,8 +40,22 @@ INDEX_CHECK = {
 	False:1,
 }
 
+INDEX_INSTITUTION = {
+	'CERN':0,
+	'FNAL':1,
+	'UCSB':2,
+	'UMN':3,
+}
+
+# VERY TEMPORARY
+from rhapi import RhApi
+
 class func(object):
 	def __init__(self,fm,page,setUIPage,setSwitchingEnabled):
+		# EXTREMELY TEMPORARY
+		test_rhapi = RhApi("www.google.com")
+
+
 		self.page      = page
 		self.setUIPage = setUIPage
 		self.setMainSwitchingEnabled = setSwitchingEnabled
@@ -141,10 +155,11 @@ class func(object):
 		for shipment in self.baseplate.shipments:
 			self.page.listShipments.addItem(str(shipment))
 
-		self.page.cbSize     .setCurrentIndex(INDEX_SIZE.get(     self.baseplate.size     , -1))
-		self.page.cbShape    .setCurrentIndex(INDEX_SHAPE.get(    self.baseplate.shape    , -1))
-		self.page.cbChirality.setCurrentIndex(INDEX_CHIRALITY.get(self.baseplate.chirality, -1))
-		self.page.cbMaterial .setCurrentIndex(INDEX_MATERIAL.get( self.baseplate.material , -1))
+		self.page.cbSize     .setCurrentIndex(   INDEX_SIZE.get(      self.baseplate.size       , -1))
+		self.page.cbShape    .setCurrentIndex(   INDEX_SHAPE.get(     self.baseplate.shape      , -1))
+		self.page.cbChirality.setCurrentIndex(   INDEX_CHIRALITY.get( self.baseplate.chirality  , -1))
+		self.page.cbMaterial .setCurrentIndex(   INDEX_MATERIAL.get(  self.baseplate.material   , -1))
+		self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.baseplate.institution, -1))
 		self.page.leInsertUser  .setText("" if self.baseplate.insertion_user  is None else self.baseplate.insertion_user  )
 		self.page.leIdentifier  .setText("" if self.baseplate.identifier      is None else self.baseplate.identifier      )
 		self.page.leLocation    .setText("" if self.baseplate.location        is None else self.baseplate.location        )
@@ -232,6 +247,7 @@ class func(object):
 		self.page.cbShape.setEnabled(               mode_creating or mode_editing  )
 		self.page.cbChirality.setEnabled(           mode_creating or mode_editing  )
 		self.page.cbMaterial.setEnabled(            mode_creating or mode_editing  )
+		self.page.cbInstitution.setEnabled(         mode_creating or mode_editing  )
 		self.page.leInsertUser.setReadOnly(    not (mode_creating or mode_editing) )
 		self.page.leIdentifier.setReadOnly(    not (mode_creating or mode_editing) )
 		self.page.leManufacturer.setReadOnly(  not (mode_creating or mode_editing) )
@@ -295,16 +311,17 @@ class func(object):
 	@enforce_mode(['editing','creating'])
 	def saveEditing(self,*args,**kwargs):
 
-		self.baseplate.size           = str(self.page.cbSize.currentText())      if str(self.page.cbSize.currentText())      else None
-		self.baseplate.shape          = str(self.page.cbShape.currentText())     if str(self.page.cbShape.currentText())     else None
-		self.baseplate.chirality      = str(self.page.cbChirality.currentText()) if str(self.page.cbChirality.currentText()) else None
-		self.baseplate.material       = str(self.page.cbMaterial.currentText())  if str(self.page.cbMaterial.currentText())  else None
-		self.baseplate.insertion_user = str(self.page.leInsertUser.text())       if str(self.page.leInsertUser.text())       else None
-		self.baseplate.manufacturer   = str(self.page.leManufacturer.text())     if str(self.page.leManufacturer.text())     else None
-		self.baseplate.location       = str(self.page.leLocation.text())         if str(self.page.leLocation.text())         else None
-		self.baseplate.identifier     = str(self.page.leIdentifier.text())       if str(self.page.leIdentifier.text())       else None
-		self.baseplate.nomthickness   =     self.page.dsbNomThickness.value()    if self.page.dsbNomThickness.value() >=0    else None
-		self.baseplate.rotation       =     self.page.sbRotation.value()         if self.page.sbRotation.value()      >=0    else None
+		self.baseplate.size           = str(self.page.cbSize.currentText())        if str(self.page.cbSize.currentText())        else None
+		self.baseplate.shape          = str(self.page.cbShape.currentText())       if str(self.page.cbShape.currentText())       else None
+		self.baseplate.chirality      = str(self.page.cbChirality.currentText())   if str(self.page.cbChirality.currentText())   else None
+		self.baseplate.material       = str(self.page.cbMaterial.currentText())    if str(self.page.cbMaterial.currentText())    else None
+		self.baseplate.institution    = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
+		self.baseplate.insertion_user = str(self.page.leInsertUser.text())         if str(self.page.leInsertUser.text())         else None
+		self.baseplate.manufacturer   = str(self.page.leManufacturer.text())       if str(self.page.leManufacturer.text())       else None
+		self.baseplate.location       = str(self.page.leLocation.text())           if str(self.page.leLocation.text())           else None
+		self.baseplate.identifier     = str(self.page.leIdentifier.text())         if str(self.page.leIdentifier.text())         else None
+		self.baseplate.nomthickness   =     self.page.dsbNomThickness.value()      if self.page.dsbNomThickness.value() >=0      else None
+		self.baseplate.rotation       =     self.page.sbRotation.value()           if self.page.sbRotation.value()      >=0      else None
 
 		num_comments = self.page.listComments.count()
 		self.baseplate.comments = []

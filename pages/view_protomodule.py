@@ -32,6 +32,13 @@ INDEX_INSPECTION = {
 	False:1,
 }
 
+INDEX_INSTITUTION = {
+	'CERN':0,
+	'FNAL':1,
+	'UCSB':2,
+	'UMN':3,
+}
+
 
 class func(object):
 	def __init__(self,fm,page,setUIPage,setSwitchingEnabled):
@@ -122,6 +129,7 @@ class func(object):
 		for shipment in self.protomodule.shipments:
 			self.page.listShipments.addItem(str(shipment))
 
+		self.page.leInsertUser.setText(  "" if self.protomodule.insertion_user is None else   self.protomodule.insertion_user)
 		self.page.leLocation.setText(    "" if self.protomodule.location     is None else     self.protomodule.location    )
 		self.page.leNumKaptons.setText(  "" if self.protomodule.num_kaptons  is None else str(self.protomodule.num_kaptons))
 		self.page.cbSize.setCurrentIndex(     INDEX_SIZE.get(     self.protomodule.size     ,-1))
@@ -148,6 +156,7 @@ class func(object):
 
 		self.page.cbCheckCracks.setCurrentIndex(   INDEX_INSPECTION.get(self.protomodule.check_cracks    , -1))
 		self.page.cbCheckGlueSpill.setCurrentIndex(INDEX_INSPECTION.get(self.protomodule.check_glue_spill, -1))
+		self.page.cbInstitution.setCurrentIndex(   INDEX_INSTITUTION.get(self.protomodule.institution, -1)    )
 		self.page.dsbOffsetTranslation.setValue( -1 if self.protomodule.offset_translation is None else self.protomodule.offset_translation )
 		self.page.dsbOffsetRotation.setValue(    -1 if self.protomodule.offset_rotation    is None else self.protomodule.offset_rotation    )
 		self.page.dsbFlatness.setValue(          -1 if self.protomodule.flatness           is None else self.protomodule.flatness           )
@@ -187,10 +196,12 @@ class func(object):
 
 		self.page.pbGoShipment.setEnabled(mode_view and shipments_exist)
 
+		self.page.leInsertUser.setReadOnly(not (mode_creating or mode_editing) )
 		self.page.leLocation.setReadOnly(  not (mode_creating or mode_editing) )
 		self.page.cbSize.setEnabled(            mode_creating or mode_editing  )
 		self.page.cbShape.setEnabled(           mode_creating or mode_editing  )
 		self.page.cbChirality.setEnabled(       mode_creating or mode_editing  )
+		self.page.cbInstitution.setEnabled(     mode_creating or mode_editing  )
 		self.page.dsbThickness.setReadOnly(not (mode_creating or mode_editing) )
 		self.page.sbChannels.setReadOnly(  not (mode_creating or mode_editing) )
 		self.page.sbRotation.setReadOnly(  not (mode_creating or mode_editing) )
@@ -239,13 +250,15 @@ class func(object):
 	@enforce_mode(['editing','creating'])
 	def saveEditing(self,*args,**kwargs):
 
-		self.protomodule.location     = str(self.page.leLocation.text()        ) if str(self.page.leLocation.text()        ) else None
-		self.protomodule.size         = str(self.page.cbSize.currentText()     ) if str(self.page.cbSize.currentText()     ) else None
-		self.protomodule.shape        = str(self.page.cbShape.currentText()    ) if str(self.page.cbShape.currentText()    ) else None
-		self.protomodule.chirality    = str(self.page.cbChirality.currentText()) if str(self.page.cbChirality.currentText()) else None
-		self.protomodule.thickness    = self.page.dsbThickness.value() if self.page.dsbThickness.value() >=0 else None
-		self.protomodule.rotation     = self.page.sbRotation.value()   if self.page.sbRotation.value()   >=0 else None
-		self.protomodule.channels     = self.page.sbChannels.value()   if self.page.sbChannels.value()   >=0 else None
+		self.protomodule.insertion_user = str(self.page.leInsertUser.text()      ) if str(self.page.leInsertUser.text()      ) else None
+		self.protomodule.location     = str(self.page.leLocation.text()          ) if str(self.page.leLocation.text()        ) else None
+		self.protomodule.size         = str(self.page.cbSize.currentText()       ) if str(self.page.cbSize.currentText()     ) else None
+		self.protomodule.shape        = str(self.page.cbShape.currentText()      ) if str(self.page.cbShape.currentText()    ) else None
+		self.protomodule.chirality    = str(self.page.cbChirality.currentText()  ) if str(self.page.cbChirality.currentText()) else None
+		self.protomodule.institution  = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
+		self.protomodule.thickness    =     self.page.dsbThickness.value()         if self.page.dsbThickness.value() >=0 else None
+		self.protomodule.rotation     =     self.page.sbRotation.value()           if self.page.sbRotation.value()   >=0 else None
+		self.protomodule.channels     =     self.page.sbChannels.value()           if self.page.sbChannels.value()   >=0 else None
 
 		num_comments = self.page.listComments.count()
 		self.protomodule.comments = []

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1097</width>
-    <height>705</height>
+    <height>726</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
      <x>10</x>
      <y>90</y>
      <width>261</width>
-     <height>571</height>
+     <height>611</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -38,7 +38,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>170</y>
+      <y>210</y>
       <width>80</width>
       <height>21</height>
      </rect>
@@ -53,27 +53,27 @@
    <widget class="QPushButton" name="pbGoShipment">
     <property name="geometry">
      <rect>
-      <x>140</x>
-      <y>20</y>
-      <width>121</width>
+      <x>120</x>
+      <y>60</y>
+      <width>141</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>go to selected</string>
+     <string>Go to selected</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="lineEdit_9">
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>1</y>
-      <width>141</width>
+      <y>41</y>
+      <width>121</width>
       <height>20</height>
      </rect>
     </property>
     <property name="text">
-     <string>location</string>
+     <string>Location</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -83,7 +83,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>150</y>
+      <y>190</y>
       <width>181</width>
       <height>21</height>
      </rect>
@@ -99,13 +99,13 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>20</y>
-      <width>141</width>
+      <y>60</y>
+      <width>121</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>shipments</string>
+     <string>Shipments</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -115,7 +115,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>150</y>
+      <y>190</y>
       <width>80</width>
       <height>20</height>
      </rect>
@@ -131,7 +131,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>170</y>
+      <y>210</y>
       <width>181</width>
       <height>21</height>
      </rect>
@@ -146,9 +146,9 @@
    <widget class="QLineEdit" name="leLocation">
     <property name="geometry">
      <rect>
-      <x>140</x>
-      <y>1</y>
-      <width>120</width>
+      <x>120</x>
+      <y>41</y>
+      <width>141</width>
       <height>20</height>
      </rect>
     </property>
@@ -163,7 +163,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>40</y>
+      <y>80</y>
       <width>261</width>
       <height>91</height>
      </rect>
@@ -176,7 +176,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>230</y>
+      <y>270</y>
       <width>81</width>
       <height>20</height>
      </rect>
@@ -224,7 +224,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>230</y>
+      <y>270</y>
       <width>181</width>
       <height>21</height>
      </rect>
@@ -240,7 +240,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>210</y>
+      <y>250</y>
       <width>181</width>
       <height>21</height>
      </rect>
@@ -256,7 +256,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>250</y>
+      <y>290</y>
       <width>181</width>
       <height>21</height>
      </rect>
@@ -272,7 +272,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>250</y>
+      <y>290</y>
       <width>80</width>
       <height>21</height>
      </rect>
@@ -291,7 +291,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>270</y>
+      <y>310</y>
       <width>80</width>
       <height>21</height>
      </rect>
@@ -310,7 +310,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>270</y>
+      <y>310</y>
       <width>181</width>
       <height>21</height>
      </rect>
@@ -326,7 +326,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>190</y>
+      <y>230</y>
       <width>80</width>
       <height>21</height>
      </rect>
@@ -342,7 +342,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>190</y>
+      <y>230</y>
       <width>181</width>
       <height>21</height>
      </rect>
@@ -358,20 +358,20 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>550</y>
+      <y>590</y>
       <width>111</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>add comment</string>
+     <string>Add comment</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="lineEdit_14">
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>330</y>
+      <y>370</y>
       <width>141</width>
       <height>21</height>
      </rect>
@@ -387,20 +387,20 @@
     <property name="geometry">
      <rect>
       <x>140</x>
-      <y>330</y>
+      <y>370</y>
       <width>121</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>delete selected</string>
+     <string>Delete selected</string>
     </property>
    </widget>
    <widget class="QPlainTextEdit" name="pteWriteComment">
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>480</y>
+      <y>520</y>
       <width>261</width>
       <height>71</height>
      </rect>
@@ -410,7 +410,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>350</y>
+      <y>390</y>
       <width>261</width>
       <height>121</height>
      </rect>
@@ -420,7 +420,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>210</y>
+      <y>250</y>
       <width>81</width>
       <height>21</height>
      </rect>
@@ -443,7 +443,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>290</y>
+      <y>330</y>
       <width>81</width>
       <height>21</height>
      </rect>
@@ -466,13 +466,94 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>290</y>
+      <y>330</y>
       <width>181</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
      <string>Semiconductor type</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_17">
+    <property name="geometry">
+     <rect>
+      <x>1</x>
+      <y>21</y>
+      <width>121</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Institution</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="cbInstitution">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>21</y>
+      <width>141</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
+    <item>
+     <property name="text">
+      <string>CERN</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>FNAL</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>UCSB</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>UMN</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QLineEdit" name="leInsertUser">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>1</y>
+      <width>141</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_18">
+    <property name="geometry">
+     <rect>
+      <x>1</x>
+      <y>1</y>
+      <width>121</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>User name</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -504,6 +585,10 @@
    <zorder>leManufacturer</zorder>
    <zorder>cbSemiType</zorder>
    <zorder>lineEdit_16</zorder>
+   <zorder>lineEdit_17</zorder>
+   <zorder>cbInstitution</zorder>
+   <zorder>leInsertUser</zorder>
+   <zorder>lineEdit_18</zorder>
   </widget>
   <widget class="QFrame" name="frame_3">
    <property name="geometry">
@@ -795,7 +880,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>visual inspection</string>
+    <string>Visual inspection</string>
    </property>
    <property name="readOnly">
     <bool>true</bool>

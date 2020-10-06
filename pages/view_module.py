@@ -38,6 +38,14 @@ INDEX_INSPECTION = {
 	False:1,
 }
 
+INDEX_INSTITUTION = {
+	'CERN':0,
+	'FNAL':1,
+	'UCSB':2,
+	'UMN':3,
+}
+
+
 def separate_sites(sites_string):
 	s = sites_string
 	for char in SITE_SEP:
@@ -143,6 +151,7 @@ class func(object):
 		self.module_exists = self.module.load(ID)
 		
 		# shipments and location
+		self.page.leInsertUser.setText("" if self.module.insertion_user is None else self.module.insertion_user)
 		self.page.leLocation.setText("" if self.module.location is None else self.module.location)
 		self.page.listShipments.clear()
 		for shipment in self.module.shipments:
@@ -153,9 +162,10 @@ class func(object):
 		self.page.sbChannels.setValue(  -1 if self.module.channels    is None else self.module.channels   )
 		self.page.dsbThickness.setValue(-1 if self.module.thickness   is None else self.module.thickness  )
 		self.page.sbRotation.setValue(  -1 if self.module.rotation    is None else self.module.rotation   )
-		self.page.cbSize.setCurrentIndex(     INDEX_SIZE.get(     self.module.size     , -1))
-		self.page.cbShape.setCurrentIndex(    INDEX_SHAPE.get(    self.module.shape    , -1))
-		self.page.cbChirality.setCurrentIndex(INDEX_CHIRALITY.get(self.module.chirality, -1))
+		self.page.cbSize.setCurrentIndex(       INDEX_SIZE.get(       self.module.size     , -1)  )
+		self.page.cbShape.setCurrentIndex(      INDEX_SHAPE.get(      self.module.shape    , -1)  )
+		self.page.cbChirality.setCurrentIndex(  INDEX_CHIRALITY.get(  self.module.chirality, -1)  )
+		self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.module.institution, -1))
 		if self.page.sbChannels.value()   == -1: self.page.sbChannels.clear()
 		if self.page.dsbThickness.value() == -1: self.page.dsbThickness.clear()
 		if self.page.sbRotation.value()   == -1: self.page.sbRotation.clear()
@@ -290,13 +300,15 @@ class func(object):
 		self.page.pbGoShipment.setEnabled(mode_view and shipments_exist)
 
 		# characteristics
+		self.page.leInsertUser.setReadOnly( not (mode_creating or mode_editing) )
 		self.page.leLocation.setReadOnly(   not (mode_creating or mode_editing) )
 		self.page.sbChannels.setReadOnly(   not (mode_creating or mode_editing) )
 		self.page.dsbThickness.setReadOnly( not (mode_creating or mode_editing) )
 		self.page.sbRotation.setReadOnly(   not (mode_creating or mode_editing) )
-		self.page.cbSize.setEnabled(      mode_creating or mode_editing )
-		self.page.cbShape.setEnabled(     mode_creating or mode_editing )
-		self.page.cbChirality.setEnabled( mode_creating or mode_editing )
+		self.page.cbSize.setEnabled(             mode_creating or mode_editing  )
+		self.page.cbShape.setEnabled(            mode_creating or mode_editing  )
+		self.page.cbChirality.setEnabled(        mode_creating or mode_editing  )
+		self.page.cbInstitution.setEnabled(      mode_creating or mode_editing  )
 
 		# parts and steps
 		self.page.pbGoStepKapton.setEnabled(   mode_view and step_kapton_exists   )
@@ -395,12 +407,15 @@ class func(object):
 	@enforce_mode(['editing','creating'])
 	def saveEditing(self,*args,**kwargs):
 		# characteristics
-		self.module.channels  = self.page.sbChannels.value()   if self.page.sbChannels.value()   >= 0 else None
-		self.module.thickness = self.page.dsbThickness.value() if self.page.dsbThickness.value() >= 0 else None
-		self.module.rotation  = self.page.sbRotation.value()   if self.page.sbRotation.value()   >= 0 else None
-		self.module.size      = str(self.page.cbSize.currentText()     ) if str(self.page.cbSize.currentText()     ) else None
-		self.module.shape     = str(self.page.cbShape.currentText()    ) if str(self.page.cbShape.currentText()    ) else None
-		self.module.chirality = str(self.page.cbChirality.currentText()) if str(self.page.cbChirality.currentText()) else None
+		self.module.insertion_user = str(self.page.leInsertUser.text()   ) if str(self.page.leInsertUser.text())         else None
+		self.module.location    = str(self.page.leLocation.text()        ) if str(self.page.leLocation.text())           else None
+		self.module.channels    =     self.page.sbChannels.value()         if self.page.sbChannels.value()   >= 0          else None
+		self.module.thickness   =     self.page.dsbThickness.value()       if self.page.dsbThickness.value() >= 0          else None
+		self.module.rotation    =     self.page.sbRotation.value()         if self.page.sbRotation.value()   >= 0          else None
+		self.module.size        = str(self.page.cbSize.currentText()     ) if str(self.page.cbSize.currentText()         ) else None
+		self.module.shape       = str(self.page.cbShape.currentText()    ) if str(self.page.cbShape.currentText()        ) else None
+		self.module.chirality   = str(self.page.cbChirality.currentText()) if str(self.page.cbChirality.currentText()    ) else None
+		self.module.institution = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
 
 		# comments
 		num_comments = self.page.listComments.count()

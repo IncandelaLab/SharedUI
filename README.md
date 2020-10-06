@@ -17,3 +17,6 @@ Running the GUI is straightforward:  Run `python mainUI.py` in a terminal to lau
 The GUI is divided into three sections:  Parts, tooling, and supplies; production steps and testing routines; and shipping.  In each section, you can enter in data by choosing the object ID number and clicking 'new' (or 'edit' if the object already has data).  A few pages, such as the kapton placement step, will display errors in a status box if there's a problem with the input, preventing the input from being saved until all problems are resolved.  For now, all data provided to the GUI is saved locally in .json files:  The GUI will create a new directory `filemanager_data` in the parent directory of SharedUI and store the files accordingly.
 
 Currently, .ui pages for the Unbiased DAQ and IV Curve pages exist but are not yet integrated into the GUI.
+
+
+WARNING:  Future updates to the GUI will require both [cmsdbldr](https://github.com/valdasraps/cmsdbldr) and the [resthub API.](https://github.com/valdasraps/resthub)  (You will need to add `https://github.com/valdasraps/cmsdbldr/blob/master/src/main/python` and `https://github.com/valdasraps/resthub/blob/master/clients/python/src/main/python` to `$PYTHONPATH`.)  cmsdbldr requires ilock, which can be installed with `pip install ilock`.

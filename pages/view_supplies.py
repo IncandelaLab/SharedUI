@@ -10,6 +10,7 @@ class simple_fsobj_vc(object):
 		sbID,
 		dReceived,
 		dExpires,
+		ckIsEmpty,
 		pbEditNew,
 		pbSave,
 		pbCancel,
@@ -24,6 +25,7 @@ class simple_fsobj_vc(object):
 		self.sbID            = sbID
 		self.dReceived       = dReceived
 		self.dExpires        = dExpires
+		self.ckIsEmpty       = ckIsEmpty
 		self.pbEditNew       = pbEditNew
 		self.pbSave          = pbSave
 		self.pbCancel        = pbCancel
@@ -45,6 +47,8 @@ class simple_fsobj_vc(object):
 			self.dReceived.setDate(QtCore.QDate(*self.fsobj.date_received))
 			self.dExpires.setDate(QtCore.QDate(*self.fsobj.date_expires))
 
+			self.ckIsEmpty.setChecked(self.fsobj.is_empty)
+
 			self.listComments.clear()
 			for comment in self.fsobj.comments:
 				self.listComments.addItem(comment)
@@ -55,6 +59,8 @@ class simple_fsobj_vc(object):
 
 			self.dReceived.setDate(QtCore.QDate(2000,1,1))
 			self.dExpires.setDate(QtCore.QDate(2000,1,1))
+
+			self.ckIsEmpty.setChecked(False)
 
 			self.listComments.clear()
 			self.pteWriteComment.clear()
@@ -74,6 +80,8 @@ class simple_fsobj_vc(object):
 
 		self.fsobj.date_received = self.dReceived.date().getDate()
 		self.fsobj.date_expires  = self.dExpires.date().getDate()
+
+		self.fsobj.is_empty = self.ckIsEmpty.isChecked()
 
 		self.fsobj.save()
 		self.update_info()
@@ -102,6 +110,7 @@ class func(object):
 			self.page.sbAralditeID,
 			self.page.dAralditeReceived,
 			self.page.dAralditeExpires,
+			self.page.ckIsAralditeEmpty,
 			self.page.pbAralditeEditNew,
 			self.page.pbAralditeSave,
 			self.page.pbAralditeCancel,
@@ -116,6 +125,7 @@ class func(object):
 			self.page.sbLoctiteID,
 			self.page.dLoctiteReceived,
 			self.page.dLoctiteExpires,
+			self.page.ckIsLoctiteEmpty,
 			self.page.pbLoctiteEditNew,
 			self.page.pbLoctiteSave,
 			self.page.pbLoctiteCancel,
@@ -130,6 +140,7 @@ class func(object):
 			self.page.sbSylgardThickID,
 			self.page.dSylgardThickReceived,
 			self.page.dSylgardThickExpires,
+			self.page.ckIsSylgardThickEmpty,
 			self.page.pbSylgardThickEditNew,
 			self.page.pbSylgardThickSave,
 			self.page.pbSylgardThickCancel,
@@ -144,6 +155,7 @@ class func(object):
 			self.page.sbSylgardThinID,
 			self.page.dSylgardThinReceived,
 			self.page.dSylgardThinExpires,
+			self.page.ckIsSylgardThinEmpty,
 			self.page.pbSylgardThinEditNew,
 			self.page.pbSylgardThinSave,
 			self.page.pbSylgardThinCancel,
@@ -158,6 +170,7 @@ class func(object):
 			self.page.sbBondWireID,
 			self.page.dBondWireReceived,
 			self.page.dBondWireExpires,
+			self.page.ckIsBondWireEmpty,
 			self.page.pbBondWireEditNew,
 			self.page.pbBondWireSave,
 			self.page.pbBondWireCancel,
@@ -328,6 +341,12 @@ class func(object):
 		self.page.dSylgardThickExpires.setEnabled(mode_editing_batch_sylgard_thick)
 		self.page.dSylgardThinExpires.setEnabled(mode_editing_batch_sylgard_thin)
 		self.page.dBondWireExpires.setEnabled(mode_editing_batch_bond_wire)
+
+		self.page.ckIsAralditeEmpty.setEnabled(mode_editing_batch_araldite)
+		self.page.ckIsLoctiteEmpty.setEnabled(mode_editing_batch_loctite)
+		self.page.ckIsSylgardThickEmpty.setEnabled(mode_editing_batch_sylgard_thick)
+		self.page.ckIsSylgardThinEmpty.setEnabled(mode_editing_batch_sylgard_thin)
+		self.page.ckIsBondWireEmpty.setEnabled(mode_editing_batch_bond_wire)
 
 		self.page.pbAralditeDeleteComment.setEnabled(mode_editing_batch_araldite)
 		self.page.pbLoctiteDeleteComment.setEnabled(mode_editing_batch_loctite)

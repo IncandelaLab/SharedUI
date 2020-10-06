@@ -8,6 +8,13 @@ PAGE_NAME = "view_pcb_step"
 OBJECTTYPE = "PCB_step"
 DEBUG = False
 
+INDEX_INSTITUTION = {
+    'CERN':0,
+    'FNAL':1,
+    'UCSB':2,
+    'UMN':3,
+}
+
 STATUS_NO_ISSUES = "valid (no issues)"
 STATUS_ISSUES    = "invalid (issues present)"
 
@@ -47,8 +54,15 @@ I_SIZE_MISMATCH   = "size mismatch between some selected objects"
 I_SIZE_MISMATCH_6 = "* list of 6-inch objects selected: {}"
 I_SIZE_MISMATCH_8 = "* list of 8-inch objects selected: {}"
 
-# location
-I_LOCATION = "some selected objects are not at this location: {}"
+# institution
+I_INSTITUTION = "some selected objects are not at this institution: {}"
+
+# supply batch empty
+I_BATCH_ARALDITE_EMPTY = "araldite batch is empty"
+
+# NEW
+I_INSTITUTION_NOT_SELECTED = "no institution selected"
+
 
 
 class func(object):
@@ -198,6 +212,8 @@ class func(object):
 			self.sb_protomodules[i].editingFinished.connect(self.loadProtomodule)
 			self.sb_modules[i].editingFinished.connect(     self.loadModule     )
 
+		self.page.cbInstitution.currentIndexChanged.connect( self.loadAllTools )
+
 		self.page.sbTrayComponent.editingFinished.connect( self.loadTrayComponentSensor )
 		self.page.sbTrayAssembly.editingFinished.connect(  self.loadTrayAssembly        )
 		self.page.sbBatchAraldite.editingFinished.connect( self.loadBatchAraldite       )
@@ -231,6 +247,8 @@ class func(object):
 		self.step_pcb_exists = self.step_pcb.load(ID)
 
 		if self.step_pcb_exists:
+			self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.step_pcb.institution, -1))
+
 			self.page.leUserPerformed.setText(self.step_pcb.user_performed)
 			self.page.leLocation.setText(self.step_pcb.location)
 
@@ -313,6 +331,7 @@ class func(object):
 					self.sb_modules[i].setValue(-1)
 
 		else:
+			self.page.cbInstitution.setCurrentIndex(-1)
 			self.page.leUserPerformed.setText("")
 			self.page.leLocation.setText("")
 			#self.page.dPerformed.setDate(QtCore.QDate(*NO_DATE))
@@ -358,6 +377,8 @@ class func(object):
 		self.setMainSwitchingEnabled(mode_view)
 		self.page.sbID.setEnabled(mode_view)
 
+		self.page.cbInstitution.setEnabled(mode_creating or mode_editing)
+
 		#self.page.pbDatePerformedNow.setEnabled(mode_creating or mode_editing)
 		self.page.pbRunStartNow     .setEnabled(mode_creating or mode_editing)
 		self.page.pbRunStopNow      .setEnabled(mode_creating or mode_editing)
@@ -401,20 +422,31 @@ class func(object):
 	@enforce_mode(['editing','creating'])
 	def loadAllObjects(self,*args,**kwargs):
 		for i in range(6):
-			self.tools_sensor[i].load(self.sb_tools[i].value()     )
+			self.tools_pcb[i].load(self.sb_tools[i].value(),       self.page.cbInstitution.currentText())
 			self.pcbs[i].load(        self.sb_pcbs[i].value()        )
 			self.protomodules[i].load(self.sb_protomodules[i].value())
 			self.modules[i].load(     self.sb_modules[i].value()     )
 
-		self.tray_component_sensor.load(self.page.sbTrayComponent.value())
-		self.tray_assembly.load(        self.page.sbTrayAssembly.value() )
+		self.tray_component_sensor.load(self.page.sbTrayComponent.value(), self.page.cbInstitution.currentText())
+		self.tray_assembly.load(        self.page.sbTrayAssembly.value(),  self.page.cbInstitution.currentText())
 		self.batch_araldite.load(       self.page.sbBatchAraldite.value())
 		self.updateIssues()
 
 	@enforce_mode(['editing','creating'])
+	def loadAllTools(self,*args,**kwargs):  # Same as above, but load only tools:
+		self.step_pcb.institution = self.page.cbInstitution.currentText()
+		for i in range(6):
+			self.tools_pcb[i].load(self.sb_tools[i].value(),       self.page.cbInstitution.currentText())
+		self.tray_component_sensor.load(self.page.sbTrayComponent.value(), self.page.cbInstitution.currentText())
+		self.tray_assembly.load(        self.page.sbTrayAssembly.value(),  self.page.cbInstitution.currentText())
+		self.batch_araldite.load(       self.page.sbBatchAraldite.value())
+		self.updateIssues()
+
+
+	@enforce_mode(['editing','creating'])
 	def unloadAllObjects(self,*args,**kwargs):
 		for i in range(6):
-			self.tools_sensor[i].clear()
+			self.tools_pcb[i].clear()
 			self.pcbs[i].clear()
 			self.protomodules[i].clear()
 			self.modules[i].clear()
@@ -427,7 +459,7 @@ class func(object):
 	def loadToolSensor(self, *args, **kwargs):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
-		self.tools_pcb[which].load(self.sb_tools[which].value())
+		self.tools_pcb[which].load(self.sb_tools[which].value(), self.page.cbInstitution.currentText())
 		self.updateIssues()
 
 	@enforce_mode(['editing','creating'])
@@ -462,12 +494,12 @@ class func(object):
 
 	@enforce_mode(['editing','creating'])
 	def loadTrayComponentSensor(self, *args, **kwargs):
-		self.tray_component_sensor.load(self.page.sbTrayComponent.value())
+		self.tray_component_sensor.load(self.page.sbTrayComponent.value(), self.page.cbInstitution.currentText())
 		self.updateIssues()
 
 	@enforce_mode(['editing','creating'])
 	def loadTrayAssembly(self, *args, **kwargs):
-		self.tray_assembly.load(self.page.sbTrayAssembly.value() )
+		self.tray_assembly.load(self.page.sbTrayAssembly.value(), self.page.cbInstitution.currentText())
 		self.updateIssues()
 
 	@enforce_mode(['editing','creating'])
@@ -491,6 +523,10 @@ class func(object):
 		issues = []
 		objects = []
 
+		print(self.step_pcb.institution)
+		if self.step_pcb.institution == None:
+			issues.append(I_INSTITUTION_NOT_SELECTED)
+
 		# tooling and supplies--copied over
 		if self.tray_component_sensor.ID is None:
 			issues.append(I_TRAY_COMPONENT_DNE)
@@ -511,6 +547,8 @@ class func(object):
 				today = datetime.date(*time.localtime()[:3])
 				if today > expires:
 					issues.append(I_BATCH_ARALDITE_EXPIRED)
+			if self.batch_araldite.is_empty:
+				issues.append(I_BATCH_ARALDITE_EMPTY)
 
 		#New
 		#sb_tools and _baseplates are gone...but pcbs, protomodules, modules aren't.
@@ -620,8 +658,8 @@ class func(object):
 			if size in [8.0, 8, '8']:
 				objects_8in.append(obj)
 
-			location = getattr(obj, "location", None)
-			if not (location in [None, self.MAC]):
+			institution = getattr(obj, "institution", None)
+			if not (institution in [None, self.page.cbInstitution.currentText()]):  #self.MAC]):
 				objects_not_here.append(obj)
 
 		if len(objects_6in) and len(objects_8in):
@@ -630,7 +668,7 @@ class func(object):
 			issues.append(I_SIZE_MISMATCH_8.format(', '.join([str(_) for _ in objects_8in])))
 
 		if objects_not_here:
-			issues.append(I_LOCATION.format([str(_) for _ in objects_not_here]))
+			issues.append(I_INSTITUTION.format([str(_) for _ in objects_not_here]))
 
 
 		self.page.listIssues.clear()
@@ -670,6 +708,8 @@ class func(object):
 
 	@enforce_mode(['editing','creating'])
 	def saveEditing(self,*args,**kwargs):
+		self.step_pcb.institution = self.page.cbInstitution(currentText())
+
 		self.step_pcb.user_performed = str( self.page.leUserPerformed.text() )
 		self.step_pcb.location = str( self.page.leLocation.text() )
 

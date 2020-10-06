@@ -19,7 +19,7 @@
      <x>10</x>
      <y>100</y>
      <width>261</width>
-     <height>551</height>
+     <height>591</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -37,27 +37,27 @@
    <widget class="QPushButton" name="pbGoShipment">
     <property name="geometry">
      <rect>
-      <x>140</x>
-      <y>20</y>
-      <width>121</width>
+      <x>120</x>
+      <y>59</y>
+      <width>141</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>go to selected</string>
+     <string>Go to selected</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="lineEdit_9">
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>1</y>
-      <width>141</width>
+      <y>40</y>
+      <width>121</width>
       <height>20</height>
      </rect>
     </property>
     <property name="text">
-     <string>location</string>
+     <string>Location</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -67,13 +67,13 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>20</y>
-      <width>141</width>
+      <y>59</y>
+      <width>121</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>shipments</string>
+     <string>Shipments</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -82,9 +82,9 @@
    <widget class="QLineEdit" name="leLocation">
     <property name="geometry">
      <rect>
-      <x>140</x>
-      <y>1</y>
-      <width>120</width>
+      <x>120</x>
+      <y>40</y>
+      <width>141</width>
       <height>20</height>
      </rect>
     </property>
@@ -99,7 +99,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>40</y>
+      <y>79</y>
       <width>261</width>
       <height>91</height>
      </rect>
@@ -112,7 +112,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>230</y>
+      <y>269</y>
       <width>181</width>
       <height>21</height>
      </rect>
@@ -128,7 +128,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>210</y>
+      <y>249</y>
       <width>181</width>
       <height>21</height>
      </rect>
@@ -144,7 +144,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>250</y>
+      <y>289</y>
       <width>181</width>
       <height>21</height>
      </rect>
@@ -160,7 +160,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>250</y>
+      <y>289</y>
       <width>80</width>
       <height>21</height>
      </rect>
@@ -179,7 +179,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>190</y>
+      <y>229</y>
       <width>81</width>
       <height>21</height>
      </rect>
@@ -198,7 +198,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>190</y>
+      <y>229</y>
       <width>181</width>
       <height>21</height>
      </rect>
@@ -214,20 +214,20 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>530</y>
+      <y>569</y>
       <width>101</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>add comment</string>
+     <string>Add comment</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="lineEdit_14">
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>310</y>
+      <y>349</y>
       <width>141</width>
       <height>21</height>
      </rect>
@@ -243,20 +243,20 @@
     <property name="geometry">
      <rect>
       <x>140</x>
-      <y>310</y>
+      <y>349</y>
       <width>121</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>delete selected</string>
+     <string>Delete selected</string>
     </property>
    </widget>
    <widget class="QPlainTextEdit" name="pteWriteComment">
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>460</y>
+      <y>499</y>
       <width>261</width>
       <height>71</height>
      </rect>
@@ -266,7 +266,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>330</y>
+      <y>369</y>
       <width>261</width>
       <height>121</height>
      </rect>
@@ -276,7 +276,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>210</y>
+      <y>249</y>
       <width>81</width>
       <height>21</height>
      </rect>
@@ -299,7 +299,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>270</y>
+      <y>309</y>
       <width>181</width>
       <height>21</height>
      </rect>
@@ -315,7 +315,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>270</y>
+      <y>309</y>
       <width>81</width>
       <height>21</height>
      </rect>
@@ -343,7 +343,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>170</y>
+      <y>209</y>
       <width>181</width>
       <height>21</height>
      </rect>
@@ -359,7 +359,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>170</y>
+      <y>209</y>
       <width>81</width>
       <height>21</height>
      </rect>
@@ -381,13 +381,13 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>150</y>
+      <y>189</y>
       <width>181</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>number of kapton layers</string>
+     <string>Number of kapton layers</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -397,7 +397,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>150</y>
+      <y>189</y>
       <width>81</width>
       <height>21</height>
      </rect>
@@ -410,7 +410,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>230</y>
+      <y>269</y>
       <width>81</width>
       <height>21</height>
      </rect>
@@ -454,6 +454,90 @@
      </property>
     </item>
    </widget>
+   <widget class="QLineEdit" name="lineEdit_52">
+    <property name="geometry">
+     <rect>
+      <x>1</x>
+      <y>20</y>
+      <width>121</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Institution</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="cbInstitution">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>19</y>
+      <width>141</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
+    <item>
+     <property name="text">
+      <string>CERN</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>FNAL</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>UCSB</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>UMN</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QLineEdit" name="leInsertUser">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>1</y>
+      <width>141</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_38">
+    <property name="geometry">
+     <rect>
+      <x>1</x>
+      <y>1</y>
+      <width>121</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>height difference between highest and lowers corners</string>
+    </property>
+    <property name="text">
+     <string>User name</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
    <zorder>lineEdit_9</zorder>
    <zorder>lineEdit_3</zorder>
    <zorder>leLocation</zorder>
@@ -478,6 +562,10 @@
    <zorder>sbChannels</zorder>
    <zorder>leNumKaptons</zorder>
    <zorder>pbGoShipment</zorder>
+   <zorder>lineEdit_52</zorder>
+   <zorder>cbInstitution</zorder>
+   <zorder>lineEdit_38</zorder>
+   <zorder>leInsertUser</zorder>
   </widget>
   <widget class="QFrame" name="frame_3">
    <property name="geometry">
@@ -631,7 +719,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>sensor</string>
+    <string>Sensor</string>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -743,7 +831,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>sensor placement</string>
+    <string>Sensor placement</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="lineEdit_17">
@@ -756,7 +844,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>baseplate</string>
+    <string>Baseplate</string>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -852,7 +940,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>translational offset (μm)</string>
+    <string>Translational offset (μm)</string>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -868,7 +956,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>rotational offset (°)</string>
+    <string>Rotational offset (°)</string>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -884,7 +972,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>flatness (mm)</string>
+    <string>Flatness (mm)</string>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -900,7 +988,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>check for cracks</string>
+    <string>Check for cracks</string>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -916,7 +1004,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>check glue spillage</string>
+    <string>Check glue spillage</string>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -932,7 +1020,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>protomodule qualification</string>
+    <string>Protomodule qualification</string>
    </property>
   </widget>
   <widget class="QDoubleSpinBox" name="dsbOffsetTranslation">

@@ -46,7 +46,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>100</y>
+     <y>120</y>
      <width>251</width>
      <height>121</height>
     </rect>
@@ -56,8 +56,8 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>30</y>
-     <width>131</width>
+     <y>50</y>
+     <width>111</width>
      <height>21</height>
     </rect>
    </property>
@@ -71,9 +71,9 @@
   <widget class="QDoubleSpinBox" name="dsbSensorToolSize">
    <property name="geometry">
     <rect>
-     <x>140</x>
-     <y>30</y>
-     <width>51</width>
+     <x>120</x>
+     <y>50</y>
+     <width>71</width>
      <height>21</height>
     </rect>
    </property>
@@ -85,7 +85,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>80</y>
+     <y>100</y>
      <width>121</width>
      <height>21</height>
     </rect>
@@ -101,7 +101,7 @@
    <property name="geometry">
     <rect>
      <x>130</x>
-     <y>80</y>
+     <y>100</y>
      <width>131</width>
      <height>21</height>
     </rect>
@@ -114,7 +114,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>230</y>
+     <y>250</y>
      <width>251</width>
      <height>71</height>
     </rect>
@@ -124,7 +124,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>300</y>
+     <y>320</y>
      <width>111</width>
      <height>23</height>
     </rect>
@@ -137,7 +137,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>660</y>
+     <y>680</y>
      <width>111</width>
      <height>21</height>
     </rect>
@@ -149,9 +149,9 @@
   <widget class="QDoubleSpinBox" name="dsbPcbToolSize">
    <property name="geometry">
     <rect>
-     <x>140</x>
-     <y>390</y>
-     <width>51</width>
+     <x>120</x>
+     <y>410</y>
+     <width>71</width>
      <height>21</height>
     </rect>
    </property>
@@ -163,7 +163,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>440</y>
+     <y>460</y>
      <width>121</width>
      <height>21</height>
     </rect>
@@ -179,7 +179,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>590</y>
+     <y>610</y>
      <width>251</width>
      <height>71</height>
     </rect>
@@ -218,7 +218,7 @@
    <property name="geometry">
     <rect>
      <x>130</x>
-     <y>440</y>
+     <y>460</y>
      <width>131</width>
      <height>21</height>
     </rect>
@@ -231,8 +231,8 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>390</y>
-     <width>131</width>
+     <y>410</y>
+     <width>111</width>
      <height>21</height>
     </rect>
    </property>
@@ -247,7 +247,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>460</y>
+     <y>480</y>
      <width>251</width>
      <height>121</height>
     </rect>
@@ -257,7 +257,7 @@
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>460</y>
+     <y>480</y>
      <width>291</width>
      <height>121</height>
     </rect>
@@ -267,7 +267,7 @@
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>300</y>
+     <y>320</y>
      <width>111</width>
      <height>23</height>
     </rect>
@@ -280,8 +280,8 @@
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>390</y>
-     <width>171</width>
+     <y>410</y>
+     <width>151</width>
      <height>21</height>
     </rect>
    </property>
@@ -296,7 +296,7 @@
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>440</y>
+     <y>460</y>
      <width>161</width>
      <height>21</height>
     </rect>
@@ -312,7 +312,7 @@
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>230</y>
+     <y>250</y>
      <width>291</width>
      <height>71</height>
     </rect>
@@ -335,7 +335,7 @@
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>660</y>
+     <y>680</y>
      <width>111</width>
      <height>21</height>
     </rect>
@@ -347,9 +347,9 @@
   <widget class="QDoubleSpinBox" name="dsbPcbTraySize">
    <property name="geometry">
     <rect>
-     <x>480</x>
-     <y>390</y>
-     <width>51</width>
+     <x>460</x>
+     <y>410</y>
+     <width>71</width>
      <height>21</height>
     </rect>
    </property>
@@ -374,7 +374,7 @@
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>100</y>
+     <y>120</y>
      <width>291</width>
      <height>121</height>
     </rect>
@@ -384,7 +384,7 @@
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>80</y>
+     <y>100</y>
      <width>161</width>
      <height>21</height>
     </rect>
@@ -416,7 +416,7 @@
    <property name="geometry">
     <rect>
      <x>470</x>
-     <y>80</y>
+     <y>100</y>
      <width>131</width>
      <height>21</height>
     </rect>
@@ -429,7 +429,7 @@
    <property name="geometry">
     <rect>
      <x>470</x>
-     <y>440</y>
+     <y>460</y>
      <width>131</width>
      <height>21</height>
     </rect>
@@ -442,8 +442,8 @@
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>30</y>
-     <width>171</width>
+     <y>50</y>
+     <width>151</width>
      <height>21</height>
     </rect>
    </property>
@@ -458,7 +458,7 @@
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>590</y>
+     <y>610</y>
      <width>291</width>
      <height>71</height>
     </rect>
@@ -467,9 +467,9 @@
   <widget class="QDoubleSpinBox" name="dsbSensorTraySize">
    <property name="geometry">
     <rect>
-     <x>480</x>
-     <y>30</y>
-     <width>51</width>
+     <x>460</x>
+     <y>50</y>
+     <width>71</width>
      <height>21</height>
     </rect>
    </property>
@@ -496,9 +496,9 @@
   <widget class="QDoubleSpinBox" name="dsbAssemblyTraySize">
    <property name="geometry">
     <rect>
-     <x>780</x>
-     <y>30</y>
-     <width>51</width>
+     <x>760</x>
+     <y>50</y>
+     <width>71</width>
      <height>21</height>
     </rect>
    </property>
@@ -510,7 +510,7 @@
    <property name="geometry">
     <rect>
      <x>650</x>
-     <y>80</y>
+     <y>100</y>
      <width>121</width>
      <height>21</height>
     </rect>
@@ -526,7 +526,7 @@
    <property name="geometry">
     <rect>
      <x>650</x>
-     <y>100</y>
+     <y>120</y>
      <width>251</width>
      <height>121</height>
     </rect>
@@ -536,7 +536,7 @@
    <property name="geometry">
     <rect>
      <x>650</x>
-     <y>300</y>
+     <y>320</y>
      <width>111</width>
      <height>23</height>
     </rect>
@@ -562,7 +562,7 @@
    <property name="geometry">
     <rect>
      <x>770</x>
-     <y>80</y>
+     <y>100</y>
      <width>131</width>
      <height>21</height>
     </rect>
@@ -575,8 +575,8 @@
    <property name="geometry">
     <rect>
      <x>650</x>
-     <y>30</y>
-     <width>131</width>
+     <y>50</y>
+     <width>111</width>
      <height>21</height>
     </rect>
    </property>
@@ -591,7 +591,7 @@
    <property name="geometry">
     <rect>
      <x>650</x>
-     <y>230</y>
+     <y>250</y>
      <width>251</width>
      <height>71</height>
     </rect>
@@ -811,9 +811,9 @@
   <widget class="QLineEdit" name="leSensorToolLocation">
    <property name="geometry">
     <rect>
-     <x>110</x>
-     <y>50</y>
-     <width>81</width>
+     <x>120</x>
+     <y>70</y>
+     <width>141</width>
      <height>20</height>
     </rect>
    </property>
@@ -822,8 +822,8 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>50</y>
-     <width>101</width>
+     <y>70</y>
+     <width>111</width>
      <height>21</height>
     </rect>
    </property>
@@ -838,8 +838,8 @@
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>50</y>
-     <width>141</width>
+     <y>70</y>
+     <width>151</width>
      <height>21</height>
     </rect>
    </property>
@@ -853,9 +853,9 @@
   <widget class="QLineEdit" name="leSensorTrayLocation">
    <property name="geometry">
     <rect>
-     <x>450</x>
-     <y>50</y>
-     <width>81</width>
+     <x>460</x>
+     <y>70</y>
+     <width>141</width>
      <height>20</height>
     </rect>
    </property>
@@ -863,9 +863,9 @@
   <widget class="QLineEdit" name="leAssemblyTrayLocation">
    <property name="geometry">
     <rect>
-     <x>750</x>
-     <y>50</y>
-     <width>81</width>
+     <x>760</x>
+     <y>70</y>
+     <width>141</width>
      <height>20</height>
     </rect>
    </property>
@@ -874,8 +874,8 @@
    <property name="geometry">
     <rect>
      <x>650</x>
-     <y>50</y>
-     <width>121</width>
+     <y>70</y>
+     <width>111</width>
      <height>21</height>
     </rect>
    </property>
@@ -890,8 +890,8 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>410</y>
-     <width>101</width>
+     <y>430</y>
+     <width>111</width>
      <height>21</height>
     </rect>
    </property>
@@ -905,9 +905,9 @@
   <widget class="QLineEdit" name="lePcbToolLocation">
    <property name="geometry">
     <rect>
-     <x>110</x>
-     <y>410</y>
-     <width>81</width>
+     <x>120</x>
+     <y>430</y>
+     <width>141</width>
      <height>20</height>
     </rect>
    </property>
@@ -916,8 +916,8 @@
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>410</y>
-     <width>141</width>
+     <y>430</y>
+     <width>151</width>
      <height>21</height>
     </rect>
    </property>
@@ -931,12 +931,257 @@
   <widget class="QLineEdit" name="lePcbTrayLocation">
    <property name="geometry">
     <rect>
-     <x>450</x>
-     <y>410</y>
-     <width>81</width>
+     <x>460</x>
+     <y>430</y>
+     <width>141</width>
      <height>20</height>
     </rect>
    </property>
+  </widget>
+  <widget class="QComboBox" name="cbSensorToolInstitution">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>30</y>
+     <width>71</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="currentIndex">
+    <number>0</number>
+   </property>
+   <item>
+    <property name="text">
+     <string>CERN</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>FNAL</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>UCSB</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>UMN</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_21">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>30</y>
+     <width>111</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Institution</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_22">
+   <property name="geometry">
+    <rect>
+     <x>310</x>
+     <y>30</y>
+     <width>151</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Institution</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="cbSensorTrayInstitution">
+   <property name="geometry">
+    <rect>
+     <x>460</x>
+     <y>30</y>
+     <width>71</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="currentIndex">
+    <number>0</number>
+   </property>
+   <item>
+    <property name="text">
+     <string>CERN</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>FNAL</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>UCSB</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>UMN</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_23">
+   <property name="geometry">
+    <rect>
+     <x>650</x>
+     <y>30</y>
+     <width>111</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Institution</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="cbAssemblyTrayInstitution">
+   <property name="geometry">
+    <rect>
+     <x>760</x>
+     <y>30</y>
+     <width>71</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="currentIndex">
+    <number>0</number>
+   </property>
+   <item>
+    <property name="text">
+     <string>CERN</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>FNAL</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>UCSB</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>UMN</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_24">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>390</y>
+     <width>111</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Institution</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="cbPcbToolInstitution">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>390</y>
+     <width>71</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="currentIndex">
+    <number>0</number>
+   </property>
+   <item>
+    <property name="text">
+     <string>CERN</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>FNAL</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>UCSB</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>UMN</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_25">
+   <property name="geometry">
+    <rect>
+     <x>310</x>
+     <y>390</y>
+     <width>151</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Institution</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="cbPcbTrayInstitution">
+   <property name="geometry">
+    <rect>
+     <x>460</x>
+     <y>390</y>
+     <width>71</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="currentIndex">
+    <number>0</number>
+   </property>
+   <item>
+    <property name="text">
+     <string>CERN</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>FNAL</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>UCSB</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>UMN</string>
+    </property>
+   </item>
   </widget>
  </widget>
  <resources/>
