@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '../main_ui/mainwindow.ui'
+# Form implementation generated from reading ui file 'mainwindow.ui'
 #
 # Created by: PyQt5 UI code generator 5.9.2
 #
@@ -72,8 +72,13 @@ class Ui_MainWindow(object):
         item = QtWidgets.QListWidgetItem()
         self.listShippingAndReceiving.addItem(item)
         self.vlUISelect.addWidget(self.listShippingAndReceiving)
-        spacerItem2 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        spacerItem2 = QtWidgets.QSpacerItem(20, 25, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.vlUISelect.addItem(spacerItem2)
+        self.pbUpload = QtWidgets.QPushButton(self.centralwidget)
+        self.pbUpload.setObjectName("pbUpload")
+        self.vlUISelect.addWidget(self.pbUpload)
+        spacerItem3 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.vlUISelect.addItem(spacerItem3)
         self.vlUISelect.setStretch(0, 1)
         self.vlUISelect.setStretch(1, 6)
         self.vlUISelect.setStretch(2, 1)
@@ -82,10 +87,10 @@ class Ui_MainWindow(object):
         self.vlUISelect.setStretch(5, 1)
         self.vlUISelect.setStretch(6, 1)
         self.vlUISelect.setStretch(7, 2)
-        self.vlUISelect.setStretch(8, 12)
+        self.vlUISelect.setStretch(10, 12)
         self.hlMainSections.addLayout(self.vlUISelect)
-        spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.hlMainSections.addItem(spacerItem3)
+        spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.hlMainSections.addItem(spacerItem4)
         self.hlUIpane = QtWidgets.QHBoxLayout()
         self.hlUIpane.setSpacing(0)
         self.hlUIpane.setObjectName("hlUIpane")
@@ -152,4 +157,5 @@ class Ui_MainWindow(object):
         item = self.listShippingAndReceiving.item(0)
         item.setText(_translate("MainWindow", "shipments"))
         self.listShippingAndReceiving.setSortingEnabled(__sortingEnabled)
+        self.pbUpload.setText(_translate("MainWindow", "Upload changes to database"))
 

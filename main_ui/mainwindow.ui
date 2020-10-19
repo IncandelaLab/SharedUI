@@ -21,7 +21,7 @@
        <number>0</number>
       </property>
       <item>
-       <layout class="QVBoxLayout" name="vlUISelect" stretch="1,6,1,1,5,1,1,2,12">
+       <layout class="QVBoxLayout" name="vlUISelect" stretch="1,6,1,1,5,1,1,2,0,0,12">
         <property name="spacing">
          <number>0</number>
         </property>
@@ -31,7 +31,7 @@
         <item>
          <widget class="QLineEdit" name="leInformation">
           <property name="text">
-           <string>Parts, tooling, supplies</string>
+           <string>Parts, tooling, and supplies</string>
           </property>
           <property name="readOnly">
            <bool>true</bool>
@@ -40,6 +40,12 @@
         </item>
         <item>
          <widget class="QListWidget" name="listInformation">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>165</height>
+           </size>
+          </property>
           <property name="currentRow">
            <number>-1</number>
           </property>
@@ -70,6 +76,11 @@
           </item>
           <item>
            <property name="text">
+            <string>wirebonding</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
             <string>tooling</string>
            </property>
           </item>
@@ -96,7 +107,7 @@
         <item>
          <widget class="QLineEdit" name="lineEdit">
           <property name="text">
-           <string>Production steps and testing routines</string>
+           <string>Production steps and testing</string>
           </property>
          </widget>
         </item>
@@ -159,6 +170,26 @@
          </widget>
         </item>
         <item>
+         <spacer name="verticalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>25</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pbUpload">
+          <property name="text">
+           <string>Upload changes to database</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <spacer name="verticalSpacer_3">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
@@ -166,7 +197,7 @@
           <property name="sizeHint" stdset="0">
            <size>
             <width>20</width>
-            <height>40</height>
+            <height>20</height>
            </size>
           </property>
          </spacer>

@@ -47,14 +47,9 @@ INDEX_INSTITUTION = {
 	'UMN':3,
 }
 
-# VERY TEMPORARY
-from rhapi import RhApi
 
 class func(object):
 	def __init__(self,fm,page,setUIPage,setSwitchingEnabled):
-		# EXTREMELY TEMPORARY
-		test_rhapi = RhApi("www.google.com")
-
 
 		self.page      = page
 		self.setUIPage = setUIPage
@@ -64,6 +59,9 @@ class func(object):
 		self.baseplate = fm.baseplate()
 
 		self.mode = 'setup'
+
+		# NEW:  List of all modified XML files
+		self.xmlModList = []
 
 
 	def enforce_mode(mode):
@@ -347,6 +345,16 @@ class func(object):
 		self.baseplate.save()
 		self.mode = 'view'
 		self.update_info()
+
+		# NEW:
+		self.xmlModList.append(self.baseplate.ID)
+
+
+	def xmlModified(self):
+		return self.xmlModList
+
+	def xmlModifiedReset(self):
+		self.xmlModList = []
 
 
 

@@ -82,6 +82,9 @@ class func(object):
 
 		self.mode = 'setup'
 
+		# NEW:
+		self.xmlModList = []
+
 	def enforce_mode(mode):
 		if not (type(mode) in [str,list]):
 			raise ValueError
@@ -758,6 +761,16 @@ class func(object):
 		self.unloadAllObjects()
 		self.mode = 'view'
 		self.update_info()
+
+		# NEW:
+		self.xmlModList.append(self.step_sensor.ID)
+
+	def xmlModified(self):
+		return self.xmlModList
+
+	def xmlModifiedReset(self):
+		self.xmlModList = []
+
 
 	def goTool(self,*args,**kwargs):
 		sender_name = str(self.page.sender().objectName())

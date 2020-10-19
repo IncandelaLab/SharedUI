@@ -50,6 +50,9 @@ class func(object):
 
 		self.mode = 'setup'
 
+		# NEW
+		self.xmlModList = []
+
 
 	def enforce_mode(mode):
 		if not (type(mode) in [str,list]):
@@ -251,8 +254,17 @@ class func(object):
 		self.mode = 'view'
 		self.update_info()
 
+		# NEW:
+		self.xmlModList.append(self.sensor.ID)
 
-	
+
+	def xmlModified(self):
+		return self.xmlModList
+
+	def xmlModifiedReset(self):
+		self.xmlModList = []
+
+
 	@enforce_mode(['editing','creating'])
 	def deleteComment(self,*args,**kwargs):
 		row = self.page.listComments.currentRow()

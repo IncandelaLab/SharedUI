@@ -6,6 +6,9 @@ import sys
 import time
 
 
+# FOR DATABASE UPLOADING:
+from cmsdbldr_client import LoaderClient
+
 
 
 # Import page functionality classes
@@ -223,6 +226,9 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		self.listShippingAndReceiving.itemActivated.connect(self.changeUIPage)
 		self.swPages.currentChanged.connect(self.pageChanged)
 
+		# NEW, experimental
+		self.pbUpload.clicked.connect(self.goUpload)
+
 
 	def timer_setup(self):
 		self.timer_id_gen = id_generator() # unique ID generator for timers
@@ -316,7 +322,82 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		self.listAssembly.setEnabled(enabled)
 		self.listShippingAndReceiving.setEnabled(enabled)
 
-	
+
+	# New, sort of experimental
+	def goUpload(self,*args,**kwargs):
+		# Create a popup box requesting username/password, plus a "cancel" button.
+		# If username+password given, submit.
+		# BUT:  How can username/password be fed to loader?
+
+		# FIRST:  Check to see whether there's any modified XML files
+		xmlStepList = [self.func_view_baseplate, self.func_view_sensor, self.func_view_PCB, self.func_view_sensor_step]
+		xmlFilesModified = 0
+		for step in xmlStepList:
+			xmlModList = step.xmlModified()
+			if len(xmlModList) != 0:  xmlFilesModified += 1
+
+		if xmlFilesModified == 0:
+			print("ALL CHANGES HAVE ALREADY BEEN SAVED")
+			return
+				
+
+		print("DISPLAYING POP-UP")
+		ldlg = LoginDialog(self)
+		loginResult = ldlg.exec_()
+		if loginResult.isCancelled():
+			print("Upload cancelled!")
+		elif loginResult == wdgt.QDialog.Accepted:
+			print("Upload successful!")
+			# MAYBE:  New popup box here!
+			# WARNING:  Might be difficult to pass obj info to save to LoginDialog...
+			
+			for step in xmlStepList:
+				step.xmlModifiedReset()
+
+		else:
+			print("Upload unsuccessful!")
+
+
+class LoginDialog(wdgt.QDialog):
+
+	def __init__(self, *args, **kwargs):
+		super(LoginDialog, self).__init__(*args, **kwargs)
+
+		self.setWindowTitle("Provide DB login credentials")
+		
+		self.textName = wdgt.QLineEdit(self)
+		self.textPass = wdgt.QLineEdit(self)
+		self.buttonLogin = wdgt.QPushButton('Login', self)
+		self.buttonCancel = wdgt.QPushButton('Cancel', self)
+		self.buttonLogin.clicked.connect(self.handleLogin)
+		self.buttonCancel.clicked.connect(self.handleCancel)
+		layout = wdgt.QVBoxLayout(self)
+		layout.addWidget(self.textName)
+		layout.addWidget(self.textPass)
+		layout.addWidget(self.buttonLogin)
+		layout.addWidget(self.buttonCancel)
+
+		self.cancelled = False
+
+	def handleLogin(self):
+		username = self.textName.text()
+		password = self.textPass.text()
+		print("Got username {}, password {}".format(username, password))
+		
+		# PERFORM ATTEMPTED UPLOAD
+		# If all good, then:
+		self.accept()
+		# Otherwise...
+		# self.reject()
+
+	def handleCancel(self):
+		print("Login canceled")
+		self.cancelled = True
+		self.reject()
+
+	def isCancelled(self):
+		return self.cancelled
+
 
 
 if __name__ == '__main__':

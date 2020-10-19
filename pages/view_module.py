@@ -63,6 +63,8 @@ class func(object):
 		self.module_exists = None
 		self.mode = 'setup'
 
+		# NEW
+		self.xmlModList = []
 
 
 	def enforce_mode(mode):
@@ -482,6 +484,14 @@ class func(object):
 		self.mode = 'view'
 		self.update_info()
 
+		self.xmlModList.append(self.module.ID)
+
+
+	def xmlModified(self):
+		return self.xmlModList
+
+	def xmlModifiedReset(self):
+		self.xmlModList = []
 
 
 	@enforce_mode(['editing','creating'])

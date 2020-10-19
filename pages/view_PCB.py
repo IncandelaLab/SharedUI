@@ -52,6 +52,9 @@ class func(object):
 
 		self.mode = 'setup'
 
+		# NEW:
+		self.xmlModList = []
+
 
 	def enforce_mode(mode):
 		if not (type(mode) in [str,list]):
@@ -268,6 +271,15 @@ class func(object):
 		self.pcb.save()
 		self.mode = 'view'
 		self.update_info()
+
+		# NEW:
+		self.xmlModList.append(self.pcb.ID)\
+
+	def xmlModified(self):
+		return self.xmlModList
+
+	def xmlModifiedReset(self):
+		self.xmlModList = []
 
 
 
