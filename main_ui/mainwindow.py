@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '../main_ui/mainwindow.ui'
+# Form implementation generated from reading ui file 'mainwindow.ui'
 #
 # Created by: PyQt5 UI code generator 5.9.2
 #
@@ -30,6 +30,8 @@ class Ui_MainWindow(object):
         self.listInformation = QtWidgets.QListWidget(self.centralwidget)
         self.listInformation.setMinimumSize(QtCore.QSize(0, 165))
         self.listInformation.setObjectName("listInformation")
+        item = QtWidgets.QListWidgetItem()
+        self.listInformation.addItem(item)
         item = QtWidgets.QListWidgetItem()
         self.listInformation.addItem(item)
         item = QtWidgets.QListWidgetItem()
@@ -141,6 +143,8 @@ class Ui_MainWindow(object):
         item.setText(_translate("MainWindow", "tooling"))
         item = self.listInformation.item(7)
         item.setText(_translate("MainWindow", "supplies"))
+        item = self.listInformation.item(8)
+        item.setText(_translate("MainWindow", "search for parts"))
         self.listInformation.setSortingEnabled(__sortingEnabled)
         self.lineEdit.setText(_translate("MainWindow", "Production steps and testing"))
         __sortingEnabled = self.listAssembly.isSortingEnabled()

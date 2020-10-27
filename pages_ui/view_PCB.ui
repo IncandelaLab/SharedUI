@@ -884,7 +884,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>-1</number>
    </property>
    <item>
     <property name="text">
@@ -983,8 +983,11 @@
      <height>21</height>
     </rect>
    </property>
+   <property name="currentText">
+    <string/>
+   </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>-1</number>
    </property>
    <item>
     <property name="text">

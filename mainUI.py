@@ -17,6 +17,7 @@ from pages.view_sensor      import func as cls_func_view_sensor
 from pages.view_PCB         import func as cls_func_view_PCB
 from pages.view_protomodule import func as cls_func_view_protomodule
 from pages.view_module      import func as cls_func_view_module
+from pages.search           import func as cls_func_search
 
 from pages.view_kapton_step import func as cls_func_view_kapton_step
 from pages.view_sensor_step import func as cls_func_view_sensor_step
@@ -62,6 +63,15 @@ class widget_view_module(wdgt.QWidget,form_view_module):
 	def __init__(self,parent):
 		super(widget_view_module,self).__init__(parent)
 		self.setupUi(self)
+
+# NEW:
+
+from pages_ui.search import Ui_Form as form_search
+class widget_search(wdgt.QWidget,form_search):
+	def __init__(self,parent):
+		super(widget_search,self).__init__(parent)
+		self.setupUI(self)
+
 
 
 from pages_ui.view_kapton_step import Ui_Form as form_view_kapton_step
@@ -118,15 +128,16 @@ PAGE_IDS = {
 	'PCBs'                   : 2,
 	'protomodules'           : 3,
 	'modules'                : 4,
+	'search for parts'       : 5, # NEW, indices have been adjusted accordingly
 
-	'kapton placement steps' : 5,
-	'sensor placement steps' : 6,
-	'PCB placement steps'    : 7,
+	'kapton placement steps' : 6,
+	'sensor placement steps' : 7,
+	'PCB placement steps'    : 9,
 
-	'tooling'                : 8,
-	'supplies'               : 9,
+	'tooling'                : 9,
+	'supplies'               : 10,
 
-	'shipments'               :10, #WARNING:  Order has been switched
+	'shipments'               :11, #WARNING:  Order has been switched
 	# 'IV curve'               :11,
 }
 
@@ -170,6 +181,8 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		self.page_view_PCB         = widget_view_PCB(None)         ; self.swPages.addWidget(self.page_view_PCB)
 		self.page_view_protomodule = widget_view_protomodule(None) ; self.swPages.addWidget(self.page_view_protomodule)
 		self.page_view_module      = widget_view_module(None)      ; self.swPages.addWidget(self.page_view_module)
+		# NEW
+		self.page_search           = widget_search(None)      ; self.swPages.addWidget(self.page_search)
 
 		self.page_view_kapton_step = widget_view_kapton_step(None) ; self.swPages.addWidget(self.page_view_kapton_step)
 		self.page_view_sensor_step = widget_view_sensor_step(None) ; self.swPages.addWidget(self.page_view_sensor_step)
@@ -188,6 +201,8 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		self.func_view_PCB         = cls_func_view_PCB(              fm, self.page_view_PCB        , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_protomodule = cls_func_view_protomodule(      fm, self.page_view_protomodule, self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_module      = cls_func_view_module(           fm, self.page_view_module     , self.setUIPage, self.setSwitchingEnabled)
+		# SEARCH
+		self.func_search           = cls_func_search(                fm, self.page_search          , self.setUIPage, self.setSwtichingEnabled)
 
 		self.func_view_kapton_step = cls_func_view_kapton_step(      fm, self.page_view_kapton_step, self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_sensor_step = cls_func_view_sensor_step(      fm, self.page_view_sensor_step, self.setUIPage, self.setSwitchingEnabled)
@@ -207,6 +222,7 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 			self.func_view_PCB,
 			self.func_view_protomodule,
 			self.func_view_module,
+			self.func_search,   # NEW
 
 			self.func_view_kapton_step,
 			self.func_view_sensor_step,
