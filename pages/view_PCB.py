@@ -2,6 +2,16 @@ PAGE_NAME = "view_pcb"
 PARTTYPE = "PCB"
 DEBUG = False
 
+INDEX_TYPE = {
+	'HGCROCV1':0,
+	'HGCROCV2':1,
+	'HGCROCV3':2,
+	'SKIROCV1':3,
+	'SKIROCV2':4,
+	'SKIROCV3':5,
+	'HGCROC dummy':6,
+}
+
 INDEX_SIZE = {
 	8:0,
 	"8":0,
@@ -137,6 +147,7 @@ class func(object):
 		self.page.leLocation.setText(    "" if self.pcb.location     is None else self.pcb.location    )
 		self.page.leIdentifier.setText(  "" if self.pcb.identifier   is None else self.pcb.identifier  )
 		self.page.leManufacturer.setText("" if self.pcb.manufacturer is None else self.pcb.manufacturer)
+		self.page.cbType.setCurrentIndex(       INDEX_TYPE.get(       self.pcb.type,-1)        )
 		self.page.cbSize.setCurrentIndex(       INDEX_SIZE.get(       self.pcb.size,-1)        )
 		self.page.cbShape.setCurrentIndex(      INDEX_SHAPE.get(      self.pcb.shape,-1)       )
 		self.page.cbChirality.setCurrentIndex(  INDEX_CHIRALITY.get(  self.pcb.chirality,-1)   )
@@ -198,6 +209,7 @@ class func(object):
 		self.page.leLocation.setReadOnly(     not (mode_creating or mode_editing) )
 		self.page.leIdentifier.setReadOnly(   not (mode_creating or mode_editing) )
 		self.page.leManufacturer.setReadOnly( not (mode_creating or mode_editing) )
+		self.page.cbType.setEnabled(               mode_creating or mode_editing  )
 		self.page.cbSize.setEnabled(               mode_creating or mode_editing  )
 		self.page.cbShape.setEnabled(              mode_creating or mode_editing  )
 		self.page.cbChirality.setEnabled(          mode_creating or mode_editing  )
@@ -250,6 +262,7 @@ class func(object):
 		self.pcb.location     = str(self.page.leLocation.text()        )   if str(self.page.leLocation.text()          ) else None
 		self.pcb.identifier   = str(self.page.leIdentifier.text()      )   if str(self.page.leIdentifier.text()        ) else None
 		self.pcb.manufacturer = str(self.page.leManufacturer.text()    )   if str(self.page.leManufacturer.text()      ) else None
+		self.pcb.type         = str(self.page.cbType.currentText()     )   if str(self.page.cbType.currentText()       ) else None
 		self.pcb.size         = str(self.page.cbSize.currentText()     )   if str(self.page.cbSize.currentText()       ) else None
 		self.pcb.shape        = str(self.page.cbShape.currentText()    )   if str(self.page.cbShape.currentText()      ) else None
 		self.pcb.chirality    = str(self.page.cbChirality.currentText())   if str(self.page.cbChirality.currentText()  ) else None

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1097</width>
-    <height>705</height>
+    <height>719</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -81,7 +81,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>340</y>
+     <y>360</y>
      <width>181</width>
      <height>21</height>
     </rect>
@@ -97,7 +97,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>320</y>
+     <y>340</y>
      <width>181</width>
      <height>21</height>
     </rect>
@@ -277,7 +277,7 @@
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>320</y>
+     <y>340</y>
      <width>81</width>
      <height>21</height>
     </rect>
@@ -337,7 +337,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>360</y>
+     <y>380</y>
      <width>181</width>
      <height>21</height>
     </rect>
@@ -353,7 +353,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>380</y>
+     <y>400</y>
      <width>181</width>
      <height>21</height>
     </rect>
@@ -369,7 +369,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>400</y>
+     <y>420</y>
      <width>181</width>
      <height>21</height>
     </rect>
@@ -385,7 +385,7 @@
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>400</y>
+     <y>420</y>
      <width>81</width>
      <height>21</height>
     </rect>
@@ -404,7 +404,7 @@
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>380</y>
+     <y>400</y>
      <width>81</width>
      <height>21</height>
     </rect>
@@ -654,7 +654,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>590</y>
+     <y>610</y>
      <width>261</width>
      <height>71</height>
     </rect>
@@ -667,7 +667,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>440</y>
+     <y>460</y>
      <width>141</width>
      <height>21</height>
     </rect>
@@ -683,7 +683,7 @@
    <property name="geometry">
     <rect>
      <x>150</x>
-     <y>440</y>
+     <y>460</y>
      <width>121</width>
      <height>21</height>
     </rect>
@@ -696,7 +696,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>460</y>
+     <y>480</y>
      <width>261</width>
      <height>121</height>
     </rect>
@@ -706,7 +706,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>660</y>
+     <y>680</y>
      <width>111</width>
      <height>21</height>
     </rect>
@@ -781,7 +781,7 @@
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>340</y>
+     <y>360</y>
      <width>81</width>
      <height>21</height>
     </rect>
@@ -830,7 +830,7 @@
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>360</y>
+     <y>380</y>
      <width>81</width>
      <height>20</height>
     </rect>
@@ -957,6 +957,70 @@
    <property name="readOnly">
     <bool>true</bool>
    </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_21">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>320</y>
+     <width>131</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Type</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="cbType">
+   <property name="geometry">
+    <rect>
+     <x>140</x>
+     <y>320</y>
+     <width>131</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="currentIndex">
+    <number>0</number>
+   </property>
+   <item>
+    <property name="text">
+     <string>HGCROCV1</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>HGCROCV2</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>HGCROCV3</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>SKIROCV1</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>SKIROCV2</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>SKIROCV3</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>HGCROC dummy</string>
+    </property>
+   </item>
   </widget>
  </widget>
  <resources/>

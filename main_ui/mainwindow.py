@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'mainwindow.ui'
+# Form implementation generated from reading ui file '../main_ui/mainwindow.ui'
 #
 # Created by: PyQt5 UI code generator 5.9.2
 #
@@ -28,7 +28,10 @@ class Ui_MainWindow(object):
         self.leInformation.setObjectName("leInformation")
         self.vlUISelect.addWidget(self.leInformation)
         self.listInformation = QtWidgets.QListWidget(self.centralwidget)
+        self.listInformation.setMinimumSize(QtCore.QSize(0, 165))
         self.listInformation.setObjectName("listInformation")
+        item = QtWidgets.QListWidgetItem()
+        self.listInformation.addItem(item)
         item = QtWidgets.QListWidgetItem()
         self.listInformation.addItem(item)
         item = QtWidgets.QListWidgetItem()
@@ -77,7 +80,7 @@ class Ui_MainWindow(object):
         self.pbUpload = QtWidgets.QPushButton(self.centralwidget)
         self.pbUpload.setObjectName("pbUpload")
         self.vlUISelect.addWidget(self.pbUpload)
-        spacerItem3 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        spacerItem3 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.vlUISelect.addItem(spacerItem3)
         self.vlUISelect.setStretch(0, 1)
         self.vlUISelect.setStretch(1, 6)
@@ -119,7 +122,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.leInformation.setText(_translate("MainWindow", "Parts, tooling, supplies"))
+        self.leInformation.setText(_translate("MainWindow", "Parts, tooling, and supplies"))
         __sortingEnabled = self.listInformation.isSortingEnabled()
         self.listInformation.setSortingEnabled(False)
         item = self.listInformation.item(0)
@@ -133,11 +136,13 @@ class Ui_MainWindow(object):
         item = self.listInformation.item(4)
         item.setText(_translate("MainWindow", "modules"))
         item = self.listInformation.item(5)
-        item.setText(_translate("MainWindow", "tooling"))
+        item.setText(_translate("MainWindow", "wirebonding"))
         item = self.listInformation.item(6)
+        item.setText(_translate("MainWindow", "tooling"))
+        item = self.listInformation.item(7)
         item.setText(_translate("MainWindow", "supplies"))
         self.listInformation.setSortingEnabled(__sortingEnabled)
-        self.lineEdit.setText(_translate("MainWindow", "Production steps and testing routines"))
+        self.lineEdit.setText(_translate("MainWindow", "Production steps and testing"))
         __sortingEnabled = self.listAssembly.isSortingEnabled()
         self.listAssembly.setSortingEnabled(False)
         item = self.listAssembly.item(0)

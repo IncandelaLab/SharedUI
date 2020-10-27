@@ -900,7 +900,7 @@ class sensor(fsobj):
 		# characteristics (defined upon reception)
 		"identifier",   # 
 		"manufacturer", # 
-		"type",         # 
+		"type",         # NEW:  This is now chosen from a drop-down menu
 		"size",         # 
 		"channels",     # 
 		"shape",        # 
@@ -988,6 +988,7 @@ class pcb(fsobj):
 		"insertion_user",
 		"identifier",   # 
 		"manufacturer", # 
+		"type",         # NEW
 		"size",         # 
 		"channels",     # 
 		"shape",        # 

@@ -322,22 +322,6 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QLineEdit" name="leType">
-    <property name="geometry">
-     <rect>
-      <x>180</x>
-      <y>230</y>
-      <width>80</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
    <widget class="QLineEdit" name="lineEdit_4">
     <property name="geometry">
      <rect>
@@ -348,7 +332,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Type</string>
+     <string>Type (Si thickness)</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -559,6 +543,39 @@
      <bool>true</bool>
     </property>
    </widget>
+   <widget class="QComboBox" name="cbType">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>230</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
+    <item>
+     <property name="text">
+      <string>100 um</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>200 um</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>300 um</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>500 um</string>
+     </property>
+    </item>
+   </widget>
    <zorder>lineEdit_9</zorder>
    <zorder>lineEdit_2</zorder>
    <zorder>lineEdit_3</zorder>
@@ -581,7 +598,6 @@
    <zorder>pbGoShipment</zorder>
    <zorder>cbShape</zorder>
    <zorder>sbChannels</zorder>
-   <zorder>leType</zorder>
    <zorder>leManufacturer</zorder>
    <zorder>cbSemiType</zorder>
    <zorder>lineEdit_16</zorder>
@@ -589,6 +605,7 @@
    <zorder>cbInstitution</zorder>
    <zorder>leInsertUser</zorder>
    <zorder>lineEdit_18</zorder>
+   <zorder>cbType</zorder>
   </widget>
   <widget class="QFrame" name="frame_3">
    <property name="geometry">
