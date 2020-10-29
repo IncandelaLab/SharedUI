@@ -8,6 +8,14 @@ DEBUG = False
 
 #NEW, WIP
 
+PAGE_NAME_DICT = {
+	'baseplate':   'baseplates',
+	'sensor':      'sensors',
+	'pcb':         'PCBs',
+	'protomodule': 'protomodules',
+	'module':      'modules',
+}
+
 #assorted useful vars
 
 STATUS_NO_ISSUES = "valid (no issues)"
@@ -104,7 +112,7 @@ class func(object):
 
 		self.page.pbAddPart.clicked.connect(self.addPart)
 		self.page.pbDeleteSelected.clicked.connect(self.deleteSelected)
-
+		self.page.pbGoToSelected.clicked.connect(self.goToSelected)
 
 
 	@enforce_mode('view')
@@ -349,6 +357,7 @@ class func(object):
 			partTemp.shipments = [x for x in partTemp.shipments if x != self.shipment.ID]
 			partTemp.save()
 
+		self.shipment.add_part_to_list()
 		self.shipment.save()
 		self.mode = 'view'
 		self.update_info()
@@ -393,6 +402,13 @@ class func(object):
 
 		self.updateIssues()
 
+	@enforce_mode(['editing','creating'])
+	def goToSelected(self,*args,**kwargs):
+		name = self.page.lwPartList.currentItem().text().split()
+		partType = name[0]
+		partID = name[1]
+		pageName = PAGE_NAME_DICT[partType]
+		self.setUIPage(pageName, ID=partID)
 
 	@enforce_mode(['editing','creating'])
 	def deleteComment(self,*args,**kwargs):

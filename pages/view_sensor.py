@@ -257,6 +257,7 @@ class func(object):
 
 		self.sensor.inspection = str(self.page.cbInspection.currentText()) if str(self.page.cbInspection.currentText()) else None
 
+		self.sensor.add_part_to_list()
 		self.sensor.save()
 		self.mode = 'view'
 		self.update_info()

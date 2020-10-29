@@ -281,6 +281,7 @@ class func(object):
 		self.pcb.flatness   =     self.page.dsbFlatness.value()         if     self.page.dsbFlatness.value()  >=0    else None
 		self.pcb.thickness  =     self.page.dsbThickness.value()        if     self.page.dsbThickness.value() >=0    else None
 
+		self.pcb.add_part_to_list()
 		self.pcb.save()
 		self.mode = 'view'
 		self.update_info()

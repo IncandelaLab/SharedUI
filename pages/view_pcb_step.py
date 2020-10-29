@@ -764,6 +764,9 @@ class func(object):
 		self.mode = 'view'
 		self.update_info()
 
+		# NEW:
+		self.add_part_to_list()
+
 	def goTool(self,*args,**kwargs):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1 # last character of sender name is integer 1 through 6; subtract one for zero index

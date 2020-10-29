@@ -70,7 +70,7 @@ from pages_ui.search import Ui_Form as form_search
 class widget_search(wdgt.QWidget,form_search):
 	def __init__(self,parent):
 		super(widget_search,self).__init__(parent)
-		self.setupUI(self)
+		self.setupUi(self)
 
 
 
@@ -202,7 +202,7 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		self.func_view_protomodule = cls_func_view_protomodule(      fm, self.page_view_protomodule, self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_module      = cls_func_view_module(           fm, self.page_view_module     , self.setUIPage, self.setSwitchingEnabled)
 		# SEARCH
-		self.func_search           = cls_func_search(                fm, self.page_search          , self.setUIPage, self.setSwtichingEnabled)
+		self.func_search           = cls_func_search(                fm, self.page_search          , self.setUIPage, self.setSwitchingEnabled)
 
 		self.func_view_kapton_step = cls_func_view_kapton_step(      fm, self.page_view_kapton_step, self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_sensor_step = cls_func_view_sensor_step(      fm, self.page_view_sensor_step, self.setUIPage, self.setSwitchingEnabled)

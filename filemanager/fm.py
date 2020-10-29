@@ -51,6 +51,19 @@ def loadconfig(file=None):
 			', '.join(MAC_ID_RANGES.keys())
 			))
 
+	# NEW for searching:  Need to store list of all searchable object IDs.  Easiest approach is to dump a list via json.
+	partlistdir = os.sep.join([DATADIR, 'partlist'])
+	if not os.path.exists(partlistdir):
+		os.makedirs(partlistdir)
+
+	# Class names MUST match actual class names or stuff will break
+	for part in ['baseplate', 'sensor', 'pcb', 'protomodule', 'module', 'shipment']:
+		fname = os.sep.join([partlistdir, part+'s.json'])
+		if not os.path.exists(fname):
+			with open(fname, 'w') as opfl:
+				# Dump an empty list if nothing is found
+				json.dump([], opfl)
+
 loadconfig()
 
 
@@ -96,6 +109,20 @@ class fsobj(object):
 		filedir  = os.sep.join([ DATADIR, self.FILEDIR.format(ID=ID, century = CENTURY.format(ID//100)) ])
 		filename = self.FILENAME.format(ID=ID)
 		return filedir, filename
+
+
+	# NEW:  For search page
+	def add_part_to_list(self):
+		part_name = self.__class__.__name__
+		partlistfile = os.sep.join([ DATADIR, 'partlist', part_name+'s.json' ])
+		# If file does not exist, something has gone wrong
+		with open(partlistfile, 'r') as opfl:
+			data = json.load(opfl)
+			if not self.ID in data:
+				data.append(self.ID)
+		with open(partlistfile, 'w') as opfl:
+			json.dump(data, opfl)
+
 
 	def save(self, objname = 'fsobj'):  #NOTE:  objname param is new
 		filedir, filename = self.get_filedir_filename(self.ID)
@@ -302,10 +329,13 @@ class fsobj_tool(fsobj):
 		return filedir, filename
 
 	def save(self):
+		print("CALLING SAVE")
+
 		#NOTE:  Tools require special treatment.
 		#       IDs are NOT unique.  ID+location is unique.  Need to use this instead to name the file.
 		filedir, filename = self.get_filedir_filename(self.ID, self.institution)
 		file = os.sep.join([filedir, filename])
+		print("Saving to "+file)
 		if not os.path.exists(filedir):
 			os.makedirs(filedir)
 
@@ -818,7 +848,8 @@ class baseplate(fsobj):
 			if vr is None:
 				# If any undef var found, save the json file only and return
 				print("NOTE:  missing required data, baseplate XML not saved.")
-				super(baseplate, self).save
+				super(baseplate, self).save()
+				print("Saved baseplate!")
 				return
 
 		# TAKE 2:  This time, use gen_xml(input_dict) to streamline things.
@@ -935,7 +966,7 @@ class sensor(fsobj):
 			if vr is None:
 				# If any undef var found, save the json file only and return
 				print("NOTE:  missing required data, baseplate XML not saved.")
-				super(sensor, self).save
+				super(sensor, self).save()
 				return
 
 		# TAKE 2:  This time, use gen_xml(input_dict) to streamline things.
@@ -1048,7 +1079,7 @@ class pcb(fsobj):
 			if vr is None:
 				# If any undef var found, save the json file only and return
 				print("NOTE:  missing required data, baseplate XML not saved.")
-				super(pcb, self).save
+				super(pcb, self).save()
 				return
 
 		# TAKE 2:  This time, use gen_xml(input_dict) to streamline things.
@@ -1362,7 +1393,6 @@ class module(fsobj):
 		
 		if os.path.exists(file):
 			return numpy.loadtxt(file)
-
 		else:
 			return None
 

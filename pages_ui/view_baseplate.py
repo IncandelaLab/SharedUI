@@ -613,7 +613,7 @@ class Ui_Form(object):
         self.lineEdit_2.setText(_translate("Form", "Identifier"))
         self.lineEdit_10.setText(_translate("Form", "Shipments"))
         self.lineEdit_7.setText(_translate("Form", "Manufacturer"))
-        self.lineEdit_3.setText(_translate("Form", "Material"))
+        self.lineEdit_3.setText(_translate("Form", "Type (material)"))
         self.listShipments.setToolTip(_translate("Form", "ID (date sent) (SENDER to RECEIVER)"))
         self.lineEdit_13.setText(_translate("Form", "Chirality"))
         self.lineEdit_16.setText(_translate("Form", "Rotation"))

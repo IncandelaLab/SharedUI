@@ -333,7 +333,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Material</string>
+     <string>Type (material)</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>

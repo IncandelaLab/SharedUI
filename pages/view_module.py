@@ -480,11 +480,13 @@ class func(object):
 		self.module.iv_ok           = str(self.page.cbIvOK.currentText()         ) if str(self.page.cbIvOK.currentText()         ) else None
 		self.module.biased_daq_ok   = str(self.page.cbBiasedDaqOK.currentText()  ) if str(self.page.cbBiasedDaqOK.currentText()  ) else None
 
+		self.module.add_part_to_list()
 		self.module.save()
 		self.mode = 'view'
 		self.update_info()
 
 		self.xmlModList.append(self.module.ID)
+
 
 
 	def xmlModified(self):

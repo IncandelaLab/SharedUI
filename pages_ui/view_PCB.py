@@ -259,6 +259,7 @@ class Ui_Form(object):
         self.lineEdit_21.setObjectName("lineEdit_21")
         self.cbType = QtWidgets.QComboBox(Form)
         self.cbType.setGeometry(QtCore.QRect(140, 320, 131, 21))
+        self.cbType.setCurrentText("")
         self.cbType.setObjectName("cbType")
         self.cbType.addItem("")
         self.cbType.addItem("")
@@ -274,8 +275,8 @@ class Ui_Form(object):
         self.cbDaqOK.setCurrentIndex(-1)
         self.cbSize.setCurrentIndex(-1)
         self.cbShape.setCurrentIndex(-1)
-        self.cbInstitution.setCurrentIndex(0)
-        self.cbType.setCurrentIndex(0)
+        self.cbInstitution.setCurrentIndex(-1)
+        self.cbType.setCurrentIndex(-1)
         QtCore.QMetaObject.connectSlotsByName(Form)
 
     def retranslateUi(self, Form):

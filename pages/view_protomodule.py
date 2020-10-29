@@ -271,10 +271,10 @@ class func(object):
 		self.protomodule.check_cracks	    = str(self.page.cbCheckCracks.currentText()   ) if str(self.page.cbCheckCracks.currentText()   ) else None
 		self.protomodule.check_glue_spill	= str(self.page.cbCheckGlueSpill.currentText()) if str(self.page.cbCheckGlueSpill.currentText()) else None
 
+		self.protomodule.add_part_to_list()
 		self.protomodule.save()
 		self.mode = 'view'
 		self.update_info()
-
 
 	
 	@enforce_mode(['editing','creating'])

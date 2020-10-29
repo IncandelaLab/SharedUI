@@ -62,6 +62,7 @@ class func(object):
 
 		# NEW:  List of all modified XML files
 		self.xmlModList = []
+		self.idList = []
 
 
 	def enforce_mode(mode):
@@ -341,13 +342,17 @@ class func(object):
 		self.baseplate.check_edges_firm_2 = str(self.page.cbCheckEdgesFirm_2.currentText()) if str(self.page.cbCheckEdgesFirm_2.currentText()) else None
 		self.baseplate.check_glue_spill_2 = str(self.page.cbCheckGlueSpill_2.currentText()) if str(self.page.cbCheckGlueSpill_2.currentText()) else None
 		self.baseplate.kapton_flatness_2  =     self.page.dsbKaptonFlatness_2.value()       if     self.page.dsbKaptonFlatness_2.value() >=0   else None
-			
+		
+		# Maybe moving this here...
+		self.baseplate.add_part_to_list()
+
 		self.baseplate.save()
 		self.mode = 'view'
 		self.update_info()
 
 		# NEW:
 		self.xmlModList.append(self.baseplate.ID)
+		#self.baseplate.add_part_to_list()
 
 
 	def xmlModified(self):
