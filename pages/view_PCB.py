@@ -144,9 +144,10 @@ class func(object):
 			self.page.listShipments.addItem(str(shipment))
 
 		self.page.leInsertUser.setText(  "" if self.pcb.insertion_user is None else self.pcb.insertion_user)
-		self.page.leLocation.setText(    "" if self.pcb.location     is None else self.pcb.location    )
-		self.page.leIdentifier.setText(  "" if self.pcb.identifier   is None else self.pcb.identifier  )
-		self.page.leManufacturer.setText("" if self.pcb.manufacturer is None else self.pcb.manufacturer)
+		self.page.leLocation.setText(    "" if self.pcb.location       is None else self.pcb.location    )
+		self.page.leSerial.setText(      "" if self.pcb.serial         is None else self.pcb.serial      )
+		self.page.leBarcode.setText(     "" if self.pcb.barcode        is None else self.pcb.barcode     )
+		self.page.leManufacturer.setText("" if self.pcb.manufacturer   is None else self.pcb.manufacturer)
 		self.page.cbType.setCurrentIndex(       INDEX_TYPE.get(       self.pcb.type,-1)        )
 		self.page.cbSize.setCurrentIndex(       INDEX_SIZE.get(       self.pcb.size,-1)        )
 		self.page.cbShape.setCurrentIndex(      INDEX_SHAPE.get(      self.pcb.shape,-1)       )
@@ -207,7 +208,8 @@ class func(object):
 
 		self.page.leInsertUser.setReadOnly(   not (mode_creating or mode_editing) )
 		self.page.leLocation.setReadOnly(     not (mode_creating or mode_editing) )
-		self.page.leIdentifier.setReadOnly(   not (mode_creating or mode_editing) )
+		self.page.leSerial.setReadOnly(       not (mode_creating or mode_editing) )
+		self.page.leBarcode.setReadOnly(      not (mode_creating or mode_editing) )
 		self.page.leManufacturer.setReadOnly( not (mode_creating or mode_editing) )
 		self.page.cbType.setEnabled(               mode_creating or mode_editing  )
 		self.page.cbSize.setEnabled(               mode_creating or mode_editing  )
@@ -260,7 +262,8 @@ class func(object):
 
 		self.pcb.insertion_user = str(self.page.leInsertUser.text()    )   if str(self.page.leInsertUser.text()        ) else None
 		self.pcb.location     = str(self.page.leLocation.text()        )   if str(self.page.leLocation.text()          ) else None
-		self.pcb.identifier   = str(self.page.leIdentifier.text()      )   if str(self.page.leIdentifier.text()        ) else None
+		self.pcb.serial       = str(self.page.leSerial.text()          )   if str(self.page.leSerial.text()            ) else None
+		self.pcb.barcode      = str(self.page.leBarcode.text()         )   if str(self.page.leBarcode.text()           ) else None
 		self.pcb.manufacturer = str(self.page.leManufacturer.text()    )   if str(self.page.leManufacturer.text()      ) else None
 		self.pcb.type         = str(self.page.cbType.currentText()     )   if str(self.page.cbType.currentText()       ) else None
 		self.pcb.size         = str(self.page.cbSize.currentText()     )   if str(self.page.cbSize.currentText()       ) else None

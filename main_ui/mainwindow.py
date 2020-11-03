@@ -166,5 +166,5 @@ class Ui_MainWindow(object):
         item = self.listShippingAndReceiving.item(0)
         item.setText(_translate("MainWindow", "shipments"))
         self.listShippingAndReceiving.setSortingEnabled(__sortingEnabled)
-        self.pbUpload.setText(_translate("MainWindow", "Upload changes to database"))
+        self.pbUpload.setText(_translate("MainWindow", "Upload changes to database (WIP)"))
 

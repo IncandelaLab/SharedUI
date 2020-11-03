@@ -635,7 +635,8 @@ class baseplate(fsobj):
 		"shipments", # list of shipments that this part has been in
 
 		# characteristics (defined upon reception)
-		"identifier",   # idenfitier given by manufacturer or distributor.
+		"serial",   # serial given by manufacturer or distributor.
+		"barcode",
 		"manufacturer", # name of company that manufactured this part
 		"material",     # physical material
 		"nomthickness", # nominal thickness
@@ -842,7 +843,7 @@ class baseplate(fsobj):
 	def save(self):  #NEW for XML generation
 		
 		# FIRST:  If not all necessary vars are defined, don't save the XML file.
-		required_vars = [self.size, self.identifier, self.comments, self.location, self.institution]
+		required_vars = [self.size, self.serial, self.comments, self.location, self.institution]
 		#contents = vars(self)
 		for vr in required_vars:
 			if vr is None:
@@ -853,13 +854,18 @@ class baseplate(fsobj):
 				return
 
 		# TAKE 2:  This time, use gen_xml(input_dict) to streamline things.
+		# Match XML schema in  https://cmsdca.cern.ch/hgc_loader/hgc/int2r/doc/doc#type_part
 		part_dict = {
+			'PART_ID':               self.ID,
 			'KIND_OF_PART':          'HGC {} Inch Kaptonized Plate'.format('Six' if self.size=='6' else 'Eight'),
-			'RECORD_INSERTION_USER': self.insertion_user,  #NOTE:  WIP
-			'SERIAL_NUMBER':         self.identifier,
+			'MANUFACTURER':          self.manufacturer,
+			'BARCODE':               'PLACEHOLDERVAL',
+			'SERIAL_NUMBER':         self.serial,
+			'VERSION':               self.material,   #THIS MAY BE WRONG
+			'LOCATION':              self.location,
+			'INSTITUTION':           self.institution,
+			'RECORD_INSERTION_USER': self.insertion_user,
 			'COMMENT_DESCRIPTION':   self.comments,
-			'LOCATION':              self.location,  # NOTE:  Seems like it's missing an inst. field!
-			'INSTITUTION':           self.institution,  # NOTE:  May be unnecessary...may be mandatory.
 		}
 		parts_dict = {
 			'PART': part_dict,
@@ -929,7 +935,8 @@ class sensor(fsobj):
 		"shipments", # list of shipments that this part has been in
 
 		# characteristics (defined upon reception)
-		"identifier",   # 
+		"serial",   # 
+		"barcode",
 		"manufacturer", # 
 		"type",         # NEW:  This is now chosen from a drop-down menu
 		"size",         # 
@@ -1017,9 +1024,10 @@ class pcb(fsobj):
 
 		# details / measurements / characteristics
 		"insertion_user",
-		"identifier",   # 
+		"serial",   # NEW
+		"barcode",  # NEW
 		"manufacturer", # 
-		"type",         # NEW
+		"type",         # 
 		"size",         # 
 		"channels",     # 
 		"shape",        # 

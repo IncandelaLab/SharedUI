@@ -122,9 +122,9 @@ class Ui_Form(object):
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "Form"))
-        self.pbGoToPart.setText(_translate("Form", "go to selected part"))
+        self.pbGoToPart.setText(_translate("Form", "go to selected item"))
         self.label.setText(_translate("Form", "Search results:"))
-        self.label_2.setText(_translate("Form", "Search by type"))
+        self.label_2.setText(_translate("Form", "Search by type:"))
         self.lineEdit_8.setText(_translate("Form", "PCB type"))
         self.lineEdit_9.setText(_translate("Form", "Sensor type"))
         self.lineEdit_10.setText(_translate("Form", "Baseplate type"))

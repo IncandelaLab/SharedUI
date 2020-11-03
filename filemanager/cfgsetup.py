@@ -1,11 +1,14 @@
 import os
 import sys
 
+# WARNING:  Currently WIP
+# For now, just edit datadir in cnf.json
+
 DATA_DIR_CONTENTS = {
 	''          :['config.txt'],
 	'modules'   :{},
 	'PCBs'      :{},
-	'sensors'   :{}.
+	'sensors'   :{},
 	'baseplates':{},
 	'supplies'  :{},
 	'hardware'  :{

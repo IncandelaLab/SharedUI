@@ -190,7 +190,7 @@
         <item>
          <widget class="QPushButton" name="pbUpload">
           <property name="text">
-           <string>Upload changes to database</string>
+           <string>Upload changes to database (WIP)</string>
           </property>
          </widget>
         </item>

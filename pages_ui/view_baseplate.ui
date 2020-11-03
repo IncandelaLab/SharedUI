@@ -145,7 +145,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>301</y>
+      <y>320</y>
       <width>80</width>
       <height>20</height>
      </rect>
@@ -173,7 +173,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>240</y>
+      <y>259</y>
       <width>181</width>
       <height>21</height>
      </rect>
@@ -205,7 +205,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>281</y>
+      <y>300</y>
       <width>80</width>
       <height>20</height>
      </rect>
@@ -266,7 +266,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>200</y>
+      <y>220</y>
       <width>80</width>
       <height>20</height>
      </rect>
@@ -285,7 +285,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Identifier</string>
+     <string>Serial number</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -311,7 +311,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>200</y>
+      <y>219</y>
       <width>181</width>
       <height>21</height>
      </rect>
@@ -327,7 +327,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>220</y>
+      <y>239</y>
       <width>181</width>
       <height>21</height>
      </rect>
@@ -372,7 +372,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>301</y>
+      <y>320</y>
       <width>181</width>
       <height>20</height>
      </rect>
@@ -388,7 +388,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>320</y>
+      <y>339</y>
       <width>181</width>
       <height>21</height>
      </rect>
@@ -404,7 +404,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>240</y>
+      <y>259</y>
       <width>80</width>
       <height>21</height>
      </rect>
@@ -422,7 +422,7 @@
      <double>0.050000000000000</double>
     </property>
    </widget>
-   <widget class="QLineEdit" name="leIdentifier">
+   <widget class="QLineEdit" name="leSerial">
     <property name="geometry">
      <rect>
       <x>180</x>
@@ -439,7 +439,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>281</y>
+      <y>300</y>
       <width>181</width>
       <height>20</height>
      </rect>
@@ -455,7 +455,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>261</y>
+      <y>280</y>
       <width>181</width>
       <height>20</height>
      </rect>
@@ -471,7 +471,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>320</y>
+      <y>339</y>
       <width>80</width>
       <height>21</height>
      </rect>
@@ -576,40 +576,11 @@
      </property>
     </widget>
    </widget>
-   <widget class="QLineEdit" name="leNumKaptons">
-    <property name="geometry">
-     <rect>
-      <x>180</x>
-      <y>340</y>
-      <width>80</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEdit_12">
-    <property name="geometry">
-     <rect>
-      <x>1</x>
-      <y>340</y>
-      <width>181</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Number of kapton layers</string>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
    <widget class="QComboBox" name="cbSize">
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>260</y>
+      <y>279</y>
       <width>80</width>
       <height>21</height>
      </rect>
@@ -632,7 +603,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>220</y>
+      <y>239</y>
       <width>81</width>
       <height>21</height>
      </rect>
@@ -740,6 +711,38 @@
      <bool>true</bool>
     </property>
    </widget>
+   <widget class="QLineEdit" name="leBarcode">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>200</y>
+      <width>80</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_9">
+    <property name="geometry">
+     <rect>
+      <x>1</x>
+      <y>200</y>
+      <width>181</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Barcode</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
    <zorder>lineEdit_4</zorder>
    <zorder>lineEdit_11</zorder>
    <zorder>lineEdit_2</zorder>
@@ -749,25 +752,25 @@
    <zorder>leLocation</zorder>
    <zorder>listShipments</zorder>
    <zorder>lineEdit_13</zorder>
-   <zorder>lineEdit_16</zorder>
    <zorder>dsbNomThickness</zorder>
-   <zorder>leIdentifier</zorder>
+   <zorder>leSerial</zorder>
    <zorder>lineEdit_15</zorder>
    <zorder>lineEdit_6</zorder>
-   <zorder>sbRotation</zorder>
    <zorder>frame</zorder>
-   <zorder>lineEdit_12</zorder>
    <zorder>cbSize</zorder>
    <zorder>cbMaterial</zorder>
    <zorder>pbGoShipment</zorder>
    <zorder>leManufacturer</zorder>
    <zorder>cbShape</zorder>
    <zorder>cbChirality</zorder>
-   <zorder>leNumKaptons</zorder>
    <zorder>lineEdit_39</zorder>
    <zorder>cbInstitution</zorder>
    <zorder>lineEdit_38</zorder>
    <zorder>leInsertUser</zorder>
+   <zorder>lineEdit_9</zorder>
+   <zorder>leBarcode</zorder>
+   <zorder>lineEdit_16</zorder>
+   <zorder>sbRotation</zorder>
   </widget>
   <widget class="QPushButton" name="pbGoProtomodule">
    <property name="geometry">
@@ -1327,7 +1330,7 @@
    <property name="geometry">
     <rect>
      <x>305</x>
-     <y>301</y>
+     <y>321</y>
      <width>241</width>
      <height>16</height>
     </rect>
@@ -1790,7 +1793,7 @@
    <property name="geometry">
     <rect>
      <x>305</x>
-     <y>322</y>
+     <y>342</y>
      <width>241</width>
      <height>101</height>
     </rect>
@@ -2027,7 +2030,7 @@
      <x>305</x>
      <y>261</y>
      <width>241</width>
-     <height>21</height>
+     <height>41</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -2079,6 +2082,35 @@
     </property>
     <property name="text">
      <string>Kapton step</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_12">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>20</y>
+      <width>191</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Number of kapton layers</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leNumKaptons">
+    <property name="geometry">
+     <rect>
+      <x>189</x>
+      <y>20</y>
+      <width>51</width>
+      <height>21</height>
+     </rect>
     </property>
     <property name="readOnly">
      <bool>true</bool>
