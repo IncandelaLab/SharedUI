@@ -13,7 +13,7 @@ class Ui_Form(object):
         Form.setObjectName("Form")
         Form.resize(1097, 705)
         self.lwPartList = QtWidgets.QListWidget(Form)
-        self.lwPartList.setGeometry(QtCore.QRect(390, 60, 281, 301))
+        self.lwPartList.setGeometry(QtCore.QRect(390, 60, 281, 41))
         self.lwPartList.setObjectName("lwPartList")
         self.pbGoToPart = QtWidgets.QPushButton(Form)
         self.pbGoToPart.setGeometry(QtCore.QRect(500, 390, 171, 21))
