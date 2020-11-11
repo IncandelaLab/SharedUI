@@ -139,18 +139,13 @@ class func(object):
 		self.page.leLocation.setText(    "" if self.sensor.location     is None else self.sensor.location    )
 		self.page.leSerial.setText(  "" if self.sensor.serial       is None else self.sensor.serial      )
 		self.page.leBarcode.setText( "" if self.sensor.barcode      is None else self.barcode.identiifer )
-		self.page.leManufacturer.setText("" if self.sensor.manufacturer is None else self.sensor.manufacturer)
 		self.page.cbType.setCurrentIndex(       INDEX_TYPE.get(       self.sensor.type,  -1)      )
-		self.page.cbSize.setCurrentIndex(       INDEX_SIZE.get(       self.sensor.size,  -1)      )
 		self.page.cbShape.setCurrentIndex(      INDEX_SHAPE.get(      self.sensor.shape, -1)      )
 		self.page.leInsertUser.setText("" if self.sensor.insertion_user is None else self.sensor.insertion_user)
 		self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.sensor.institution, -1))
-		self.page.sbRotation.setValue(-1 if self.sensor.rotation is None else self.sensor.rotation)
 		self.page.sbChannels.setValue(-1 if self.sensor.channels is None else self.sensor.channels)
 
-		if self.page.sbRotation.value() == -1:self.page.sbRotation.clear()
 		if self.page.sbChannels.value() == -1:self.page.sbChannels.clear()
-		self.page.cbSemiType.setCurrentIndex(INDEX_SEMI.get(self.sensor.semi_type, -1))  # New
 
 		self.page.listComments.clear()
 		for comment in self.sensor.comments:
@@ -195,14 +190,10 @@ class func(object):
 		self.page.leLocation.setReadOnly(     not (mode_creating or mode_editing) )
 		self.page.leSerial.setReadOnly(       not (mode_creating or mode_editing) )
 		self.page.leBarcode.setReadOnly(      not (mode_creating or mode_editing) )
-		self.page.leManufacturer.setReadOnly( not (mode_creating or mode_editing) )
 		self.page.cbType.setEnabled(               mode_creating or mode_editing  )
-		self.page.cbSize.setEnabled(               mode_creating or mode_editing  )
 		self.page.cbShape.setEnabled(              mode_creating or mode_editing  )
 		self.page.cbInstitution.setEnabled(        mode_creating or mode_editing  )
-		self.page.sbRotation.setReadOnly(     not (mode_creating or mode_editing) )
 		self.page.sbChannels.setReadOnly(     not (mode_creating or mode_editing) )
-		self.page.cbSemiType.setEnabled(           mode_creating or mode_editing  )  # New
 
 		self.page.pbDeleteComment.setEnabled(mode_creating or mode_editing)
 		self.page.pbAddComment.setEnabled(   mode_creating or mode_editing)
@@ -244,14 +235,10 @@ class func(object):
 		self.sensor.location     = str(self.page.leLocation.text()          ) if str(self.page.leLocation.text()    )       else None
 		self.sensor.serial       = str(self.page.leSerial.text()            ) if str(self.page.leSerial.text()      )       else None
 		self.sensor.barcode      = str(self.page.leBarcode.text()           ) if str(self.page.leBarcode.text()     )       else None
-		self.sensor.manufacturer = str(self.page.leManufacturer.text()      ) if str(self.page.leManufacturer.text())       else None
 		self.sensor.type         = str(self.page.cbType.currentText()       ) if str(self.page.cbType.currentText() )       else None
-		self.sensor.size         = str(self.page.cbSize.currentText()       ) if str(self.page.cbSize.currentText() )       else None
 		self.sensor.shape        = str(self.page.cbShape.currentText()      ) if str(self.page.cbShape.currentText())       else None
 		self.sensor.institution  = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
-		self.sensor.rotation     =     self.page.sbRotation.value()           if     self.page.sbRotation.value() >=0       else None
 		self.sensor.channels     =     self.page.sbChannels.value()           if     self.page.sbChannels.value() >=0       else None
-		self.sensor.semi_type    =     self.page.cbSemiType.currentText()     if     self.page.cbSemiType.currentText()     else None
 
 		num_comments = self.page.listComments.count()
 		self.sensor.comments = []
@@ -260,7 +247,6 @@ class func(object):
 
 		self.sensor.inspection = str(self.page.cbInspection.currentText()) if str(self.page.cbInspection.currentText()) else None
 
-		self.sensor.add_part_to_list()
 		self.sensor.save()
 		self.mode = 'view'
 		self.update_info()

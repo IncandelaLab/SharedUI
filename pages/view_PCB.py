@@ -149,14 +149,11 @@ class func(object):
 		self.page.leBarcode.setText(     "" if self.pcb.barcode        is None else self.pcb.barcode     )
 		self.page.leManufacturer.setText("" if self.pcb.manufacturer   is None else self.pcb.manufacturer)
 		self.page.cbType.setCurrentIndex(       INDEX_TYPE.get(       self.pcb.type,-1)        )
-		self.page.cbSize.setCurrentIndex(       INDEX_SIZE.get(       self.pcb.size,-1)        )
 		self.page.cbShape.setCurrentIndex(      INDEX_SHAPE.get(      self.pcb.shape,-1)       )
 		self.page.cbChirality.setCurrentIndex(  INDEX_CHIRALITY.get(  self.pcb.chirality,-1)   )
 		self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.pcb.institution, -1))
 		self.page.sbChannels.setValue(-1 if self.pcb.channels is None else self.pcb.channels)
-		self.page.sbRotation.setValue(-1 if self.pcb.rotation is None else self.pcb.rotation)
 		if self.page.sbChannels.value() == -1: self.page.sbChannels.clear()
-		if self.page.sbRotation.value() == -1: self.page.sbRotation.clear()
 
 		self.page.listComments.clear()
 		for comment in self.pcb.comments:
@@ -212,12 +209,10 @@ class func(object):
 		self.page.leBarcode.setReadOnly(      not (mode_creating or mode_editing) )
 		self.page.leManufacturer.setReadOnly( not (mode_creating or mode_editing) )
 		self.page.cbType.setEnabled(               mode_creating or mode_editing  )
-		self.page.cbSize.setEnabled(               mode_creating or mode_editing  )
 		self.page.cbShape.setEnabled(              mode_creating or mode_editing  )
 		self.page.cbChirality.setEnabled(          mode_creating or mode_editing  )
 		self.page.cbInstitution.setEnabled(        mode_creating or mode_editing  )
 		self.page.sbChannels.setReadOnly(     not (mode_creating or mode_editing) )
-		self.page.sbRotation.setReadOnly(     not (mode_creating or mode_editing) )
 
 		self.page.pbDeleteComment.setEnabled(mode_creating or mode_editing)
 		self.page.pbAddComment.setEnabled(   mode_creating or mode_editing)
@@ -266,12 +261,10 @@ class func(object):
 		self.pcb.barcode      = str(self.page.leBarcode.text()         )   if str(self.page.leBarcode.text()           ) else None
 		self.pcb.manufacturer = str(self.page.leManufacturer.text()    )   if str(self.page.leManufacturer.text()      ) else None
 		self.pcb.type         = str(self.page.cbType.currentText()     )   if str(self.page.cbType.currentText()       ) else None
-		self.pcb.size         = str(self.page.cbSize.currentText()     )   if str(self.page.cbSize.currentText()       ) else None
 		self.pcb.shape        = str(self.page.cbShape.currentText()    )   if str(self.page.cbShape.currentText()      ) else None
 		self.pcb.chirality    = str(self.page.cbChirality.currentText())   if str(self.page.cbChirality.currentText()  ) else None
 		self.pcb.institution  = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
 		self.pcb.channels     =     self.page.sbChannels.value()           if     self.page.sbChannels.value() >=0       else None
-		self.pcb.rotation     =     self.page.sbRotation.value()           if     self.page.sbRotation.value() >=0       else None
 
 		num_comments = self.page.listComments.count()
 		self.pcb.comments = []
@@ -284,13 +277,12 @@ class func(object):
 		self.pcb.flatness   =     self.page.dsbFlatness.value()         if     self.page.dsbFlatness.value()  >=0    else None
 		self.pcb.thickness  =     self.page.dsbThickness.value()        if     self.page.dsbThickness.value() >=0    else None
 
-		self.pcb.add_part_to_list()
 		self.pcb.save()
 		self.mode = 'view'
 		self.update_info()
 
 		# NEW:
-		self.xmlModList.append(self.pcb.ID)\
+		self.xmlModList.append(self.pcb.ID)
 
 	def xmlModified(self):
 		return self.xmlModList

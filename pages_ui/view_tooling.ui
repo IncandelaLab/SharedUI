@@ -46,46 +46,17 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>120</y>
+     <y>100</y>
      <width>251</width>
      <height>121</height>
     </rect>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_2">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>50</y>
-     <width>111</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Size (inches)</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="dsbSensorToolSize">
-   <property name="geometry">
-    <rect>
-     <x>120</x>
-     <y>50</y>
-     <width>71</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="maximum">
-    <double>100.000000000000000</double>
    </property>
   </widget>
   <widget class="QLineEdit" name="lineEdit_3">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>100</y>
+     <y>80</y>
      <width>121</width>
      <height>21</height>
     </rect>
@@ -101,7 +72,7 @@
    <property name="geometry">
     <rect>
      <x>130</x>
-     <y>100</y>
+     <y>80</y>
      <width>131</width>
      <height>21</height>
     </rect>
@@ -114,7 +85,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>250</y>
+     <y>230</y>
      <width>251</width>
      <height>71</height>
     </rect>
@@ -124,7 +95,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>320</y>
+     <y>300</y>
      <width>111</width>
      <height>23</height>
     </rect>
@@ -137,7 +108,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>680</y>
+     <y>640</y>
      <width>111</width>
      <height>21</height>
     </rect>
@@ -146,24 +117,11 @@
     <string>add comment</string>
    </property>
   </widget>
-  <widget class="QDoubleSpinBox" name="dsbPcbToolSize">
-   <property name="geometry">
-    <rect>
-     <x>120</x>
-     <y>410</y>
-     <width>71</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="maximum">
-    <double>100.000000000000000</double>
-   </property>
-  </widget>
   <widget class="QLineEdit" name="lineEdit_4">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>460</y>
+     <y>420</y>
      <width>121</width>
      <height>21</height>
     </rect>
@@ -179,7 +137,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>610</y>
+     <y>570</y>
      <width>251</width>
      <height>71</height>
     </rect>
@@ -189,7 +147,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>370</y>
+     <y>350</y>
      <width>131</width>
      <height>21</height>
     </rect>
@@ -205,7 +163,7 @@
    <property name="geometry">
     <rect>
      <x>140</x>
-     <y>370</y>
+     <y>350</y>
      <width>51</width>
      <height>21</height>
     </rect>
@@ -218,7 +176,7 @@
    <property name="geometry">
     <rect>
      <x>130</x>
-     <y>460</y>
+     <y>420</y>
      <width>131</width>
      <height>21</height>
     </rect>
@@ -227,27 +185,11 @@
     <string>delete selected</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_6">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>410</y>
-     <width>111</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Size (inches)</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
   <widget class="QListWidget" name="listPcbToolComments">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>480</y>
+     <y>440</y>
      <width>251</width>
      <height>121</height>
     </rect>
@@ -257,7 +199,7 @@
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>480</y>
+     <y>440</y>
      <width>291</width>
      <height>121</height>
     </rect>
@@ -267,7 +209,7 @@
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>320</y>
+     <y>300</y>
      <width>111</width>
      <height>23</height>
     </rect>
@@ -276,27 +218,11 @@
     <string>add comment</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_7">
-   <property name="geometry">
-    <rect>
-     <x>310</x>
-     <y>410</y>
-     <width>151</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Size (inches)</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
   <widget class="QLineEdit" name="lineEdit_8">
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>460</y>
+     <y>420</y>
      <width>161</width>
      <height>21</height>
     </rect>
@@ -312,7 +238,7 @@
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>250</y>
+     <y>230</y>
      <width>291</width>
      <height>71</height>
     </rect>
@@ -335,7 +261,7 @@
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>680</y>
+     <y>640</y>
      <width>111</width>
      <height>21</height>
     </rect>
@@ -344,24 +270,11 @@
     <string>add comment</string>
    </property>
   </widget>
-  <widget class="QDoubleSpinBox" name="dsbPcbTraySize">
-   <property name="geometry">
-    <rect>
-     <x>460</x>
-     <y>410</y>
-     <width>71</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="maximum">
-    <double>100.000000000000000</double>
-   </property>
-  </widget>
   <widget class="QSpinBox" name="sbPcbTrayID">
    <property name="geometry">
     <rect>
      <x>480</x>
-     <y>370</y>
+     <y>350</y>
      <width>51</width>
      <height>21</height>
     </rect>
@@ -374,7 +287,7 @@
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>120</y>
+     <y>100</y>
      <width>291</width>
      <height>121</height>
     </rect>
@@ -384,7 +297,7 @@
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>100</y>
+     <y>80</y>
      <width>161</width>
      <height>21</height>
     </rect>
@@ -416,7 +329,7 @@
    <property name="geometry">
     <rect>
      <x>470</x>
-     <y>100</y>
+     <y>80</y>
      <width>131</width>
      <height>21</height>
     </rect>
@@ -429,7 +342,7 @@
    <property name="geometry">
     <rect>
      <x>470</x>
-     <y>460</y>
+     <y>420</y>
      <width>131</width>
      <height>21</height>
     </rect>
@@ -438,50 +351,21 @@
     <string>delete selected</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_11">
-   <property name="geometry">
-    <rect>
-     <x>310</x>
-     <y>50</y>
-     <width>151</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Size (inches)</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
   <widget class="QPlainTextEdit" name="ptePcbTrayWriteComment">
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>610</y>
+     <y>570</y>
      <width>291</width>
      <height>71</height>
     </rect>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="dsbSensorTraySize">
-   <property name="geometry">
-    <rect>
-     <x>460</x>
-     <y>50</y>
-     <width>71</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="maximum">
-    <double>100.000000000000000</double>
    </property>
   </widget>
   <widget class="QLineEdit" name="lineEdit_12">
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>370</y>
+     <y>350</y>
      <width>171</width>
      <height>21</height>
     </rect>
@@ -493,24 +377,11 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QDoubleSpinBox" name="dsbAssemblyTraySize">
-   <property name="geometry">
-    <rect>
-     <x>760</x>
-     <y>50</y>
-     <width>71</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="maximum">
-    <double>100.000000000000000</double>
-   </property>
-  </widget>
   <widget class="QLineEdit" name="lineEdit_13">
    <property name="geometry">
     <rect>
      <x>650</x>
-     <y>100</y>
+     <y>80</y>
      <width>121</width>
      <height>21</height>
     </rect>
@@ -526,7 +397,7 @@
    <property name="geometry">
     <rect>
      <x>650</x>
-     <y>120</y>
+     <y>100</y>
      <width>251</width>
      <height>121</height>
     </rect>
@@ -536,7 +407,7 @@
    <property name="geometry">
     <rect>
      <x>650</x>
-     <y>320</y>
+     <y>300</y>
      <width>111</width>
      <height>23</height>
     </rect>
@@ -562,7 +433,7 @@
    <property name="geometry">
     <rect>
      <x>770</x>
-     <y>100</y>
+     <y>80</y>
      <width>131</width>
      <height>21</height>
     </rect>
@@ -571,27 +442,11 @@
     <string>delete selected</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_14">
-   <property name="geometry">
-    <rect>
-     <x>650</x>
-     <y>50</y>
-     <width>111</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Size (inches)</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
   <widget class="QPlainTextEdit" name="pteAssemblyTrayWriteComment">
    <property name="geometry">
     <rect>
      <x>650</x>
-     <y>250</y>
+     <y>230</y>
      <width>251</width>
      <height>71</height>
     </rect>
@@ -656,7 +511,7 @@
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>410</y>
+     <y>390</y>
      <width>71</width>
      <height>21</height>
     </rect>
@@ -669,7 +524,7 @@
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>390</y>
+     <y>370</y>
      <width>71</width>
      <height>21</height>
     </rect>
@@ -682,7 +537,7 @@
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>370</y>
+     <y>350</y>
      <width>71</width>
      <height>21</height>
     </rect>
@@ -695,7 +550,7 @@
    <property name="geometry">
     <rect>
      <x>530</x>
-     <y>370</y>
+     <y>350</y>
      <width>71</width>
      <height>21</height>
     </rect>
@@ -708,7 +563,7 @@
    <property name="geometry">
     <rect>
      <x>530</x>
-     <y>390</y>
+     <y>370</y>
      <width>71</width>
      <height>21</height>
     </rect>
@@ -721,7 +576,7 @@
    <property name="geometry">
     <rect>
      <x>530</x>
-     <y>410</y>
+     <y>390</y>
      <width>71</width>
      <height>21</height>
     </rect>
@@ -811,9 +666,9 @@
   <widget class="QLineEdit" name="leSensorToolLocation">
    <property name="geometry">
     <rect>
-     <x>120</x>
-     <y>70</y>
-     <width>141</width>
+     <x>80</x>
+     <y>50</y>
+     <width>111</width>
      <height>20</height>
     </rect>
    </property>
@@ -822,8 +677,8 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>70</y>
-     <width>111</width>
+     <y>50</y>
+     <width>71</width>
      <height>21</height>
     </rect>
    </property>
@@ -838,8 +693,8 @@
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>70</y>
-     <width>151</width>
+     <y>50</y>
+     <width>71</width>
      <height>21</height>
     </rect>
    </property>
@@ -853,9 +708,9 @@
   <widget class="QLineEdit" name="leSensorTrayLocation">
    <property name="geometry">
     <rect>
-     <x>460</x>
-     <y>70</y>
-     <width>141</width>
+     <x>380</x>
+     <y>50</y>
+     <width>151</width>
      <height>20</height>
     </rect>
    </property>
@@ -863,9 +718,9 @@
   <widget class="QLineEdit" name="leAssemblyTrayLocation">
    <property name="geometry">
     <rect>
-     <x>760</x>
-     <y>70</y>
-     <width>141</width>
+     <x>720</x>
+     <y>50</y>
+     <width>111</width>
      <height>20</height>
     </rect>
    </property>
@@ -874,8 +729,8 @@
    <property name="geometry">
     <rect>
      <x>650</x>
-     <y>70</y>
-     <width>111</width>
+     <y>50</y>
+     <width>71</width>
      <height>21</height>
     </rect>
    </property>
@@ -890,8 +745,8 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>430</y>
-     <width>111</width>
+     <y>390</y>
+     <width>71</width>
      <height>21</height>
     </rect>
    </property>
@@ -905,9 +760,9 @@
   <widget class="QLineEdit" name="lePcbToolLocation">
    <property name="geometry">
     <rect>
-     <x>120</x>
-     <y>430</y>
-     <width>141</width>
+     <x>80</x>
+     <y>390</y>
+     <width>111</width>
      <height>20</height>
     </rect>
    </property>
@@ -916,8 +771,8 @@
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>430</y>
-     <width>151</width>
+     <y>390</y>
+     <width>71</width>
      <height>21</height>
     </rect>
    </property>
@@ -931,9 +786,9 @@
   <widget class="QLineEdit" name="lePcbTrayLocation">
    <property name="geometry">
     <rect>
-     <x>460</x>
-     <y>430</y>
-     <width>141</width>
+     <x>380</x>
+     <y>390</y>
+     <width>151</width>
      <height>20</height>
     </rect>
    </property>
@@ -948,7 +803,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>-1</number>
    </property>
    <item>
     <property name="text">
@@ -968,6 +823,11 @@
    <item>
     <property name="text">
      <string>UMN</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>NTU</string>
     </property>
    </item>
   </widget>
@@ -1013,7 +873,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>-1</number>
    </property>
    <item>
     <property name="text">
@@ -1033,6 +893,11 @@
    <item>
     <property name="text">
      <string>UMN</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>NTU</string>
     </property>
    </item>
   </widget>
@@ -1062,11 +927,16 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>-1</number>
    </property>
    <item>
     <property name="text">
      <string>CERN</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>NTU</string>
     </property>
    </item>
    <item>
@@ -1089,7 +959,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>390</y>
+     <y>370</y>
      <width>111</width>
      <height>21</height>
     </rect>
@@ -1105,13 +975,13 @@
    <property name="geometry">
     <rect>
      <x>120</x>
-     <y>390</y>
+     <y>370</y>
      <width>71</width>
      <height>21</height>
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>-1</number>
    </property>
    <item>
     <property name="text">
@@ -1133,12 +1003,17 @@
      <string>UMN</string>
     </property>
    </item>
+   <item>
+    <property name="text">
+     <string>NTU</string>
+    </property>
+   </item>
   </widget>
   <widget class="QLineEdit" name="lineEdit_25">
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>390</y>
+     <y>370</y>
      <width>151</width>
      <height>21</height>
     </rect>
@@ -1154,13 +1029,13 @@
    <property name="geometry">
     <rect>
      <x>460</x>
-     <y>390</y>
+     <y>370</y>
      <width>71</width>
      <height>21</height>
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>-1</number>
    </property>
    <item>
     <property name="text">
@@ -1180,6 +1055,11 @@
    <item>
     <property name="text">
      <string>UMN</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>NTU</string>
     </property>
    </item>
   </widget>

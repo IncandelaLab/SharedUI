@@ -128,14 +128,15 @@ PAGE_IDS = {
 	'PCBs'                   : 2,
 	'protomodules'           : 3,
 	'modules'                : 4,
-	'search for parts'       : 5, # NEW, indices have been adjusted accordingly
+	'tooling'                : 5,
+	'supplies'               : 6,
+	'search for parts'       : 7, # NEW, indices have been adjusted accordingly
 
-	'kapton placement steps' : 6,
-	'sensor placement steps' : 7,
-	'PCB placement steps'    : 9,
 
-	'tooling'                : 9,
-	'supplies'               : 10,
+	'kapton placement steps' : 8,
+	'sensor placement steps' : 9,
+	'PCB placement steps'    : 10,
+	#'wirebonding and encapsulating' : 11,
 
 	'shipments'               :11, #WARNING:  Order has been switched
 	# 'IV curve'               :11,
@@ -181,15 +182,15 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		self.page_view_PCB         = widget_view_PCB(None)         ; self.swPages.addWidget(self.page_view_PCB)
 		self.page_view_protomodule = widget_view_protomodule(None) ; self.swPages.addWidget(self.page_view_protomodule)
 		self.page_view_module      = widget_view_module(None)      ; self.swPages.addWidget(self.page_view_module)
-		# NEW
-		self.page_search           = widget_search(None)      ; self.swPages.addWidget(self.page_search)
+		self.page_view_tooling     = widget_view_tooling(None)     ; self.swPages.addWidget(self.page_view_tooling)
+		self.page_view_supplies    = widget_view_supplies(None)    ; self.swPages.addWidget(self.page_view_supplies)	# NEW
+		self.page_search           = widget_search(None)           ; self.swPages.addWidget(self.page_search)
 
 		self.page_view_kapton_step = widget_view_kapton_step(None) ; self.swPages.addWidget(self.page_view_kapton_step)
 		self.page_view_sensor_step = widget_view_sensor_step(None) ; self.swPages.addWidget(self.page_view_sensor_step)
 		self.page_view_pcb_step    = widget_view_pcb_step(None)    ; self.swPages.addWidget(self.page_view_pcb_step)
 
-		self.page_view_tooling     = widget_view_tooling(None)     ; self.swPages.addWidget(self.page_view_tooling)
-		self.page_view_supplies    = widget_view_supplies(None)    ; self.swPages.addWidget(self.page_view_supplies)
+
 
 		# self.page_routine_iv       = widget_routine_iv(None)       ; self.swPages.addWidget(self.page_routine_iv)
 		self.page_shipment         = widget_shipment(None)         ; self.swPages.addWidget(self.page_shipment)
@@ -222,14 +223,13 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 			self.func_view_PCB,
 			self.func_view_protomodule,
 			self.func_view_module,
+			self.func_view_tooling,
+			self.func_view_supplies,
 			self.func_search,   # NEW
 
 			self.func_view_kapton_step,
 			self.func_view_sensor_step,
 			self.func_view_pcb_step,
-
-			self.func_view_tooling,
-			self.func_view_supplies,
 
 			self.func_shipment,  #WARNING:  Order has been switched.
 			# self.func_routine_iv,

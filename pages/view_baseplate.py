@@ -123,8 +123,6 @@ class func(object):
 
 		self.page.pbGoStepKapton.clicked.connect(self.goStepKapton)
 
-		self.page.pbGoStepKapton_2.clicked.connect(self.goStepKapton_2)
-
 		self.page.pbGoStepSensor.clicked.connect(self.goStepSensor)
 		self.page.pbGoProtomodule.clicked.connect(self.goProtomodule)
 
@@ -154,7 +152,6 @@ class func(object):
 		for shipment in self.baseplate.shipments:
 			self.page.listShipments.addItem(str(shipment))
 
-		self.page.cbSize       .setCurrentIndex(INDEX_SIZE.get(       self.baseplate.size       , -1))
 		self.page.cbShape      .setCurrentIndex(INDEX_SHAPE.get(      self.baseplate.shape      , -1))
 		self.page.cbChirality  .setCurrentIndex(INDEX_CHIRALITY.get(  self.baseplate.chirality  , -1))
 		self.page.cbMaterial   .setCurrentIndex(INDEX_MATERIAL.get(   self.baseplate.material   , -1))
@@ -164,11 +161,8 @@ class func(object):
 		self.page.leBarcode      .setText("" if self.baseplate.barcode         is None else self.baseplate.barcode         )
 		self.page.leLocation     .setText("" if self.baseplate.location        is None else self.baseplate.location        )
 		self.page.leManufacturer .setText("" if self.baseplate.manufacturer    is None else self.baseplate.manufacturer    )
-		self.page.leNumKaptons   .setText("" if self.baseplate.num_kaptons     is None else str(self.baseplate.num_kaptons))
 		self.page.dsbNomThickness.setValue(-1 if self.baseplate.nomthickness   is None else self.baseplate.nomthickness    )
-		self.page.sbRotation     .setValue(-1 if self.baseplate.rotation       is None else self.baseplate.rotation        )
 		if self.page.dsbNomThickness.value() == -1: self.page.dsbNomThickness.clear()
-		if self.page.sbRotation.value()      == -1: self.page.sbRotation.clear()
 
 		self.page.listComments.clear()
 		for comment in self.baseplate.comments:
@@ -185,29 +179,16 @@ class func(object):
 				if corner.value() == -1: corner.clear()
 
 		self.page.leFlatness.setText("" if self.baseplate.flatness is None else str(round(self.baseplate.flatness,DISPLAY_PRECISION)))
-		self.page.ckKaptonTapeApplied.setChecked(True if self.baseplate.kapton_tape_applied else False)
 		self.page.dsbThickness.setValue(-1 if self.baseplate.thickness is None else self.baseplate.thickness)
 		if self.page.dsbThickness.value() == -1: self.page.dsbThickness.clear()
 
 		self.page.sbStepKapton.setValue(-1 if self.baseplate.step_kapton is None else self.baseplate.step_kapton)
 		if self.page.sbStepKapton.value() == -1: self.page.sbStepKapton.clear()
 
-		self.page.cbCheckLeakage.setCurrentIndex(  INDEX_CHECK.get(self.baseplate.check_leakage   , -1))
-		self.page.cbCheckSurface.setCurrentIndex(  INDEX_CHECK.get(self.baseplate.check_surface   , -1))
 		self.page.cbCheckEdgesFirm.setCurrentIndex(INDEX_CHECK.get(self.baseplate.check_edges_firm, -1))
 		self.page.cbCheckGlueSpill.setCurrentIndex(INDEX_CHECK.get(self.baseplate.check_glue_spill, -1))
 		self.page.dsbKaptonFlatness.setValue(-1 if self.baseplate.kapton_flatness is None else self.baseplate.kapton_flatness)
 		if self.page.dsbKaptonFlatness.value() == -1: self.page.dsbKaptonFlatness.clear()
-
-		self.page.sbStepKapton_2.setValue(-1 if self.baseplate.step_kapton_2 is None else self.baseplate.step_kapton_2)
-		if self.page.sbStepKapton_2.value() == -1: self.page.sbStepKapton_2.clear()
-
-		self.page.cbCheckLeakage_2.setCurrentIndex(  INDEX_CHECK.get(self.baseplate.check_leakage_2   , -1))
-		self.page.cbCheckSurface_2.setCurrentIndex(  INDEX_CHECK.get(self.baseplate.check_surface_2   , -1))
-		self.page.cbCheckEdgesFirm_2.setCurrentIndex(INDEX_CHECK.get(self.baseplate.check_edges_firm_2, -1))
-		self.page.cbCheckGlueSpill_2.setCurrentIndex(INDEX_CHECK.get(self.baseplate.check_glue_spill_2, -1))
-		self.page.dsbKaptonFlatness_2.setValue(-1 if self.baseplate.kapton_flatness_2 is None else self.baseplate.kapton_flatness_2)
-		if self.page.dsbKaptonFlatness_2.value() == -1: self.page.dsbKaptonFlatness_2.clear()
 
 		self.page.sbStepSensor.setValue( -1 if self.baseplate.step_sensor is None else self.baseplate.step_sensor)
 		self.page.sbProtomodule.setValue(-1 if self.baseplate.protomodule is None else self.baseplate.protomodule)
@@ -224,7 +205,6 @@ class func(object):
 		shipments_exist = self.page.listShipments.count() > 0
 
 		step_kapton_exists   = self.page.sbStepKapton.value()   >=0
-		step_kapton_2_exists = self.page.sbStepKapton_2.value() >=0
 		step_senor_exists    = self.page.sbStepSensor.value()   >=0
 		protomodule_exists   = self.page.sbProtomodule.value()  >=0
 		module_exists        = self.page.sbModule.value()       >=0
@@ -243,10 +223,8 @@ class func(object):
 
 		self.page.pbGoShipment.setEnabled(mode_view and shipments_exist)
 
-		self.page.cbSize.setEnabled(                mode_creating or mode_editing  )
 		self.page.cbShape.setEnabled(               mode_creating or mode_editing  )
 		self.page.cbChirality.setEnabled(           mode_creating or mode_editing  )
-		self.page.cbMaterial.setEnabled(            mode_creating or mode_editing  )
 		self.page.cbInstitution.setEnabled(         mode_creating or mode_editing  )
 		self.page.leInsertUser.setReadOnly(    not (mode_creating or mode_editing) )
 		self.page.leSerial.setReadOnly(        not (mode_creating or mode_editing) )
@@ -254,7 +232,6 @@ class func(object):
 		self.page.leManufacturer.setReadOnly(  not (mode_creating or mode_editing) )
 		self.page.leLocation.setReadOnly(      not (mode_creating or mode_editing) )
 		self.page.dsbNomThickness.setReadOnly( not (mode_creating or mode_editing) )
-		self.page.sbRotation.setReadOnly(      not (mode_creating or mode_editing) )
 
 		self.page.pbDeleteComment.setEnabled(mode_creating or mode_editing)
 		self.page.pbAddComment.setEnabled(   mode_creating or mode_editing)
@@ -262,22 +239,12 @@ class func(object):
 
 		for corner in self.corners:
 			corner.setReadOnly(not (mode_creating or mode_editing))
-		self.page.ckKaptonTapeApplied.setEnabled(mode_creating or mode_editing)
 		self.page.dsbThickness.setReadOnly(not (mode_creating or mode_editing))
 
 		self.page.pbGoStepKapton.setEnabled(mode_view and step_kapton_exists)
-		self.page.cbCheckLeakage.setEnabled(mode_creating or mode_editing)
-		self.page.cbCheckSurface.setEnabled(mode_creating or mode_editing)
 		self.page.cbCheckEdgesFirm.setEnabled(mode_creating or mode_editing)
 		self.page.cbCheckGlueSpill.setEnabled(mode_creating or mode_editing)
 		self.page.dsbKaptonFlatness.setReadOnly(not (mode_creating or mode_editing))
-
-		self.page.pbGoStepKapton_2.setEnabled(mode_view and step_kapton_2_exists)
-		self.page.cbCheckLeakage_2.setEnabled(mode_creating or mode_editing)
-		self.page.cbCheckSurface_2.setEnabled(mode_creating or mode_editing)
-		self.page.cbCheckEdgesFirm_2.setEnabled(mode_creating or mode_editing)
-		self.page.cbCheckGlueSpill_2.setEnabled(mode_creating or mode_editing)
-		self.page.dsbKaptonFlatness_2.setReadOnly(not (mode_creating or mode_editing))
 
 		self.page.pbGoStepSensor.setEnabled(mode_view and step_senor_exists)
 		self.page.pbGoProtomodule.setEnabled(mode_view and protomodule_exists)
@@ -312,7 +279,6 @@ class func(object):
 	@enforce_mode(['editing','creating'])
 	def saveEditing(self,*args,**kwargs):
 
-		self.baseplate.size           = str(self.page.cbSize.currentText())        if str(self.page.cbSize.currentText())        else None
 		self.baseplate.shape          = str(self.page.cbShape.currentText())       if str(self.page.cbShape.currentText())       else None
 		self.baseplate.chirality      = str(self.page.cbChirality.currentText())   if str(self.page.cbChirality.currentText())   else None
 		self.baseplate.material       = str(self.page.cbMaterial.currentText())    if str(self.page.cbMaterial.currentText())    else None
@@ -323,7 +289,6 @@ class func(object):
 		self.baseplate.serial         = str(self.page.leSerial.text())             if str(self.page.leSerial.text())             else None
 		self.baseplate.barcode        = str(self.page.leBarcode.text())            if str(self.page.leBarcode.text())            else None
 		self.baseplate.nomthickness   =     self.page.dsbNomThickness.value()      if self.page.dsbNomThickness.value() >=0      else None
-		self.baseplate.rotation       =     self.page.sbRotation.value()           if self.page.sbRotation.value()      >=0      else None
 
 		num_comments = self.page.listComments.count()
 		self.baseplate.comments = []
@@ -331,31 +296,19 @@ class func(object):
 			self.baseplate.comments.append(str(self.page.listComments.item(i).text()))
 
 		self.baseplate.corner_heights = [_.value() if _.value()>=0 else None for _ in self.corners]
-		self.baseplate.kapton_tape_applied = self.page.ckKaptonTapeApplied.isChecked()
 		self.baseplate.thickness = self.page.dsbThickness.value() if self.page.dsbThickness.value()>=0 else None
 
-		self.baseplate.check_leakage    = str(self.page.cbCheckLeakage.currentText())   if str(self.page.cbCheckLeakage.currentText())   else None
-		self.baseplate.check_surface    = str(self.page.cbCheckSurface.currentText())   if str(self.page.cbCheckSurface.currentText())   else None
 		self.baseplate.check_edges_firm = str(self.page.cbCheckEdgesFirm.currentText()) if str(self.page.cbCheckEdgesFirm.currentText()) else None
 		self.baseplate.check_glue_spill = str(self.page.cbCheckGlueSpill.currentText()) if str(self.page.cbCheckGlueSpill.currentText()) else None
 		self.baseplate.kapton_flatness  =     self.page.dsbKaptonFlatness.value()       if self.page.dsbKaptonFlatness.value() >=0       else None
 
-		self.baseplate.check_leakage_2    = str(self.page.cbCheckLeakage_2.currentText())   if str(self.page.cbCheckLeakage_2.currentText())   else None
-		self.baseplate.check_surface_2    = str(self.page.cbCheckSurface_2.currentText())   if str(self.page.cbCheckSurface_2.currentText())   else None
-		self.baseplate.check_edges_firm_2 = str(self.page.cbCheckEdgesFirm_2.currentText()) if str(self.page.cbCheckEdgesFirm_2.currentText()) else None
-		self.baseplate.check_glue_spill_2 = str(self.page.cbCheckGlueSpill_2.currentText()) if str(self.page.cbCheckGlueSpill_2.currentText()) else None
-		self.baseplate.kapton_flatness_2  =     self.page.dsbKaptonFlatness_2.value()       if     self.page.dsbKaptonFlatness_2.value() >=0   else None
 		
-		# Maybe moving this here...
-		self.baseplate.add_part_to_list()
-
 		self.baseplate.save()
 		self.mode = 'view'
 		self.update_info()
 
 		# NEW:
 		self.xmlModList.append(self.baseplate.ID)
-		#self.baseplate.add_part_to_list()
 
 
 	def xmlModified(self):
@@ -391,12 +344,7 @@ class func(object):
 		if ID >= 0:
 			self.setUIPage('kapton placement steps',ID=ID)
 
-	@enforce_mode('view')
-	def goStepKapton_2(self,*args,**kwargs):
-		ID = self.page.sbStepKapton_2.value()
-		if ID >= 0:
-			self.setUIPage('kapton placement steps',ID=ID)
-	
+
 	@enforce_mode('view')
 	def goStepSensor(self,*args,**kwargs):
 		ID = self.page.sbStepSensor.value()

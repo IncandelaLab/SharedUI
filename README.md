@@ -18,11 +18,27 @@ It's recommended to use Qt Creator for editing the .ui files.  If it's not alrea
 
 ## Running and using the GUI
 
-Running the GUI is straightforward:  Run `python mainUI.py` in a terminal to launch it.  On Windows, you can run the batch file `run.bat` instead through either the terminal or the file manager.
+Running the GUI is straightforward:  Run `python mainUI.py` in a terminal to launch it.  On Windows, you can run the batch file `run.bat` instead through either the terminal or the file manager.  All data will automatically be stored as .json files in the directory `/path/to/SharedUI/filemanager_data`.  (Some pages will also produce one or more XML files, but this is still preliminary.)
 
-The GUI is divided into three sections:  Parts, tooling, and supplies; production steps and testing routines; and shipping.  In each section, you can enter in data by choosing the object ID number and clicking 'new' (or 'edit' if the object already has data).  A few pages, such as the kapton placement step, will display errors in a status box if there's a problem with the input, preventing the input from being saved until all problems are resolved.  For now, all data provided to the GUI is saved locally in .json files:  The GUI will create a new directory `filemanager_data/` in the parent directory of `SharedUI/` and store the files accordingly.
+The GUI is divided into three sections:  Parts, tooling, and supplies; production steps and testing routines; and shipping.
 
-Currently, .ui pages for the Unbiased DAQ and IV Curve pages exist but are not yet integrated into the GUI.
+###Parts, tooling, and supplies
+
+Before performing a production step, all necessary parts, tools, and supplies must be created using their respective pages.  For instance, a kapton placement step requires an existing sensor tool, baseplate, sensor component tray, etc.  To create a part, enter the desired part ID into the "[part] ID" box on the corresponding page, then click "New".  It is possible to enter in and save incomplete information for a part, but the production steps will check to make sure that all relevant information has been filled in before allowing the user to save it.
+
+Note that protomodules and modules are automatically createdy by the sensor placement and pcb placement steps, respectively.  They cannot be created manually, but can be edited after creation.  (Some protomodule/module information can't be inherited from their component parts, and has to be entered in manually.)
+
+###Production steps and testing routines
+
+Once all necessary information in the parts, tooling, and supplies section has been filled in, you can proceed to the production steps.  The production step pages are broadly similar to the previous ones, but with one major difference:  the data will be automatically checked for errors, and if any are found, a message will appear in the status box.  Once all errors have been resolved, you can save the step.
+
+Currently, the wirebonding and testing routine pages have not been implemented.
+
+###Shipping
+
+Like the production step pages, the shipping page will display errors unless all of the referenced parts exist.
+
+This step may undergo substantial revision in the future.
 
 
 WARNING:  Future updates to the GUI will require the [resthub API.](https://github.com/valdasraps/resthub)  (You will need to clone the repo and add `[install-dir]/resthub/clients/python/src/main/python` to your `$PYTHONPATH`.)  However, it's not necessary yet.

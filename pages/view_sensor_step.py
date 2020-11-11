@@ -29,6 +29,9 @@ I_BATCH_LOCTITE_EXPIRED  = "loctite batch has expired"
 # baseplates
 I_BASEPLATE_NOT_READY  = "baseplate(s) in position(s) {} is not ready for sensor application. reason: {}"
 
+# baseplate-sensor incompatibility
+I_BASEPLATE_SENSOR_SHAPE = "baseplate {} has shape {} but sensor {} has shape {}"
+
 # kapton inspection
 #I_KAPTON_INSPECTION_NOT_DONE = "kapton inspection not done for position(s) {}"
 #I_KAPTON_INSPECTION_ON_EMPTY = "kapton inspection checked for empty position(s) {}"
@@ -47,9 +50,6 @@ I_SENSOR_DUPLICATE      = "same sensor is selected on multiple positions: {}"
 I_SIZE_MISMATCH = "size mismatch between some selected objects"
 I_SIZE_MISMATCH_6 = "* list of 6-inch objects selected: {}"
 I_SIZE_MISMATCH_8 = "* list of 8-inch objects selected: {}"
-
-# semiconductor type
-I_SEMI_TYPE_DNE = "semiconductor type for position(s) {} has not been selected"
 
 # location
 I_INSTITUTION = "some selected objects are not at this institution: {}"
@@ -78,7 +78,7 @@ class func(object):
 		self.step_sensor = fm.step_sensor()
 		self.step_sensor_exists = None
 
-		self.MAC = fm.MAC
+		#self.MAC = fm.MAC
 
 		self.mode = 'setup'
 
@@ -228,11 +228,8 @@ class func(object):
 
 		# NOTE:  Date no longer necessary?
 		#self.page.pbDatePerformedNow.clicked.connect(self.setDatePerformedNow)
-		self.page.pbCureStartNow    .clicked.connect(self.setCureStartNow)
-		self.page.pbCureStopNow     .clicked.connect(self.setCureStopNow)
 		# New
 		self.page.pbRunStartNow     .clicked.connect(self.setRunStartNow)
-		self.page.pbRunStopNow      .clicked.connect(self.setRunStopNow)
 
 
 	@enforce_mode('view')
@@ -264,21 +261,6 @@ class func(object):
 			# New
 			run_start  = self.step_sensor.run_start
 			run_stop   = self.step_sensor.run_stop
-			if cure_start is None:
-				self.page.dtCureStart.setDate(QtCore.QDate(*NO_DATE))
-				self.page.dtCureStart.setTime(QtCore.QTime(0,0,0))
-			else:
-				localtime = list(time.localtime(cure_start))
-				self.page.dtCureStart.setDate(QtCore.QDate(*localtime[0:3]))
-				self.page.dtCureStart.setTime(QtCore.QTime(*localtime[3:6]))
-
-			if cure_stop is None:
-				self.page.dtCureStop.setDate(QtCore.QDate(*NO_DATE))
-				self.page.dtCureStop.setTime(QtCore.QTime(0,0,0))
-			else:
-				localtime = list(time.localtime(cure_stop))
-				self.page.dtCureStop.setDate(QtCore.QDate(*localtime[0:3]))
-				self.page.dtCureStop.setTime(QtCore.QTime(*localtime[3:6]))
 			# New
 			if run_start is None:
 				self.page.dtRunStart.setDate(QtCore.QDate(*NO_DATE))
@@ -287,17 +269,8 @@ class func(object):
 				localtime = list(time.localtime(run_start))
 				self.page.dtRunStart.setDate(QtCore.QDate(*localtime[0:3]))
 				self.page.dtRunStart.setTime(QtCore.QTime(*localtime[3:6]))
-			if run_stop is None:
-				self.page.dtRunStop.setDate(QtCore.QDate(*NO_DATE))
-				self.page.dtRunStop.setTime(QtCore.QTime(0,0,0))
-			else:
-				localtime = list(time.localtime(run_stop))
-				self.page.dtRunStop.setDate(QtCore.QDate(*localtime[0:3]))
-				self.page.dtRunStop.setTime(QtCore.QTime(*localtime[3:6]))
 
 
-
-			self.page.leCureDuration.setText(str(int(self.step_sensor.cure_duration)) if not (self.step_sensor.cure_duration is None) else "")
 			self.page.leCureTemperature.setText(self.step_sensor.cure_temperature)
 			self.page.leCureHumidity.setText(self.step_sensor.cure_humidity)
 
@@ -340,17 +313,10 @@ class func(object):
 			self.page.leUserPerformed.setText("")
 			self.page.leLocation.setText("")
 			#self.page.dPerformed.setDate(QtCore.QDate(*NO_DATE)) #Redundant
-			self.page.dtCureStart.setDate(QtCore.QDate(*NO_DATE))
-			self.page.dtCureStart.setTime(QtCore.QTime(0,0,0))
-			self.page.dtCureStop.setDate(QtCore.QDate(*NO_DATE))
-			self.page.dtCureStop.setTime(QtCore.QTime(0,0,0))
 			# New
 			self.page.dtRunStart.setDate(QtCore.QDate(*NO_DATE))
 			self.page.dtRunStart.setTime(QtCore.QTime(0,0,0))
-			self.page.dtRunStop.setDate(QtCore.QDate(*NO_DATE))
-			self.page.dtRunStop.setTime(QtCore.QTime(0,0,0))
 
-			self.page.leCureDuration.setText("")
 			self.page.leCureTemperature.setText("")
 			self.page.leCureHumidity.setText("")
 			self.page.sbBatchAraldite.setValue(-1)
@@ -393,20 +359,14 @@ class func(object):
 		self.page.cbInstitution.setEnabled(mode_creating or mode_editing)
 
 		#self.page.pbDatePerformedNow.setEnabled(mode_creating or mode_editing) #Redundant
-		self.page.pbCureStartNow    .setEnabled(mode_creating or mode_editing)
-		self.page.pbCureStopNow     .setEnabled(mode_creating or mode_editing)
 		# New
 		self.page.pbRunStartNow     .setEnabled(mode_creating or mode_editing)
-		self.page.pbRunStopNow      .setEnabled(mode_creating or mode_editing)
 
 		self.page.leUserPerformed  .setReadOnly(mode_view)
 		self.page.leLocation       .setReadOnly(mode_view)
 		#self.page.dPerformed       .setReadOnly(mode_view) #Redundant
-		self.page.dtCureStart      .setReadOnly(mode_view)
-		self.page.dtCureStop       .setReadOnly(mode_view)
 		# New
 		self.page.dtRunStart       .setReadOnly(mode_view)
-		self.page.dtRunStop        .setReadOnly(mode_view)
 		self.page.leCureTemperature.setReadOnly(mode_view)
 		self.page.leCureHumidity   .setReadOnly(mode_view)
 		self.page.sbTrayComponent  .setReadOnly(mode_view)
@@ -581,7 +541,6 @@ class func(object):
 		rows_baseplate_dne   = []
 		rows_tool_sensor_dne = []
 		rows_sensor_dne      = []
-		rows_semi_type_dne   = []  #NEW
 
 		for i in range(6):
 			num_parts = 0
@@ -607,12 +566,13 @@ class func(object):
 				objects.append(self.sensors[i])
 				if self.sensors[i].ID is None:
 					rows_sensor_dne.append(i)
-				try:  #NEW
-					if self.sensors[i].semi_type in [None, ""]:
-						rows_semi_type_dne.append(i)
-				except AttributeError:
-					#This shouldn't happen
-					rows_semi_type_dne.append(i)
+
+			if baseplates_selected[i] >= 0 and sensors_selected[i] >= 0:
+				# Check for compatibility bw two objects:
+				if self.baseplates[i].shape != self.sensors[i].shape:
+					issues.append(I_BASEPLATE_SENSOR_SHAPE.format(self.baseplates[i].ID,    self.sensors[i].ID, \
+																  self.baseplates[i].shape, self.sensors[i].shape))
+
 			#print("num_parts is "+str(num_parts))
 			if num_parts == 0:
 				rows_empty.append(i)
@@ -635,9 +595,6 @@ class func(object):
 			issues.append(I_TOOL_SENSOR_DNE.format(', '.join([str(_+1) for _ in rows_tool_sensor_dne])))
 		if rows_sensor_dne:
 			issues.append(I_SENSOR_DNE.format(', '.join([str(_+1) for _ in rows_sensor_dne])))
-		if rows_semi_type_dne:
-			print("Semi DNE")
-			issues.append(I_SEMI_TYPE_DNE.format(', '.join([str(_+1) for _ in rows_semi_type_dne])))
 
 
 		objects_6in = []
@@ -714,25 +671,11 @@ class func(object):
 		#else:
 		#	self.step_sensor.date_performed = [*self.page.dPerformed.date().getDate()]
 
-		if self.page.dtCureStart.date().year() == NO_DATE[0]:
-			self.step_sensor.cure_start = None
-		else:
-			self.step_sensor.cure_start = self.page.dtCureStart.dateTime().toTime_t()
-
-		if self.page.dtCureStop.date().year() == NO_DATE[0]:
-			self.step_sensor.cure_stop = None
-		else:
-			self.step_sensor.cure_stop  = self.page.dtCureStop.dateTime().toTime_t()
 		# New
 		if self.page.dtRunStart.date().year() == NO_DATE[0]:
 			self.step_sensor.run_start = None
 		else:
 			self.step_sensor.run_start = self.page.dtRunStart.dateTime().toTime_t()
-
-		if self.page.dtRunStop.date().year() == NO_DATE[0]:
-			self.step_sensor.run_stop = None
-		else:
-			self.step_sensor.run_stop  = self.page.dtRunStop.dateTime().toTime_t()
 
 
 		self.step_sensor.cure_humidity    = str(self.page.leCureHumidity.text())
@@ -756,6 +699,42 @@ class func(object):
 		self.step_sensor.tray_assembly         = self.page.sbTrayAssembly.value()  if self.page.sbTrayAssembly.value()  >= 0 else None
 		self.step_sensor.batch_araldite        = self.page.sbBatchAraldite.value() if self.page.sbBatchAraldite.value() >= 0 else None
 		self.step_sensor.batch_loctite         = self.page.sbBatchLoctite.value()  if self.page.sbBatchLoctite.value()  >= 0 else None
+
+		# Add protomodule ID to baseplate, sensor lists; create protomodule if it doesn't exist:
+		for i in range(6):
+			temp_protomodule = fm.protomodule()
+			if not protomodules[i] is None:
+				# protomodule exists
+				temp_protomodule.load(protomodules[i])
+			else:
+				print("Creating new protomodule {}!".format(protomodules[i]))
+				temp_protomodule.new(protomodules[i])
+				# Thickness = sum of baseplate and sensor, plus glue gaps
+				sensor_thk_str = self.sensors[i].type  # Should be "[thickness] um"
+				sensor_thk = float(sensor_thk_str.split()[0]/1000.0)
+
+				temp_protomodule.institution    = self.step_sensor.institution
+				temp_protomodule.location       = self.step_sensor.location
+				temp_protomodule.insertion_user = self.step_sensor.user_performed
+				temp_protomodule.thickness      = self.baseplates[i].thickness + sensor_thk + 0.0 # TBD
+				temp_protomodule.channels       = self.sensors[i].channels
+				temp_protomodule.size           = self.sensors[i].size
+				temp_protomodule.chape          = self.sensors[i].shape
+				temp_protomodule.chirality      = self.baseplates[i].chirality
+
+				temp_protomodule.step_sensor    = self.step_sensor.ID
+				temp_protomodule.baseplate      = baseplates[i]
+				temp_protomodule.sensor         = sensors[i]
+				temp_protomodule.step_kapton    = self.baseplates[i].step_kapton
+
+				temp_protomodule.save()
+
+			self.baseplates[i].step_sensor = self.step_sensor.ID
+			self.baseplates[i].module = protomodules[i]
+			self.baseplates[i].save()
+			self.sensors[i].step_sensor = self.step_sensor.ID
+			self.sensors[i].module = protomodules[i]
+			self.sensors[i].save()
 
 		self.step_sensor.save()
 		self.unloadAllObjects()
@@ -816,26 +795,12 @@ class func(object):
 	#def setDatePerformedNow(self, *args, **kwargs):   #Redundant
 	#	self.page.dPerformed.setDate(QtCore.QDate(*time.localtime()[:3]))
 
-	def setCureStartNow(self, *args, **kwargs):
-		localtime = time.localtime()
-		self.page.dtCureStart.setDate(QtCore.QDate(*localtime[0:3]))
-		self.page.dtCureStart.setTime(QtCore.QTime(*localtime[3:6]))
-
-	def setCureStopNow(self, *args, **kwargs):
-		localtime = time.localtime()
-		self.page.dtCureStop.setDate(QtCore.QDate(*localtime[0:3]))
-		self.page.dtCureStop.setTime(QtCore.QTime(*localtime[3:6]))
 
 	# New
 	def setRunStartNow(self, *args, **kwargs):
 		localtime = time.localtime()
 		self.page.dtRunStart.setDate(QtCore.QDate(*localtime[0:3]))
 		self.page.dtRunStart.setTime(QtCore.QTime(*localtime[3:6]))
-
-	def setRunStopNow(self, *args, **kwargs):
-		localtime = time.localtime()
-		self.page.dtRunStop.setDate(QtCore.QDate(*localtime[0:3]))
-		self.page.dtRunStop.setTime(QtCore.QTime(*localtime[3:6]))
 
 
 

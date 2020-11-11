@@ -43,7 +43,7 @@
           <property name="minimumSize">
            <size>
             <width>0</width>
-            <height>165</height>
+            <height>155</height>
            </size>
           </property>
           <property name="currentRow">
@@ -76,11 +76,6 @@
           </item>
           <item>
            <property name="text">
-            <string>wirebonding</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
             <string>tooling</string>
            </property>
           </item>
@@ -104,7 +99,7 @@
           <property name="sizeHint" stdset="0">
            <size>
             <width>20</width>
-            <height>40</height>
+            <height>20</height>
            </size>
           </property>
          </spacer>
@@ -131,6 +126,11 @@
           <item>
            <property name="text">
             <string>PCB placement steps</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>wirebonding and encapuslating</string>
            </property>
           </item>
           <item>

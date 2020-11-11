@@ -67,7 +67,7 @@ class func(object):
 		self.step_kapton = fm.step_kapton()
 		self.step_kapton_exists = None
 
-		self.MAC = fm.MAC
+		#self.MAC = fm.MAC
 
 		self.mode = 'setup'
 
@@ -183,9 +183,6 @@ class func(object):
 
 		#self.page.pbDatePerformedNow.clicked.connect( self.setDatePerformedNow )
 		self.page.pbRunStartNow.clicked.connect(      self.setRunStartNow      )
-		self.page.pbRunStopNow.clicked.connect(       self.setRunStopNow       )
-		self.page.pbCureStartNow.clicked.connect(     self.setCureStartNow     )
-		self.page.pbCureStopNow.clicked.connect(      self.setCureStopNow      )
 
 	@enforce_mode('view')
 	def update_info(self,ID=None,*args,**kwargs):
@@ -212,7 +209,6 @@ class func(object):
 			#	self.page.dPerformed.setDate(QtCore.QDate(*NO_DATE))
 
 			run_start = self.step_kapton.run_start
-			run_stop  = self.step_kapton.run_stop
 			if run_start is None:
 				self.page.dtRunStart.setDate(QtCore.QDate(*NO_DATE))
 				self.page.dtRunStart.setTime(QtCore.QTime(0,0,0))
@@ -221,34 +217,6 @@ class func(object):
 				self.page.dtRunStart.setDate(QtCore.QDate(*localtime[0:3]))
 				self.page.dtRunStart.setTime(QtCore.QTime(*localtime[3:6]))
 
-			if run_stop is None:
-				self.page.dtRunStop.setDate(QtCore.QDate(*NO_DATE))
-				self.page.dtRunStop.setTime(QtCore.QTime(0,0,0))
-			else:
-				localtime = list(time.localtime(run_stop))
-				self.page.dtRunStop.setDate(QtCore.QDate(*localtime[0:3]))
-				self.page.dtRunStop.setTime(QtCore.QTime(*localtime[3:6]))
-
-
-			cure_start = self.step_kapton.cure_start
-			cure_stop  = self.step_kapton.cure_stop
-			if cure_start is None:
-				self.page.dtCureStart.setDate(QtCore.QDate(*NO_DATE))
-				self.page.dtCureStart.setTime(QtCore.QTime(0,0,0))
-			else:
-				localtime = list(time.localtime(cure_start))
-				self.page.dtCureStart.setDate(QtCore.QDate(*localtime[0:3]))
-				self.page.dtCureStart.setTime(QtCore.QTime(*localtime[3:6]))
-
-			if cure_stop is None:
-				self.page.dtCureStop.setDate(QtCore.QDate(*NO_DATE))
-				self.page.dtCureStop.setTime(QtCore.QTime(0,0,0))
-			else:
-				localtime = list(time.localtime(cure_stop))
-				self.page.dtCureStop.setDate(QtCore.QDate(*localtime[0:3]))
-				self.page.dtCureStop.setTime(QtCore.QTime(*localtime[3:6]))
-
-			self.page.leCureDuration.setText(str(int(self.step_kapton.cure_duration)) if not (self.step_kapton.cure_duration is None) else "")
 			self.page.leCureTemperature.setText(self.step_kapton.cure_temperature)
 			self.page.leCureHumidity.setText(self.step_kapton.cure_humidity)
 
@@ -284,13 +252,6 @@ class func(object):
 			#self.page.dPerformed.setDate(QtCore.QDate(*NO_DATE))
 			self.page.dtRunStart.setDate(QtCore.QDate(*NO_DATE))
 			self.page.dtRunStart.setTime(QtCore.QTime(0,0,0))
-			self.page.dtRunStop.setDate(QtCore.QDate(*NO_DATE))
-			self.page.dtRunStop.setTime(QtCore.QTime(0,0,0))
-			self.page.dtCureStart.setDate(QtCore.QDate(*NO_DATE))
-			self.page.dtCureStart.setTime(QtCore.QTime(0,0,0))
-			self.page.dtCureStop.setDate(QtCore.QDate(*NO_DATE))
-			self.page.dtCureStop.setTime(QtCore.QTime(0,0,0))
-			self.page.leCureDuration.setText("")
 			self.page.leCureTemperature.setText("")
 			self.page.leCureHumidity.setText("")
 			self.page.sbBatchAraldite.setValue(-1)
@@ -327,17 +288,11 @@ class func(object):
 
 		#self.page.pbDatePerformedNow.setEnabled(mode_creating or mode_editing)
 		self.page.pbRunStartNow     .setEnabled(mode_creating or mode_editing)
-		self.page.pbRunStopNow      .setEnabled(mode_creating or mode_editing)
-		self.page.pbCureStartNow    .setEnabled(mode_creating or mode_editing)
-		self.page.pbCureStopNow     .setEnabled(mode_creating or mode_editing)
 
 		self.page.leUserPerformed  .setReadOnly(mode_view)
 		self.page.leLocation       .setReadOnly(mode_view)
 		#self.page.dPerformed       .setReadOnly(mode_view)
 		self.page.dtRunStart       .setReadOnly(mode_view)
-		self.page.dtRunStop        .setReadOnly(mode_view)
-		self.page.dtCureStart      .setReadOnly(mode_view)
-		self.page.dtCureStop       .setReadOnly(mode_view)
 		self.page.leCureTemperature.setReadOnly(mode_view)
 		self.page.leCureHumidity   .setReadOnly(mode_view)
 		self.page.sbTrayComponent  .setReadOnly(mode_view)
@@ -359,30 +314,6 @@ class func(object):
 		self.page.pbEdit.setEnabled(   mode_view and     step_kapton_exists )
 		self.page.pbSave.setEnabled(   mode_creating or mode_editing        )
 		self.page.pbCancel.setEnabled( mode_creating or mode_editing        )
-
-		#NEW:  May resolve the num_kapton issue...should at least init num_kaptons to 0.
-		#baseplates = []
-		#print("Initializing num_kaptons")
-		for i in range(6):
-			if self.baseplates[i].num_kaptons == None:
-				#print("Baseplate "+str(i)+" was None")
-				self.baseplates[i].num_kaptons = 0
-			#initializes only...maybe this will work.
-			#The below was commented until recently...
-			self.baseplates.append(self.sb_baseplates[i].value() if self.sb_baseplates[i].value() >= 0 else None)
-			if not self.baseplates[i] == None:
-				which_kapton_layer = None
-				if (self.baseplates[i].step_kapton is None) or (self.baseplates[i].step_kapton == self.ID):
-					which_kapton_layer = 1
-					#print("kapton layer 1...")
-				elif (baseplates[i].step_kapton_2 is None) or (self.baseplates[i].step_kapton_2 == self.ID):
-					which_kapton_layer = 2
-					#print("kapton layer 2...")
-				num_kaptons = 0
-				if not self.baseplates[i].step_kapton   is None: num_kaptons += 1
-				if not self.baseplates[i].step_kapton_2 is None: num_kaptons += 1
-				self.baseplates[i].num_kaptons = num_kaptons
-
 
 
 	@enforce_mode(['editing','creating'])
@@ -424,10 +355,10 @@ class func(object):
 	def loadBaseplate(self, *args, **kwargs):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
-		#print("LOADING BASEPLATE", self.sb_baseplates[which].value())
+		print("LOADING BASEPLATE", self.sb_baseplates[which].value())
 		self.baseplates[which].load(self.sb_baseplates[which].value())
-		#print("ID:", self.baseplates[which].ID)
-		#print("Inst:", self.baseplates[which].institution)
+		print("ID:", self.baseplates[which].ID)
+		print("Inst:", self.baseplates[which].institution)
 		self.updateIssues()
 
 	@enforce_mode(['editing','creating'])
@@ -522,8 +453,10 @@ class func(object):
 					rows_baseplate_dne.append(i)
 				else:
 					#NOTE:  Max flatness is 250 um.  I think.
-					print("calling ready_step "+str(i)+", num_k is "+str(self.baseplates[i].num_kaptons))
-					ready, reason = self.baseplates[i].ready_step_kapton(self.page.sbID.value(), .250)
+					max_flatness = 0.250 #mm
+					max_kapton_flatness = None
+					ready, reason = self.baseplates[i].ready_step_kapton(self.page.sbID.value(), \
+																		 max_flatness, max_kapton_flatness)
 					if not ready:
 						issues.append(I_BASEPLATE_NOT_READY.format(i,reason))
 
@@ -635,22 +568,6 @@ class func(object):
 		else:
 			self.step_kapton.run_start = self.page.dtRunStart.dateTime().toTime_t()
 
-		if self.page.dtRunStop.date().year() == NO_DATE[0]:
-			self.step_kapton.run_stop = None
-		else:
-			self.step_kapton.run_stop  = self.page.dtRunStop.dateTime().toTime_t()
-
-
-		if self.page.dtCureStart.date().year() == NO_DATE[0]:
-			self.step_kapton.cure_start = None
-		else:
-			self.step_kapton.cure_start = self.page.dtCureStart.dateTime().toTime_t()
-
-		if self.page.dtCureStop.date().year() == NO_DATE[0]:
-			self.step_kapton.cure_stop = None
-		else:
-			self.step_kapton.cure_stop  = self.page.dtCureStop.dateTime().toTime_t()
-
 		self.step_kapton.cure_humidity    = str(self.page.leCureHumidity.text())
 		self.step_kapton.cure_temperature = str(self.page.leCureTemperature.text())
 
@@ -668,6 +585,13 @@ class func(object):
 		self.step_kapton.tray_component_sensor = self.page.sbTrayComponent.value() if self.page.sbTrayComponent.value() >= 0 else None
 		self.step_kapton.tray_assembly         = self.page.sbTrayAssembly.value()  if self.page.sbTrayAssembly.value()  >= 0 else None
 		self.step_kapton.batch_araldite        = self.page.sbBatchAraldite.value() if self.page.sbBatchAraldite.value() >= 0 else None
+
+		# Update baseplates to point to this step:
+		for i in range(6):
+			if not self.baseplates[i].ID is None:
+				self.baseplates[i].step_kapton = self.step_kapton.ID
+				self.baseplates[i].save()
+
 
 		print("Saving kapton step")
 		self.step_kapton.save()
@@ -707,21 +631,6 @@ class func(object):
 		self.page.dtRunStart.setDate(QtCore.QDate(*localtime[0:3]))
 		self.page.dtRunStart.setTime(QtCore.QTime(*localtime[3:6]))
 
-	def setRunStopNow(self, *args, **kwargs):
-		localtime = time.localtime()
-		self.page.dtRunStop.setDate(QtCore.QDate(*localtime[0:3]))
-		self.page.dtRunStop.setTime(QtCore.QTime(*localtime[3:6]))
-
-	def setCureStartNow(self, *args, **kwargs):
-		localtime = time.localtime()
-		self.page.dtCureStart.setDate(QtCore.QDate(*localtime[0:3]))
-		self.page.dtCureStart.setTime(QtCore.QTime(*localtime[3:6]))
-
-	def setCureStopNow(self, *args, **kwargs):
-		localtime = time.localtime()
-		self.page.dtCureStop.setDate(QtCore.QDate(*localtime[0:3]))
-		self.page.dtCureStop.setTime(QtCore.QTime(*localtime[3:6]))
-
 	@enforce_mode('view')
 	def load_kwargs(self,kwargs):
 		if 'ID' in kwargs.keys():
@@ -736,3 +645,5 @@ class func(object):
 	def changed_to(self):
 		print("changed to {}".format(PAGE_NAME))
 		self.update_info()
+
+

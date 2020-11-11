@@ -86,7 +86,7 @@ class func(object):
 		self.step_pcb = fm.step_pcb()
 		self.step_pcb_exists = None
 
-		self.MAC = fm.MAC
+		#self.MAC = fm.MAC
 
 		self.mode = 'setup'
 
@@ -233,9 +233,6 @@ class func(object):
 
 		#self.page.pbDatePerformedNow.clicked.connect(self.setDatePerformedNow)
 		self.page.pbRunStartNow     .clicked.connect(self.setRunStartNow)
-		self.page.pbRunStopNow      .clicked.connect(self.setRunStopNow)
-		self.page.pbCureStartNow    .clicked.connect(self.setCureStartNow)
-		self.page.pbCureStopNow     .clicked.connect(self.setCureStopNow)
 
 	@enforce_mode('view')
 	def update_info(self,ID=None,*args,**kwargs):
@@ -267,34 +264,7 @@ class func(object):
 				localtime = list(time.localtime(run_start))
 				self.page.dtRunStart.setDate(QtCore.QDate(*localtime[0:3]))
 				self.page.dtRunStart.setTime(QtCore.QTime(*localtime[3:6]))
-			if run_stop is None:
-				self.page.dtRunStop.setDate(QtCore.QDate(*NO_DATE))
-				self.page.dtRunStop.setTime(QtCore.QTime(0,0,0))
-			else:
-				localtime = list(time.localtime(run_stop))
-				self.page.dtRunStop.setDate(QtCore.QDate(*localtime[0:3]))
-				self.page.dtRunStop.setTime(QtCore.QTime(*localtime[3:6]))
 
-
-			cure_start = self.step_pcb.cure_start
-			cure_stop  = self.step_pcb.cure_stop
-			if cure_start is None:
-				self.page.dtCureStart.setDate(QtCore.QDate(*NO_DATE))
-				self.page.dtCureStart.setTime(QtCore.QTime(0,0,0))
-			else:
-				localtime = list(time.localtime(cure_start))
-				self.page.dtCureStart.setDate(QtCore.QDate(*localtime[0:3]))
-				self.page.dtCureStart.setTime(QtCore.QTime(*localtime[3:6]))
-
-			if cure_stop is None:
-				self.page.dtCureStop.setDate(QtCore.QDate(*NO_DATE))
-				self.page.dtCureStop.setTime(QtCore.QTime(0,0,0))
-			else:
-				localtime = list(time.localtime(cure_stop))
-				self.page.dtCureStop.setDate(QtCore.QDate(*localtime[0:3]))
-				self.page.dtCureStop.setTime(QtCore.QTime(*localtime[3:6]))
-
-			self.page.leCureDuration.setText(str(int(self.step_pcb.cure_duration)) if not (self.step_pcb.cure_duration is None) else "")
 			self.page.leCureTemperature.setText(self.step_pcb.cure_temperature)
 			self.page.leCureHumidity.setText(self.step_pcb.cure_humidity)
 
@@ -335,11 +305,8 @@ class func(object):
 			self.page.leUserPerformed.setText("")
 			self.page.leLocation.setText("")
 			#self.page.dPerformed.setDate(QtCore.QDate(*NO_DATE))
-			self.page.dtCureStart.setDate(QtCore.QDate(*NO_DATE))
-			self.page.dtCureStart.setTime(QtCore.QTime(0,0,0))
-			self.page.dtCureStop.setDate(QtCore.QDate(*NO_DATE))
-			self.page.dtCureStop.setTime(QtCore.QTime(0,0,0))
-			self.page.leCureDuration.setText("")
+			self.page.dtRunStart.setDate(QtCore.QDate(*NO_DATE))
+			self.page.dtRunStart.setTime(QtCore.QTime(0,0,0))
 			self.page.leCureTemperature.setText("")
 			self.page.leCureHumidity.setText("")
 			self.page.sbBatchAraldite.setValue(-1)
@@ -381,15 +348,11 @@ class func(object):
 
 		#self.page.pbDatePerformedNow.setEnabled(mode_creating or mode_editing)
 		self.page.pbRunStartNow     .setEnabled(mode_creating or mode_editing)
-		self.page.pbRunStopNow      .setEnabled(mode_creating or mode_editing)
-		self.page.pbCureStartNow    .setEnabled(mode_creating or mode_editing)
-		self.page.pbCureStopNow     .setEnabled(mode_creating or mode_editing)
 
 		self.page.leUserPerformed  .setReadOnly(mode_view)
 		self.page.leLocation       .setReadOnly(mode_view)
 		#self.page.dPerformed       .setReadOnly(mode_view)
-		self.page.dtCureStart      .setReadOnly(mode_view)
-		self.page.dtCureStop       .setReadOnly(mode_view)
+		self.page.dtRunStart       .setReadOnly(mode_view)
 		self.page.leCureTemperature.setReadOnly(mode_view)
 		self.page.leCureHumidity   .setReadOnly(mode_view)
 		self.page.sbTrayComponent  .setReadOnly(mode_view)
@@ -723,21 +686,6 @@ class func(object):
 		else:
 			self.step_pcb.run_start = self.page.dtRunStart.dateTime().toTime_t()
 
-		if self.page.dtRunStop.date().year() == NO_DATE[0]:
-			self.step_pcb.run_stop = None
-		else:
-			self.step_pcb.run_stop  = self.page.dtRunStop.dateTime().toTime_t()
-
-
-		if self.page.dtCureStart.date().year() == NO_DATE[0]:
-			self.step_pcb.cure_start = None
-		else:
-			self.step_pcb.cure_start = self.page.dtCureStart.dateTime().toTime_t()
-
-		if self.page.dtCureStop.date().year() == NO_DATE[0]:
-			self.step_pcb.cure_stop = None
-		else:
-			self.step_pcb.cure_stop  = self.page.dtCureStop.dateTime().toTime_t()
 
 		self.step_pcb.cure_humidity    = str(self.page.leCureHumidity.text())
 		self.step_pcb.cure_temperature = str(self.page.leCureTemperature.text())
@@ -760,12 +708,46 @@ class func(object):
 		self.step_pcb.tray_assembly         = self.page.sbTrayAssembly.value()  if self.page.sbTrayAssembly.value()  >= 0 else None
 		self.step_pcb.batch_araldite        = self.page.sbBatchAraldite.value() if self.page.sbBatchAraldite.value() >= 0 else None
 
+
+		for i in range(6):
+			temp_module = fm.module()
+			if not modules[i] is None:
+				temp_module.load(modules[i])
+			else:
+				print("Creating new module {}!".format(modules[i]))
+				temp_module.new(modules[i])
+				# Pull data from current step, PCB, protomodule:
+				temp_module.institution    = self.step_pcb.institution
+				temp_module.location       = self.step_pcb.location
+				temp_module.insertion_user = self.step_pcb.user_performed
+				temp_module.thickness      = self.protomodules[i].thickness
+				temp_module.channels       = self.protomodules[i].channels
+				temp_module.size           = self.protomodules[i].size
+				temp_module.shape          = self.protomodules[i].shape
+				temp_module.chirality      = self.protomodules[i].chirality
+
+				temp_module.baseplate      = self.protomodules[i].baseplate
+				temp_module.sensor         = self.protomodules[i].sensor
+				temp_module.protomodule    = self.protomodules[i].ID
+				temp_module.pcb            = self.pcbs[i].ID
+				temp_module.step_kapton    = self.protomodules[i].step_kapton
+				temp_module.step_sensor    = self.protomodules[i].step_sensor
+				temp_module.step_pcb       = self.step_pcb.ID
+
+				temp_module.save()
+
+			self.pcbs[i].step_pcb = self.step_pcb.ID
+			self.pcbs[i].module = modules[i]
+			self.pcbs[i].save()
+			self.protomodules[i].step_pcb = self.step_pcb.ID
+			self.protomodules[i].module = modules[i]
+			self.protomodules[i].save()
+
 		self.step_pcb.save()
+		self.unloadAllObjects()
 		self.mode = 'view'
 		self.update_info()
 
-		# NEW:
-		self.add_part_to_list()
 
 	def goTool(self,*args,**kwargs):
 		sender_name = str(self.page.sender().objectName())
@@ -811,21 +793,6 @@ class func(object):
 		localtime = time.localtime()
 		self.page.dtRunStart.setDate(QtCore.QDate(*localtime[0:3]))
 		self.page.dtRunStart.setTime(QtCore.QTime(*localtime[3:6]))
-
-	def setRunStopNow(self, *args, **kwargs):
-		localtime = time.localtime()
-		self.page.dtRunStop.setDate(QtCore.QDate(*localtime[0:3]))
-		self.page.dtRunStop.setTime(QtCore.QTime(*localtime[3:6]))
-
-	def setCureStartNow(self, *args, **kwargs):
-		localtime = time.localtime()
-		self.page.dtCureStart.setDate(QtCore.QDate(*localtime[0:3]))
-		self.page.dtCureStart.setTime(QtCore.QTime(*localtime[3:6]))
-
-	def setCureStopNow(self, *args, **kwargs):
-		localtime = time.localtime()
-		self.page.dtCureStop.setDate(QtCore.QDate(*localtime[0:3]))
-		self.page.dtCureStop.setTime(QtCore.QTime(*localtime[3:6]))
 
 
 	@enforce_mode('view')

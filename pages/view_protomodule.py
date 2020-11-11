@@ -98,7 +98,8 @@ class func(object):
 	def rig(self):
 		self.page.sbID.valueChanged.connect(self.update_info)
 
-		self.page.pbNew.clicked.connect(self.startCreating)
+		# No longer used; only created in production steps
+		#self.page.pbNew.clicked.connect(self.startCreating)
 		self.page.pbEdit.clicked.connect(self.startEditing)
 		self.page.pbSave.clicked.connect(self.saveEditing)
 		self.page.pbCancel.clicked.connect(self.cancelEditing)
@@ -131,16 +132,12 @@ class func(object):
 
 		self.page.leInsertUser.setText(  "" if self.protomodule.insertion_user is None else   self.protomodule.insertion_user)
 		self.page.leLocation.setText(    "" if self.protomodule.location     is None else     self.protomodule.location    )
-		self.page.leNumKaptons.setText(  "" if self.protomodule.num_kaptons  is None else str(self.protomodule.num_kaptons))
-		self.page.cbSize.setCurrentIndex(     INDEX_SIZE.get(     self.protomodule.size     ,-1))
 		self.page.cbShape.setCurrentIndex(    INDEX_SHAPE.get(    self.protomodule.shape    ,-1))
 		self.page.cbChirality.setCurrentIndex(INDEX_CHIRALITY.get(self.protomodule.chirality,-1))
 		self.page.dsbThickness.setValue( -1 if self.protomodule.thickness is None else self.protomodule.thickness )
 		self.page.sbChannels.setValue(   -1 if self.protomodule.channels  is None else self.protomodule.channels  )
-		self.page.sbRotation.setValue(   -1 if self.protomodule.rotation  is None else self.protomodule.rotation  )
 		if self.page.dsbThickness.value() == -1: self.page.dsbThickness.clear()
 		if self.page.sbChannels.value()   == -1: self.page.sbChannels.clear()
-		if self.page.sbRotation.value()   == -1: self.page.sbRotation.clear()
 
 		self.page.listComments.clear()
 		for comment in self.protomodule.comments:
@@ -198,13 +195,11 @@ class func(object):
 
 		self.page.leInsertUser.setReadOnly(not (mode_creating or mode_editing) )
 		self.page.leLocation.setReadOnly(  not (mode_creating or mode_editing) )
-		self.page.cbSize.setEnabled(            mode_creating or mode_editing  )
 		self.page.cbShape.setEnabled(           mode_creating or mode_editing  )
 		self.page.cbChirality.setEnabled(       mode_creating or mode_editing  )
 		self.page.cbInstitution.setEnabled(     mode_creating or mode_editing  )
 		self.page.dsbThickness.setReadOnly(not (mode_creating or mode_editing) )
 		self.page.sbChannels.setReadOnly(  not (mode_creating or mode_editing) )
-		self.page.sbRotation.setReadOnly(  not (mode_creating or mode_editing) )
 
 		self.page.pbDeleteComment.setEnabled(mode_creating or mode_editing)
 		self.page.pbAddComment.setEnabled(   mode_creating or mode_editing)
@@ -252,12 +247,10 @@ class func(object):
 
 		self.protomodule.insertion_user = str(self.page.leInsertUser.text()      ) if str(self.page.leInsertUser.text()      ) else None
 		self.protomodule.location     = str(self.page.leLocation.text()          ) if str(self.page.leLocation.text()        ) else None
-		self.protomodule.size         = str(self.page.cbSize.currentText()       ) if str(self.page.cbSize.currentText()     ) else None
 		self.protomodule.shape        = str(self.page.cbShape.currentText()      ) if str(self.page.cbShape.currentText()    ) else None
 		self.protomodule.chirality    = str(self.page.cbChirality.currentText()  ) if str(self.page.cbChirality.currentText()) else None
 		self.protomodule.institution  = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
 		self.protomodule.thickness    =     self.page.dsbThickness.value()         if self.page.dsbThickness.value() >=0 else None
-		self.protomodule.rotation     =     self.page.sbRotation.value()           if self.page.sbRotation.value()   >=0 else None
 		self.protomodule.channels     =     self.page.sbChannels.value()           if self.page.sbChannels.value()   >=0 else None
 
 		num_comments = self.page.listComments.count()
@@ -271,7 +264,6 @@ class func(object):
 		self.protomodule.check_cracks	    = str(self.page.cbCheckCracks.currentText()   ) if str(self.page.cbCheckCracks.currentText()   ) else None
 		self.protomodule.check_glue_spill	= str(self.page.cbCheckGlueSpill.currentText()) if str(self.page.cbCheckGlueSpill.currentText()) else None
 
-		self.protomodule.add_part_to_list()
 		self.protomodule.save()
 		self.mode = 'view'
 		self.update_info()

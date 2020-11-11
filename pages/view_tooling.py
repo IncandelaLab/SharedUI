@@ -21,7 +21,7 @@ class simple_fsobj_vc(object):
 		fsobj_tool,
 		sbID,
 		cbInstitution,  # New
-		dsbSize,
+		#dsbSize,
 		leLocation,  # New
 		pbEditNew,
 		pbSave,
@@ -36,7 +36,7 @@ class simple_fsobj_vc(object):
 		self.fsobj_tool      = fsobj_tool  # Renamed to clarify that obj is a fsobj_tool
 		self.sbID            = sbID
 		self.cbInstitution   = cbInstitution
-		self.dsbSize         = dsbSize
+		#self.dsbSize         = dsbSize
 		self.leLocation      = leLocation
 		self.pbEditNew       = pbEditNew
 		self.pbSave          = pbSave
@@ -47,12 +47,9 @@ class simple_fsobj_vc(object):
 		self.pbAddComment    = pbAddComment
 
 	def update_info(self,ID=None,institution=None,*args,**kwargs):
-		print(ID, institution)
 		if ID is None:
 			ID = self.sbID.value()
 		else:
-			print("ID is", ID)
-			print("inst is", institution)
 			self.sbID.setValue(ID)
 		if institution is None:
 			institution = self.cbInstitution.currentText()
@@ -63,11 +60,11 @@ class simple_fsobj_vc(object):
 
 		if self.fsobj_exists:
 			self.pbEditNew.setText("edit")
-			if self.fsobj_tool.size is None:
-				self.dsbSize.setValue(0)
-				self.dsbSize.clear()
-			else:
-				self.dsbSize.setValue(self.fsobj_tool.size)
+			#if self.fsobj_tool.size is None:
+			#	self.dsbSize.setValue(0)
+			#	self.dsbSize.clear()
+			#else:
+			#	self.dsbSize.setValue(self.fsobj_tool.size)
 			if self.fsobj_tool.location is None:
 				self.leLocation.setText("")
 			else:
@@ -80,9 +77,8 @@ class simple_fsobj_vc(object):
 
 		else:
 			self.pbEditNew.setText("new")
-			self.dsbSize.setValue(0)
+			#self.dsbSize.setValue(0)
 			self.leLocation.setText("")
-			self.dsbSize.clear()
 			self.listComments.clear()
 			self.pteWriteComment.clear()
 
@@ -98,10 +94,10 @@ class simple_fsobj_vc(object):
 		for i in range(self.listComments.count()):
 			comments.append(self.listComments.item(i).text())
 		self.fsobj_tool.comments = comments
-		size = self.dsbSize.value()
-		if size == 0.0:
-			size = None
-		self.fsobj_tool.size = size
+		#size = self.dsbSize.value()
+		#if size == 0.0:
+		#	size = None
+		#self.fsobj_tool.size = size
 		self.fsobj_tool.location = self.leLocation.text()  # New
 		self.fsobj_tool.save()
 		self.update_info()
@@ -129,7 +125,7 @@ class func(object):
 			self.fm.tool_sensor(),
 			self.page.sbSensorToolID,
 			self.page.cbSensorToolInstitution,
-			self.page.dsbSensorToolSize,
+			#self.page.dsbSensorToolSize,
 			self.page.leSensorToolLocation,
 			self.page.pbSensorToolEditNew,
 			self.page.pbSensorToolSave,
@@ -144,7 +140,7 @@ class func(object):
 			self.fm.tool_pcb(),
 			self.page.sbPcbToolID,
 			self.page.cbPcbToolInstitution,
-			self.page.dsbPcbToolSize,
+			#self.page.dsbPcbToolSize,
 			self.page.lePcbToolLocation,
 			self.page.pbPcbToolEditNew,
 			self.page.pbPcbToolSave,
@@ -159,7 +155,7 @@ class func(object):
 			self.fm.tray_component_sensor(),
 			self.page.sbSensorTrayID,
 			self.page.cbSensorTrayInstitution,
-			self.page.dsbSensorTraySize,
+			#self.page.dsbSensorTraySize,
 			self.page.leSensorTrayLocation,
 			self.page.pbSensorTrayEditNew,
 			self.page.pbSensorTraySave,
@@ -174,7 +170,7 @@ class func(object):
 			self.fm.tray_component_pcb(),
 			self.page.sbPcbTrayID,
 			self.page.cbPcbTrayInstitution,
-			self.page.dsbPcbTraySize,
+			#self.page.dsbPcbTraySize,
 			self.page.lePcbTrayLocation,
 			self.page.pbPcbTrayEditNew,
 			self.page.pbPcbTraySave,
@@ -189,7 +185,7 @@ class func(object):
 			self.fm.tray_assembly(),
 			self.page.sbAssemblyTrayID,
 			self.page.cbAssemblyTrayInstitution,
-			self.page.dsbAssemblyTraySize,
+			#self.page.dsbAssemblyTraySize,
 			self.page.leAssemblyTrayLocation,
 			self.page.pbAssemblyTrayEditNew,
 			self.page.pbAssemblyTraySave,
@@ -296,7 +292,6 @@ class func(object):
 			institution = None
 		else:
 			institution = self.page.cbSensorToolInstitution.currentText()
-		print("ID, sensor tool:", ID, institution)
 		self.tool_sensor.update_info(ID,institution)
 
 	@enforce_mode(['view','editing_pcb_tool','editing_sensor_tray','editing_pcb_tray','editing_assembly_tray'])
@@ -304,7 +299,6 @@ class func(object):
 		ID = self.page.sbSensorToolID.value()
 		# By default, this fn is handed the # of the combobox, not the text.  Fix that:
 		institution = INSTITUTION_INDEX[institution]
-		print("inst, sensor tool:", ID, institution)
 		self.tool_sensor.update_info(ID,institution)
 
 	@enforce_mode(['view','editing_sensor_tool','editing_sensor_tray','editing_pcb_tray','editing_assembly_tray'])
@@ -414,11 +408,12 @@ class func(object):
 		self.page.pbPcbTrayCancel     .setEnabled(mode_editing_pcb_tray     )
 		self.page.pbAssemblyTrayCancel.setEnabled(mode_editing_assembly_tray)
 
-		self.page.dsbSensorToolSize  .setEnabled(mode_editing_sensor_tool  )
+		"""self.page.dsbSensorToolSize  .setEnabled(mode_editing_sensor_tool  )
 		self.page.dsbPcbToolSize     .setEnabled(mode_editing_pcb_tool     )
 		self.page.dsbSensorTraySize  .setEnabled(mode_editing_sensor_tray  )
 		self.page.dsbPcbTraySize     .setEnabled(mode_editing_pcb_tray     )
 		self.page.dsbAssemblyTraySize.setEnabled(mode_editing_assembly_tray)
+		"""
 
 		self.page.leSensorToolLocation  .setEnabled(mode_editing_sensor_tool  )  # New
 		self.page.lePcbToolLocation     .setEnabled(mode_editing_pcb_tool     )

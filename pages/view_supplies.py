@@ -57,8 +57,8 @@ class simple_fsobj_vc(object):
 		else:
 			self.pbEditNew.setText("new")
 
-			self.dReceived.setDate(QtCore.QDate(2000,1,1))
-			self.dExpires.setDate(QtCore.QDate(2000,1,1))
+			self.dReceived.setDate(QtCore.QDate(2020,1,1))
+			self.dExpires.setDate(QtCore.QDate(2020,1,1))
 
 			self.ckIsEmpty.setChecked(False)
 

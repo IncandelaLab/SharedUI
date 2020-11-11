@@ -41,7 +41,8 @@ def loadconfig(file=None):
 	global DATADIR
 	global MAC
 
-	DATADIR  = data['datadir']
+	# NOTE:  Currently hardcoding the filemanager_data location, and ignoring the config information!
+	DATADIR  = os.sep.join([os.getcwd(), 'filemanager_data'])  # data['datadir']
 	MAC      = data['MAC']
 	ID_RANGE = MAC_ID_RANGES.get(MAC,[90000,99999])
 
@@ -129,6 +130,7 @@ class fsobj(object):
 		file = os.sep.join([filedir, filename])
 		if not os.path.exists(filedir):
 			os.makedirs(filedir)
+			self.add_part_to_list()
 
 		with open(file, 'w') as opfl:
 			if hasattr(self, 'PROPERTIES_DO_NOT_SAVE'):
@@ -156,9 +158,6 @@ class fsobj(object):
 
 		with open(file, 'r') as opfl:
 			data = json.load(opfl)
-
-		# TEMP
-		print(data)
 
 		if not (data['ID'] == ID):
 			err = "ID in data file ({}) does not match ID of filename ({})".format(data['ID'],ID)
@@ -292,7 +291,7 @@ class fsobj(object):
 		filename = filename.replace('.json', '.xml')
 		if not os.path.exists(filedir):
 			os.makedirs(filedir)
-		print("Saving file to ", filedir+'/'+filename)
+		print("Saving XML file to ", filedir+'/'+filename)
 		xml_tree.write(open(filedir+'/'+filename.replace('.json', '.xml'), 'wb'))
 
 
@@ -325,17 +324,14 @@ class fsobj_tool(fsobj):
 			instiution = self.institution
 		filedir  = os.sep.join([ DATADIR, self.FILEDIR.format(ID=ID, institution=institution, century = CENTURY.format(ID//100)) ])
 		filename = self.FILENAME.format(ID=ID, institution=institution)
-		print("filedir=", filedir, ", filename=", filename)
 		return filedir, filename
 
 	def save(self):
-		print("CALLING SAVE")
 
 		#NOTE:  Tools require special treatment.
 		#       IDs are NOT unique.  ID+location is unique.  Need to use this instead to name the file.
 		filedir, filename = self.get_filedir_filename(self.ID, self.institution)
 		file = os.sep.join([filedir, filename])
-		print("Saving to "+file)
 		if not os.path.exists(filedir):
 			os.makedirs(filedir)
 
@@ -367,9 +363,6 @@ class fsobj_tool(fsobj):
 
 		with open(file, 'r') as opfl:
 			data = json.load(opfl)
-
-		# TEMP
-		#print(data)
 
 		if not (data['ID'] == ID):
 			err = "ID in data file ({}) does not match ID of filename ({})".format(data['ID'],ID)
@@ -455,7 +448,7 @@ class tool_sensor(fsobj_tool):
 	#FILENAME = 'tool_sensor_{ID:0>5}.json'
 	FILENAME = 'tool_sensor_{institution}_{ID:0>5}.json'
 	PROPERTIES = [
-		'size',
+		#'size',
 		'location',
 	]
 
@@ -468,7 +461,7 @@ class tool_pcb(fsobj_tool):
 	#FILENAME = 'tool_pcb_{ID:0>5}.json'
 	FILENAME = 'tool_pcb_{institution}_{ID:0>5}.json'
 	PROPERTIES = [
-		'size',
+		#'size',  # Removed; everything should be 8 in
 		'location',
 	]
 
@@ -479,7 +472,7 @@ class tray_assembly(fsobj_tool):
 	#FILENAME = 'tray_assembly_{ID:0>5}.json'
 	FILENAME = 'tray_assembly_{institution}_{ID:0>5}.json'
 	PROPERTIES = [
-		'size',
+		#'size',
 		'location',
 	]
 
@@ -490,7 +483,7 @@ class tray_component_sensor(fsobj_tool):
 	#FILENAME = 'tray_component_sensor_{ID:0>5}.json'
 	FILENAME = 'tray_component_sensor_{institution}_{ID:0>5}.json'
 	PROPERTIES = [
-		'size',
+		#'size',
 		'location',
 	]
 
@@ -501,7 +494,7 @@ class tray_component_pcb(fsobj_tool):
 	#FILENAME = 'tray_component_pcb_{ID:0>5}.json'
 	FILENAME = 'tray_component_pcb_{institution}_{ID:0>5}.json'
 	PROPERTIES = [
-		'size',
+		#'size',
 		'location',
 	]
 
@@ -523,6 +516,7 @@ class shipment(fsobj):
 
 		"sendOrReceive",  #NEW, may be unnecessary
 		#= "send" or "receive"
+		"fedex_id", # NEW
 
 		"kaptons",
 		"baseplates",
@@ -643,14 +637,15 @@ class baseplate(fsobj):
 		"size",         # hexagon width, numerical. 6 or 8 (integers) for 6-inch or 8-inch
 		"shape",        # 
 		"chirality",    # 
-		"rotation",     # 
+		#"rotation",     # 
 
 		# kapton number
-		"num_kaptons", # number of kaptons; 0/None for pcb baseplates, 0/None 1 or 2 for metal baseplates
+		# REMOVED -- all kapton layers are currently double layers
+		#"num_kaptons", # number of kaptons; 0/None for pcb baseplates, 0/None 1 or 2 for metal baseplates
 
 		# baseplate qualification 
 		"corner_heights",      # list of corner heights
-		"kapton_tape_applied", # only for metal baseplates (not pcb baseplates)
+		#"kapton_tape_applied", # only for metal baseplates (not pcb baseplates)
 		                       # True if kapton tape has been applied
 		"thickness",           # measure thickness of baseplate
 
@@ -658,21 +653,15 @@ class baseplate(fsobj):
 		"step_kapton", # ID of step_kapton that applied the kapton to it
 
 		# kaptonized baseplate qualification (1)
-		"check_leakage",    # None if not checked yet; True if passed; False if failed
-		"check_surface",    # None if not checked yet; True if passed; False if failed
+		#"check_leakage",    # None if not checked yet; True if passed; False if failed
+		#"check_surface",    # None if not checked yet; True if passed; False if failed
 		"check_edges_firm", # None if not checked yet; True if passed; False if failed
 		"check_glue_spill", # None if not checked yet; True if passed; False if failed
 		"kapton_flatness",  # flatness of kapton layer after curing
 
 		# kapton application (2) - for double kapton baseplates
-		"step_kapton_2", # ID of the step_kapton that applied the second kapton
-
-		# kaptonized baseplate qualification (2) - for double kapton baseplates
-		"check_leakage_2",    # None if not checked yet; True if passed; False if failed
-		"check_surface_2",    # None if not checked yet; True if passed; False if failed
-		"check_edges_firm_2", # None if not checked yet; True if passed; False if failed
-		"check_glue_spill_2", # None if not checked yet; True if passed; False if failed
-		"kapton_flatness_2",  # flatness of kapton layer after curing
+		# REMOVED -- see above
+		#"step_kapton_2", # ID of the step_kapton that applied the second kapton
 
 		# sensor application
 		"step_sensor", # which step_sensor used it
@@ -687,6 +676,7 @@ class baseplate(fsobj):
 
 	DEFAULTS = {
 		"shipments":[],
+		"size":     '8', # This should not be changed!
 	}
 
 	#NEW:  List of vars that are manually given to the XML file via Akshay's script and 
@@ -700,6 +690,7 @@ class baseplate(fsobj):
 
 	@property
 	def flatness(self):
+		# BASEPLATE flatness, not kapton flatness!
 		if self.corner_heights is None:
 			return None
 		else:
@@ -708,59 +699,55 @@ class baseplate(fsobj):
 			else:
 				return max(self.corner_heights) - min(self.corner_heights)
 
-	def ready_step_kapton(self, step_kapton = None, max_flatness = None):
-		print("num_kaptons is "+str(self.num_kaptons))
-		if step_kapton in [self.step_kapton, self.step_kapton_2]:
+	def ready_step_kapton(self, step_kapton = None, max_flatness = None, max_kapton_flatness = None):
+		if step_kapton == self.step_kapton:
 			return True, "already part associated with this kapton step"
 
 		if not (self.step_sensor is None):
 			return False, "already part of a protomodule (has a sensor step)"
 
-		if self.num_kaptons is None:
-			#This is presumably acceptable...
-			#return False, "num_kaptons is None; something's wrong?"
-			self.num_kaptons = 0  #This is probably okay
+		if not self.step_kapton is None:
+			# step_kapton has already been assigned, and it isn't the one that's currently being added!
+			return False, "baseplate already has an assigned kapton step!"
+		
+		if self.material == "PCB":
+			return False, "baseplate is a PCB baseplate"
 
-		if self.num_kaptons == 2:
-			return False, "already has two kaptons"
+		# Kapton qualification checks:
+		errstr = ""
+		checks = [
+			#self.check_leakage    == "pass",
+			#self.check_surface    == "pass",
+			self.check_edges_firm == "pass",
+			self.check_glue_spill == "pass",
+			self.kapton_flatness  != None,
+			]
+		if self.kapton_flatness is None:
+			errstr+=" kapton flatness doesn't exist."
+			checks.append(False)
+		elif not (max_kapton_flatness is None) and (self.kapton_flatness > max_kapton_flatness):
+			errstr.append(" kapton flatness {} exceeds max of {}.".format(self.kapton_flatness, max_kapton_flatness))
+			checks.append(False)
 
-		if self.num_kaptons == 1:
-			checks = [
-				self.check_leakage    == "pass",
-				self.check_surface    == "pass",
-				self.check_edges_firm == "pass",
-				self.check_glue_spill == "pass",
-				]
-			if self.kapton_flatness is None:
+		# Baseplate qualification+preparation checks:
+		#if not self.kapton_tape_applied:
+		#	errstr+=" kapton tape not applied."
+		#	checks.append(False)
+		if not self.thickness:
+			errstr+=" thickness doesn't exist."
+			checks.append(False)
+		if self.flatness is None:
+			errstr+=" flatness doesn't exist."
+			checks.append(False)
+		elif not (max_flatness is None):
+			if max_flatness<self.flatness:
+				errstr+="kapton flatness "+str(self.flatness)+" exceeds max "+str(max_flatness)+"."
 				checks.append(False)
-			elif not (max_flatness is None):
-				checks.append(self.kapton_flatness < max_flatness)
-			
-			if not all(checks):
-				return False, "kaptonized baseplate qualification failed or incomplete"
-			else:
-				return True, ""
 
-		if self.num_kaptons == 0:
-			checks = []
-			errstr = ""
-			if not self.kapton_tape_applied:
-				errstr+=" kapton tape not applied."
-				checks.append(False)
-			if not self.thickness:
-				errstr+=" thickness doesn't exist."
-				checks.append(False)
-			if self.flatness is None:
-				errstr+=" flatness doesn't exist."
-				checks.append(False)
-			if not (max_flatness is None):
-				if max_flatness<self.flatness:  errstr+="kapton flatness "+str(self.flatness)+" exceeds max "+str(max_flatness)+"."
-				checks.append(max_flatness > self.flatness)
-
-			if not all(checks):
-				return False, "baseplate qualification failed or incomplete: "+errstr
-			else:
-				return True, ""
+		if not all(checks):
+			return False, "baseplate qualification failed or incomplete: "+errstr
+		else:
+			return True, ""
 
 
 	def ready_step_sensor(self, step_sensor = None, max_flatness = None):
@@ -856,7 +843,7 @@ class baseplate(fsobj):
 		# TAKE 2:  This time, use gen_xml(input_dict) to streamline things.
 		# Match XML schema in  https://cmsdca.cern.ch/hgc_loader/hgc/int2r/doc/doc#type_part
 		part_dict = {
-			'PART_ID':               self.ID,
+			'PART_ID':               str(self.ID),
 			'KIND_OF_PART':          'HGC {} Inch Kaptonized Plate'.format('Six' if self.size=='6' else 'Eight'),
 			'MANUFACTURER':          self.manufacturer,
 			'BARCODE':               'PLACEHOLDERVAL',
@@ -885,45 +872,6 @@ class baseplate(fsobj):
 
 
 
-	"""
-	def load(self, ID, on_property_missing = "warn"):
-		#Perform (temporary) json load
-		result = super(baseplate, self).load(ID, on_property_missing)
-		if ID != 0:
-			print("Performed load for baseplate "+str(ID))
-
-			filedir, filename = self.get_filedir_filename(ID)
-			filename = filename.replace('.json', '.xml')
-			#Load XML file
-			tree = etree.parse(filedir+'/'+filename)
-			root = tree.getroot()
-			# For now, just browse through the tree and make sure that all info read out matches the json data.  Testing only.
-			# (Next step is to make sure save() saves *everything* that needs saving, and that the fmt matches the DB...
-			# root's onnly child is PARTS, etc...
-			parts = root[0]
-			part = parts[0]
-			# 'part' contains all elements:  kindOfPart, user, comments, etc...
-			for child in part:
-				if child.tag == "KIND_OF_PART":
-					print("Found part type")
-					if (self.size == 6 and child.text == "HGC Six Inch Plate") or (self.size == 8 and child.attrib == "HGC Eight Inch Plate"):
-						print("All good; size matches")
-					else:  print("PROBLEM, read "+child.text)
-				if child.tag == "RECORD_INSERTION_USER":
-					print("Found insertion user")
-					if child.text == self.insertion_user:  print("All good; username matches")
-					else:  print("PROBLEM, read "+child.text)
-				if child.tag == "SERIAL_NUMBER":
-					print("Found serial number "+child.text)
-				if child.tag == "COMMENT_DESCRIPTION":
-					print("Found comment:")
-					print(child.text)
-			print("Finished load test")
-		
-		return result
-	"""
-
-
 class sensor(fsobj):
 	OBJECTNAME = "sensor"
 	FILEDIR = os.sep.join(['sensors','{century}'])
@@ -937,12 +885,12 @@ class sensor(fsobj):
 		# characteristics (defined upon reception)
 		"serial",   # 
 		"barcode",
-		"manufacturer", # 
+		#"manufacturer", # REMOVED; apparently this is all the same?
 		"type",         # NEW:  This is now chosen from a drop-down menu
 		"size",         # 
 		"channels",     # 
 		"shape",        # 
-		"rotation",     # 
+		#"rotation",     # 
 
 		# sensor qualification
 		"inspection", # None if not inspected yet; True if passed; False if failed
@@ -951,7 +899,7 @@ class sensor(fsobj):
 		"step_sensor", # which step_sensor placed this sensor
 		"protomodule", # which protomodule this sensor is a part of
 		#NEW, WIP
-		"semi_type",   #semiconductor type--either P or N
+		#"semi_type",   #semiconductor type--either P or N
 
 		# associations to other objects
 		"module", # which module this sensor is a part of
@@ -962,12 +910,13 @@ class sensor(fsobj):
 
 	DEFAULTS = {
 		"shipments":[],
+		"size":    '8',  # DO NOT MODIFY
 	}
 
 	def save(self):  #NEW for XML generation
 		
 		# FIRST:  If not all necessary vars are defined, don't save the XML file.
-		required_vars = [self.size, self.identifier, self.comments, self.location, self.institution]
+		required_vars = [self.size, self.comments, self.location, self.institution]
 		#contents = vars(self)
 		for vr in required_vars:
 			if vr is None:
@@ -991,7 +940,7 @@ class sensor(fsobj):
 			'SERIAL_NUMBER':         self.identifier,
 			'COMMENT_DESCRIPTION':   self.comments,   # Note:  Requires special treatment
 			'LOCATION':              self.location,
-			'MANUFACTURER':          self.manufacturer,
+			'MANUFACTURER':          "DUMMY_MANUFACTURER", #self.manufacturer,
 			'PREDEFINED_ATTRIBUTES': attr_dict,
 		}
 		parts_dict = {
@@ -1032,7 +981,7 @@ class pcb(fsobj):
 		"channels",     # 
 		"shape",        # 
 		"chirality",    # 
-		"rotation",     # 
+		#"rotation",     # 
 
 		# pcb qualification
 		"daq",        # name of dataset
@@ -1056,6 +1005,7 @@ class pcb(fsobj):
 	DEFAULTS = {
 		"shipments":[],
 		"daq_data":[],
+		"size":     '8',
 	}
 
 	DAQ_DATADIR = 'daq'
@@ -1081,7 +1031,7 @@ class pcb(fsobj):
 	def save(self):  #NEW for XML generation
 		
 		# FIRST:  If not all necessary vars are defined, don't save the XML file.
-		required_vars = [self.size, self.identifier, self.comments, self.location, self.institution]
+		required_vars = [self.size, self.comments, self.location, self.institution]
 		#contents = vars(self)
 		for vr in required_vars:
 			if vr is None:
@@ -1148,18 +1098,19 @@ class protomodule(fsobj):
 		# characteristics - taken from child parts upon creation of protomodule
 		"insertion_user",
 		"thickness",   # sum of baseplate and sensor, plus glue gap
-		"num_kaptons", # from baseplate
+		#"num_kaptons", # from baseplate  # OLD
 		"channels",    # from sensor
 		"size",        # from baseplate or sensor (identical)
 		"shape",       # from baseplate or sensor (identical)
 		"chirality",   # from baseplate
-		"rotation",    # from baseplate or sensor (identical)
+		#"rotation",    # from baseplate or sensor (identical)
 		# initial location is also filled from child parts
 
 		# sensor step - filled upon creation
 		"step_sensor", # ID of sensor step
 		"baseplate",   # ID of baseplate
 		"sensor",      # ID of sensor
+		"self_kapton", # ID of kapton step (from baseplate)
 
 		# protomodule qualification
 		"offset_translation", # translational offset of placement
@@ -1175,6 +1126,7 @@ class protomodule(fsobj):
 
 	DEFAULTS = {
 		"shipments":[],
+		"size":     '8',
 	}
 
 
@@ -1194,12 +1146,12 @@ class module(fsobj):
 		# characteristics - taken from child parts upon creation of module
 		"insertion_user",
 		"thickness",   # sum of protomodule and sensor, plus glue gap
-		"num_kaptons", # from protomodule
+		#"num_kaptons", # from protomodule # Removed, no longer necessary
 		"channels",    # from protomodule or pcb (identical)
 		"size",        # from protomodule or pcb (identical)
 		"shape",       # from protomodule or pcb (identical)
 		"chirality",   # from protomodule or pcb (identical)
-		"rotation",    # from protomodule or pcb (identical)
+		#"rotation",    # from protomodule or pcb (identical)
 		# initial location is also filled from child parts
 
 		# components and steps - filled upon creation
@@ -1208,7 +1160,7 @@ class module(fsobj):
 		"protomodule",   # 
 		"pcb",           # 
 		"step_kapton",   # 
-		"step_kapton_2", # 
+		#"step_kapton_2", # Removed, no longer necessary
 		"step_sensor",   # 
 		"step_pcb",      # 
 
@@ -1275,6 +1227,7 @@ class module(fsobj):
 		"shipments":[],
 		'iv_data':[],
 		'daq_data':[],
+		"size":    '8',
 	}
 
 	IV_DATADIR      = 'iv'
@@ -1516,10 +1469,11 @@ class step_kapton(fsobj):
 		'location', # location at institution where step was performed
 		#'date_performed', # date step was performed
 		'run_start',  # unix time @ start of run
-		'run_stop',   # unix time @ end of run
+		# Currently replacing all other time info:
+		#'run_stop',   # unix time @ end of run
 
-		'cure_start',       # unix time @ start of curing
-		'cure_stop',        # unix time @ end of curing
+		#'cure_start',       # unix time @ start of curing
+		#'cure_stop',        # unix time @ end of curing
 		'cure_temperature', # Average temperature during curing (centigrade)
 		'cure_humidity',    # Average humidity during curing (percent)
 
@@ -1533,51 +1487,32 @@ class step_kapton(fsobj):
 	]
 
 
-	@property
+	"""@property
 	def cure_duration(self):
 		if (self.cure_stop is None) or (self.cure_start is None):
 			return None
 		else:
 			return self.cure_stop - self.cure_start
+	"""
 
 	def save(self):
-		print("Saving step_kapton")
 		super(step_kapton, self).save()
 		inst_baseplate = baseplate()
 
 		for i in range(6):
 			baseplate_exists = False if self.baseplates[i] is None else inst_baseplate.load(self.baseplates[i])
 			if baseplate_exists:
-				print("Baseplate "+str(i)+" exists")
 
-				which_kapton_layer = None
-
+				# If baseplate has no step_kapton or if its step_kapton is the one being edited now:
 				if (inst_baseplate.step_kapton is None) or (inst_baseplate.step_kapton == self.ID):
-					which_kapton_layer = 1
-
-				else:
-					if (inst_baseplate.step_kapton_2 is None) or (inst_baseplate.step_kapton_2 == self.ID):
-						which_kapton_layer = 2
-
-				if which_kapton_layer is None:
-					print("step_kapton cannot write ID {} to baseplate {}: already has two kapton steps")
-
-				else:
-					if which_kapton_layer == 1:
-						if self.ID==None:  print("self.ID is none, handed to step_kapton!")
-						else:  print("self.ID is NOT None, handed to step_kapton!")
-						inst_baseplate.step_kapton = self.ID
-					elif which_kapton_layer == 2:
-						if self.ID==None:  print("self.ID is none, handed to step_kapton_2!")
-						inst_baseplate.step_kapton_2 = self.ID
-					print("**Initializing num_kaptons**")
-					num_kaptons = 0
-					if not (inst_baseplate.step_kapton   is None): num_kaptons += 1
-					if not (inst_baseplate.step_kapton_2 is None): num_kaptons += 1
-					inst_baseplate.num_kaptons = num_kaptons
-
+					inst_baseplate.step_kapton = self.ID
 					inst_baseplate.save()
-					inst_baseplate.clear()  #This is okay...
+					inst_baseplate.clear()
+				else:
+					print("ERROR:  Baseplate {} has already been assigned a kapton step!")
+					print("*WARNING:  ready_step_kapton should prevent this from working!")
+					assert(False)
+
 
 			else:
 				if not (self.baseplates[i] is None):
@@ -1597,12 +1532,12 @@ class step_sensor(fsobj):
 		'location', # New--instituition where step was performed
 
 		'run_start',  # New--unix time @ start of run
-		'run_stop',  # New--unix time @ end of run
+		#'run_stop',  # New--unix time @ end of run
 
 		# Note:  Semiconductors types are stored in the sensor objects
 
-		'cure_start',       # unix time @ start of curing
-		'cure_stop',        # unix time @ end of curing
+		#'cure_start',       # unix time @ start of curing
+		#'cure_stop',        # unix time @ end of curing
 		'cure_temperature', # Average temperature during curing (centigrade)
 		'cure_humidity',    # Average humidity during curing (percent)
 
@@ -1618,12 +1553,13 @@ class step_sensor(fsobj):
 	]
 
 
-	@property
+	"""@property
 	def cure_duration(self):
 		if (self.cure_stop is None) or (self.cure_start is None):
 			return None
 		else:
 			return self.cure_stop - self.cure_start
+	"""
 
 	# WIP
 
@@ -1651,7 +1587,7 @@ class step_sensor(fsobj):
 						'RUN_TYPE':'HGC {}inch Proto Module Assembly'.format(baseplate_.size),
 						'RUN_NUMBER':self.ID,
 						'RUN_BEGIN_TIMESTAMP':self.run_start,
-						'RUN_END_TIMESTAMP':self.run_stop,
+						'RUN_END_TIMESTAMP':"PLACEHOLDER", #self.run_stop,
 						'INITIATED_BY_USER':self.user_performed,
 						'LOCATION':", ".format(self.institution, self.location),
 						'COMMENT_DESCRIPTION':'Build {}inch proto modules'.format(baseplate_.size),
@@ -1726,13 +1662,12 @@ class step_sensor(fsobj):
 			if not (self.protomodules[i] is None):
 				if not protomodule_exists:
 					inst_protomodule.new(self.protomodules[i])
-				inst_protomodule.num_kaptons = inst_baseplate.num_kaptons if baseplate_exists else None
 				inst_protomodule.channels    = inst_sensor.channels       if sensor_exists    else None
 				inst_protomodule.size        = inst_baseplate.size        if baseplate_exists else None
 				inst_protomodule.shape       = inst_baseplate.shape       if baseplate_exists else None
 				inst_protomodule.chirality   = inst_baseplate.chirality   if baseplate_exists else None
-				inst_protomodule.rotation    = inst_baseplate.rotation    if baseplate_exists else None
 				inst_protomodule.location    = MAC
+				inst_protomodule.institution = inst_sensor.institution
 				inst_protomodule.step_sensor = self.ID
 				inst_protomodule.baseplate   = self.baseplates[i]
 				inst_protomodule.sensor      = self.sensors[i]
@@ -1917,15 +1852,12 @@ class step_pcb(fsobj):
 				inst_module.pcb         = inst_pcb.ID         if pcb_exists         else None
 				inst_module.protomodule = inst_protomodule.ID if protomodule_exists else None
 				inst_module.step_kapton   = inst_baseplate.step_kapton   if baseplate_exists   else None
-				inst_module.step_kapton_2 = inst_baseplate.step_kapton_2 if baseplate_exists   else None
 				inst_module.step_sensor = inst_protomodule.step_sensor if protomodule_exists else None
 				inst_module.step_pcb    = self.ID
-				inst_module.num_kaptons = inst_baseplate.num_kaptons if baseplate_exists else None
 				inst_module.channels    = inst_sensor.channels       if sensor_exists    else None
 				inst_module.size        = inst_pcb.size              if pcb_exists       else None
 				inst_module.shape       = inst_pcb.shape             if pcb_exists       else None
 				inst_module.chirality   = inst_pcb.chirality         if pcb_exists       else None
-				inst_module.rotation    = inst_pcb.rotation          if pcb_exists       else None
 				inst_module.location    = MAC
 				inst_module.save()
 

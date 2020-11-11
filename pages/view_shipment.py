@@ -26,6 +26,7 @@ I_PART_DNE = "part(s) do not exist: {}"  #'PCB 10', etc
 I_PART_DUP = "part(s) have duplicates: {}"
 I_SENDER_DNE = "sender name is empty"
 I_RECEIVER_DNE = "receiver name is empty"
+I_FEDEX_DNE = "FedEx ID is empty"
 
 INDEX_SEND_RECV = {
 	'sending':0,
@@ -147,8 +148,9 @@ class func(object):
 
 		if not self.shipment.sendOrReceive is None:
 			self.page.cbShipmentType.setCurrentIndex(INDEX_SEND_RECV.get(self.shipment.sendOrReceive))
-		self.page.leSender.setText("" if self.shipment.sender is None else self.shipment.sender)
+		self.page.leSender  .setText("" if self.shipment.sender   is None else self.shipment.sender)
 		self.page.leReceiver.setText("" if self.shipment.receiver is None else self.shipment.receiver)
+		self.page.leFedEx   .setText("" if self.shipment.fedex_id is None else self.shipment.fedex_id)
 		if not self.shipment.date_sent is None:
 			self.page.dSent.setDate(QtCore.QDate(*self.shipment.date_sent))
 		if not self.shipment.date_received is None:
@@ -177,6 +179,7 @@ class func(object):
 		self.page.cbShipmentType.setEnabled(   mode_creating or mode_editing  )
 		self.page.leSender.setReadOnly(   not (mode_creating or mode_editing) )
 		self.page.leReceiver.setReadOnly( not (mode_creating or mode_editing) )
+		self.page.leFedEx.setReadOnly(    not (mode_creating or mode_editing) )
 
 		self.page.dSent.setReadOnly(      not (mode_creating or mode_editing) )
 		self.page.pbSentNow.setEnabled(        mode_creating or mode_editing  )
@@ -245,6 +248,8 @@ class func(object):
 			issues.append(I_SENDER_DNE)
 		if self.page.leReceiver.text() == "":
 			issues.append(I_RECEIVER_DNE)
+		if self.page.leFedEx.text() == "":
+			issues.append(I_FEDEX_DNE)
 
 		#Check send/receive dates
 		if self.page.dSent.date() > self.page.dReceived.date():
@@ -290,11 +295,13 @@ class func(object):
 	@enforce_mode(['editing','creating'])
 	def saveEditing(self,*args,**kwargs):
 
-		self.shipment.sender        = str(self.page.leSender.text()      ) if str(self.page.leSender.text()      ) else None
-		self.shipment.receiver      = str(self.page.leReceiver.text()    ) if str(self.page.leReceiver.text()    ) else None
+		self.shipment.sender        = str(self.page.leSender.text()  ) if str(self.page.leSender.text()  ) else None
+		self.shipment.receiver      = str(self.page.leReceiver.text()) if str(self.page.leReceiver.text()) else None
+		self.shipment.fedex_id      = str(self.page.leFedEx.text()   ) if str(self.page.leFedEx.text()   ) else None
 		self.shipment.date_sent     = [*self.page.dSent.date().getDate()]
 		self.shipment.date_received = [*self.page.dReceived.date().getDate()]
 		self.shipment.sendOrReceive = self.page.cbShipmentType.currentText().replace(' parts','')
+
 
 		self.shipment.modules      = [] #All info has already been loaded into lwPartList, so no worries about info loss
 		self.shipment.baseplates   = []

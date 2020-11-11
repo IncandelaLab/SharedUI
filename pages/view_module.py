@@ -112,8 +112,8 @@ class func(object):
 	@enforce_mode('setup')
 	def rig(self):
 		self.page.sbID.valueChanged.connect(self.update_info)
-
-		self.page.pbNew.clicked.connect(self.startCreating)
+		# Now automated
+		#self.page.pbNew.clicked.connect(self.startCreating)
 		self.page.pbEdit.clicked.connect(self.startEditing)
 		self.page.pbSave.clicked.connect(self.saveEditing)
 		self.page.pbCancel.clicked.connect(self.cancelEditing)
@@ -121,7 +121,6 @@ class func(object):
 		self.page.pbGoShipment.clicked.connect(self.goShipment)
 
 		self.page.pbGoStepKapton.clicked.connect(   self.goStepKapton   )
-		self.page.pbGoStepKapton_2.clicked.connect( self.goStepKapton_2 )
 		self.page.pbGoStepSensor.clicked.connect(   self.goStepSensor   )
 		self.page.pbGoStepPcb.clicked.connect(      self.goStepPcb      )
 		self.page.pbGoBaseplate.clicked.connect(    self.goBaseplate    )
@@ -160,21 +159,16 @@ class func(object):
 			self.page.listShipments.addItem(str(shipment))
 
 		# characteristics
-		self.page.leNumKaptons.setText( "" if self.module.num_kaptons is None else str(self.module.num_kaptons))
 		self.page.sbChannels.setValue(  -1 if self.module.channels    is None else self.module.channels   )
 		self.page.dsbThickness.setValue(-1 if self.module.thickness   is None else self.module.thickness  )
-		self.page.sbRotation.setValue(  -1 if self.module.rotation    is None else self.module.rotation   )
-		self.page.cbSize.setCurrentIndex(       INDEX_SIZE.get(       self.module.size     , -1)  )
 		self.page.cbShape.setCurrentIndex(      INDEX_SHAPE.get(      self.module.shape    , -1)  )
 		self.page.cbChirality.setCurrentIndex(  INDEX_CHIRALITY.get(  self.module.chirality, -1)  )
 		self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.module.institution, -1))
 		if self.page.sbChannels.value()   == -1: self.page.sbChannels.clear()
 		if self.page.dsbThickness.value() == -1: self.page.dsbThickness.clear()
-		if self.page.sbRotation.value()   == -1: self.page.sbRotation.clear()
 
 		# parts and steps
 		self.page.sbStepKapton.setValue(   -1 if self.module.step_kapton   is None else self.module.step_kapton   )
-		self.page.sbStepKapton_2.setValue( -1 if self.module.step_kapton_2 is None else self.module.step_kapton_2 )
 		self.page.sbStepSensor.setValue(   -1 if self.module.step_sensor   is None else self.module.step_sensor   )
 		self.page.sbStepPcb.setValue(      -1 if self.module.step_pcb      is None else self.module.step_pcb      )
 		self.page.sbBaseplate.setValue(    -1 if self.module.baseplate     is None else self.module.baseplate     )
@@ -182,7 +176,6 @@ class func(object):
 		self.page.sbPcb.setValue(          -1 if self.module.pcb           is None else self.module.pcb           )
 		self.page.sbProtomodule.setValue(  -1 if self.module.protomodule   is None else self.module.protomodule   )
 		if self.page.sbStepKapton.value()   == -1:self.page.sbStepKapton.clear()
-		if self.page.sbStepKapton_2.value() == -1:self.page.sbStepKapton_2.clear()
 		if self.page.sbStepSensor.value()   == -1:self.page.sbStepSensor.clear()
 		if self.page.sbStepPcb.value()      == -1:self.page.sbStepPcb.clear()
 		if self.page.sbBaseplate.value()    == -1:self.page.sbBaseplate.clear()
@@ -278,7 +271,6 @@ class func(object):
 		iv_data_exists  = self.page.listIvData.count()    > 0
 
 		step_kapton_exists   = self.page.sbStepKapton.value()    >= 0
-		step_kapton_2_exists = self.page.sbStepKapton_2.value()  >= 0
 		step_sensor_exists   = self.page.sbStepSensor.value()    >= 0
 		step_pcb_exists      = self.page.sbStepPcb.value()       >= 0
 		baseplate_exists   = self.page.sbBaseplate.value()   >= 0
@@ -293,7 +285,7 @@ class func(object):
 		self.setMainSwitchingEnabled(mode_view) 
 		self.page.sbID.setEnabled(mode_view)
 
-		self.page.pbNew   .setEnabled( mode_view and not module_exists )
+		#self.page.pbNew   .setEnabled( mode_view and not module_exists )
 		self.page.pbEdit  .setEnabled( mode_view and     module_exists )
 		self.page.pbSave  .setEnabled( mode_creating or mode_editing   )
 		self.page.pbCancel.setEnabled( mode_creating or mode_editing   )
@@ -306,15 +298,12 @@ class func(object):
 		self.page.leLocation.setReadOnly(   not (mode_creating or mode_editing) )
 		self.page.sbChannels.setReadOnly(   not (mode_creating or mode_editing) )
 		self.page.dsbThickness.setReadOnly( not (mode_creating or mode_editing) )
-		self.page.sbRotation.setReadOnly(   not (mode_creating or mode_editing) )
-		self.page.cbSize.setEnabled(             mode_creating or mode_editing  )
 		self.page.cbShape.setEnabled(            mode_creating or mode_editing  )
 		self.page.cbChirality.setEnabled(        mode_creating or mode_editing  )
 		self.page.cbInstitution.setEnabled(      mode_creating or mode_editing  )
 
 		# parts and steps
 		self.page.pbGoStepKapton.setEnabled(   mode_view and step_kapton_exists   )
-		self.page.pbGoStepKapton_2.setEnabled( mode_view and step_kapton_2_exists )
 		self.page.pbGoStepSensor.setEnabled(   mode_view and step_sensor_exists   )
 		self.page.pbGoStepPcb.setEnabled(      mode_view and step_pcb_exists      )
 		self.page.pbGoBaseplate.setEnabled(    mode_view and baseplate_exists     )
@@ -413,8 +402,6 @@ class func(object):
 		self.module.location    = str(self.page.leLocation.text()        ) if str(self.page.leLocation.text())           else None
 		self.module.channels    =     self.page.sbChannels.value()         if self.page.sbChannels.value()   >= 0          else None
 		self.module.thickness   =     self.page.dsbThickness.value()       if self.page.dsbThickness.value() >= 0          else None
-		self.module.rotation    =     self.page.sbRotation.value()         if self.page.sbRotation.value()   >= 0          else None
-		self.module.size        = str(self.page.cbSize.currentText()     ) if str(self.page.cbSize.currentText()         ) else None
 		self.module.shape       = str(self.page.cbShape.currentText()    ) if str(self.page.cbShape.currentText()        ) else None
 		self.module.chirality   = str(self.page.cbChirality.currentText()) if str(self.page.cbChirality.currentText()    ) else None
 		self.module.institution = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
@@ -480,7 +467,6 @@ class func(object):
 		self.module.iv_ok           = str(self.page.cbIvOK.currentText()         ) if str(self.page.cbIvOK.currentText()         ) else None
 		self.module.biased_daq_ok   = str(self.page.cbBiasedDaqOK.currentText()  ) if str(self.page.cbBiasedDaqOK.currentText()  ) else None
 
-		self.module.add_part_to_list()
 		self.module.save()
 		self.mode = 'view'
 		self.update_info()
@@ -554,12 +540,6 @@ class func(object):
 	@enforce_mode('view')
 	def goStepKapton(self,*args,**kwargs):
 		ID = self.page.sbStepKapton.value()
-		if ID>=0:
-			self.setUIPage('kapton placement steps',ID=ID)
-
-	@enforce_mode('view')
-	def goStepKapton_2(self,*args,**kwargs):
-		ID = self.page.sbStepKapton_2.value()
 		if ID>=0:
 			self.setUIPage('kapton placement steps',ID=ID)
 

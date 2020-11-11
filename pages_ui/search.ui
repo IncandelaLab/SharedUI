@@ -249,6 +249,11 @@
      <string>UMN</string>
     </property>
    </item>
+   <item>
+    <property name="text">
+     <string>NTU</string>
+    </property>
+   </item>
   </widget>
   <widget class="QPushButton" name="pbSearchRecDate">
    <property name="geometry">
