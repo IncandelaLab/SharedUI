@@ -2,6 +2,8 @@ from PyQt5 import QtCore
 import time
 import datetime
 
+from filemanager import fm
+
 NO_DATE = [2000,1,1]
 
 PAGE_NAME = "view_pcb_step"
@@ -41,7 +43,7 @@ I_BASEPLATE_DNE         = "baseplate(s) in position(s) {} do not exist"
 I_SENSOR_DNE            = "sensor(s) in position(s) {} do not exist"
 I_PCB_DNE               = "pcb(s) in position(s) {} do not exist"
 I_PROTO_DNE             = "protomodule(s) in position(s) {} do not exist"
-I_MODULE_DNE            = "module(s) in position(s) {} do not exist"
+#I_MODULE_DNE            = "module(s) in position(s) {} do not exist"
 I_TOOL_PCB_DUPLICATE    = "same PCB tool is selected on multiple positions: {}"
 I_BASEPLATE_DUPLICATE   = "same baseplate is selected on multiple positions: {}"
 I_SENSOR_DUPLICATE      = "same sensor is selected on multiple positions: {}"
@@ -486,7 +488,6 @@ class func(object):
 		issues = []
 		objects = []
 
-		print(self.step_pcb.institution)
 		if self.step_pcb.institution == None:
 			issues.append(I_INSTITUTION_NOT_SELECTED)
 
@@ -543,7 +544,6 @@ class func(object):
 		rows_protomodule_dne = []
 		rows_module_dne      = []
 
-		print("  Counting part errors....")
 
 		for i in range(6):
 			num_parts = 0
@@ -576,14 +576,12 @@ class func(object):
 			if protomodules_selected[i] >= 0:
 				num_parts += 1
 				objects.append(self.protomodules[i])
-				print("proto: " + str(self.protomodules[i].ID))
 				if self.protomodules[i].ID is None:
 					rows_protomodule_dne.append(i)
 
 			if modules_selected[i] >= 0:
 				num_parts += 1
 				objects.append(self.modules[i])
-				print("module: " + str(self.modules[i].ID))
 				if self.modules[i].ID is None:
 					rows_module_dne.append(i)
 
@@ -606,8 +604,8 @@ class func(object):
 			issues.append(I_PCB_DNE.format(        ', '.join([str(_+1) for _ in rows_pcb_dne])))
 		if rows_protomodule_dne:
 			issues.append(I_PROTO_DNE.format(      ', '.join([str(_+1) for _ in rows_protomodule_dne])))
-		if rows_module_dne:
-			issues.append(I_MODULE_DNE.format(     ', '.join([str(_+1) for _ in rows_module_dne])))
+		#if rows_module_dne:
+		#	issues.append(I_MODULE_DNE.format(     ', '.join([str(_+1) for _ in rows_module_dne])))
 
 		objects_6in = []
 		objects_8in = []
@@ -671,7 +669,7 @@ class func(object):
 
 	@enforce_mode(['editing','creating'])
 	def saveEditing(self,*args,**kwargs):
-		self.step_pcb.institution = self.page.cbInstitution(currentText())
+		self.step_pcb.institution = self.page.cbInstitution.currentText()
 
 		self.step_pcb.user_performed = str( self.page.leUserPerformed.text() )
 		self.step_pcb.location = str( self.page.leLocation.text() )
@@ -710,11 +708,13 @@ class func(object):
 
 
 		for i in range(6):
+			if modules[i] is None:
+				# Row is empty, continue
+				continue
 			temp_module = fm.module()
+			module_exists = temp_module.load(protomodules[i])
 			if not modules[i] is None:
-				temp_module.load(modules[i])
-			else:
-				print("Creating new module {}!".format(modules[i]))
+				temp_module.new(modules[i])
 				temp_module.new(modules[i])
 				# Pull data from current step, PCB, protomodule:
 				temp_module.institution    = self.step_pcb.institution

@@ -58,7 +58,13 @@ def loadconfig(file=None):
 		os.makedirs(partlistdir)
 
 	# Class names MUST match actual class names or stuff will break
-	for part in ['baseplate', 'sensor', 'pcb', 'protomodule', 'module', 'shipment']:
+	# Note:  Only the first 6 are searchable at the moment; the rest are in case they're needed later.
+	# (And because save() now calls add_part_to_list for all objects except tools)
+	obj_list = ['baseplate', 'sensor', 'pcb', 'protomodule', 'module', 'shipment',
+				'batch_araldite', 'batch_loctite', 'batch_sylgard_thick',
+				'batch_sylgard_thin', 'batch_bond_wire',
+				'step_kapton', 'step_sensor', 'step_pcb']
+	for part in obj_list:
 		fname = os.sep.join([partlistdir, part+'s.json'])
 		if not os.path.exists(fname):
 			with open(fname, 'w') as opfl:
@@ -130,6 +136,7 @@ class fsobj(object):
 		file = os.sep.join([filedir, filename])
 		if not os.path.exists(filedir):
 			os.makedirs(filedir)
+		if not os.path.exists(file):
 			self.add_part_to_list()
 
 		with open(file, 'w') as opfl:
@@ -745,7 +752,7 @@ class baseplate(fsobj):
 				checks.append(False)
 
 		if not all(checks):
-			return False, "baseplate qualification failed or incomplete: "+errstr
+			return False, "baseplate qualification failed or incomplete. "+errstr
 		else:
 			return True, ""
 
@@ -937,7 +944,7 @@ class sensor(fsobj):
 			'KIND_OF_PART':          'HPK {} Inch {} Cell Silicon Sensor'.format('Six' if self.size=='6'
 																				else 'Eight', self.channels),
 			'RECORD_INSERTION_USER': self.insertion_user,   # NOTE:  This may have to be redone when XML uploading is implemented!
-			'SERIAL_NUMBER':         self.identifier,
+			'SERIAL_NUMBER':         self.serial,
 			'COMMENT_DESCRIPTION':   self.comments,   # Note:  Requires special treatment
 			'LOCATION':              self.location,
 			'MANUFACTURER':          "DUMMY_MANUFACTURER", #self.manufacturer,
@@ -1044,7 +1051,7 @@ class pcb(fsobj):
 		part_dict = {
 			'KIND_OF_PART':          'HGC {} Inch {} Channel PCB'.format('Six' if self.size=='6' else 'Eight', self.channels),
 			'RECORD_INSERTION_USER': self.insertion_user,   # NOTE:  This may have to be redone when XML uploading is implemented!
-			'SERIAL_NUMBER':         self.identifier,
+			'SERIAL_NUMBER':         self.serial,
 			'COMMENT_DESCRIPTION':   self.comments,   # Note:  Requires special treatment
 			'LOCATION':              self.location,
 			'MANUFACTURER':          self.manufacturer,
@@ -1110,7 +1117,7 @@ class protomodule(fsobj):
 		"step_sensor", # ID of sensor step
 		"baseplate",   # ID of baseplate
 		"sensor",      # ID of sensor
-		"self_kapton", # ID of kapton step (from baseplate)
+		"step_kapton", # ID of kapton step (from baseplate)
 
 		# protomodule qualification
 		"offset_translation", # translational offset of placement
@@ -1585,8 +1592,8 @@ class step_sensor(fsobj):
 					}
 		run_dict =  {
 						'RUN_TYPE':'HGC {}inch Proto Module Assembly'.format(baseplate_.size),
-						'RUN_NUMBER':self.ID,
-						'RUN_BEGIN_TIMESTAMP':self.run_start,
+						'RUN_NUMBER':str(self.ID),
+						'RUN_BEGIN_TIMESTAMP':str(self.run_start),
 						'RUN_END_TIMESTAMP':"PLACEHOLDER", #self.run_stop,
 						'INITIATED_BY_USER':self.user_performed,
 						'LOCATION':", ".format(self.institution, self.location),
@@ -1609,16 +1616,16 @@ class step_sensor(fsobj):
 						'RUN_NAME':'HGC {}inch Proto Module Assembly'.format(baseplate_.size),
 						#'RUN_NUMBER':self.ID,
 						'RUN_BEGIN_TIMESTAMP':self.run_start,  #WIP (add to GUI)
-						'RUN_END_TIMESTAMP':self.run_stop,  #WIP
+						'RUN_END_TIMESTAMP':"PLACEHOLDER",  #self.run_stop,  #WIP
 						'INITIATED_BY_USER':self.user_performed,
 						'LOCATION':self.location,  #WIP (add to GUI)
-						'COMMENT_DESCRIPTION':'Build {}inch proto modules'.format(self.size),
+						'COMMENT_DESCRIPTION':'Build {}inch proto modules'.format(baseplate_.size),
 					}
 		header_dict_cond = {
 						'TYPE':type_dict,
 						'RUN':run_dict,
 					  }
-		root_cond_dict['HEADER'] = header_dict_cond
+		root_dict_cond['HEADER'] = header_dict_cond
 		
 
 		# BODY OF FILE:
@@ -1628,9 +1635,9 @@ class step_sensor(fsobj):
 		comp_tray  = tray_component_sensor()
 		glue_batch = batch_araldite()
 		#slvr_epxy  = batch_loctite()
-		asmbl_tray.load(self.tray_assembly)
-		comp_tray.load(self.tray_component_sensor)
-		glue_batch.load(self.batch_araldite)
+		asmbl_tray.load(self.tray_assembly, self.institution)
+		comp_tray.load(self.tray_component_sensor, self.institution)
+		glue_batch.load(self.batch_araldite, self.institution)
 		#slvr_epxy.load(self.batch_loctite)
 		
 		data_sets = []  # Store the dictionaries for each DATA_SET/protomodule
@@ -1682,23 +1689,25 @@ class step_sensor(fsobj):
 					# Code is streamlined slightly:  Use a dictionary for every element w/ sub-elements.  Key:value is 'VAR_NAME':value...
 					# ...unless value = multiple entries, in which case value = a dict.
 					# Convert 1->1,1; 2->1,2; 3->2,1; etc.
+					snsr = sensor()
+					snsr.load(self.sensors[i])
 					snsr_tool = tool_sensor()
-					snsr_tool.load(tools[i])
+					snsr_tool.load(self.tools[i], self.institution)
 					data_dict = {
 								# WIP:
 								'ASMBL_TRAY_NAME':'{}_ASMBLY_TRAY_{}'.format(asmbl_tray.location, asmbl_tray.ID),
 								# Reminder:  PLT==baseplate
-								'PLT_SER_NUM':'NCU {}'.format(inst_baseplate.ID),
-								'PLT_ASM_ROW':(i // 3) + 1,
-								'PLT_ASM_COL':(i % 2) + 1,
+								'PLT_SER_NUM':'{}'.format(inst_baseplate.ID),
+								'PLT_ASM_ROW':str((i // 3) + 1),
+								'PLT_ASM_COL':str((i % 2) + 1),
 								# NOTE:  Make sure .flatness() works
-								'PLT_FLTNES_MM':inst_baseplate.flatness(),
-								'PLT_THKNES_MM':inst_baseplate.thickness,
+								'PLT_FLTNES_MM':str(inst_baseplate.flatness),
+								'PLT_THKNES_MM':str(inst_baseplate.thickness),
 								# ADD location to:
 								'COMP_TRAY_NAME':'{}_COMP_TRAY_{}'.format(comp_tray.institution, comp_tray.ID),
-								'SNSR_SER_NUM':'NCU {}'.format(self.sensors[i].ID),
-								'SNSR_CMP_ROW':part_row,
-								'SNSR_CMP_COL':part_col,   #Should == PLT_ASM_ROW, etc above
+								'SNSR_SER_NUM':str(snsr.ID),
+								'SNSR_CMP_ROW':str((i // 3) + 1),
+								'SNSR_CMP_COL':str((i % 2) + 1),   #Should == PLT_ASM_ROW, etc above
 								
 								# NOTE:  I assume these are measured during the placement step, not taken from view_sensor.ui.  Need to check.
 								'SNSR_X_OFFST':'TEMP',  #NOTE:  WIP
@@ -1709,18 +1718,18 @@ class step_sensor(fsobj):
 								'SNSR_TOOL_HT_CHK':'TEMP',
 								
 								# Need to test QDate.year--should work if type(date_received)==QDate
-								'GLUE_TYPE':'Araldite {}'.format(glue_batch.date_received.year()),
-								'GLUE_BATCH_NUM':self.batch_araldite.ID,
+								'GLUE_TYPE':'Araldite {}'.format(glue_batch.date_received[0]),
+								'GLUE_BATCH_NUM':str(self.batch_araldite),
 								'SLVR_EPXY_TYPE':'Loctite Ablestik',
-								'SLVR_EXPY_BATCH_NUM':self.batch_loctite.ID,
+								'SLVR_EXPY_BATCH_NUM':str(self.batch_loctite),
 							}
 					part_dict = {
-								'KIND_OF_PART':'HGC {} Inch Silicon Proto Module'.format('Six' if self.baseplates[i].size==6 else 'Eight'),
+								'KIND_OF_PART':'HGC {} Inch Silicon Proto Module'.format('Six' if snsr.size==6 else 'Eight'),
 								'SERIAL_NUMBER':'{}_HGC_TST_PRTMOD_{}'.format(self.location, self.ID),
 							}
 					dataset_dict = {
 								'COMMENT_DESCRIPTION':'{}_HGC_TST_PRTMOD_{} Assembly'.format(self.institution, self.ID),
-								'VERSION':1,  # Assumed
+								'VERSION':'1',  # Assumed
 								'PART':part_dict,
 								'DATA':data_dict,
 							}
@@ -1734,18 +1743,18 @@ class step_sensor(fsobj):
 								# WIP:
 								'CURING_TIME_HRS':'',
 								# NOTE:  Need to check the time/date format
-								'TIME_START':self.cure_start,
-								'TIME_END':self.cure_stop,
-								'TEMP_DEGC':self.cure_temperature,
-								'HUMIDITY_PRCNT':self.cure_humidity,
+								'TIME_START':str(self.run_start),
+								'TIME_END':"PLACEHOLDER", #self.cure_stop,
+								'TEMP_DEGC':str(self.cure_temperature),
+								'HUMIDITY_PRCNT':str(self.cure_humidity),
 								}
 					part_dict_cond = {
-								'KIND_OF_PART':'HGC {} Inch Silicon Proto Module'.format('Six' if self.baseplates[i].size==6 else 'Eight'),
+								'KIND_OF_PART':'HGC {} Inch Silicon Proto Module'.format('Six' if snsr.size==6 else 'Eight'),
 								'SERIAL_NUMBER':'{}_HGC_TST_PRTMOD_{}'.format(self.location, self.ID),
 								}
 					dataset_dict_cond = {
 								'COMMENT_DESCRIPTION':'Proto Module PRTMOD_{:0<3} Assembly'.format(self.ID),
-								'VERSION':1,  # Assumed
+								'VERSION':'1',  # Assumed
 								'PART':part_dict_cond,
 								'DATA':data_dict_cond,
 								}

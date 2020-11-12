@@ -137,13 +137,13 @@ class func(object):
 			self.page.listShipments.addItem(str(shipment))
 
 		self.page.leLocation.setText(    "" if self.sensor.location     is None else self.sensor.location    )
-		self.page.leSerial.setText(  "" if self.sensor.serial       is None else self.sensor.serial      )
-		self.page.leBarcode.setText( "" if self.sensor.barcode      is None else self.barcode.identiifer )
+		self.page.leSerial.setText(  "" if self.sensor.serial           is None else self.sensor.serial      )
+		self.page.leBarcode.setText( "" if self.sensor.barcode          is None else self.sensor.barcode     )
 		self.page.cbType.setCurrentIndex(       INDEX_TYPE.get(       self.sensor.type,  -1)      )
 		self.page.cbShape.setCurrentIndex(      INDEX_SHAPE.get(      self.sensor.shape, -1)      )
 		self.page.leInsertUser.setText("" if self.sensor.insertion_user is None else self.sensor.insertion_user)
 		self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.sensor.institution, -1))
-		self.page.sbChannels.setValue(-1 if self.sensor.channels is None else self.sensor.channels)
+		self.page.sbChannels.setValue(-1 if self.sensor.channels        is None else self.sensor.channels)
 
 		if self.page.sbChannels.value() == -1:self.page.sbChannels.clear()
 

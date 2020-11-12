@@ -186,7 +186,7 @@ class func(object):
 		self.setMainSwitchingEnabled(mode_view)
 		self.page.sbID.setEnabled(mode_view)
 
-		self.page.pbNew.setEnabled(     mode_view and not protomodule_exists )
+		#self.page.pbNew.setEnabled(     mode_view and not protomodule_exists )
 		self.page.pbEdit.setEnabled(    mode_view and     protomodule_exists )
 		self.page.pbSave.setEnabled(    mode_editing or mode_creating )
 		self.page.pbCancel.setEnabled(  mode_editing or mode_creating )

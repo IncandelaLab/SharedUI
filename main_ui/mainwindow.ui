@@ -189,6 +189,9 @@
         </item>
         <item>
          <widget class="QPushButton" name="pbUpload">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>Upload changes to database (WIP)</string>
           </property>

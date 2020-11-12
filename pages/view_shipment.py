@@ -357,6 +357,8 @@ class func(object):
 			elif partType == "protomodule":
 				if partID in self.shipment.protomodules:  self.shipment.protomodules.remove(partID)
 				partTemp = fm.protomodule()
+			if partID is None:
+				print("ERROR:  Attempted to load a None part ID in view_shipment.")
 			if not partTemp.load(partID):
 				pass  #This WILL be called if someone accidentally adds a nonexistent part and then deletes it.  No action required.
 

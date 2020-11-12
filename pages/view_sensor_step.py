@@ -2,6 +2,8 @@ from PyQt5 import QtCore
 import time
 import datetime
 
+from filemanager import fm
+
 NO_DATE = [2000,1,1]
 
 PAGE_NAME = "view_sensor_step"
@@ -246,6 +248,7 @@ class func(object):
 		self.page.leStatus.clear()
 
 		if self.step_sensor_exists:
+
 			self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.step_sensor.institution, -1))
 			self.page.leUserPerformed.setText(self.step_sensor.user_performed)
 			self.page.leLocation.setText(self.step_sensor.location)
@@ -256,11 +259,7 @@ class func(object):
 			#else:
 			#	self.page.dPerformed.setDate(QtCore.QDate(*NO_DATE))
 
-			cure_start = self.step_sensor.cure_start
-			cure_stop  = self.step_sensor.cure_stop
-			# New
 			run_start  = self.step_sensor.run_start
-			run_stop   = self.step_sensor.run_stop
 			# New
 			if run_start is None:
 				self.page.dtRunStart.setDate(QtCore.QDate(*NO_DATE))
@@ -340,6 +339,7 @@ class func(object):
 		if self.page.sbTrayComponent.value() == -1:self.page.sbTrayComponent.clear()
 		if self.page.sbTrayAssembly.value()  == -1:self.page.sbTrayAssembly.clear()
 
+
 		self.updateElements()
 
 	@enforce_mode(['view','editing','creating'])
@@ -400,7 +400,8 @@ class func(object):
 	@enforce_mode(['editing','creating'])
 	def loadAllObjects(self,*args,**kwargs):
 		for i in range(6):
-			self.tools_sensor[i].load(self.sb_tools[i].value(),      self.page.cbInstitution.currentText())
+			result = self.tools_sensor[i].load(self.sb_tools[i].value(),      self.page.cbInstitution.currentText())
+			if not result:  print("FAILED TO LOAD tools_sensor", self.sb_tools[i].value())
 			self.baseplates[i].load(  self.sb_baseplates[i].value())
 			self.sensors[i].load(     self.sb_sensors[i].value()   )
 
@@ -435,7 +436,7 @@ class func(object):
 	def loadToolSensor(self, *args, **kwargs):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
-		self.tools_sensor[which].load(self.sb_tools[which].value(), self.page.cbInstitution.currentText())
+		result = self.tools_sensor[which].load(self.sb_tools[which].value(), self.page.cbInstitution.currentText())
 		self.updateIssues()
 
 	@enforce_mode(['editing','creating'])
@@ -447,9 +448,12 @@ class func(object):
 
 	@enforce_mode(['editing','creating'])
 	def loadSensor(self, *args, **kwargs):
+		print("Loading sensor")
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
-		self.sensors[which].load(self.sb_sensors[which].value())
+		result = self.sensors[which].load(self.sb_sensors[which].value())
+		print("Result of loading {}: {}".format(self.sb_sensors[which].value(), result))
+		print("Loaded ID is ", self.sensors[which].ID)
 		self.updateIssues()
 
 	@enforce_mode(['editing','creating'])
@@ -636,7 +640,6 @@ class func(object):
 
 
 
-
 	@enforce_mode('view')
 	def startCreating(self,*args,**kwargs):
 		if not self.step_sensor_exists:
@@ -661,6 +664,7 @@ class func(object):
 
 	@enforce_mode(['editing','creating'])
 	def saveEditing(self,*args,**kwargs):
+
 		self.step_sensor.institution = self.page.cbInstitution.currentText()
 
 		self.step_sensor.user_performed = str( self.page.leUserPerformed.text() )
@@ -700,18 +704,19 @@ class func(object):
 		self.step_sensor.batch_araldite        = self.page.sbBatchAraldite.value() if self.page.sbBatchAraldite.value() >= 0 else None
 		self.step_sensor.batch_loctite         = self.page.sbBatchLoctite.value()  if self.page.sbBatchLoctite.value()  >= 0 else None
 
+
 		# Add protomodule ID to baseplate, sensor lists; create protomodule if it doesn't exist:
 		for i in range(6):
+			if protomodules[i] is None:
+				# Row is empty; ignore
+				continue
 			temp_protomodule = fm.protomodule()
-			if not protomodules[i] is None:
-				# protomodule exists
-				temp_protomodule.load(protomodules[i])
-			else:
-				print("Creating new protomodule {}!".format(protomodules[i]))
+			proto_exists = temp_protomodule.load(protomodules[i])
+			if not proto_exists:
 				temp_protomodule.new(protomodules[i])
 				# Thickness = sum of baseplate and sensor, plus glue gaps
 				sensor_thk_str = self.sensors[i].type  # Should be "[thickness] um"
-				sensor_thk = float(sensor_thk_str.split()[0]/1000.0)
+				sensor_thk = float(sensor_thk_str.split()[0])/1000.0
 
 				temp_protomodule.institution    = self.step_sensor.institution
 				temp_protomodule.location       = self.step_sensor.location
