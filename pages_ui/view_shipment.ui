@@ -310,33 +310,17 @@
   <widget class="QLineEdit" name="lineEdit_6">
    <property name="geometry">
     <rect>
-     <x>200</x>
-     <y>610</y>
-     <width>31</width>
+     <x>10</x>
+     <y>630</y>
+     <width>51</width>
      <height>20</height>
     </rect>
    </property>
    <property name="text">
-    <string>ID</string>
+    <string>serial</string>
    </property>
    <property name="readOnly">
     <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QSpinBox" name="sbPartID">
-   <property name="geometry">
-    <rect>
-     <x>230</x>
-     <y>610</y>
-     <width>91</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="minimum">
-    <number>-1</number>
-   </property>
-   <property name="maximum">
-    <number>2147483647</number>
    </property>
   </widget>
   <widget class="QListWidget" name="lwPartList">
@@ -353,7 +337,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>640</y>
+     <y>660</y>
      <width>151</width>
      <height>21</height>
     </rect>
@@ -421,7 +405,7 @@
    <property name="geometry">
     <rect>
      <x>170</x>
-     <y>640</y>
+     <y>660</y>
      <width>151</width>
      <height>21</height>
     </rect>
@@ -541,6 +525,16 @@
    </property>
    <property name="calendarPopup">
     <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lePartID">
+   <property name="geometry">
+    <rect>
+     <x>60</x>
+     <y>630</y>
+     <width>141</width>
+     <height>20</height>
+    </rect>
    </property>
   </widget>
  </widget>

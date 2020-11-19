@@ -1,6 +1,7 @@
 import os
 import json
 import numpy
+import time
 
 #NEW for xml file generation:
 from PyQt5 import QtCore
@@ -68,8 +69,9 @@ def loadconfig(file=None):
 		fname = os.sep.join([partlistdir, part+'s.json'])
 		if not os.path.exists(fname):
 			with open(fname, 'w') as opfl:
-				# Dump an empty list if nothing is found
-				json.dump([], opfl)
+				# Dump an empty dict if nothing is found
+				# NOTE:  Format of dictionary is {ID:creation-date-string, ...}
+				json.dump({}, opfl)
 
 loadconfig()
 
@@ -99,7 +101,7 @@ class fsobj(object):
 	}
 
 	OBJ_NAME_DICT = {  #store list of corrected object names
-		'baseplate':'HGC Six Inch Plate',  #COMPLICATION
+		'baseplate':'HGC Eight Inch Plate',  #COMPLICATION
 	}
 
 
@@ -111,33 +113,62 @@ class fsobj(object):
 		return "<{} {}>".format(self.OBJECTNAME, self.ID)
 
 	def get_filedir_filename(self, ID = None):
+		print("GETTING FILEDIR_FILENAME")
 		if ID is None:
 			ID = self.ID
-		filedir  = os.sep.join([ DATADIR, self.FILEDIR.format(ID=ID, century = CENTURY.format(ID//100)) ])
+		#filedir  = os.sep.join([ DATADIR, self.FILEDIR.format(ID=ID, century = CENTURY.format(ID//100)) ])
+		# filedir now depends on date information, defined upon first save() and stored via add_part_to_list
+		with open(self.partlistfile, 'r') as opfl:
+			data = json.load(opfl)
+			date = data[ID]
+
+		filedir = os.sep.join([ DATADIR, self.FILEDIR.format(ID=ID, date=date) ])
 		filename = self.FILENAME.format(ID=ID)
 		return filedir, filename
 
 
 	# NEW:  For search page
 	def add_part_to_list(self):
+		print("ADDING PART TO LIST")
 		part_name = self.__class__.__name__
-		partlistfile = os.sep.join([ DATADIR, 'partlist', part_name+'s.json' ])
-		# If file does not exist, something has gone wrong
-		with open(partlistfile, 'r') as opfl:
+		self.partlistfile = os.sep.join([ DATADIR, 'partlist', part_name+'s.json' ])
+		with open(self.partlistfile, 'r') as opfl:
 			data = json.load(opfl)
-			if not self.ID in data:
-				data.append(self.ID)
-		with open(partlistfile, 'w') as opfl:
+			print("LOADED DATA:")
+			print(data)
+			if not self.ID in data.keys():
+				#data.append(self.ID)
+				# Now a dictionary:
+				# Note creation date and pass it to the dict
+				dcreated = time.localtime()
+				if self.ID == None:  print("ERROR:  self.ID in add_part_to_list is None!!!")
+				data[self.ID] = '{}-{}-{}'.format(dcreated.tm_mon, dcreated.tm_mday, dcreated.tm_year)
+				print("EXPORTING DATA:")
+				print(data)
+		with open(self.partlistfile, 'w') as opfl:
 			json.dump(data, opfl)
 
 
 	def save(self, objname = 'fsobj'):  #NOTE:  objname param is new
+		# NOTE:  Can't check item existence via filepath existence, bc filepath isn't known until after item creation!
+		# Instead, go into partlist dict and check to see whether item exists:
+		print("SAVING")
+		part_name = self.__class__.__name__
+		self.partlistfile = os.sep.join([ DATADIR, 'partlist', part_name+'s.json' ])
+		with open(self.partlistfile, 'r') as opfl:
+			data = json.load(opfl)
+			if not self.ID in data.keys():
+				# Object does not exist, so can't get filedir from get_filedir_filename()
+				# ...until the date has been set via add_part_to_list.  Do that now.
+				self.add_part_to_list()
+				
+
 		filedir, filename = self.get_filedir_filename(self.ID)
 		file = os.sep.join([filedir, filename])
 		if not os.path.exists(filedir):
 			os.makedirs(filedir)
-		if not os.path.exists(file):
-			self.add_part_to_list()
+		#if not os.path.exists(file):  # Now redundant w/ above
+		#	self.add_part_to_list()
 
 		with open(file, 'w') as opfl:
 			if hasattr(self, 'PROPERTIES_DO_NOT_SAVE'):
@@ -150,11 +181,18 @@ class fsobj(object):
 
 
 	def load(self, ID, on_property_missing = "warn"):
-		# NOTE:  May have to be redone for XML.
+		part_name = self.__class__.__name__
+		self.partlistfile = os.sep.join([ DATADIR, 'partlist', part_name+'s.json' ])
+		with open(self.partlistfile, 'r') as opfl:
+			data = json.load(opfl)
+			if not self.ID in data.keys():
+				self.clear()
+				return False
+		# (else:)
 
-		if ID == -1:
-			self.clear()
-			return False
+		#if ID == -1:
+		#	self.clear()
+		#	return False
 
 		filedir, filename = self.get_filedir_filename(ID)
 		file = os.sep.join([filedir, filename])
@@ -627,8 +665,8 @@ class shipment(fsobj):
 
 class baseplate(fsobj):
 	OBJECTNAME = "baseplate"
-	FILEDIR = os.sep.join(['baseplates','{century}'])
-	FILENAME = "baseplate_{ID:0>5}.json"
+	FILEDIR = os.sep.join(['baseplates','{date}'])
+	FILENAME = "baseplate_{ID}.json"
 	PROPERTIES = [
 		# shipments and location
 		"institution",
@@ -871,11 +909,14 @@ class baseplate(fsobj):
 		# CREATE XML FILE OBJECT:
 		xml_tree = self.generate_xml(root_dict)
 
+		# ORDER CHANGED--this should be necessary
+		super(baseplate, self).save()
+
 		# Save:
 		self.save_xml(xml_tree)
 
 		# Save old json file:
-		super(baseplate, self).save()
+		#super(baseplate, self).save()
 
 
 

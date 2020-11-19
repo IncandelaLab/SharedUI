@@ -549,7 +549,7 @@
      <rect>
       <x>1</x>
       <y>1</y>
-      <width>171</width>
+      <width>151</width>
       <height>19</height>
      </rect>
     </property>
@@ -573,17 +573,36 @@
      <string>New</string>
     </property>
    </widget>
-   <widget class="QSpinBox" name="sbID">
+   <widget class="QLineEdit" name="leID">
     <property name="geometry">
      <rect>
-      <x>169</x>
-      <y>1</y>
-      <width>91</width>
+      <x>150</x>
+      <y>0</y>
+      <width>111</width>
       <height>20</height>
      </rect>
     </property>
-    <property name="maximum">
-     <number>2147483647</number>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leStatus">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>50</y>
+      <width>111</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
     </property>
    </widget>
   </widget>

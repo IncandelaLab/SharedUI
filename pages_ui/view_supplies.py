@@ -82,7 +82,7 @@ class Ui_Form(object):
         self.pbLoctiteCancel.setGeometry(QtCore.QRect(200, 430, 71, 21))
         self.pbLoctiteCancel.setObjectName("pbLoctiteCancel")
         self.pbLoctiteAddComment = QtWidgets.QPushButton(Form)
-        self.pbLoctiteAddComment.setGeometry(QtCore.QRect(10, 680, 111, 23))
+        self.pbLoctiteAddComment.setGeometry(QtCore.QRect(10, 700, 111, 23))
         self.pbLoctiteAddComment.setObjectName("pbLoctiteAddComment")
         self.lineEdit_8 = QtWidgets.QLineEdit(Form)
         self.lineEdit_8.setGeometry(QtCore.QRect(10, 390, 101, 21))

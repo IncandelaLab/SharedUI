@@ -123,15 +123,14 @@ class widget_shipment(wdgt.QWidget, form_shipment):
 
 # Dict of page IDs by name (as the name shows up in the page list widgets)
 PAGE_IDS = {
-	'baseplates'             : 0,
-	'sensors'                : 1,
-	'PCBs'                   : 2,
-	'protomodules'           : 3,
-	'modules'                : 4,
-	'tooling'                : 5,
-	'supplies'               : 6,
-	'search for parts'       : 7, # NEW, indices have been adjusted accordingly
-
+	'search for parts'       : 0,
+	'baseplates'             : 1,
+	'sensors'                : 2,
+	'PCBs'                   : 3,
+	'protomodules'           : 4,
+	'modules'                : 5,
+	'tooling'                : 6,
+	'supplies'               : 7,
 
 	'kapton placement steps' : 8,
 	'sensor placement steps' : 9,
@@ -177,6 +176,8 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 
 
 	def setupPagesUI(self):
+		self.page_search           = widget_search(None)           ; self.swPages.addWidget(self.page_search)
+
 		self.page_view_baseplate   = widget_view_baseplate(None)   ; self.swPages.addWidget(self.page_view_baseplate)
 		self.page_view_sensor      = widget_view_sensor(None)      ; self.swPages.addWidget(self.page_view_sensor)
 		self.page_view_PCB         = widget_view_PCB(None)         ; self.swPages.addWidget(self.page_view_PCB)
@@ -184,7 +185,6 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		self.page_view_module      = widget_view_module(None)      ; self.swPages.addWidget(self.page_view_module)
 		self.page_view_tooling     = widget_view_tooling(None)     ; self.swPages.addWidget(self.page_view_tooling)
 		self.page_view_supplies    = widget_view_supplies(None)    ; self.swPages.addWidget(self.page_view_supplies)	# NEW
-		self.page_search           = widget_search(None)           ; self.swPages.addWidget(self.page_search)
 
 		self.page_view_kapton_step = widget_view_kapton_step(None) ; self.swPages.addWidget(self.page_view_kapton_step)
 		self.page_view_sensor_step = widget_view_sensor_step(None) ; self.swPages.addWidget(self.page_view_sensor_step)
@@ -197,13 +197,12 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 
 
 	def initPages(self):
+		self.func_search           = cls_func_search(                fm, self.page_search          , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_baseplate   = cls_func_view_baseplate(        fm, self.page_view_baseplate  , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_sensor      = cls_func_view_sensor(           fm, self.page_view_sensor     , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_PCB         = cls_func_view_PCB(              fm, self.page_view_PCB        , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_protomodule = cls_func_view_protomodule(      fm, self.page_view_protomodule, self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_module      = cls_func_view_module(           fm, self.page_view_module     , self.setUIPage, self.setSwitchingEnabled)
-		# SEARCH
-		self.func_search           = cls_func_search(                fm, self.page_search          , self.setUIPage, self.setSwitchingEnabled)
 
 		self.func_view_kapton_step = cls_func_view_kapton_step(      fm, self.page_view_kapton_step, self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_sensor_step = cls_func_view_sensor_step(      fm, self.page_view_sensor_step, self.setUIPage, self.setSwitchingEnabled)
@@ -218,6 +217,7 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		# This list must be in the same order that the pages are in in the stackedWidget in the main UI file.
 		# This is the same order as in the dict PAGE_IDS
 		self.func_list = [
+			self.func_search,
 			self.func_view_baseplate,
 			self.func_view_sensor,
 			self.func_view_PCB,
@@ -225,7 +225,6 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 			self.func_view_module,
 			self.func_view_tooling,
 			self.func_view_supplies,
-			self.func_search,   # NEW
 
 			self.func_view_kapton_step,
 			self.func_view_sensor_step,

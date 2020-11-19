@@ -51,6 +51,11 @@
           </property>
           <item>
            <property name="text">
+            <string>search for parts</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
             <string>baseplates</string>
            </property>
           </item>
@@ -82,11 +87,6 @@
           <item>
            <property name="text">
             <string>supplies</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>search for parts</string>
            </property>
           </item>
          </widget>

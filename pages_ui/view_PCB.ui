@@ -109,19 +109,6 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QSpinBox" name="sbID">
-   <property name="geometry">
-    <rect>
-     <x>140</x>
-     <y>10</y>
-     <width>131</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="maximum">
-    <number>2147483647</number>
-   </property>
-  </widget>
   <widget class="QLineEdit" name="leManufacturer">
    <property name="geometry">
     <rect>
@@ -975,6 +962,38 @@
      <x>190</x>
      <y>300</y>
      <width>80</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="leID">
+   <property name="geometry">
+    <rect>
+     <x>140</x>
+     <y>10</y>
+     <width>111</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="leStatus">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>60</y>
+     <width>111</width>
      <height>20</height>
     </rect>
    </property>

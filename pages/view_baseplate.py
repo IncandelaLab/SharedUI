@@ -1,3 +1,5 @@
+from filemanager import fm
+
 PAGE_NAME = "view_baseplate"
 OBJECTTYPE = "baseplate"
 DEBUG = False
@@ -109,7 +111,7 @@ class func(object):
 
 	@enforce_mode('setup')
 	def rig(self):
-		self.page.sbID.valueChanged.connect(self.update_info)
+		#self.page.sbID.valueChanged.connect(self.update_info)
 
 		self.page.pbNew.clicked.connect(self.startCreating)
 		self.page.pbEdit.clicked.connect(self.startEditing)
@@ -142,11 +144,16 @@ class func(object):
 	def update_info(self,ID=None):
 		"""Loads info on the selected baseplate ID and updates UI elements accordingly"""
 		if ID is None:
-			ID = self.page.sbID.value()
+			#ID = self.page.sbID.value()
+			ID = self.page.leID.text()
 		else:
-			self.page.sbID.setValue(ID)
+			#self.page.sbID.setValue(ID)
+			self.page.leID.setText(ID)
 
+		print("Updating info!  ID={}".format(ID))
 		self.baseplate_exists = self.baseplate.load(ID)
+		print("Loaded baseplate.  ID={}".format(self.baseplate.ID))
+
 
 		self.page.listShipments.clear()
 		for shipment in self.baseplate.shipments:
@@ -197,12 +204,20 @@ class func(object):
 		if self.page.sbProtomodule.value() == -1: self.page.sbProtomodule.clear()
 		if self.page.sbModule.value()      == -1: self.page.sbModule.clear()
 
+		print("updated info, now updating elements; ID={}".format(self.baseplate.ID))
 		self.updateElements()
+		print("updated elements, ID={}".format(self.baseplate.ID))
+
+
 
 	@enforce_mode(['view','editing_corners','editing','creating'])
 	def updateElements(self):
 		exists = self.baseplate_exists
 		shipments_exist = self.page.listShipments.count() > 0
+
+		# NEW:
+		print("Setting status LE!")
+		self.page.leStatus.setText(self.mode)
 
 		step_kapton_exists   = self.page.sbStepKapton.value()   >=0
 		step_senor_exists    = self.page.sbStepSensor.value()   >=0
@@ -214,10 +229,12 @@ class func(object):
 		mode_creating = self.mode == 'creating'
 
 		self.setMainSwitchingEnabled(mode_view)
-		self.page.sbID.setEnabled(mode_view)
+		#self.page.sbID.setEnabled(mode_view)
+		self.page.leID.setReadOnly(not mode_view)
 
-		self.page.pbNew.setEnabled(    mode_view and not exists )
-		self.page.pbEdit.setEnabled(   mode_view and     exists )
+		# MODIFIED:
+		self.page.pbNew.setEnabled(    mode_view)  # and not exists )
+		self.page.pbEdit.setEnabled(   mode_view)  # and     exists )
 		self.page.pbSave.setEnabled(   mode_creating or mode_editing )
 		self.page.pbCancel.setEnabled( mode_creating or mode_editing )
 
@@ -255,19 +272,39 @@ class func(object):
 
 	@enforce_mode('view')
 	def startCreating(self,*args,**kwargs):
-		if not self.baseplate_exists:
-			ID = self.page.sbID.value()
-			self.mode = 'creating'
+		if self.page.leID.text() == "":
+			self.page.leStatus.setText("input an ID")
+			return
+		# Check whether baseplate exists:
+		tmp_baseplate = fm.baseplate()
+		tmp_ID = self.page.leID.text()
+		tmp_exists = tmp_baseplate.load(tmp_ID)
+		#if not self.baseplate_exists:
+		if not tmp_exists:  # DNE; good to create
+			ID = self.page.leID.text()
 			self.baseplate.new(ID)
+			#print("CREATING.  Current ID: {}".format(self.baseplate.ID))
+			#self.update_info()
+			print("Current ID: {}".format(self.baseplate.ID))
+			self.mode = 'creating'  # update_info needs mode==view
 			self.updateElements()
+			self.update_info()
 		else:
-			pass
+			# pass
+			self.page.leStatus.setText("already exists")
+		print("Started creation.  ID = {}".format(self.baseplate.ID))
 
 	@enforce_mode('view')
 	def startEditing(self,*args,**kwargs):
-		if not self.baseplate_exists:
-			pass
+		tmp_baseplate = fm.baseplate()
+		tmp_ID = self.page.leID.text()
+		tmp_exists = tmp_baseplate.load(tmp_ID)
+		#if not self.baseplate_exists:
+		if not tmp_exists:
+			#pass
+			self.page.leStatus.setText("does not exist")
 		else:
+			self.update_info()
 			self.mode = 'editing'
 			self.updateElements()
 
@@ -278,6 +315,7 @@ class func(object):
 
 	@enforce_mode(['editing','creating'])
 	def saveEditing(self,*args,**kwargs):
+		print("SAVING baseplate, ID={}".format(self.baseplate.ID))
 
 		self.baseplate.shape          = str(self.page.cbShape.currentText())       if str(self.page.cbShape.currentText())       else None
 		self.baseplate.chirality      = str(self.page.cbChirality.currentText())   if str(self.page.cbChirality.currentText())   else None
@@ -369,11 +407,13 @@ class func(object):
 	def load_kwargs(self,kwargs):
 		if 'ID' in kwargs.keys():
 			ID = kwargs['ID']
-			if not (type(ID) is int):
-				raise TypeError("Expected type <int> for ID; got <{}>".format(type(ID)))
-			if ID < 0:
-				raise ValueError("ID cannot be negative")
-			self.page.sbID.setValue(ID)
+			#if not (type(ID) is int):
+			#	raise TypeError("Expected type <int> for ID; got <{}>".format(type(ID)))
+			if not (type(ID) is str):
+				raise TypeError("Expected type <str> for ID; got <{}>".format(type(ID)))
+			#if ID < 0:
+			#	raise ValueError("ID cannot be negative")
+			self.page.leID.setText(ID)
 
 	@enforce_mode('view')
 	def changed_to(self):
