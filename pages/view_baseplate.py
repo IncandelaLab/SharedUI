@@ -140,19 +140,21 @@ class func(object):
 			]
 
 
-	@enforce_mode('view')
+	@enforce_mode(['view', 'editing', 'creating']) # NEW:  Now allowed in editing, creating mode
 	def update_info(self,ID=None):
 		"""Loads info on the selected baseplate ID and updates UI elements accordingly"""
-		if ID is None:
-			#ID = self.page.sbID.value()
-			ID = self.page.leID.text()
-		else:
-			#self.page.sbID.setValue(ID)
-			self.page.leID.setText(ID)
+		# IMPORTANT CHANGE:  Baseplate load and existence check have been moved to startCreating/Editing()!
+		#if ID is None:
+		#	ID = self.page.leID.text()
+		#else:
+		#	#self.page.sbID.setValue(ID)
+		#	self.page.leID.setText(ID)
 
-		print("Updating info!  ID={}".format(ID))
-		self.baseplate_exists = self.baseplate.load(ID)
-		print("Loaded baseplate.  ID={}".format(self.baseplate.ID))
+		self.page.leID.setText(self.baseplate.ID)
+
+		#print("Updating info!  ID={}".format(ID))
+		#self.baseplate_exists = self.baseplate.load(ID)
+		#print("Loaded baseplate.  ID={}".format(self.baseplate.ID))
 
 
 		self.page.listShipments.clear()
@@ -216,7 +218,6 @@ class func(object):
 		shipments_exist = self.page.listShipments.count() > 0
 
 		# NEW:
-		print("Setting status LE!")
 		self.page.leStatus.setText(self.mode)
 
 		step_kapton_exists   = self.page.sbStepKapton.value()   >=0
@@ -287,8 +288,7 @@ class func(object):
 			#self.update_info()
 			print("Current ID: {}".format(self.baseplate.ID))
 			self.mode = 'creating'  # update_info needs mode==view
-			self.updateElements()
-			self.update_info()
+			self.update_info()  # Automatically calls updateElements() too
 		else:
 			# pass
 			self.page.leStatus.setText("already exists")
@@ -298,15 +298,16 @@ class func(object):
 	def startEditing(self,*args,**kwargs):
 		tmp_baseplate = fm.baseplate()
 		tmp_ID = self.page.leID.text()
+		print("LOADING ID {}".format(tmp_ID))
 		tmp_exists = tmp_baseplate.load(tmp_ID)
 		#if not self.baseplate_exists:
 		if not tmp_exists:
 			#pass
 			self.page.leStatus.setText("does not exist")
 		else:
-			self.update_info()
+			self.baseplate = tmp_baseplate
 			self.mode = 'editing'
-			self.updateElements()
+			self.update_info()
 
 	@enforce_mode(['editing','creating'])
 	def cancelEditing(self,*args,**kwargs):

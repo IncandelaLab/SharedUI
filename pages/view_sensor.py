@@ -1,3 +1,5 @@
+from filemanager import fm
+
 PAGE_NAME = "view_sensor"
 OBJECTTYPE = "sensor"
 DEBUG = False
@@ -105,7 +107,7 @@ class func(object):
 
 	@enforce_mode('setup')
 	def rig(self):
-		self.page.sbID.valueChanged.connect(self.update_info)
+		#self.page.sbID.valueChanged.connect(self.update_info)
 
 		self.page.pbNew.clicked.connect(self.startCreating)
 		self.page.pbEdit.clicked.connect(self.startEditing)
@@ -125,12 +127,14 @@ class func(object):
 
 	@enforce_mode('view')
 	def update_info(self,ID=None,*args,**kwargs):
-		if ID is None:
-			ID = self.page.sbID.value()
-		else:
-			self.page.sbID.setValue(ID)
+		#if ID is None:
+		#	ID = self.page.sbID.value()
+		#else:
+		#	self.page.sbID.setValue(ID)
+		#
+		#self.sensor_exists = self.sensor.load(ID)
 
-		self.sensor_exists = self.sensor.load(ID)
+		self.page.leID.setText(self.sensor.ID)
 
 		self.page.listShipments.clear()
 		for shipment in self.sensor.shipments:
@@ -166,6 +170,8 @@ class func(object):
 
 	@enforce_mode(['view','editing','creating'])
 	def updateElements(self):
+		self.page.leStatus.setText(self.mode)
+
 		mode_view     = self.mode == 'view'
 		mode_editing  = self.mode == 'editing'
 		mode_creating = self.mode == 'creating'
@@ -177,7 +183,8 @@ class func(object):
 		module_exists      = self.page.sbModule.value() >= 0
 
 		self.setMainSwitchingEnabled(mode_view)
-		self.page.sbID.setEnabled(mode_view)
+		#self.page.sbID.setEnabled(mode_view)
+		self.page.leID.setReadOnly(not mode_view)
 
 		self.page.pbNew.setEnabled(     mode_view and not sensor_exists )
 		self.page.pbEdit.setEnabled(    mode_view and     sensor_exists )
@@ -207,21 +214,32 @@ class func(object):
 
 	@enforce_mode('view')
 	def startCreating(self,*args,**kwargs):
-		if not self.sensor_exists:
-			ID = self.page.sbID.value()
-			self.mode = 'creating'
+		if self.page.leID.text() == "":
+			self.page.leStatus.setText("input an ID")
+			return
+		tmp_sensor = fm.sensor()
+		tmp_ID = self.page.leID.text()
+		tmp_exists = tmp_sensor.load(tmp_ID)
+
+		if not tmp_exists:
+			ID = self.page.leID.text()
 			self.sensor.new(ID)
-			self.updateElements()
+			self.mode = 'creating'
+			self.update_info()
 		else:
-			pass
+			self.page.leStatus.setText("already exists")
 
 	@enforce_mode('view')
 	def startEditing(self,*args,**kwargs):
-		if not self.sensor_exists:
-			pass
+		tmp_sensor = fm.sensor()
+		tmp_ID = self.page.leID.text()
+		tmp_exists = tmp_sensor.load(tmp_ID)
+		if not tmp_exists:
+			self.page.leStatus.setText("does not exist")
 		else:
+			self.baseplate = tmp_baseplate
 			self.mode = 'editing'
-			self.updateElements()
+			self.update_info()
 
 	@enforce_mode(['editing','creating'])
 	def cancelEditing(self,*args,**kwargs):
@@ -251,7 +269,6 @@ class func(object):
 		self.mode = 'view'
 		self.update_info()
 
-		# NEW:
 		self.xmlModList.append(self.sensor.ID)
 
 
@@ -307,11 +324,14 @@ class func(object):
 	def load_kwargs(self,kwargs):
 		if 'ID' in kwargs.keys():
 			ID = kwargs['ID']
-			if not (type(ID) is int):
-				raise TypeError("Expected type <int> for ID; got <{}>".format(type(ID)))
-			if ID < 0:
-				raise ValueError("ID cannot be negative")
-			self.page.sbID.setValue(ID)
+			#if not (type(ID) is int):
+			#	raise TypeError("Expected type <int> for ID; got <{}>".format(type(ID)))
+			#if ID < 0:
+			#	raise ValueError("ID cannot be negative")
+			#self.page.sbID.setValue(ID)
+			if not (type(ID) is str):
+				raise TypeError("Expected type <str> for ID; got <{}>".format(type(ID)))
+			self.page.leID.setText(ID)
 
 	@enforce_mode('view')
 	def changed_to(self):

@@ -113,7 +113,6 @@ class fsobj(object):
 		return "<{} {}>".format(self.OBJECTNAME, self.ID)
 
 	def get_filedir_filename(self, ID = None):
-		print("GETTING FILEDIR_FILENAME")
 		if ID is None:
 			ID = self.ID
 		#filedir  = os.sep.join([ DATADIR, self.FILEDIR.format(ID=ID, century = CENTURY.format(ID//100)) ])
@@ -129,13 +128,10 @@ class fsobj(object):
 
 	# NEW:  For search page
 	def add_part_to_list(self):
-		print("ADDING PART TO LIST")
 		part_name = self.__class__.__name__
 		self.partlistfile = os.sep.join([ DATADIR, 'partlist', part_name+'s.json' ])
 		with open(self.partlistfile, 'r') as opfl:
 			data = json.load(opfl)
-			print("LOADED DATA:")
-			print(data)
 			if not self.ID in data.keys():
 				#data.append(self.ID)
 				# Now a dictionary:
@@ -143,8 +139,6 @@ class fsobj(object):
 				dcreated = time.localtime()
 				if self.ID == None:  print("ERROR:  self.ID in add_part_to_list is None!!!")
 				data[self.ID] = '{}-{}-{}'.format(dcreated.tm_mon, dcreated.tm_mday, dcreated.tm_year)
-				print("EXPORTING DATA:")
-				print(data)
 		with open(self.partlistfile, 'w') as opfl:
 			json.dump(data, opfl)
 
@@ -152,7 +146,6 @@ class fsobj(object):
 	def save(self, objname = 'fsobj'):  #NOTE:  objname param is new
 		# NOTE:  Can't check item existence via filepath existence, bc filepath isn't known until after item creation!
 		# Instead, go into partlist dict and check to see whether item exists:
-		print("SAVING")
 		part_name = self.__class__.__name__
 		self.partlistfile = os.sep.join([ DATADIR, 'partlist', part_name+'s.json' ])
 		with open(self.partlistfile, 'r') as opfl:
@@ -181,11 +174,15 @@ class fsobj(object):
 
 
 	def load(self, ID, on_property_missing = "warn"):
+		print("Loading!  ID = ".format(ID))
 		part_name = self.__class__.__name__
 		self.partlistfile = os.sep.join([ DATADIR, 'partlist', part_name+'s.json' ])
 		with open(self.partlistfile, 'r') as opfl:
 			data = json.load(opfl)
-			if not self.ID in data.keys():
+			print("Partlistfile data:  ", data)
+			print("ID: ", ID)
+			if not ID in data.keys():
+				print("Failed to load:  Not in partlistfile!")
 				self.clear()
 				return False
 		# (else:)
@@ -196,11 +193,13 @@ class fsobj(object):
 
 		filedir, filename = self.get_filedir_filename(ID)
 		file = os.sep.join([filedir, filename])
+		print("Searching for file {}".format(file))
 
 		if not os.path.exists(file):
 			self.clear()
 			return False
 
+		print("Loading file:")
 		with open(file, 'r') as opfl:
 			data = json.load(opfl)
 
