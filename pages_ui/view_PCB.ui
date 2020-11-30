@@ -65,7 +65,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>360</y>
+     <y>340</y>
      <width>181</width>
      <height>21</height>
     </rect>
@@ -81,7 +81,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>320</y>
+     <y>300</y>
      <width>181</width>
      <height>21</height>
     </rect>
@@ -113,7 +113,7 @@
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>320</y>
+     <y>300</y>
      <width>81</width>
      <height>21</height>
     </rect>
@@ -216,7 +216,7 @@
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>360</y>
+     <y>340</y>
      <width>81</width>
      <height>21</height>
     </rect>
@@ -253,30 +253,11 @@
     <double>0.050000000000000</double>
    </property>
   </widget>
-  <widget class="QSpinBox" name="sbModule">
-   <property name="geometry">
-    <rect>
-     <x>440</x>
-     <y>260</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-   <property name="minimum">
-    <number>-1</number>
-   </property>
-   <property name="maximum">
-    <number>2147483647</number>
-   </property>
-  </widget>
   <widget class="QLineEdit" name="lineEdit_15">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>380</y>
+     <y>360</y>
      <width>181</width>
      <height>21</height>
     </rect>
@@ -292,7 +273,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>400</y>
+     <y>380</y>
      <width>181</width>
      <height>21</height>
     </rect>
@@ -308,7 +289,7 @@
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>400</y>
+     <y>380</y>
      <width>81</width>
      <height>21</height>
     </rect>
@@ -558,7 +539,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>580</y>
+     <y>560</y>
      <width>261</width>
      <height>71</height>
     </rect>
@@ -571,7 +552,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>440</y>
+     <y>420</y>
      <width>141</width>
      <height>21</height>
     </rect>
@@ -587,7 +568,7 @@
    <property name="geometry">
     <rect>
      <x>150</x>
-     <y>440</y>
+     <y>420</y>
      <width>121</width>
      <height>21</height>
     </rect>
@@ -600,7 +581,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>460</y>
+     <y>440</y>
      <width>261</width>
      <height>111</height>
     </rect>
@@ -610,7 +591,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>650</y>
+     <y>630</y>
      <width>111</width>
      <height>21</height>
     </rect>
@@ -711,7 +692,7 @@
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>380</y>
+     <y>360</y>
      <width>81</width>
      <height>20</height>
     </rect>
@@ -848,7 +829,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>340</y>
+     <y>320</y>
      <width>131</width>
      <height>21</height>
     </rect>
@@ -864,7 +845,7 @@
    <property name="geometry">
     <rect>
      <x>140</x>
-     <y>340</y>
+     <y>320</y>
      <width>131</width>
      <height>21</height>
     </rect>
@@ -911,40 +892,11 @@
     </property>
    </item>
   </widget>
-  <widget class="QLineEdit" name="leSerial">
-   <property name="geometry">
-    <rect>
-     <x>190</x>
-     <y>280</y>
-     <width>80</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_22">
-   <property name="geometry">
-    <rect>
-     <x>11</x>
-     <y>280</y>
-     <width>181</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Serial number</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
   <widget class="QLineEdit" name="lineEdit_23">
    <property name="geometry">
     <rect>
      <x>11</x>
-     <y>300</y>
+     <y>280</y>
      <width>181</width>
      <height>21</height>
     </rect>
@@ -960,7 +912,7 @@
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>300</y>
+     <y>280</y>
      <width>80</width>
      <height>20</height>
     </rect>
@@ -994,6 +946,22 @@
      <x>100</x>
      <y>60</y>
      <width>111</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="leModule">
+   <property name="geometry">
+    <rect>
+     <x>440</x>
+     <y>260</y>
+     <width>81</width>
      <height>20</height>
     </rect>
    </property>

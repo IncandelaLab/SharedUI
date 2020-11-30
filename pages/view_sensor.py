@@ -108,6 +108,7 @@ class func(object):
 	@enforce_mode('setup')
 	def rig(self):
 		#self.page.sbID.valueChanged.connect(self.update_info)
+		self.page.leID.textChanged.connect(self.update_info)
 
 		self.page.pbNew.clicked.connect(self.startCreating)
 		self.page.pbEdit.clicked.connect(self.startEditing)
@@ -125,23 +126,24 @@ class func(object):
 
 
 
-	@enforce_mode('view')
+	@enforce_mode(['view', 'editing', 'creating'])
 	def update_info(self,ID=None,*args,**kwargs):
-		#if ID is None:
-		#	ID = self.page.sbID.value()
-		#else:
-		#	self.page.sbID.setValue(ID)
-		#
-		#self.sensor_exists = self.sensor.load(ID)
+		if ID is None:
+			#ID = self.page.sbID.value()
+			ID = self.page.leID.text()
+		else:
+			#self.page.sbID.setValue(ID)
+			self.page.leID.setText(ID)
+		
+		self.sensor_exists = self.sensor.load(ID)
 
-		self.page.leID.setText(self.sensor.ID)
+		#self.page.leID.setText(self.sensor.ID)
 
 		self.page.listShipments.clear()
 		for shipment in self.sensor.shipments:
 			self.page.listShipments.addItem(str(shipment))
 
 		self.page.leLocation.setText(    "" if self.sensor.location     is None else self.sensor.location    )
-		self.page.leSerial.setText(  "" if self.sensor.serial           is None else self.sensor.serial      )
 		self.page.leBarcode.setText( "" if self.sensor.barcode          is None else self.sensor.barcode     )
 		self.page.cbType.setCurrentIndex(       INDEX_TYPE.get(       self.sensor.type,  -1)      )
 		self.page.cbShape.setCurrentIndex(      INDEX_SHAPE.get(      self.sensor.shape, -1)      )
@@ -159,11 +161,13 @@ class func(object):
 		self.page.cbInspection.setCurrentIndex(INDEX_INSPECTION.get(self.sensor.inspection,-1))
 
 		self.page.sbStepSensor.setValue( -1 if self.sensor.step_sensor is None else self.sensor.step_sensor)
-		self.page.sbProtomodule.setValue(-1 if self.sensor.protomodule is None else self.sensor.protomodule)
-		self.page.sbModule.setValue(     -1 if self.sensor.module      is None else self.sensor.module     )
+		#self.page.sbProtomodule.setValue(-1 if self.sensor.protomodule is None else self.sensor.protomodule)
+		#self.page.sbModule.setValue(     -1 if self.sensor.module      is None else self.sensor.module     )
+		self.page.leProtomodule.setText("" if self.sensor.protomodule is None else self.sensor.protomodule)
+		self.page.leModule.setText(     "" if self.sensor.module      is None else self.sensor.module)
 		if self.page.sbStepSensor.value()  == -1: self.page.sbStepSensor.clear()
-		if self.page.sbProtomodule.value() == -1: self.page.sbProtomodule.clear()
-		if self.page.sbModule.value()      == -1: self.page.sbModule.clear()
+		#if self.page.sbProtomodule.value() == -1: self.page.sbProtomodule.clear()
+		#if self.page.sbModule.value()      == -1: self.page.sbModule.clear()
 
 		self.updateElements()
 
@@ -179,8 +183,10 @@ class func(object):
 		sensor_exists      = self.sensor_exists
 		shipments_exist    = self.page.listShipments.count() > 0
 		step_sensor_exists = self.page.sbStepSensor.value() >= 0
-		protomodule_exists = self.page.sbProtomodule.value() >= 0
-		module_exists      = self.page.sbModule.value() >= 0
+		#protomodule_exists = self.page.sbProtomodule.value() >= 0
+		#module_exists      = self.page.sbModule.value() >= 0
+		protomodule_exists = self.page.leProtomodule.text() != ""
+		module_exists      = self.page.leModule.text()      != ""
 
 		self.setMainSwitchingEnabled(mode_view)
 		#self.page.sbID.setEnabled(mode_view)
@@ -195,7 +201,6 @@ class func(object):
 
 		self.page.leInsertUser.setReadOnly(   not (mode_creating or mode_editing) )
 		self.page.leLocation.setReadOnly(     not (mode_creating or mode_editing) )
-		self.page.leSerial.setReadOnly(       not (mode_creating or mode_editing) )
 		self.page.leBarcode.setReadOnly(      not (mode_creating or mode_editing) )
 		self.page.cbType.setEnabled(               mode_creating or mode_editing  )
 		self.page.cbShape.setEnabled(              mode_creating or mode_editing  )
@@ -237,7 +242,7 @@ class func(object):
 		if not tmp_exists:
 			self.page.leStatus.setText("does not exist")
 		else:
-			self.baseplate = tmp_baseplate
+			self.sensor = tmp_sensor
 			self.mode = 'editing'
 			self.update_info()
 
@@ -251,7 +256,6 @@ class func(object):
 
 		self.sensor.insertion_user = str(self.page.leInsertUser.text()      ) if str(self.page.leInsertUser.text()  )       else None
 		self.sensor.location     = str(self.page.leLocation.text()          ) if str(self.page.leLocation.text()    )       else None
-		self.sensor.serial       = str(self.page.leSerial.text()            ) if str(self.page.leSerial.text()      )       else None
 		self.sensor.barcode      = str(self.page.leBarcode.text()           ) if str(self.page.leBarcode.text()     )       else None
 		self.sensor.type         = str(self.page.cbType.currentText()       ) if str(self.page.cbType.currentText() )       else None
 		self.sensor.shape        = str(self.page.cbShape.currentText()      ) if str(self.page.cbShape.currentText())       else None
@@ -306,17 +310,19 @@ class func(object):
 	
 	@enforce_mode('view')
 	def goProtomodule(self,*args,**kwargs):
-		ID = self.page.sbProtomodule.value()
-		if ID >= 0:
+		#ID = self.page.sbProtomodule.value()
+		#if ID >= 0:
+		ID = self.page.leProtomodule.text()
+		if ID != "":
 			self.setUIPage('protomodules',ID=ID)
 
 	@enforce_mode('view')
 	def goModule(self,*args,**kwargs):
-		ID = self.page.sbModule.value()
-		if ID >= 0:
+		#ID = self.page.sbModule.value()
+		#if ID >= 0:
+		ID = self.page.leModule.text()
+		if ID != "":
 			self.setUIPage('modules',ID=ID)
-		else:
-			return
 
 
 

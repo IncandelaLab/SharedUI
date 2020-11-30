@@ -1,3 +1,5 @@
+from filemanager import fm
+
 PAGE_NAME = "view_pcb"
 PARTTYPE = "PCB"
 DEBUG = False
@@ -110,7 +112,8 @@ class func(object):
 
 	@enforce_mode('setup')
 	def rig(self):
-		self.page.sbID.valueChanged.connect(self.update_info)
+		#self.page.sbID.valueChanged.connect(self.update_info)
+		self.page.leID.textChanged.connect(self.update_info)
 
 		self.page.pbNew.clicked.connect(self.startCreating)
 		self.page.pbEdit.clicked.connect(self.startEditing)
@@ -129,23 +132,25 @@ class func(object):
 		self.page.pbGoPlotter.clicked.connect(self.goPlotter)
 
 
-	@enforce_mode('view')
+	@enforce_mode(['view', 'editing', 'creating'])
 	def update_info(self,ID=None,*args,**kwargs):
 		if ID is None:
-			ID = self.page.sbID.value()
+			#ID = self.page.sbID.value()
+			ID = self.page.leID.text()
 		else:
-			self.page.sbID.setValue(ID)
-
+			#self.page.sbID.setValue(ID)
+			self.page.leID.setText(ID)
+		
 		self.pcb_exists = self.pcb.load(ID)
+
+		#self.page.leID.setText(self.pcb.ID)
 
 		self.page.listShipments.clear()
 		for shipment in self.pcb.shipments:
-			print(self.pcb.shipments)
 			self.page.listShipments.addItem(str(shipment))
 
 		self.page.leInsertUser.setText(  "" if self.pcb.insertion_user is None else self.pcb.insertion_user)
 		self.page.leLocation.setText(    "" if self.pcb.location       is None else self.pcb.location    )
-		self.page.leSerial.setText(      "" if self.pcb.serial         is None else self.pcb.serial      )
 		self.page.leBarcode.setText(     "" if self.pcb.barcode        is None else self.pcb.barcode     )
 		self.page.leManufacturer.setText("" if self.pcb.manufacturer   is None else self.pcb.manufacturer)
 		self.page.cbType.setCurrentIndex(       INDEX_TYPE.get(       self.pcb.type,-1)        )
@@ -169,9 +174,10 @@ class func(object):
 		if self.page.dsbThickness.value() == -1: self.page.dsbThickness.clear()
 
 		self.page.sbStepPcb.setValue(-1 if self.pcb.step_pcb is None else self.pcb.step_pcb)
-		self.page.sbModule.setValue( -1 if self.pcb.module   is None else self.pcb.module  )
+		#self.page.sbModule.setValue( -1 if self.pcb.module   is None else self.pcb.module  )
+		self.page.leModule.setText(  "" if self.pcb.module   is None else self.pcb.module)
 		if self.page.sbStepPcb.value() == -1: self.page.sbStepPcb.clear()
-		if self.page.sbModule.value()  == -1: self.page.sbModule.clear()
+		#if self.page.sbModule.value()  == -1: self.page.sbModule.clear()
 
 		self.page.listDaqData.clear()
 		for daq in self.pcb.daq_data:
@@ -182,20 +188,24 @@ class func(object):
 
 	@enforce_mode(['view','editing','creating'])
 	def updateElements(self,use_info=False):
+		self.page.leStatus.setText(self.mode)
+
 		pcb_exists      = self.pcb_exists
 		shipments_exist = self.page.listShipments.count() > 0
 		daq_data_exists = self.page.listDaqData.count()   > 0
 
 		step_pcb_exists = self.page.sbStepPcb.value() >=0
-		module_exists   = self.page.sbModule.value()  >=0
+		#module_exists   = self.page.sbModule.value()  >=0
+		module_exists   = self.page.leModule.text()  != ""
 
 		mode_view     = self.mode == 'view'
 		mode_editing  = self.mode == 'editing'
 		mode_creating = self.mode == 'creating'
 
 		self.setMainSwitchingEnabled(mode_view)
-		self.page.sbID.setEnabled(mode_view)
-				
+		#self.page.sbID.setEnabled(mode_view)
+		self.page.leID.setReadOnly(not mode_view)
+		
 		self.page.pbNew.setEnabled(    mode_view and not pcb_exists  )
 		self.page.pbEdit.setEnabled(   mode_view and     pcb_exists  )
 		self.page.pbSave.setEnabled(   mode_editing or mode_creating )
@@ -205,7 +215,6 @@ class func(object):
 
 		self.page.leInsertUser.setReadOnly(   not (mode_creating or mode_editing) )
 		self.page.leLocation.setReadOnly(     not (mode_creating or mode_editing) )
-		self.page.leSerial.setReadOnly(       not (mode_creating or mode_editing) )
 		self.page.leBarcode.setReadOnly(      not (mode_creating or mode_editing) )
 		self.page.leManufacturer.setReadOnly( not (mode_creating or mode_editing) )
 		self.page.cbType.setEnabled(               mode_creating or mode_editing  )
@@ -224,28 +233,37 @@ class func(object):
 		self.page.dsbFlatness.setReadOnly(  not (mode_creating or mode_editing) )
 		self.page.dsbThickness.setReadOnly( not (mode_creating or mode_editing) )
 
-		self.page.sbStepPcb.setEnabled(mode_view and step_pcb_exists)
-		self.page.sbModule.setEnabled( mode_view and module_exists  )
-
 		self.page.pbAddToPlotter.setEnabled(mode_view and daq_data_exists)
 		self.page.pbGoPlotter.setEnabled(   mode_view and daq_data_exists)
 
 
 	@enforce_mode('view')
 	def startCreating(self,*args,**kwargs):
-		if not self.pcb_exists:
-			ID = self.page.sbID.value()
-			self.mode = 'creating'
+		if self.page.leID.text() == "":
+			self.page.leStatus.setText("input an ID")
+			return
+		tmp_pcb = fm.pcb()
+		tmp_ID = self.page.leID.text()
+		tmp_exists = tmp_pcb.load(tmp_ID)
+		if not tmp_exists:
+			ID = self.page.leID.text()
 			self.pcb.new(ID)
-			self.updateElements()
+			self.mode = 'creating'
+			self.update_info()
 		else:
-			pass
+			self.page.leStatus.setText("already exists")
 
 	@enforce_mode('view')
 	def startEditing(self,*args,**kwargs):
-		if self.pcb_exists:
+		tmp_pcb = fm.pcb()
+		tmp_ID = self.page.leID.text()
+		tmp_exists = tmp_pcb.load(tmp_ID)
+		if not tmp_exists:
+			self.page.leStatus.setText("does not exist")
+		else:
+			self.pcb = tmp_pcb
 			self.mode = 'editing'
-			self.updateElements()
+			self.update_info()
 
 	@enforce_mode(['editing','creating'])
 	def cancelEditing(self,*args,**kwargs):
@@ -257,7 +275,6 @@ class func(object):
 
 		self.pcb.insertion_user = str(self.page.leInsertUser.text()    )   if str(self.page.leInsertUser.text()        ) else None
 		self.pcb.location     = str(self.page.leLocation.text()        )   if str(self.page.leLocation.text()          ) else None
-		self.pcb.serial       = str(self.page.leSerial.text()          )   if str(self.page.leSerial.text()            ) else None
 		self.pcb.barcode      = str(self.page.leBarcode.text()         )   if str(self.page.leBarcode.text()           ) else None
 		self.pcb.manufacturer = str(self.page.leManufacturer.text()    )   if str(self.page.leManufacturer.text()      ) else None
 		self.pcb.type         = str(self.page.cbType.currentText()     )   if str(self.page.cbType.currentText()       ) else None
@@ -281,7 +298,6 @@ class func(object):
 		self.mode = 'view'
 		self.update_info()
 
-		# NEW:
 		self.xmlModList.append(self.pcb.ID)
 
 	def xmlModified(self):
@@ -313,8 +329,10 @@ class func(object):
 
 	@enforce_mode('view')
 	def goModule(self,*args,**kwargs):
-		ID = self.page.sbModule.value()
-		if ID >= 0:
+		#ID = self.page.sbModule.value()
+		#if ID >= 0:
+		ID = self.page.leModule.text()
+		if ID != "":
 			self.setUIPage('modules',ID=ID)
 	
 	@enforce_mode('view')
@@ -333,16 +351,13 @@ class func(object):
 
 
 
-
 	@enforce_mode('view')
 	def load_kwargs(self,kwargs):
 		if 'ID' in kwargs.keys():
 			ID = kwargs['ID']
-			if not (type(ID) is int):
-				raise TypeError("Expected type <int> for ID; got <{}>".format(type(ID)))
-			if ID < 0:
-				raise ValueError("ID cannot be negative")
-			self.page.sbID.setValue(ID)
+			if not (type(ID) is str):
+				raise TypeError("Expected type <str> for ID; got <{}>".format(type(ID)))
+			self.page.leID.setText(ID)
 
 	@enforce_mode('view')
 	def changed_to(self):

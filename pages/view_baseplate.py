@@ -64,7 +64,6 @@ class func(object):
 
 		# NEW:  List of all modified XML files
 		self.xmlModList = []
-		self.idList = []
 
 
 	def enforce_mode(mode):
@@ -112,6 +111,8 @@ class func(object):
 	@enforce_mode('setup')
 	def rig(self):
 		#self.page.sbID.valueChanged.connect(self.update_info)
+		# Experimental:
+		self.page.leID.textChanged.connect( self.update_info )
 
 		self.page.pbNew.clicked.connect(self.startCreating)
 		self.page.pbEdit.clicked.connect(self.startEditing)
@@ -144,18 +145,16 @@ class func(object):
 	def update_info(self,ID=None):
 		"""Loads info on the selected baseplate ID and updates UI elements accordingly"""
 		# IMPORTANT CHANGE:  Baseplate load and existence check have been moved to startCreating/Editing()!
-		#if ID is None:
-		#	ID = self.page.leID.text()
-		#else:
-		#	#self.page.sbID.setValue(ID)
-		#	self.page.leID.setText(ID)
+		# Uncommenting this to see what happens...
+		if ID is None:
+			ID = self.page.leID.text()
+		else:
+			#self.page.sbID.setValue(ID)
+			self.page.leID.setText(ID)
 
-		self.page.leID.setText(self.baseplate.ID)
+		self.baseplate_exists = self.baseplate.load(ID)
 
-		#print("Updating info!  ID={}".format(ID))
-		#self.baseplate_exists = self.baseplate.load(ID)
-		#print("Loaded baseplate.  ID={}".format(self.baseplate.ID))
-
+		#self.page.leID.setText(self.baseplate.ID)
 
 		self.page.listShipments.clear()
 		for shipment in self.baseplate.shipments:
@@ -166,7 +165,6 @@ class func(object):
 		self.page.cbMaterial   .setCurrentIndex(INDEX_MATERIAL.get(   self.baseplate.material   , -1))
 		self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.baseplate.institution, -1))
 		self.page.leInsertUser   .setText("" if self.baseplate.insertion_user  is None else self.baseplate.insertion_user  )
-		self.page.leSerial       .setText("" if self.baseplate.serial          is None else self.baseplate.serial          )
 		self.page.leBarcode      .setText("" if self.baseplate.barcode         is None else self.baseplate.barcode         )
 		self.page.leLocation     .setText("" if self.baseplate.location        is None else self.baseplate.location        )
 		self.page.leManufacturer .setText("" if self.baseplate.manufacturer    is None else self.baseplate.manufacturer    )
@@ -200,30 +198,31 @@ class func(object):
 		if self.page.dsbKaptonFlatness.value() == -1: self.page.dsbKaptonFlatness.clear()
 
 		self.page.sbStepSensor.setValue( -1 if self.baseplate.step_sensor is None else self.baseplate.step_sensor)
-		self.page.sbProtomodule.setValue(-1 if self.baseplate.protomodule is None else self.baseplate.protomodule)
-		self.page.sbModule.setValue(     -1 if self.baseplate.module      is None else self.baseplate.module     )
+		#self.page.sbProtomodule.setValue(-1 if self.baseplate.protomodule is None else self.baseplate.protomodule)
+		#self.page.sbModule.setValue(     -1 if self.baseplate.module      is None else self.baseplate.module     )
+		self.page.leProtomodule.setText("" if self.baseplate.protomodule is None else self.baseplate.protomodule)
+		self.page.leModule.setText(     "" if self.baseplate.module      is None else self.baseplate.module)
 		if self.page.sbStepSensor.value()  == -1: self.page.sbStepSensor.clear()
-		if self.page.sbProtomodule.value() == -1: self.page.sbProtomodule.clear()
-		if self.page.sbModule.value()      == -1: self.page.sbModule.clear()
+		#if self.page.sbProtomodule.value() == -1: self.page.sbProtomodule.clear()
+		#if self.page.sbModule.value()      == -1: self.page.sbModule.clear()
 
-		print("updated info, now updating elements; ID={}".format(self.baseplate.ID))
 		self.updateElements()
-		print("updated elements, ID={}".format(self.baseplate.ID))
-
 
 
 	@enforce_mode(['view','editing_corners','editing','creating'])
 	def updateElements(self):
-		exists = self.baseplate_exists
-		shipments_exist = self.page.listShipments.count() > 0
-
 		# NEW:
 		self.page.leStatus.setText(self.mode)
 
+		exists = self.baseplate_exists
+		shipments_exist = self.page.listShipments.count() > 0
+
 		step_kapton_exists   = self.page.sbStepKapton.value()   >=0
 		step_senor_exists    = self.page.sbStepSensor.value()   >=0
-		protomodule_exists   = self.page.sbProtomodule.value()  >=0
-		module_exists        = self.page.sbModule.value()       >=0
+		#protomodule_exists   = self.page.sbProtomodule.value()  >=0
+		#module_exists        = self.page.sbModule.value()       >=0
+		protomodule_exists   = self.page.leProtomodule.text() != ""
+		module_exists        = self.page.leModule.text()      != ""
 
 		mode_view     = self.mode == 'view'
 		mode_editing  = self.mode == 'editing'
@@ -234,8 +233,8 @@ class func(object):
 		self.page.leID.setReadOnly(not mode_view)
 
 		# MODIFIED:
-		self.page.pbNew.setEnabled(    mode_view)  # and not exists )
-		self.page.pbEdit.setEnabled(   mode_view)  # and     exists )
+		self.page.pbNew.setEnabled(    mode_view and not exists )
+		self.page.pbEdit.setEnabled(   mode_view and     exists )
 		self.page.pbSave.setEnabled(   mode_creating or mode_editing )
 		self.page.pbCancel.setEnabled( mode_creating or mode_editing )
 
@@ -245,7 +244,6 @@ class func(object):
 		self.page.cbChirality.setEnabled(           mode_creating or mode_editing  )
 		self.page.cbInstitution.setEnabled(         mode_creating or mode_editing  )
 		self.page.leInsertUser.setReadOnly(    not (mode_creating or mode_editing) )
-		self.page.leSerial.setReadOnly(        not (mode_creating or mode_editing) )
 		self.page.leBarcode.setReadOnly(       not (mode_creating or mode_editing) )
 		self.page.leManufacturer.setReadOnly(  not (mode_creating or mode_editing) )
 		self.page.leLocation.setReadOnly(      not (mode_creating or mode_editing) )
@@ -284,21 +282,16 @@ class func(object):
 		if not tmp_exists:  # DNE; good to create
 			ID = self.page.leID.text()
 			self.baseplate.new(ID)
-			#print("CREATING.  Current ID: {}".format(self.baseplate.ID))
-			#self.update_info()
-			print("Current ID: {}".format(self.baseplate.ID))
 			self.mode = 'creating'  # update_info needs mode==view
 			self.update_info()  # Automatically calls updateElements() too
 		else:
 			# pass
 			self.page.leStatus.setText("already exists")
-		print("Started creation.  ID = {}".format(self.baseplate.ID))
 
 	@enforce_mode('view')
 	def startEditing(self,*args,**kwargs):
 		tmp_baseplate = fm.baseplate()
 		tmp_ID = self.page.leID.text()
-		print("LOADING ID {}".format(tmp_ID))
 		tmp_exists = tmp_baseplate.load(tmp_ID)
 		#if not self.baseplate_exists:
 		if not tmp_exists:
@@ -316,7 +309,6 @@ class func(object):
 
 	@enforce_mode(['editing','creating'])
 	def saveEditing(self,*args,**kwargs):
-		print("SAVING baseplate, ID={}".format(self.baseplate.ID))
 
 		self.baseplate.shape          = str(self.page.cbShape.currentText())       if str(self.page.cbShape.currentText())       else None
 		self.baseplate.chirality      = str(self.page.cbChirality.currentText())   if str(self.page.cbChirality.currentText())   else None
@@ -325,7 +317,6 @@ class func(object):
 		self.baseplate.insertion_user = str(self.page.leInsertUser.text())         if str(self.page.leInsertUser.text())         else None
 		self.baseplate.manufacturer   = str(self.page.leManufacturer.text())       if str(self.page.leManufacturer.text())       else None
 		self.baseplate.location       = str(self.page.leLocation.text())           if str(self.page.leLocation.text())           else None
-		self.baseplate.serial         = str(self.page.leSerial.text())             if str(self.page.leSerial.text())             else None
 		self.baseplate.barcode        = str(self.page.leBarcode.text())            if str(self.page.leBarcode.text())            else None
 		self.baseplate.nomthickness   =     self.page.dsbNomThickness.value()      if self.page.dsbNomThickness.value() >=0      else None
 
@@ -346,7 +337,6 @@ class func(object):
 		self.mode = 'view'
 		self.update_info()
 
-		# NEW:
 		self.xmlModList.append(self.baseplate.ID)
 
 
@@ -392,14 +382,18 @@ class func(object):
 	
 	@enforce_mode('view')
 	def goProtomodule(self,*args,**kwargs):
-		ID = self.page.sbProtomodule.value()
-		if ID >= 0:
+		#ID = self.page.sbProtomodule.value()
+		#if ID >= 0:
+		ID = self.page.leProtomodule.text()
+		if ID != "":
 			self.setUIPage('protomodules',ID=ID)
 
 	@enforce_mode('view')
 	def goModule(self,*args,**kwargs):
-		ID = self.page.sbModule.value()
-		if ID >= 0:
+		#ID = self.page.sbModule.value()
+		#if ID >= 0:
+		ID = self.page.leModule.text()
+		if ID != "":
 			self.setUIPage('modules',ID=ID)
 
 

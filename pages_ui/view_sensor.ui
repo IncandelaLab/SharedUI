@@ -19,7 +19,7 @@
      <x>10</x>
      <y>90</y>
      <width>261</width>
-     <height>541</height>
+     <height>521</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -112,7 +112,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>240</y>
+      <y>220</y>
       <width>81</width>
       <height>20</height>
      </rect>
@@ -160,7 +160,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>240</y>
+      <y>220</y>
       <width>181</width>
       <height>21</height>
      </rect>
@@ -176,7 +176,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>260</y>
+      <y>240</y>
       <width>80</width>
       <height>21</height>
      </rect>
@@ -195,7 +195,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>260</y>
+      <y>240</y>
       <width>181</width>
       <height>21</height>
      </rect>
@@ -211,7 +211,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>220</y>
+      <y>200</y>
       <width>181</width>
       <height>21</height>
      </rect>
@@ -227,7 +227,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>520</y>
+      <y>500</y>
       <width>111</width>
       <height>21</height>
      </rect>
@@ -240,7 +240,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>300</y>
+      <y>280</y>
       <width>141</width>
       <height>21</height>
      </rect>
@@ -256,7 +256,7 @@
     <property name="geometry">
      <rect>
       <x>140</x>
-      <y>300</y>
+      <y>280</y>
       <width>121</width>
       <height>21</height>
      </rect>
@@ -269,7 +269,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>450</y>
+      <y>430</y>
       <width>261</width>
       <height>71</height>
      </rect>
@@ -279,7 +279,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>320</y>
+      <y>300</y>
       <width>261</width>
       <height>121</height>
      </rect>
@@ -375,7 +375,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>220</y>
+      <y>200</y>
       <width>81</width>
       <height>21</height>
      </rect>
@@ -408,7 +408,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>200</y>
+      <y>180</y>
       <width>80</width>
       <height>20</height>
      </rect>
@@ -424,42 +424,13 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>200</y>
+      <y>180</y>
       <width>181</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
      <string>Barcode</string>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="leSerial">
-    <property name="geometry">
-     <rect>
-      <x>180</x>
-      <y>180</y>
-      <width>80</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEdit_22">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>180</y>
-      <width>181</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Serial number</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -487,8 +458,6 @@
    <zorder>cbType</zorder>
    <zorder>leBarcode</zorder>
    <zorder>lineEdit_23</zorder>
-   <zorder>leSerial</zorder>
-   <zorder>lineEdit_22</zorder>
   </widget>
   <widget class="QFrame" name="frame_3">
    <property name="geometry">
@@ -632,25 +601,6 @@
     <string>Go to</string>
    </property>
   </widget>
-  <widget class="QSpinBox" name="sbProtomodule">
-   <property name="geometry">
-    <rect>
-     <x>430</x>
-     <y>170</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-   <property name="minimum">
-    <number>-1</number>
-   </property>
-   <property name="maximum">
-    <number>2147483647</number>
-   </property>
-  </widget>
   <widget class="QLineEdit" name="lineEdit_12">
    <property name="geometry">
     <rect>
@@ -681,25 +631,6 @@
    </property>
    <property name="readOnly">
     <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QSpinBox" name="sbModule">
-   <property name="geometry">
-    <rect>
-     <x>430</x>
-     <y>240</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-   <property name="minimum">
-    <number>-1</number>
-   </property>
-   <property name="maximum">
-    <number>2147483647</number>
    </property>
   </widget>
   <widget class="QLineEdit" name="lineEdit_13">
@@ -827,6 +758,32 @@
      <string>fail</string>
     </property>
    </item>
+  </widget>
+  <widget class="QLineEdit" name="leProtomodule">
+   <property name="geometry">
+    <rect>
+     <x>430</x>
+     <y>170</y>
+     <width>80</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="leModule">
+   <property name="geometry">
+    <rect>
+     <x>430</x>
+     <y>240</y>
+     <width>80</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
   </widget>
  </widget>
  <resources/>

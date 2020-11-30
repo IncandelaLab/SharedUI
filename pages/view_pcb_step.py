@@ -4,7 +4,7 @@ import datetime
 
 from filemanager import fm
 
-NO_DATE = [2000,1,1]
+NO_DATE = [2020,1,1]
 
 PAGE_NAME = "view_pcb_step"
 OBJECTTYPE = "PCB_step"
@@ -15,6 +15,7 @@ INDEX_INSTITUTION = {
     'FNAL':1,
     'UCSB':2,
     'UMN':3,
+	'NTU':4,
 }
 
 STATUS_NO_ISSUES = "valid (no issues)"
@@ -78,8 +79,6 @@ class func(object):
 		self.pcbs         = [fm.pcb()         for _ in range(6)]
 		self.protomodules = [fm.protomodule() for _ in range(6)]
 		self.modules      = [fm.module()      for _ in range(6)]
-		#baseplates aren't used/considered
-		#self.baseplates = [fm.baseplate() for _ in range(6)]
 		self.tray_component_sensor = fm.tray_component_sensor()
 		self.tray_assembly         = fm.tray_assembly()
 		self.batch_araldite        = fm.batch_araldite()
@@ -151,7 +150,7 @@ class func(object):
 			self.page.pbGoTool5,
 			self.page.pbGoTool6,
 		]
-
+		"""
 		self.sb_pcbs = [
 			self.page.sbPcb1,
 			self.page.sbPcb2,
@@ -159,6 +158,14 @@ class func(object):
 			self.page.sbPcb4,
 			self.page.sbPcb5,
 			self.page.sbPcb6,
+		]"""
+		self.le_pcbs = [
+			self.page.lePcb1,
+			self.page.lePcb2,
+			self.page.lePcb3,
+			self.page.lePcb4,
+			self.page.lePcb5,
+			self.page.lePcb6,
 		]
 		self.pb_go_pcbs = [
 			self.page.pbGoPcb1,
@@ -168,7 +175,7 @@ class func(object):
 			self.page.pbGoPcb5,
 			self.page.pbGoPcb6,
 		]
-
+		"""
 		self.sb_protomodules = [
 			self.page.sbProtomodule1,
 			self.page.sbProtomodule2,
@@ -176,6 +183,14 @@ class func(object):
 			self.page.sbProtomodule4,
 			self.page.sbProtomodule5,
 			self.page.sbProtomodule6,
+		]"""
+		self.le_protomodules = [
+			self.page.leProtomodule1,
+			self.page.leProtomodule2,
+			self.page.leProtomodule3,
+			self.page.leProtomodule4,
+			self.page.leProtomodule5,
+			self.page.leProtomodule6,
 		]
 		self.pb_go_protomodules = [
 			self.page.pbGoProtomodule1,
@@ -185,7 +200,7 @@ class func(object):
 			self.page.pbGoProtomodule5,
 			self.page.pbGoProtomodule6,
 		]
-
+		"""
 		self.sb_modules = [
 			self.page.sbModule1,
 			self.page.sbModule2,
@@ -193,6 +208,14 @@ class func(object):
 			self.page.sbModule4,
 			self.page.sbModule5,
 			self.page.sbModule6,
+		]"""
+		self.le_modules = [
+			self.page.leModule1,
+			self.page.leModule2,
+			self.page.leModule3,
+			self.page.leModule4,
+			self.page.leModule5,
+			self.page.leModule6,
 		]
 		self.pb_go_modules = [
 			self.page.pbGoModule1,
@@ -210,17 +233,18 @@ class func(object):
 			self.pb_go_modules[i].clicked.connect(     self.goModule     )
 
 			self.sb_tools[i].editingFinished.connect(       self.loadToolSensor )
-			self.sb_pcbs[i].editingFinished.connect(        self.loadPcb        )
-			self.sb_protomodules[i].editingFinished.connect(self.loadProtomodule)
-			self.sb_modules[i].editingFinished.connect(     self.loadModule     )
+			#self.sb_pcbs[i].editingFinished.connect(        self.loadPcb        )
+			#self.sb_protomodules[i].editingFinished.connect(self.loadProtomodule)
+			#self.sb_modules[i].editingFinished.connect(     self.loadModule     )
+			self.le_pcbs[i].textChanged.connect(        self.loadPcb        )
+			self.le_protomodules[i].textChanged.connect(self.loadProtomodule)
+			self.le_modules[i].textChanged.connect(     self.loadModule     )
 
 		self.page.cbInstitution.currentIndexChanged.connect( self.loadAllTools )
 
 		self.page.sbTrayComponent.editingFinished.connect( self.loadTrayComponentSensor )
 		self.page.sbTrayAssembly.editingFinished.connect(  self.loadTrayAssembly        )
 		self.page.sbBatchAraldite.editingFinished.connect( self.loadBatchAraldite       )
-		#May or may not need to add this check box
-		#self.page.sbBatchLoctite.editingFinished.connect(  self.loadBatchLoctite        )
 
 		self.page.sbID.valueChanged.connect(self.update_info)
 
@@ -233,7 +257,6 @@ class func(object):
 		self.page.pbGoTrayAssembly.clicked.connect(self.goTrayAssembly)
 		self.page.pbGoTrayComponent.clicked.connect(self.goTrayComponent)
 
-		#self.page.pbDatePerformedNow.clicked.connect(self.setDatePerformedNow)
 		self.page.pbRunStartNow     .clicked.connect(self.setRunStartNow)
 
 	@enforce_mode('view')
@@ -244,6 +267,9 @@ class func(object):
 			self.page.sbID.setValue(ID)
 
 		self.step_pcb_exists = self.step_pcb.load(ID)
+
+		self.page.listIssues.clear()
+		self.page.leStatus.clear()
 
 		if self.step_pcb_exists:
 			self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.step_pcb.institution, -1))
@@ -283,30 +309,35 @@ class func(object):
 
 			if not (self.step_pcb.pcbs is None):
 				for i in range(6):
-					self.sb_pcbs[i].setValue(self.step_pcb.pcbs[i] if not (self.step_pcb.pcbs[i] is None) else -1)
+					#self.sb_pcbs[i].setValue(self.step_pcb.pcbs[i] if not (self.step_pcb.pcbs[i] is None) else -1)
+					self.le_pcbs[i].setText(self.step_pcb.pcbs[i] if not (self.step_pcb.pcbs[i] is None) else "")
 			else:
 				for i in range(6):
-					self.sb_pcbs[i].setValue(-1)
+					#self.sb_pcbs[i].setValue(-1)
+					self.le_pcbs[i].setText("")
 
 			if not (self.step_pcb.protomodules is None):
 				for i in range(6):
-					self.sb_protomodules[i].setValue(self.step_pcb.protomodules[i] if not (self.step_pcb.protomodules[i] is None) else -1)
+					#self.sb_protomodules[i].setValue(self.step_pcb.protomodules[i] if not (self.step_pcb.protomodules[i] is None) else -1)
+					self.le_protomodules[i].setText(self.step_pcb.protomodules[i] if not (self.step_pcb.protomodules[i] is None) else "")
 			else:
 				for i in range(6):
-					self.sb_protomodules[i].setValue(-1)
+					#self.sb_protomodules[i].setValue(-1)
+					self.le_protomodules[i].setText("")
 
 			if not (self.step_pcb.modules is None):
 				for i in range(6):
-					self.sb_modules[i].setValue(self.step_pcb.modules[i] if not (self.step_pcb.modules[i] is None) else -1)
+					#self.sb_modules[i].setValue(self.step_pcb.modules[i] if not (self.step_pcb.modules[i] is None) else -1)
+					self.le_modules[i].setText(self.step_pcb.modules[i] if not (self.step_pcb.modules[i] is None) else "")
 			else:
-				for i in range(6):
-					self.sb_modules[i].setValue(-1)
+				for i  in range(6):
+					#self.sb_modules[i].setValue(-1)
+					self.le_modules[i].setText("")
 
 		else:
 			self.page.cbInstitution.setCurrentIndex(-1)
 			self.page.leUserPerformed.setText("")
 			self.page.leLocation.setText("")
-			#self.page.dPerformed.setDate(QtCore.QDate(*NO_DATE))
 			self.page.dtRunStart.setDate(QtCore.QDate(*NO_DATE))
 			self.page.dtRunStart.setTime(QtCore.QTime(0,0,0))
 			self.page.leCureTemperature.setText("")
@@ -316,19 +347,23 @@ class func(object):
 			self.page.sbTrayAssembly.setValue(-1)
 			for i in range(6):
 				self.sb_tools[i].setValue(-1)
-				self.sb_pcbs[i].setValue(-1)
-				self.sb_protomodules[i].setValue(-1)
-				self.sb_modules[i].setValue(-1)
+				#self.sb_pcbs[i].setValue(-1)
+				#self.sb_protomodules[i].setValue(-1)
+				#self.sb_modules[i].setValue(-1)
+				self.le_pcbs[i].setText("")
+				self.le_protomodules[i].setText("")
+				self.le_modules[i].setText("")
+
 		
 		for i in range(6):
-			if self.sb_tools[i].value()        == -1:self.sb_tools[i].clear()
-			if self.sb_pcbs[i].value()         == -1:self.sb_pcbs[i].clear()
-			if self.sb_protomodules[i].value() == -1:self.sb_protomodules[i].clear()
-			if self.sb_modules[i].value()      == -1:self.sb_modules[i].clear()
-
-		if self.page.sbBatchAraldite.value() == -1:self.page.sbBatchAraldite.clear()
-		if self.page.sbTrayComponent.value() == -1:self.page.sbTrayComponent.clear()
-		if self.page.sbTrayAssembly.value()  == -1:self.page.sbTrayAssembly.clear()	
+			if self.sb_tools[i].value()        == -1:  self.sb_tools[i].clear()
+			#if self.sb_pcbs[i].value()         == -1:  self.sb_pcbs[i].clear()
+			#if self.sb_protomodules[i].value() == -1:  self.sb_protomodules[i].clear()
+			#if self.sb_modules[i].value()      == -1:  self.sb_modules[i].clear()
+		
+		if self.page.sbBatchAraldite.value() == -1:  self.page.sbBatchAraldite.clear()
+		if self.page.sbTrayComponent.value() == -1:  self.page.sbTrayComponent.clear()
+		if self.page.sbTrayAssembly.value()  == -1:  self.page.sbTrayAssembly.clear()	
 		
 		self.updateElements()
 
@@ -338,9 +373,12 @@ class func(object):
 		mode_editing  = self.mode == 'editing'
 		mode_creating = self.mode == 'creating'
 		tools_exist        = [_.value()>=0 for _ in self.sb_tools       ]
-		pcbs_exist         = [_.value()>=0 for _ in self.sb_pcbs        ]
-		protomodules_exist = [_.value()>=0 for _ in self.sb_protomodules]
-		modules_exist      = [_.value()>=0 for _ in self.sb_modules     ]
+		#pcbs_exist         = [_.value()>=0 for _ in self.sb_pcbs        ]
+		#protomodules_exist = [_.value()>=0 for _ in self.sb_protomodules]
+		#modules_exist      = [_.value()>=0 for _ in self.sb_modules     ]
+		pcbs_exist         = [_.text()!="" for _ in self.le_pcbs        ]
+		protomodules_exist = [_.text()!="" for _ in self.le_protomodules]
+		modules_exist      = [_.text()!="" for _ in self.le_modules     ]
 		step_pcb_exists    = self.step_pcb_exists
 
 		self.setMainSwitchingEnabled(mode_view)
@@ -348,12 +386,10 @@ class func(object):
 
 		self.page.cbInstitution.setEnabled(mode_creating or mode_editing)
 
-		#self.page.pbDatePerformedNow.setEnabled(mode_creating or mode_editing)
 		self.page.pbRunStartNow     .setEnabled(mode_creating or mode_editing)
 
 		self.page.leUserPerformed  .setReadOnly(mode_view)
 		self.page.leLocation       .setReadOnly(mode_view)
-		#self.page.dPerformed       .setReadOnly(mode_view)
 		self.page.dtRunStart       .setReadOnly(mode_view)
 		self.page.leCureTemperature.setReadOnly(mode_view)
 		self.page.leCureHumidity   .setReadOnly(mode_view)
@@ -367,9 +403,12 @@ class func(object):
 
 		for i in range(6):
 			self.sb_tools[i].setReadOnly(       mode_view)
-			self.sb_pcbs[i].setReadOnly(        mode_view)
-			self.sb_protomodules[i].setReadOnly(mode_view)
-			self.sb_modules[i].setReadOnly(     mode_view)
+			#self.sb_pcbs[i].setReadOnly(        mode_view)
+			#self.sb_protomodules[i].setReadOnly(mode_view)
+			#self.sb_modules[i].setReadOnly(     mode_view)
+			self.le_pcbs[i].setReadOnly(        mode_view)
+			self.le_protomodules[i].setReadOnly(mode_view)
+			self.le_modules[i].setReadOnly(     mode_view)
 			self.pb_go_tools[i].setEnabled(       mode_view and tools_exist[i]       )
 			self.pb_go_pcbs[i].setEnabled(        mode_view and pcbs_exist[i]        )
 			self.pb_go_protomodules[i].setEnabled(mode_view and protomodules_exist[i])
@@ -388,9 +427,12 @@ class func(object):
 	def loadAllObjects(self,*args,**kwargs):
 		for i in range(6):
 			self.tools_pcb[i].load(self.sb_tools[i].value(),       self.page.cbInstitution.currentText())
-			self.pcbs[i].load(        self.sb_pcbs[i].value()        )
-			self.protomodules[i].load(self.sb_protomodules[i].value())
-			self.modules[i].load(     self.sb_modules[i].value()     )
+			#self.pcbs[i].load(        self.sb_pcbs[i].value()        )
+			#self.protomodules[i].load(self.sb_protomodules[i].value())
+			#self.modules[i].load(     self.sb_modules[i].value()     )
+			self.pcbs[i].load(        self.le_pcbs[i].text()        )
+			self.protomodules[i].load(self.le_protomodules[i].text())
+			self.modules[i].load(     self.le_modules[i].text()     )
 
 		self.tray_component_sensor.load(self.page.sbTrayComponent.value(), self.page.cbInstitution.currentText())
 		self.tray_assembly.load(        self.page.sbTrayAssembly.value(),  self.page.cbInstitution.currentText())
@@ -431,14 +473,16 @@ class func(object):
 	def loadBaseplate(self, *args, **kwargs):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
-		self.baseplates[which].load(self.sb_baseplates[which].value())
+		#self.baseplates[which].load(self.sb_baseplates[which].value())
+		self.baseplates[which].load(self.le_baseplates[which].text())
 		self.updateIssues()
 
 	@enforce_mode(['editing','creating'])
 	def loadPcb(self, *args, **kwargs):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
-		self.pcbs[which].load(self.sb_pcbs[which].value())
+		#self.pcbs[which].load(self.sb_pcbs[which].value())
+		self.pcbs[which].load(self.le_pcbs[which].text())
 		self.updateIssues()
 
 	#New
@@ -446,14 +490,16 @@ class func(object):
 	def loadProtomodule(self, *args, **kwargs):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
-		self.protomodules[which].load(self.sb_protomodules[which].value())
+		#self.protomodules[which].load(self.sb_protomodules[which].value())
+		self.protomodules[which].load(self.le_protomodules[which].text())
 		self.updateIssues()
 
 	@enforce_mode(['editing','creating'])
 	def loadModule(self, *args, **kwargs):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
-		self.modules[which].load(self.sb_modules[which].value())
+		#self.modules[which].load(self.sb_modules[which].value())
+		self.modules[which].load(self.le_modules[which].text())
 		self.updateIssues()
 
 
@@ -517,14 +563,17 @@ class func(object):
 		#New
 		#sb_tools and _baseplates are gone...but pcbs, protomodules, modules aren't.
 		pcb_tools_selected    = [_.value() for _ in self.sb_tools       ]
-		pcbs_selected         = [_.value() for _ in self.sb_pcbs        ]
-		protomodules_selected = [_.value() for _ in self.sb_protomodules]
-		modules_selected      = [_.value() for _ in self.sb_modules     ]
+		#pcbs_selected         = [_.value() for _ in self.sb_pcbs        ]
+		#protomodules_selected = [_.value() for _ in self.sb_protomodules]
+		#modules_selected      = [_.value() for _ in self.sb_modules     ]
+		pcbs_selected         = [_.text() for _ in self.le_pcbs         ]
+		protomodules_selected = [_.text() for _ in self.le_protomodules ]
+		modules_selected      = [_.text() for _ in self.le_modules      ]
 
 		pcb_tool_duplicates    = [_ for _ in range(6) if pcb_tools_selected[_]    >= 0 and pcb_tools_selected.count(   pcb_tools_selected[_]   )>1]
-		pcb_duplicates         = [_ for _ in range(6) if pcbs_selected[_]         >= 0 and pcbs_selected.count(        pcbs_selected[_]        )>1]
-		protomodule_duplicates = [_ for _ in range(6) if protomodules_selected[_] >= 0 and protomodules_selected.count(protomodules_selected[_])>1]
-		module_duplicates      = [_ for _ in range(6) if modules_selected[_]      >= 0 and modules_selected.count(     modules_selected[_]     )>1]
+		pcb_duplicates         = [_ for _ in range(6) if pcbs_selected[_]         != "" and pcbs_selected.count(        pcbs_selected[_]        )>1]
+		protomodule_duplicates = [_ for _ in range(6) if protomodules_selected[_] != "" and protomodules_selected.count(protomodules_selected[_])>1]
+		module_duplicates      = [_ for _ in range(6) if modules_selected[_]      != "" and modules_selected.count(     modules_selected[_]     )>1]
 
 		if pcb_tool_duplicates:
 			issues.append(I_TOOL_PCB_DUPLICATE.format(', '.join([str(_+1) for _ in pcb_tool_duplicates])))
@@ -542,7 +591,7 @@ class func(object):
 		rows_tool_dne        = []
 		rows_pcb_dne         = []
 		rows_protomodule_dne = []
-		rows_module_dne      = []
+		rows_module_na       = []
 
 
 		for i in range(6):
@@ -567,24 +616,20 @@ class func(object):
 			"""
 
 
-			if pcbs_selected[i] >= 0:
+			if pcbs_selected[i] != "":
 				num_parts += 1
 				objects.append(self.pcbs[i])
 				if self.pcbs[i].ID is None:
 					rows_pcb_dne.append(i)
 
-			if protomodules_selected[i] >= 0:
+			if protomodules_selected[i] != "":
 				num_parts += 1
 				objects.append(self.protomodules[i])
 				if self.protomodules[i].ID is None:
 					rows_protomodule_dne.append(i)
 
-			if modules_selected[i] >= 0:
+			if modules_selected[i] != "":
 				num_parts += 1
-				objects.append(self.modules[i])
-				if self.modules[i].ID is None:
-					rows_module_dne.append(i)
-
 
 			if num_parts == 0:
 				rows_empty.append(i)
@@ -655,15 +700,18 @@ class func(object):
 			self.mode = 'creating'
 			self.step_pcb.new(ID)
 			self.updateElements()
+			self.loadAllObjects()
 
 	@enforce_mode('view')
 	def startEditing(self,*args,**kwargs):
 		if self.step_pcb_exists:
 			self.mode = 'editing'
 			self.updateElements()
+			self.loadAllObjects()
 
 	@enforce_mode(['editing','creating'])
 	def cancelEditing(self,*args,**kwargs):
+		self.unloadAllObjects()
 		self.mode = 'view'
 		self.update_info()
 
@@ -673,11 +721,6 @@ class func(object):
 
 		self.step_pcb.user_performed = str( self.page.leUserPerformed.text() )
 		self.step_pcb.location = str( self.page.leLocation.text() )
-
-		#if self.page.dPerformed.date().year() == NO_DATE[0]:
-		#	self.step_pcb.date_performed = None
-		#else:
-		#	self.step_pcb.date_performed = [*self.page.dPerformed.date().getDate()]
 
 		if self.page.dtRunStart.date().year() == NO_DATE[0]:
 			self.step_pcb.run_start = None
@@ -694,9 +737,13 @@ class func(object):
 		modules      = []
 		for i in range(6):
 			tools.append(       self.sb_tools[i].value()        if self.sb_tools[i].value()        >= 0 else None)
-			pcbs.append(        self.sb_pcbs[i].value()         if self.sb_pcbs[i].value()         >= 0 else None)
-			protomodules.append(self.sb_protomodules[i].value() if self.sb_protomodules[i].value() >= 0 else None)
-			modules.append(     self.sb_modules[i].value()      if self.sb_modules[i].value()      >= 0 else None)
+			#pcbs.append(        self.sb_pcbs[i].value()         if self.sb_pcbs[i].value()         >= 0 else None)
+			#protomodules.append(self.sb_protomodules[i].value() if self.sb_protomodules[i].value() >= 0 else None)
+			#modules.append(     self.sb_modules[i].value()      if self.sb_modules[i].value()      >= 0 else None)
+			pcbs.append(        self.le_pcbs[i].text()         if self.le_pcbs[i].text()         != "" else None)
+			protomodules.append(self.le_protomodules[i].text() if self.le_protomodules[i].text() != "" else None)
+			modules.append(     self.le_modules[i].text()      if self.le_modules[i].text()      != "" else None)
+	
 		self.step_pcb.tools        = tools
 		self.step_pcb.pcbs         = pcbs
 		self.step_pcb.protomodules = protomodules
@@ -758,19 +805,22 @@ class func(object):
 	def goPcb(self,*args,**kwargs):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
-		pcb = self.sb_pcbs[which].value()
+		#pcb = self.sb_pcbs[which].value()
+		pcb = self.le_pcbs[which].text()
 		self.setUIPage('PCBs',ID=pcb)
 
 	def goProtomodule(self,*args,**kwargs):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
-		protomodule = self.sb_protomodules[which].value()
+		#protomodule = self.sb_protomodules[which].value()
+		protomodules = self.le_protomodules[which].value()
 		self.setUIPage('protomodules',ID=protomodule)
 
 	def goModule(self,*args,**kwargs):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
-		module = self.sb_modules[which].value()
+		#module = self.sb_modules[which].value()
+		module = self.le_modules[which].value()
 		self.setUIPage('modules',ID=module)
 
 	def goBatchAraldite(self,*args,**kwargs):
@@ -786,9 +836,6 @@ class func(object):
 		print(tray_assembly)
 		self.setUIPage('tooling',tray_assembly=tray_assembly)
 	
-	#def setDatePerformedNow(self, *args, **kwargs):
-	#	self.page.dPerformed.setDate(QtCore.QDate(*time.localtime()[:3]))
-
 	def setRunStartNow(self, *args, **kwargs):
 		localtime = time.localtime()
 		self.page.dtRunStart.setDate(QtCore.QDate(*localtime[0:3]))

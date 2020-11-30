@@ -1,3 +1,5 @@
+from filemanager import fm
+
 PAGE_NAME = "view_protomodule"
 OBJECTTYPE = "protomodule"
 DEBUG = False
@@ -96,7 +98,8 @@ class func(object):
 
 	@enforce_mode('setup')
 	def rig(self):
-		self.page.sbID.valueChanged.connect(self.update_info)
+		#self.page.sbID.valueChanged.connect(self.update_info)
+		self.page.leID.textChanged.connect(self.update_info)
 
 		# No longer used; only created in production steps
 		#self.page.pbNew.clicked.connect(self.startCreating)
@@ -117,14 +120,18 @@ class func(object):
 
 
 
-	@enforce_mode('view')
+	@enforce_mode(['view', 'editing', 'creating'])
 	def update_info(self,ID=None,*args,**kwargs):
 		if ID is None:
-			ID = self.page.sbID.value()
+			#ID = self.page.sbID.value()
+			ID = self.page.leID.text()
 		else:
-			self.page.sbID.setValue(ID)
+			#self.page.sbID.setValue(ID)
+			self.page.leID.setText(ID)
 
 		self.protomodule_exists = self.protomodule.load(ID)
+
+		#self.page.leID.setText(self.protomodule.ID)
 
 		self.page.listShipments.clear()
 		for shipment in self.protomodule.shipments:
@@ -145,11 +152,13 @@ class func(object):
 		self.page.pteWriteComment.clear()
 
 		self.page.sbStepSensor.setValue(-1 if self.protomodule.step_sensor is None else self.protomodule.step_sensor)
-		self.page.sbSensor.setValue(    -1 if self.protomodule.sensor      is None else self.protomodule.sensor     )
-		self.page.sbBaseplate.setValue( -1 if self.protomodule.baseplate   is None else self.protomodule.baseplate  )
+		#self.page.sbSensor.setValue(    -1 if self.protomodule.sensor      is None else self.protomodule.sensor     )
+		self.page.leSensor.setText(     "" if self.protomodule.sensor      is None else self.protomodule.sensor     )
+		#self.page.sbBaseplate.setValue( -1 if self.protomodule.baseplate   is None else self.protomodule.baseplate  )
+		self.page.leBaseplate.setText(  "" if self.protomodule.baseplate   is None else self.protomodule.baseplate  )
 		if self.page.sbStepSensor.value() == -1: self.page.sbStepSensor.clear()
-		if self.page.sbSensor.value()     == -1: self.page.sbSensor.clear()
-		if self.page.sbBaseplate.value()  == -1: self.page.sbBaseplate.clear()
+		#if self.page.sbSensor.value()     == -1: self.page.sbSensor.clear()
+		#if self.page.sbBaseplate.value()  == -1: self.page.sbBaseplate.clear()
 
 		self.page.cbCheckCracks.setCurrentIndex(   INDEX_INSPECTION.get(self.protomodule.check_cracks    , -1))
 		self.page.cbCheckGlueSpill.setCurrentIndex(INDEX_INSPECTION.get(self.protomodule.check_glue_spill, -1))
@@ -162,29 +171,36 @@ class func(object):
 		if self.page.dsbFlatness.value() == -1: self.page.dsbFlatness.clear()
 
 		self.page.sbStepPcb.setValue(-1 if self.protomodule.step_pcb is None else self.protomodule.step_pcb)
-		self.page.sbModule.setValue( -1 if self.protomodule.module   is None else self.protomodule.module  )
+		#self.page.sbModule.setValue( -1 if self.protomodule.module   is None else self.protomodule.module  )
+		self.page.leModule.setText("" if self.protomodule.module is None else self.protomodule.module)
 		if self.page.sbStepPcb.value() == -1: self.page.sbStepPcb.clear()
-		if self.page.sbModule.value() == -1: self.page.sbModule.clear()
+		#if self.page.sbModule.value() == -1: self.page.sbModule.clear()
 
 		self.updateElements()
 
 	@enforce_mode(['view','editing','creating'])
 	def updateElements(self):
+		self.page.leStatus.setText(self.mode)
+
 		protomodule_exists = self.protomodule_exists
 		shipments_exist    = self.page.listShipments.count() > 0
 
 		step_sensor_exists = self.page.sbStepSensor.value() >=0
-		sensor_exists      = self.page.sbSensor.value()     >=0
-		baseplate_exists   = self.page.sbBaseplate.value()  >=0
+		#sensor_exists      = self.page.sbSensor.value()     >=0
+		sensor_exists      = self.page.leSensor.text()      !=""
+		#baseplate_exists   = self.page.sbBaseplate.value()  >=0
+		baseplate_exists   = self.page.leBaseplate.text()   !=""
 		step_pcb_exists    = self.page.sbStepPcb.value()    >=0
-		module_exists      = self.page.sbModule.value()     >=0
+		#module_exists      = self.page.sbModule.value()     >=0
+		module_exists      = self.page.leModule.text()      !=""
 
 		mode_view     = self.mode == 'view'
 		mode_editing  = self.mode == 'editing'
 		mode_creating = self.mode == 'creating'
 		
 		self.setMainSwitchingEnabled(mode_view)
-		self.page.sbID.setEnabled(mode_view)
+		#self.page.sbID.setEnabled(mode_view)
+		self.page.leID.setReadOnly(not mode_view)
 
 		#self.page.pbNew.setEnabled(     mode_view and not protomodule_exists )
 		self.page.pbEdit.setEnabled(    mode_view and     protomodule_exists )
@@ -225,17 +241,25 @@ class func(object):
 
 	@enforce_mode('view')
 	def startCreating(self,*args,**kwargs):
+		print("THIS IS OLD AND BROKEN; has not been updated.  Do not use this.")
 		if not self.protomodule_exists:
-			ID = self.page.sbID.value()
+		#	ID = self.page.sbID.value()
+			ID = self.page.leID.value()
 			self.mode = 'creating'
 			self.protomodule.new(ID)
 			self.updateElements()
 
 	@enforce_mode('view')
 	def startEditing(self,*args,**kwargs):
-		if self.protomodule_exists:
+		tmp_protomodule = fm.protomodule()
+		tmp_ID = self.page.leID.text()
+		tmp_exists = tmp_protomodule.load(tmp_ID)
+		if not tmp_exists:
+			self.page.leStatus.load(tmp_ID)
+		else:
+			self.protomodule = tmp_protomodule
 			self.mode = 'editing'
-			self.updateElements()
+			self.update_info()
 
 	@enforce_mode(['editing','creating'])
 	def cancelEditing(self,*args,**kwargs):
@@ -296,14 +320,18 @@ class func(object):
 	
 	@enforce_mode('view')
 	def goSensor(self,*args,**kwargs):
-		ID = self.page.sbSensor.value()
-		if ID >= 0:
+		#ID = self.page.sbSensor.value()
+		ID = self.page.leSensor.text()
+		#if ID >= 0:
+		if ID != "":
 			self.setUIPage('sensors',ID=ID)
 
 	@enforce_mode('view')
 	def goBaseplate(self,*args,**kwargs):
-		ID = self.page.sbBaseplate.value()
-		if ID >= 0:
+		#ID = self.page.sbBaseplate.value()
+		ID = self.page.leBaseplate.text()
+		#if ID >= 0:
+		if ID != "":
 			self.setUIPage('baseplates',ID=ID)
 
 	@enforce_mode('view')
@@ -314,8 +342,10 @@ class func(object):
 
 	@enforce_mode('view')
 	def goModule(self,*args,**kwargs):
-		ID = self.page.sbModule.value()
-		if ID >= 0:
+		#ID = self.page.sbModule.value()
+		ID = self.page.leModule.value()
+		#if ID >= 0:
+		if ID != "":
 			self.setUIPage('modules',ID=ID)
 		else:
 			return
@@ -326,11 +356,12 @@ class func(object):
 	def load_kwargs(self,kwargs):
 		if 'ID' in kwargs.keys():
 			ID = kwargs['ID']
-			if not (type(ID) is int):
-				raise TypeError("Expected type <int> for ID; got <{}>".format(type(ID)))
-			if ID < 0:
-				raise ValueError("ID cannot be negative")
-			self.page.sbID.setValue(ID)
+			if not (type(ID) is str):
+				raise TypeError("Expected type <str> for ID; got <{}>".format(type(ID)))
+			#if ID < 0:
+			#	raise ValueError("ID cannot be negative")
+			#self.page.sbID.setValue(ID)
+			self.page.leID.setText(ID)
 
 	@enforce_mode('view')
 	def changed_to(self):

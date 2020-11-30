@@ -189,7 +189,8 @@ class func(object):
 		self.page.lwPartList.setEnabled(       mode_creating or mode_editing  )
 		self.page.pbAddPart.setEnabled(        mode_creating or mode_editing  )
 		self.page.cbPartType.setEnabled(       mode_creating or mode_editing  )
-		self.page.sbPartID.setReadOnly(   not (mode_creating or mode_editing) )
+		#self.page.sbPartID.setReadOnly(   not (mode_creating or mode_editing) )
+		self.page.lePartID.setReadOnly(   not (mode_creating or mode_editing) )
 		self.page.pbDeleteSelected.setEnabled( mode_creating or mode_editing  )
 		
 
@@ -388,7 +389,8 @@ class func(object):
 
 	@enforce_mode(['editing','creating'])
 	def addPart(self,*args,**kwargs):  #WIP:  Ensure no duplicates, possibly the multiple shipments thing
-		partID = self.page.sbPartID.value()
+		#partID = self.page.sbPartID.value()
+		partID = self.page.lePartID.text()
 		partName = self.page.cbPartType.currentText() + " " + str(partID)
 		if partName == '':  return
 

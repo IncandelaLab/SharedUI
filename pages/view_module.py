@@ -1,3 +1,4 @@
+from filemanager import fm
 from PyQt5 import QtCore
 import time
 
@@ -111,8 +112,9 @@ class func(object):
 
 	@enforce_mode('setup')
 	def rig(self):
-		self.page.sbID.valueChanged.connect(self.update_info)
-		# Now automated
+		#self.page.sbID.valueChanged.connect(self.update_info)
+		self.page.leID.textChanged.connect(self.update_info)
+
 		#self.page.pbNew.clicked.connect(self.startCreating)
 		self.page.pbEdit.clicked.connect(self.startEditing)
 		self.page.pbSave.clicked.connect(self.saveEditing)
@@ -142,15 +144,19 @@ class func(object):
 
 
 
-	@enforce_mode('view')
+	@enforce_mode(['view', 'editing', 'creating'])
 	def update_info(self,ID=None,*args,**kwargs):
 		if ID is None:
-			ID = self.page.sbID.value()
+			#ID = self.page.sbID.value()
+			ID = self.page.leID.text()
 		else:
-			self.page.sbID.setValue(ID)
-
+			#self.page.sbID.setValue(ID)
+			self.page.leID.setText(ID)
+		
 		self.module_exists = self.module.load(ID)
 		
+		#self.page.leID.setText(self.module.ID)
+
 		# shipments and location
 		self.page.leInsertUser.setText("" if self.module.insertion_user is None else self.module.insertion_user)
 		self.page.leLocation.setText("" if self.module.location is None else self.module.location)
@@ -171,17 +177,26 @@ class func(object):
 		self.page.sbStepKapton.setValue(   -1 if self.module.step_kapton   is None else self.module.step_kapton   )
 		self.page.sbStepSensor.setValue(   -1 if self.module.step_sensor   is None else self.module.step_sensor   )
 		self.page.sbStepPcb.setValue(      -1 if self.module.step_pcb      is None else self.module.step_pcb      )
-		self.page.sbBaseplate.setValue(    -1 if self.module.baseplate     is None else self.module.baseplate     )
-		self.page.sbSensor.setValue(       -1 if self.module.sensor        is None else self.module.sensor        )
-		self.page.sbPcb.setValue(          -1 if self.module.pcb           is None else self.module.pcb           )
-		self.page.sbProtomodule.setValue(  -1 if self.module.protomodule   is None else self.module.protomodule   )
-		if self.page.sbStepKapton.value()   == -1:self.page.sbStepKapton.clear()
-		if self.page.sbStepSensor.value()   == -1:self.page.sbStepSensor.clear()
-		if self.page.sbStepPcb.value()      == -1:self.page.sbStepPcb.clear()
-		if self.page.sbBaseplate.value()    == -1:self.page.sbBaseplate.clear()
-		if self.page.sbSensor.value()       == -1:self.page.sbSensor.clear()
-		if self.page.sbPcb.value()          == -1:self.page.sbPcb.clear()
-		if self.page.sbProtomodule.value()  == -1:self.page.sbProtomodule.clear()
+		#self.page.sbBaseplate.setValue(    -1 if self.module.baseplate     is None else self.module.baseplate     )
+		#self.page.sbSensor.setValue(       -1 if self.module.sensor        is None else self.module.sensor        )
+		#self.page.sbPcb.setValue(          -1 if self.module.pcb           is None else self.module.pcb           )
+		#self.page.sbProtomodule.setValue(  -1 if self.module.protomodule   is None else self.module.protomodule   )
+		self.page.leBaseplate.setText(    "" if self.module.baseplate     is None else self.module.baseplate     )
+		self.page.leSensor.setText(       "" if self.module.sensor        is None else self.module.sensor        )
+		self.page.lePcb.setText(          "" if self.module.pcb           is None else self.module.pcb           )
+		self.page.leProtomodule.setText(  "" if self.module.protomodule   is None else self.module.protomodule   )
+		if self.page.sbStepKapton.value()   == -1:  self.page.sbStepKapton.clear()
+		if self.page.sbStepSensor.value()   == -1:  self.page.sbStepSensor.clear()
+		if self.page.sbStepPcb.value()      == -1:  self.page.sbStepPcb.clear()
+		#if self.page.sbBaseplate.value()    == -1:  self.page.sbBaseplate.clear()
+		#if self.page.sbSensor.value()       == -1:  self.page.sbSensor.clear()
+		#if self.page.sbPcb.value()          == -1:  self.page.sbPcb.clear()
+		#if self.page.sbProtomodule.value()  == -1:  self.page.sbProtomodule.clear()
+		if self.page.leBaseplate.text()    == -1:  self.page.leBaseplate.clear()
+		if self.page.leSensor.text()       == -1:  self.page.leSensor.clear()
+		if self.page.lePcb.text()          == -1:  self.page.lePcb.clear()
+		if self.page.leProtomodule.text()  == -1:  self.page.leProtomodule.clear()
+
 
 		# comments
 		self.page.listComments.clear()
@@ -273,17 +288,23 @@ class func(object):
 		step_kapton_exists   = self.page.sbStepKapton.value()    >= 0
 		step_sensor_exists   = self.page.sbStepSensor.value()    >= 0
 		step_pcb_exists      = self.page.sbStepPcb.value()       >= 0
-		baseplate_exists   = self.page.sbBaseplate.value()   >= 0
-		sensor_exists      = self.page.sbSensor.value()      >= 0
-		pcb_exists         = self.page.sbPcb.value()         >= 0
-		protomodule_exists = self.page.sbProtomodule.value() >= 0
+		#baseplate_exists   = self.page.sbBaseplate.value()   >= 0
+		#sensor_exists      = self.page.sbSensor.value()      >= 0
+		#pcb_exists         = self.page.sbPcb.value()         >= 0
+		#protomodule_exists = self.page.sbProtomodule.value() >= 0
+		baseplate_exists   = self.page.leBaseplate.text()   != ""
+		sensor_exists      = self.page.leSensor.text()      != ""
+		pcb_exists         = self.page.lePcb.text()         != ""
+		protomodule_exists = self.page.leProtomodule.text() != ""
+
 
 		mode_view     = self.mode == 'view'
 		mode_editing  = self.mode == 'editing'
 		mode_creating = self.mode == 'creating'
 
 		self.setMainSwitchingEnabled(mode_view) 
-		self.page.sbID.setEnabled(mode_view)
+		#self.page.sbID.setEnabled(mode_view)
+		self.page.leID.setReadOnly(not mode_view)
 
 		#self.page.pbNew   .setEnabled( mode_view and not module_exists )
 		self.page.pbEdit  .setEnabled( mode_view and     module_exists )
@@ -378,6 +399,7 @@ class func(object):
 
 	@enforce_mode('view')
 	def startCreating(self,*args,**kwargs):
+		print("ERROR:  This is outdated and should not be used.")
 		if not self.module_exists:
 			ID = self.page.sbID.value()
 			self.mode = 'creating'
@@ -386,9 +408,15 @@ class func(object):
 
 	@enforce_mode('view')
 	def startEditing(self,*args,**kwargs):
-		if self.module_exists:
+		tmp_module = fm.module()
+		tmp_ID = self.page.leID.text()
+		tmp_exists = tmp_module.load(tmp_ID)
+		if not tmp_exists:
+			self.page.leStatus.setText("does not exist")
+		else:
+			self.module = tmp_module
 			self.mode = 'editing'
-			self.updateElements()
+			self.update_info()
 
 	@enforce_mode(['editing','creating'])
 	def cancelEditing(self,*args,**kwargs):
@@ -509,26 +537,34 @@ class func(object):
 
 	@enforce_mode('view')
 	def goBaseplate(self,*args,**kwargs):
-		ID = self.page.sbBaseplate.value()
-		if ID>=0:
+		#ID = self.page.sbBaseplate.value()
+		#if ID>=0:
+		ID = self.page.leBaseplate.text()
+		if ID != "":
 			self.setUIPage('baseplates',ID=ID)
 
 	@enforce_mode('view')
 	def goSensor(self,*args,**kwargs):
-		ID = self.page.sbSensor.value()
-		if ID>=0:
+		#ID = self.page.sbSensor.value()
+		#if ID>=0:
+		ID = self.page.leSensor.text()
+		if ID != "":
 			self.setUIPage('sensors',ID=ID)
 
 	@enforce_mode('view')
 	def goPcb(self,*args,**kwargs):
-		ID = self.page.sbPcb.value()
-		if ID>=0:
+		#ID = self.page.sbPcb.value()
+		#if ID>=0:
+		ID = self.page.lePcb.value()
+		if ID != "":
 			self.setUIPage('PCBs',ID=ID)
 
 	@enforce_mode('view')
 	def goProtomodule(self,*args,**kwargs):
-		ID = self.page.sbProtomodule.value()
-		if ID>=0:
+		#ID = self.page.sbProtomodule.value()
+		#if ID>=0:
+		ID = self.page.leProtomodule.value()
+		if ID != "":
 			self.setUIPage('protomodules',ID=ID)
 
 	@enforce_mode('view')
@@ -578,10 +614,10 @@ class func(object):
 	def load_kwargs(self,kwargs):
 		if 'ID' in kwargs.keys():
 			ID = kwargs['ID']
-			if not (type(ID) is int):
-				raise TypeError("Expected type <int> for ID; got <{}>".format(type(ID)))
-			if ID < 0:
-				raise ValueError("ID cannot be negative")
+			if not (type(ID) is str):
+				raise TypeError("Expected type <str> for ID; got <{}>".format(type(ID)))
+			#if ID < 0:
+			#	raise ValueError("ID cannot be negative")
 			self.page.sbID.setValue(ID)
 
 	@enforce_mode('view')

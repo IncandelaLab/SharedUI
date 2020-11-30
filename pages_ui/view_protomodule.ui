@@ -592,25 +592,6 @@
     <string>Go to</string>
    </property>
   </widget>
-  <widget class="QSpinBox" name="sbSensor">
-   <property name="geometry">
-    <rect>
-     <x>450</x>
-     <y>120</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-   <property name="minimum">
-    <number>-1</number>
-   </property>
-   <property name="maximum">
-    <number>2147483647</number>
-   </property>
-  </widget>
   <widget class="QLineEdit" name="lineEdit_12">
    <property name="geometry">
     <rect>
@@ -641,25 +622,6 @@
    </property>
    <property name="readOnly">
     <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QSpinBox" name="sbModule">
-   <property name="geometry">
-    <rect>
-     <x>420</x>
-     <y>380</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-   <property name="minimum">
-    <number>-1</number>
-   </property>
-   <property name="maximum">
-    <number>2147483647</number>
    </property>
   </widget>
   <widget class="QLineEdit" name="lineEdit_13">
@@ -763,25 +725,6 @@
    </property>
    <property name="text">
     <string>Go to</string>
-   </property>
-  </widget>
-  <widget class="QSpinBox" name="sbBaseplate">
-   <property name="geometry">
-    <rect>
-     <x>450</x>
-     <y>140</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-   <property name="minimum">
-    <number>-1</number>
-   </property>
-   <property name="maximum">
-    <number>2147483647</number>
    </property>
   </widget>
   <widget class="QSpinBox" name="sbStepPcb">
@@ -1050,6 +993,54 @@
     <string>Note:  protomodules are automatically created upon completion of a sensor step.</string>
    </property>
    <property name="wordWrap">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="leBaseplate">
+   <property name="geometry">
+    <rect>
+     <x>450</x>
+     <y>140</y>
+     <width>81</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="leSensor">
+   <property name="geometry">
+    <rect>
+     <x>450</x>
+     <y>120</y>
+     <width>81</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="leModule">
+   <property name="geometry">
+    <rect>
+     <x>420</x>
+     <y>380</y>
+     <width>81</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="readOnly">
     <bool>true</bool>
    </property>
   </widget>

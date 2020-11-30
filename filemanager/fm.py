@@ -119,7 +119,7 @@ class fsobj(object):
 		# filedir now depends on date information, defined upon first save() and stored via add_part_to_list
 		with open(self.partlistfile, 'r') as opfl:
 			data = json.load(opfl)
-			date = data[ID]
+			date = data[str(ID)]
 
 		filedir = os.sep.join([ DATADIR, self.FILEDIR.format(ID=ID, date=date) ])
 		filename = self.FILENAME.format(ID=ID)
@@ -138,7 +138,7 @@ class fsobj(object):
 				# Note creation date and pass it to the dict
 				dcreated = time.localtime()
 				if self.ID == None:  print("ERROR:  self.ID in add_part_to_list is None!!!")
-				data[self.ID] = '{}-{}-{}'.format(dcreated.tm_mon, dcreated.tm_mday, dcreated.tm_year)
+				data[str(self.ID)] = '{}-{}-{}'.format(dcreated.tm_mon, dcreated.tm_mday, dcreated.tm_year)
 		with open(self.partlistfile, 'w') as opfl:
 			json.dump(data, opfl)
 
@@ -174,15 +174,11 @@ class fsobj(object):
 
 
 	def load(self, ID, on_property_missing = "warn"):
-		print("Loading!  ID = ".format(ID))
 		part_name = self.__class__.__name__
 		self.partlistfile = os.sep.join([ DATADIR, 'partlist', part_name+'s.json' ])
 		with open(self.partlistfile, 'r') as opfl:
 			data = json.load(opfl)
-			print("Partlistfile data:  ", data)
-			print("ID: ", ID)
-			if not ID in data.keys():
-				print("Failed to load:  Not in partlistfile!")
+			if not str(ID) in data.keys():
 				self.clear()
 				return False
 		# (else:)
@@ -193,13 +189,11 @@ class fsobj(object):
 
 		filedir, filename = self.get_filedir_filename(ID)
 		file = os.sep.join([filedir, filename])
-		print("Searching for file {}".format(file))
 
 		if not os.path.exists(file):
 			self.clear()
 			return False
 
-		print("Loading file:")
 		with open(file, 'r') as opfl:
 			data = json.load(opfl)
 
@@ -673,7 +667,7 @@ class baseplate(fsobj):
 		"shipments", # list of shipments that this part has been in
 
 		# characteristics (defined upon reception)
-		"serial",   # serial given by manufacturer or distributor.
+		#"serial",   # serial given by manufacturer or distributor.
 		"barcode",
 		"manufacturer", # name of company that manufactured this part
 		"material",     # physical material
@@ -921,8 +915,8 @@ class baseplate(fsobj):
 
 class sensor(fsobj):
 	OBJECTNAME = "sensor"
-	FILEDIR = os.sep.join(['sensors','{century}'])
-	FILENAME = "sensor_{ID:0>5}.json"
+	FILEDIR = os.sep.join(['sensors','{date}'])
+	FILENAME = "sensor_{ID}.json"
 	PROPERTIES = [
 		# shipments and location
 		"institution",
@@ -930,7 +924,7 @@ class sensor(fsobj):
 		"shipments", # list of shipments that this part has been in
 
 		# characteristics (defined upon reception)
-		"serial",   # 
+		#"serial",
 		"barcode",
 		#"manufacturer", # REMOVED; apparently this is all the same?
 		"type",         # NEW:  This is now chosen from a drop-down menu
@@ -1000,18 +994,18 @@ class sensor(fsobj):
 		# CREATE XML FILE OBJECT:
 		xml_tree = self.generate_xml(root_dict)
 
+		# Save json (order fixed):
+		super(sensor, self).save()
+
 		# Save:
 		self.save_xml(xml_tree)
 		
-		# Save old json file:
-		super(sensor, self).save()
-
 
 
 class pcb(fsobj):
 	OBJECTNAME = "PCB"
-	FILEDIR = os.sep.join(['pcbs','{century}','pcb_{ID:0>5}'])
-	FILENAME = "pcb_{ID:0>5}.json"
+	FILEDIR = os.sep.join(['pcbs','{date}','pcb_{ID}'])
+	FILENAME = "pcb_{ID}.json"
 	PROPERTIES = [
 		# shipments and location
 		"institution",
@@ -1020,7 +1014,7 @@ class pcb(fsobj):
 
 		# details / measurements / characteristics
 		"insertion_user",
-		"serial",   # NEW
+		#"serial",   # NEW
 		"barcode",  # NEW
 		"manufacturer", # 
 		"type",         # 
@@ -1107,12 +1101,12 @@ class pcb(fsobj):
 		# CREATE XML FILE OBJECT:
 		xml_tree = self.generate_xml(root_dict)
 
+		# Order changed:
+		super(pcb, self).save()
+
 		# Save:
 		self.save_xml(xml_tree)
 		
-		# Save old json file:
-		super(pcb, self).save()
-
 		# From old save():
 		filedir, filename = self.get_filedir_filename(self.ID)
 		if not os.path.exists(os.sep.join([filedir, self.DAQ_DATADIR])):
@@ -1134,8 +1128,8 @@ class pcb(fsobj):
 
 class protomodule(fsobj):
 	OBJECTNAME = "protomodule"
-	FILEDIR = os.sep.join(['protomodules','{century}'])
-	FILENAME = 'protomodule_{ID:0>5}.json'
+	FILEDIR = os.sep.join(['protomodules','{date}'])
+	FILENAME = 'protomodule_{ID}.json'
 	PROPERTIES = [
 		# shipments and location
 		"institution",
@@ -1182,8 +1176,8 @@ class protomodule(fsobj):
 
 class module(fsobj):
 	OBJECTNAME = "module"
-	FILEDIR    = os.sep.join(['modules','{century}','module_{ID:0>5}'])
-	FILENAME   = 'module_{ID:0>5}.json'
+	FILEDIR    = os.sep.join(['modules','{date}','module_{ID}'])
+	FILENAME   = 'module_{ID}.json'
 	PROPERTIES = [
 		# shipments and location
 		"institution",
@@ -1300,88 +1294,6 @@ class module(fsobj):
 			self.daq_data = [_ for _ in os.listdir(daq_datadir) if os.path.isfile(os.sep.join([daq_datadir,_]))]
 		else:
 			self.daq_data = []
-	"""  WIP
-	def load(self, ID):
-		root = Element('ROOT')
-		tree = ElementTree(root)
-		root.set('xmlns:xsi','http://www.w3.org/2001/XMLSchema-instance')
-		header = Element('HEADER')
-		root.append(header)
-		typ = Element('TYPE')
-		header.append(typ)
-		ext = Element('EXTENSION_TABLE_NAME')
-		typ.append(ext)
-		ext.text = 'HGC_PRTO_MOD_ASMBLY'
-		name = Element('NAME')
-		name.text = 'HGC Six Inch Proto Module Assembly'
-		typ.append(name)
-		run = Element('RUN')
-		header.append(run)
-		run_name = Element('RUN_NAME')
-		run_name.text = 'HGC 6inch Proto Module Assembly'
-		run.append(run_name)
-		run_begin = Element('RUN_BEGIN_TIMESTAMP')
-		run_begin.text = 'time'
-		run.append(run_begin)
-		run_end = Element('RUN_END_TIMESTAMP')
-		run_end.text = 'time'
-		run.append(run_end)
-		user = Element('INITIATED_BY_USER')
-		user.text = self.my_name
-		run.append(user)
-		loc = Element('LOCATION')
-		loc.text = self.modules[2]
-		run.append(loc)
-		comment = Element('COMMENT_DESCRIPTION')
-		comment.text = 'Build 6inch proto modules'
-		run.append(comment)
-		dataset = Element('DATA_SET')
-		root.append(dataset)
-		comment2 = Element('COMMENT_DESCRIPTION')
-		dataset.append(comment2)
-		comment2.text = 'Proto-module' + str(self.modules[0]) + 'Assembly'
-		version = Element('VERSION')
-		dataset.append(version)
-		version.text = '1'
-		part = Element('PART')
-		dataset.append(part)
-		kop = Element('KIND_OF_PART')
-		part.append(kop)
-		kop.text = 'HGC Six Inch Silicon Proto Module'
-		SN = Element('SERIAL_NUMBER')
-		part.append(SN)
-		SN.text = 'Proto-module' + str(self.modules[0])
-		data = Element('DATA')
-		dataset.append(data)
-		data_fields = ['ASMBL_TRAY_NAME','PRTO_SER_NUM','PRTO_ASM_COL','PRTO_ASM_ROW','COMP_TRAY_NAME','PCB_SER_NUM','PCB_THKNES_MM',
-						'PCB_CMP_ROW','PCB_CMP_COL','PCB_TOOL_NAME','PCB_TOOL_NAME','PCB_TOOL_HT_SET','PCB_TOOL_HT_CHK','GLUE_TYPE','GLUE_BATCH_NUM']                      
-		data_text = ['UCSB_ASMBLY_TRAY_00','proto-module'+ self.modules[0],'1','1','UCSB_COMP_TRAY_00','pcb'+self.modules[1],
-						'1','1','0.0001','0.0001','0.0002', 'UCSB_PCKUP_TOOL_11','GLUE','Batch1']
-		counter = 0
-		while counter < len(data_fields):
-			elem = Element(data_fields[counter])
-			elem.text = data_text[counter]
-			data.append(elem)
-			counter += 1
-		tree.write(open('module.xml','wb'))
-
-		# Save .json file using the old save() function:
-		super(baseplate, self).save()
-
-		# Save .xml file:
-		# Store in same directory as .json files, w/ same name:
-		filedir, filename = self.get_filedir_filename(self.ID)
-		#filename = self.FILENAME.format(ID=self.ID)  #Copied from get_filedir_filename()
-		print("Saving file to ", filedir+'/'+filename.replace('.json', '.xml'))
-		tree.write(open(filedir+'/'+filename.replace('.json', '.xml'), 'wb'))
-		print('Created baseplate XML file')
-
-
-		success = super(module, self).load(ID)
-		if success:
-			self.fetch_datasets()
-		return success
-	"""
 
 
 	def save(self):
@@ -1508,7 +1420,7 @@ class module(fsobj):
 
 class step_kapton(fsobj):
 	OBJECTNAME = "kapton step"
-	FILEDIR    = os.sep.join(['steps','kapton','{century}'])
+	FILEDIR    = os.sep.join(['steps','kapton','{date}'])
 	FILENAME   = 'kapton_assembly_step_{ID:0>5}.json'
 	PROPERTIES = [
 		'user_performed', # name of user who performed step
@@ -1570,7 +1482,7 @@ class step_kapton(fsobj):
 
 class step_sensor(fsobj):
 	OBJECTNAME = "sensor step"
-	FILEDIR    = os.sep.join(['steps','sensor','{century}'])
+	FILEDIR    = os.sep.join(['steps','sensor','{date}'])
 	FILENAME   = 'sensor_assembly_step_{ID:0>5}.json'
 	PROPERTIES = [
 		'user_performed', # name of user who performed step
@@ -1820,7 +1732,7 @@ class step_sensor(fsobj):
 
 class step_pcb(fsobj):
 	OBJECTNAME = "PCB step"
-	FILEDIR = os.sep.join(['steps','pcb','{century}'])
+	FILEDIR = os.sep.join(['steps','pcb','{date}'])
 	FILENAME = 'pcb_assembly_step_{ID:0>5}.json'
 	PROPERTIES = [
 		'user_performed', # name of user who performed step
@@ -1923,7 +1835,7 @@ class step_pcb(fsobj):
 
 class batch_araldite(fsobj):
 	OBJECTNAME = "araldite batch"
-	FILEDIR = os.sep.join(['supplies','batch_araldite','{century}'])
+	FILEDIR = os.sep.join(['supplies','batch_araldite','{date}'])
 	FILENAME = 'batch_araldite_{ID:0>5}.json'
 	PROPERTIES = [
 		'date_received',
@@ -1934,7 +1846,7 @@ class batch_araldite(fsobj):
 
 class batch_loctite(fsobj):
 	OBJECTNAME = "loctite batch"
-	FILEDIR = os.sep.join(['supplies','batch_loctite','{century}'])
+	FILEDIR = os.sep.join(['supplies','batch_loctite','{date}'])
 	FILENAME = 'batch_loctite_{ID:0>5}.json'
 	PROPERTIES = [
 		'date_received',
@@ -1945,7 +1857,7 @@ class batch_loctite(fsobj):
 
 class batch_sylgard_thick(fsobj):
 	OBJECTNAME = "sylgard (thick) batch"
-	FILEDIR = os.sep.join(['supplies','batch_sylgard_thick','{century}'])
+	FILEDIR = os.sep.join(['supplies','batch_sylgard_thick','{date}'])
 	FILENAME = 'batch_sylgard_thick_{ID:0>5}.json'
 	PROPERTIES = [
 		'date_received',
@@ -1956,7 +1868,7 @@ class batch_sylgard_thick(fsobj):
 
 class batch_sylgard_thin(fsobj):
 	OBJECTNAME = "sylgard (thin) batch"
-	FILEDIR = os.sep.join(['supplies','batch_sylgard_thin','{century}'])
+	FILEDIR = os.sep.join(['supplies','batch_sylgard_thin','{date}'])
 	FILENAME = 'batch_sylgard_thin_{ID:0>5}.json'
 	PROPERTIES = [
 		'date_received',
@@ -1967,7 +1879,7 @@ class batch_sylgard_thin(fsobj):
 
 class batch_bond_wire(fsobj):
 	OBJECTNAME = "bond wire batch"
-	FILEDIR = os.sep.join(['supplies','batch_bond_wire','{century}'])
+	FILEDIR = os.sep.join(['supplies','batch_bond_wire','{date}'])
 	FILENAME = 'batch_bond_wire_{ID:0>5}.json'
 	PROPERTIES = [
 		'date_received',
