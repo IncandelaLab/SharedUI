@@ -249,7 +249,7 @@ class func(object):
 			ID = self.page.leID.text()
 			self.pcb.new(ID)
 			self.mode = 'creating'
-			self.update_info()
+			self.updateElements()
 		else:
 			self.page.leStatus.setText("already exists")
 

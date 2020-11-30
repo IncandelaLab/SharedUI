@@ -283,7 +283,7 @@ class func(object):
 			ID = self.page.leID.text()
 			self.baseplate.new(ID)
 			self.mode = 'creating'  # update_info needs mode==view
-			self.update_info()  # Automatically calls updateElements() too
+			self.updateElements()
 		else:
 			# pass
 			self.page.leStatus.setText("already exists")
@@ -309,6 +309,7 @@ class func(object):
 
 	@enforce_mode(['editing','creating'])
 	def saveEditing(self,*args,**kwargs):
+		print("SAVING, ID=", self.baseplate.ID)
 
 		self.baseplate.shape          = str(self.page.cbShape.currentText())       if str(self.page.cbShape.currentText())       else None
 		self.baseplate.chirality      = str(self.page.cbChirality.currentText())   if str(self.page.cbChirality.currentText())   else None
@@ -332,7 +333,6 @@ class func(object):
 		self.baseplate.check_glue_spill = str(self.page.cbCheckGlueSpill.currentText()) if str(self.page.cbCheckGlueSpill.currentText()) else None
 		self.baseplate.kapton_flatness  =     self.page.dsbKaptonFlatness.value()       if self.page.dsbKaptonFlatness.value() >=0       else None
 
-		
 		self.baseplate.save()
 		self.mode = 'view'
 		self.update_info()

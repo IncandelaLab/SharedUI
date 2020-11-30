@@ -545,9 +545,13 @@ class func(object):
 
 	@enforce_mode(['editing','creating'])
 	def cancelEditing(self,*args,**kwargs):
+		print("CANCELLING")
 		self.unloadAllObjects()
+		print("UPDATED OBJECTS, changing mode to view")
 		self.mode = 'view'
+		print("Updating info")
 		self.update_info()
+		print("Updated info")
 
 	@enforce_mode(['editing','creating'])
 	def saveEditing(self,*args,**kwargs):

@@ -868,7 +868,7 @@ class baseplate(fsobj):
 	def save(self):  #NEW for XML generation
 		
 		# FIRST:  If not all necessary vars are defined, don't save the XML file.
-		required_vars = [self.size, self.serial, self.comments, self.location, self.institution]
+		required_vars = [self.size, self.comments, self.location, self.institution]
 		#contents = vars(self)
 		for vr in required_vars:
 			if vr is None:
@@ -881,11 +881,11 @@ class baseplate(fsobj):
 		# TAKE 2:  This time, use gen_xml(input_dict) to streamline things.
 		# Match XML schema in  https://cmsdca.cern.ch/hgc_loader/hgc/int2r/doc/doc#type_part
 		part_dict = {
-			'PART_ID':               str(self.ID),
+			#'PART_ID':               str(self.ID),  
 			'KIND_OF_PART':          'HGC {} Inch Kaptonized Plate'.format('Six' if self.size=='6' else 'Eight'),
 			'MANUFACTURER':          self.manufacturer,
 			'BARCODE':               'PLACEHOLDERVAL',
-			'SERIAL_NUMBER':         self.serial,
+			'SERIAL_NUMBER':         str(self.ID),
 			'VERSION':               self.material,   #THIS MAY BE WRONG
 			'LOCATION':              self.location,
 			'INSTITUTION':           self.institution,
@@ -978,7 +978,7 @@ class sensor(fsobj):
 			'KIND_OF_PART':          'HPK {} Inch {} Cell Silicon Sensor'.format('Six' if self.size=='6'
 																				else 'Eight', self.channels),
 			'RECORD_INSERTION_USER': self.insertion_user,   # NOTE:  This may have to be redone when XML uploading is implemented!
-			'SERIAL_NUMBER':         self.serial,
+			'SERIAL_NUMBER':         self.ID,
 			'COMMENT_DESCRIPTION':   self.comments,   # Note:  Requires special treatment
 			'LOCATION':              self.location,
 			'MANUFACTURER':          "DUMMY_MANUFACTURER", #self.manufacturer,

@@ -1,6 +1,5 @@
 from filemanager import fm
 from main_ui.mainwindow import Ui_MainWindow
-#from PyQt4 import QtGui as gui, QtCore as core
 from PyQt5 import QtGui as gui, QtCore as core, QtWidgets as wdgt
 import sys
 import time
