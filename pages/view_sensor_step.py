@@ -705,10 +705,11 @@ class func(object):
 		self.step_sensor.user_performed = str( self.page.leUserPerformed.text() )
 		self.step_sensor.location = str( self.page.leLocation.text() )
 
-		if self.page.dtRunStart.date().year() == NO_DATE[0]:
-			self.step_sensor.run_start = None
-		else:
-			self.step_sensor.run_start = self.page.dtRunStart.dateTime().toTime_t()
+		# Honestly not sure what the point of this part is...
+		#if self.page.dtRunStart.date().year() == NO_DATE[0]:
+		#	self.step_sensor.run_start = None
+		#else:
+		self.step_sensor.run_start = self.page.dtRunStart.dateTime().toTime_t()
 
 
 		self.step_sensor.cure_humidity    = str(self.page.leCureHumidity.text())
@@ -760,8 +761,8 @@ class func(object):
 				temp_protomodule.chirality      = self.baseplates[i].chirality
 
 				temp_protomodule.step_sensor    = self.step_sensor.ID
-				temp_protomodule.baseplate      = self.baseplates[i].serial
-				temp_protomodule.sensor         = self.sensors[i].serial
+				temp_protomodule.baseplate      = self.baseplates[i].ID
+				temp_protomodule.sensor         = self.sensors[i].ID
 				temp_protomodule.step_kapton    = self.baseplates[i].step_kapton
 
 				temp_protomodule.save()

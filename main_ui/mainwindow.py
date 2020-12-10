@@ -155,7 +155,7 @@ class Ui_MainWindow(object):
         item = self.listAssembly.item(2)
         item.setText(_translate("MainWindow", "PCB placement steps"))
         item = self.listAssembly.item(3)
-        item.setText(_translate("MainWindow", "wirebonding and encapuslating"))
+        item.setText(_translate("MainWindow", "wirebonding and encapsulating"))
         item = self.listAssembly.item(4)
         item.setText(_translate("MainWindow", "unbiased DAQ"))
         item = self.listAssembly.item(5)

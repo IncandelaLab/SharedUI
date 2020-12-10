@@ -560,10 +560,10 @@ class func(object):
 		self.step_kapton.user_performed = str( self.page.leUserPerformed.text() )
 		self.step_kapton.location       = str( self.page.leLocation.text() )
 
-		if self.page.dtRunStart.date().year() == NO_DATE[0]:
-			self.step_kapton.run_start = None
-		else:
-			self.step_kapton.run_start = self.page.dtRunStart.dateTime().toTime_t()
+		#if self.page.dtRunStart.date().year() == NO_DATE[0]:
+		#	self.step_kapton.run_start = None
+		#else:
+		self.step_kapton.run_start = self.page.dtRunStart.dateTime().toTime_t()
 
 		self.step_kapton.cure_humidity    = str(self.page.leCureHumidity.text())
 		self.step_kapton.cure_temperature = str(self.page.leCureTemperature.text())

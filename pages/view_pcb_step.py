@@ -722,10 +722,10 @@ class func(object):
 		self.step_pcb.user_performed = str( self.page.leUserPerformed.text() )
 		self.step_pcb.location = str( self.page.leLocation.text() )
 
-		if self.page.dtRunStart.date().year() == NO_DATE[0]:
-			self.step_pcb.run_start = None
-		else:
-			self.step_pcb.run_start = self.page.dtRunStart.dateTime().toTime_t()
+		#if self.page.dtRunStart.date().year() == NO_DATE[0]:
+		#	self.step_pcb.run_start = None
+		#else:
+		self.step_pcb.run_start = self.page.dtRunStart.dateTime().toTime_t()
 
 
 		self.step_pcb.cure_humidity    = str(self.page.leCureHumidity.text())

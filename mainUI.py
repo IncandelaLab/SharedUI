@@ -21,6 +21,7 @@ from pages.search           import func as cls_func_search
 from pages.view_kapton_step import func as cls_func_view_kapton_step
 from pages.view_sensor_step import func as cls_func_view_sensor_step
 from pages.view_pcb_step    import func as cls_func_view_pcb_step
+from pages.view_wirebonding import func as cls_func_view_wirebonding
 
 from pages.view_tooling     import func as cls_func_view_tooling
 from pages.view_supplies    import func as cls_func_view_supplies
@@ -91,6 +92,12 @@ class widget_view_pcb_step(wdgt.QWidget, form_view_pcb_step):
 		super(widget_view_pcb_step,self).__init__(parent)
 		self.setupUi(self)
 
+from pages_ui.view_wirebonding import Ui_Form as form_view_wirebonding
+class widget_view_wirebonding(wdgt.QWidget, form_view_wirebonding):
+	def __init__(self,parent):
+		super(widget_view_wirebonding,self).__init__(parent)
+		self.setupUi(self)
+
 
 from pages_ui.view_tooling import Ui_Form as form_view_tooling
 class widget_view_tooling(wdgt.QWidget, form_view_tooling):
@@ -134,9 +141,9 @@ PAGE_IDS = {
 	'kapton placement steps' : 8,
 	'sensor placement steps' : 9,
 	'PCB placement steps'    : 10,
-	#'wirebonding and encapsulating' : 11,
+	'wirebonding and encapsulating' : 11,
 
-	'shipments'               :11, #WARNING:  Order has been switched
+	'shipments'               :12, #WARNING:  Order has been switched
 	# 'IV curve'               :11,
 }
 
@@ -189,7 +196,7 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		self.page_view_kapton_step = widget_view_kapton_step(None) ; self.swPages.addWidget(self.page_view_kapton_step)
 		self.page_view_sensor_step = widget_view_sensor_step(None) ; self.swPages.addWidget(self.page_view_sensor_step)
 		self.page_view_pcb_step    = widget_view_pcb_step(None)    ; self.swPages.addWidget(self.page_view_pcb_step)
-
+		self.page_view_wirebonding = widget_view_wirebonding(None) ; self.swPages.addWidget(self.page_view_wirebonding)
 
 
 		# self.page_routine_iv       = widget_routine_iv(None)       ; self.swPages.addWidget(self.page_routine_iv)
@@ -207,6 +214,7 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		self.func_view_kapton_step = cls_func_view_kapton_step(      fm, self.page_view_kapton_step, self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_sensor_step = cls_func_view_sensor_step(      fm, self.page_view_sensor_step, self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_pcb_step    = cls_func_view_pcb_step(         fm, self.page_view_pcb_step   , self.setUIPage, self.setSwitchingEnabled)
+		self.func_view_wirebonding = cls_func_view_wirebonding(      fm, self.page_view_wirebonding, self.setUIPage, self.setSwitchingEnabled)
 
 		self.func_view_tooling     = cls_func_view_tooling(          fm, self.page_view_tooling    , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_supplies    = cls_func_view_supplies(         fm, self.page_view_supplies   , self.setUIPage, self.setSwitchingEnabled)
@@ -229,6 +237,7 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 			self.func_view_kapton_step,
 			self.func_view_sensor_step,
 			self.func_view_pcb_step,
+			self.func_view_wirebonding,
 
 			self.func_shipment,  #WARNING:  Order has been switched.
 			# self.func_routine_iv,

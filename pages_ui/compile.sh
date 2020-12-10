@@ -7,7 +7,7 @@ pwd
 for f in "view_module" "view_baseplate" "view_sensor" "view_PCB" \
     "view_protomodule" "view_kapton_step" "view_sensor_step" \
     "view_pcb_step" "view_tooling" "view_supplies" \
-    "view_shipment" "routine_iv" "search" \
+    "view_shipment" "routine_iv" "search" "view_wirebonding"\
     "../main_ui/mainwindow"
 do
     command="pyuic5 $f.ui -o $f.py"

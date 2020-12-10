@@ -1085,7 +1085,7 @@ class pcb(fsobj):
 		part_dict = {
 			'KIND_OF_PART':          'HGC {} Inch {} Channel PCB'.format('Six' if self.size=='6' else 'Eight', self.channels),
 			'RECORD_INSERTION_USER': self.insertion_user,   # NOTE:  This may have to be redone when XML uploading is implemented!
-			'SERIAL_NUMBER':         self.serial,
+			'SERIAL_NUMBER':         self.ID,
 			'COMMENT_DESCRIPTION':   self.comments,   # Note:  Requires special treatment
 			'LOCATION':              self.location,
 			'MANUFACTURER':          self.manufacturer,
@@ -1187,12 +1187,10 @@ class module(fsobj):
 		# characteristics - taken from child parts upon creation of module
 		"insertion_user",
 		"thickness",   # sum of protomodule and sensor, plus glue gap
-		#"num_kaptons", # from protomodule # Removed, no longer necessary
 		"channels",    # from protomodule or pcb (identical)
 		"size",        # from protomodule or pcb (identical)
 		"shape",       # from protomodule or pcb (identical)
 		"chirality",   # from protomodule or pcb (identical)
-		#"rotation",    # from protomodule or pcb (identical)
 		# initial location is also filled from child parts
 
 		# components and steps - filled upon creation
@@ -1201,45 +1199,75 @@ class module(fsobj):
 		"protomodule",   # 
 		"pcb",           # 
 		"step_kapton",   # 
-		#"step_kapton_2", # Removed, no longer necessary
 		"step_sensor",   # 
 		"step_pcb",      # 
 
 		# module qualification
 		"check_glue_spill",        # None if not yet checked; True if passed; False if failed
-		"check_glue_edge_contact", # None if not yet checked; True if passed; False if failed
-		"unbonded_daq",      # name of dataset
-		"unbonded_daq_user", # who performed test
-		"unbonded_daq_ok",   # whether the output passes muster
+		#"check_glue_edge_contact", # None if not yet checked; True if passed; False if failed
+		#"unbonded_daq",      # name of dataset
+		#"unbonded_daq_user", # who performed test
+		#"unbonded_daq_ok",   # whether the output passes muster
 
 		# wirebonding
-		"wirebonding",                # has wirebonding been done
-		"wirebonding_unbonded_sites", # list of sites that were not wirebonded
-		"wirebonding_user",           # who performed wirebonding
+		# NEW: NOTE:  This info is filled out using the wirebonding page exclusively!
+		"wirebonding_comments",  # Comments from wirebonding page only
+
+		# back wirebonding
+		"wirebonding_back",                # has wirebonding been done
+		"wirebonding_unbonded_channels_back", # list of sites that were not wirebonded
+		"wirebonding_user_back",           # who performed wirebonding
+		"wirebonds_inspected_back",     # whether inspection has happened
+		"wirebonds_damaged_back",       # list of damaged bonds found during inspection
+		"wirebonds_repaired_back",      # have wirebonds been repaired
+		"wirebonds_repaired_list_back", # list of wirebonds succesfully repaired
+		"wirebonds_repaired_user_back", # who repaired bonds
+
+
+		# front wirebonding
+		"wirebonding_front",                # has wirebonding been done
+		"wirebonding_skip_channels_front",  # list of channels to ignore
+		"wirebonding_unbonded_channels_front", # list of sites that were not wirebonded
+		"wirebonding_user_front",           # who performed wirebonding
+		"wirebonds_inspected_front",     # whether inspection has happened
+		"wirebonds_damaged_front",       # list of damaged bonds found during inspection
+		"wirebonds_repaired_front",      # have wirebonds been repaired
+		"wirebonds_repaired_list_front", # list of wirebonds succesfully repaired
+		"wirebonds_repaired_user_front", # who repaired bonds
+
+		"wirebonding_shield",
+		"wirebonding_guard",
+
+
+		# back encapsulation
+		"encapsulation_back",             # has encapsulation been done
+		"encapsulation_user_back",        # who performed encapsulation
+		"encapsulation_cure_start_back", # (unix) time at start of encapsulation
+		"encapsulation_cure_stop_back",  # (unix) time at end of encapsulation
+		"encapsulation_inspection_back", # None if not yet inspected; True if pased; False if failed
+
+		# front encapsulation
+		"encapsulation_front",             # has encapsulation been done
+		"encapsulation_user_front",        # who performed encapsulation
+		"encapsulation_cure_start_front", # (unix) time at start of encapsulation
+		"encapsulation_cure_stop_front",  # (unix) time at end of encapsulation
+		"encapsulation_inspection_front", # None if not yet inspected; True if pased; False if failed
+
+		# test bonds
 		"test_bonds",             # is this a module for which test bonds will be done?
 		"test_bonds_pulled",      # have test bonds been pulled
 		"test_bonds_pulled_user", # who pulled test bonds
 		"test_bonds_pulled_ok",   # is result of test bond pulling ok
-		"test_bonds_rebonded",      # have test bonds been rebonded
-		"test_bonds_rebonded_user", # who rebonded test bonds
-		"test_bonds_rebonded_ok",   # is result of rebonding test bonds ok
-		"wirebonds_inspected",     # whether inspection has happened
-		"wirebonds_damaged",       # list of damaged bonds found during inspection
-		"wirebonds_repaired",      # have wirebonds been repaired
-		"wirebonds_repaired_list", # list of wirebonds succesfully repaired
-		"wirebonds_repaired_user", # who repaired bonds
+		#"test_bonds_rebonded",      # have test bonds been rebonded
+		#"test_bonds_rebonded_user", # who rebonded test bonds
+		#"test_bonds_rebonded_ok",   # is result of rebonding test bonds ok
+
 
 		# wirebonding qualification
 		"wirebonding_final_inspection",
 		"wirebonding_final_inspection_user",
 		"wirebonding_final_inspection_ok",
 
-		# encapsulation
-		"encapsulation",             # has encapsulation been done
-		"encapsulation_user",        # who performed encapsulation
-		"encapsulation_cure_start", # (unix) time at start of encapsulation
-		"encapsulation_cure_stop",  # (unix) time at end of encapsulation
-		"encapsulation_inspection", # None if not yet inspected; True if pased; False if failed
 
 		# module qualification (final)
 		"hv_cables_attached",      # have HV cables been attached
@@ -1266,6 +1294,7 @@ class module(fsobj):
 
 	DEFAULTS = {
 		"shipments":[],
+		'wirebonding_comments':[],
 		'iv_data':[],
 		'daq_data':[],
 		"size":    '8',
@@ -1472,10 +1501,10 @@ class step_kapton(fsobj):
 					print("*WARNING:  ready_step_kapton should prevent this from working!")
 					assert(False)
 
-
-			else:
-				if not (self.baseplates[i] is None):
-					print("step_kapton {} cannot write to baseplate {}: does not exist".format(self.ID, self.baseplates[i]))
+			# Unnecessary code; this would only activate on empty rows and do nothing
+			#else:
+			#	if not (self.baseplates[i] is None):
+			#		print("step_kapton {} cannot write to baseplate {}: does not exist".format(self.ID, self.baseplates[i]))
 
 
 
