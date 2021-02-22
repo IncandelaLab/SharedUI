@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '../main_ui/mainwindow.ui'
+# Form implementation generated from reading ui file 'mainwindow.ui'
 #
 # Created by: PyQt5 UI code generator 5.9.2
 #
@@ -80,7 +80,7 @@ class Ui_MainWindow(object):
         spacerItem2 = QtWidgets.QSpacerItem(20, 25, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.vlUISelect.addItem(spacerItem2)
         self.pbUpload = QtWidgets.QPushButton(self.centralwidget)
-        self.pbUpload.setEnabled(False)
+        self.pbUpload.setEnabled(True)
         self.pbUpload.setObjectName("pbUpload")
         self.vlUISelect.addWidget(self.pbUpload)
         spacerItem3 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)

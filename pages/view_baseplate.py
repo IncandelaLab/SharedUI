@@ -246,6 +246,7 @@ class func(object):
 		self.page.leInsertUser.setReadOnly(    not (mode_creating or mode_editing) )
 		self.page.leBarcode.setReadOnly(       not (mode_creating or mode_editing) )
 		self.page.leManufacturer.setReadOnly(  not (mode_creating or mode_editing) )
+		self.page.cbMaterial.setEnabled(            mode_creating or mode_editing  )
 		self.page.leLocation.setReadOnly(      not (mode_creating or mode_editing) )
 		self.page.dsbNomThickness.setReadOnly( not (mode_creating or mode_editing) )
 

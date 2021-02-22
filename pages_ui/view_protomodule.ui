@@ -583,7 +583,7 @@
    <property name="geometry">
     <rect>
      <x>500</x>
-     <y>380</y>
+     <y>400</y>
      <width>51</width>
      <height>21</height>
     </rect>
@@ -612,7 +612,7 @@
    <property name="geometry">
     <rect>
      <x>330</x>
-     <y>380</y>
+     <y>400</y>
      <width>91</width>
      <height>21</height>
     </rect>
@@ -676,7 +676,7 @@
    <property name="geometry">
     <rect>
      <x>330</x>
-     <y>340</y>
+     <y>360</y>
      <width>111</width>
      <height>16</height>
     </rect>
@@ -731,7 +731,7 @@
    <property name="geometry">
     <rect>
      <x>420</x>
-     <y>360</y>
+     <y>380</y>
      <width>81</width>
      <height>21</height>
     </rect>
@@ -750,7 +750,7 @@
    <property name="geometry">
     <rect>
      <x>330</x>
-     <y>360</y>
+     <y>380</y>
      <width>91</width>
      <height>21</height>
     </rect>
@@ -766,7 +766,7 @@
    <property name="geometry">
     <rect>
      <x>500</x>
-     <y>360</y>
+     <y>380</y>
      <width>51</width>
      <height>21</height>
     </rect>
@@ -780,12 +780,12 @@
     <rect>
      <x>330</x>
      <y>210</y>
-     <width>181</width>
+     <width>191</width>
      <height>21</height>
     </rect>
    </property>
    <property name="text">
-    <string>Translational offset (μm)</string>
+    <string>x translational offset (μm)</string>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -795,8 +795,8 @@
    <property name="geometry">
     <rect>
      <x>330</x>
-     <y>230</y>
-     <width>181</width>
+     <y>250</y>
+     <width>191</width>
      <height>21</height>
     </rect>
    </property>
@@ -811,8 +811,8 @@
    <property name="geometry">
     <rect>
      <x>330</x>
-     <y>250</y>
-     <width>181</width>
+     <y>270</y>
+     <width>191</width>
      <height>21</height>
     </rect>
    </property>
@@ -827,8 +827,8 @@
    <property name="geometry">
     <rect>
      <x>330</x>
-     <y>270</y>
-     <width>181</width>
+     <y>290</y>
+     <width>191</width>
      <height>21</height>
     </rect>
    </property>
@@ -843,8 +843,8 @@
    <property name="geometry">
     <rect>
      <x>330</x>
-     <y>290</y>
-     <width>181</width>
+     <y>310</y>
+     <width>191</width>
      <height>21</height>
     </rect>
    </property>
@@ -868,10 +868,10 @@
     <string>Protomodule qualification</string>
    </property>
   </widget>
-  <widget class="QDoubleSpinBox" name="dsbOffsetTranslation">
+  <widget class="QDoubleSpinBox" name="dsbOffsetTranslationX">
    <property name="geometry">
     <rect>
-     <x>510</x>
+     <x>520</x>
      <y>210</y>
      <width>81</width>
      <height>21</height>
@@ -893,8 +893,8 @@
   <widget class="QDoubleSpinBox" name="dsbOffsetRotation">
    <property name="geometry">
     <rect>
-     <x>510</x>
-     <y>230</y>
+     <x>520</x>
+     <y>250</y>
      <width>81</width>
      <height>21</height>
     </rect>
@@ -915,8 +915,8 @@
   <widget class="QDoubleSpinBox" name="dsbFlatness">
    <property name="geometry">
     <rect>
-     <x>510</x>
-     <y>250</y>
+     <x>520</x>
+     <y>270</y>
      <width>81</width>
      <height>21</height>
     </rect>
@@ -937,8 +937,8 @@
   <widget class="QComboBox" name="cbCheckCracks">
    <property name="geometry">
     <rect>
-     <x>510</x>
-     <y>270</y>
+     <x>520</x>
+     <y>290</y>
      <width>81</width>
      <height>20</height>
     </rect>
@@ -960,8 +960,8 @@
   <widget class="QComboBox" name="cbCheckGlueSpill">
    <property name="geometry">
     <rect>
-     <x>510</x>
-     <y>290</y>
+     <x>520</x>
+     <y>310</y>
      <width>81</width>
      <height>20</height>
     </rect>
@@ -1032,7 +1032,7 @@
    <property name="geometry">
     <rect>
      <x>420</x>
-     <y>380</y>
+     <y>400</y>
      <width>81</width>
      <height>20</height>
     </rect>
@@ -1042,6 +1042,44 @@
    </property>
    <property name="readOnly">
     <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_24">
+   <property name="geometry">
+    <rect>
+     <x>330</x>
+     <y>230</y>
+     <width>191</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>y translational offset (μm)</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QDoubleSpinBox" name="dsbOffsetTranslationY">
+   <property name="geometry">
+    <rect>
+     <x>520</x>
+     <y>230</y>
+     <width>81</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="minimum">
+    <double>-1.000000000000000</double>
+   </property>
+   <property name="maximum">
+    <double>2147483647.000000000000000</double>
+   </property>
+   <property name="singleStep">
+    <double>0.100000000000000</double>
    </property>
   </widget>
  </widget>

@@ -3,11 +3,11 @@ from main_ui.mainwindow import Ui_MainWindow
 from PyQt5 import QtGui as gui, QtCore as core, QtWidgets as wdgt
 import sys
 import time
-
+import os
 
 # FOR DATABASE UPLOADING:
 from cmsdbldr_client import LoaderClient
-
+import atexit  # Close ssh tunnel upon exiting the GUI
 
 
 # Import page functionality classes
@@ -181,6 +181,21 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 	
 		self.timer_setup()
 
+		# NEW:  Set up ssh tunnel for DB access!
+		# First, request username:
+		ldlg = UserDialog(self)
+		loginResult = ldlg.exec_()
+		while loginResult != 1:  # was if
+			print("Username request cancelled!  Trying again...")
+			loginResult = ldlg.exec_()
+		print("Got username:  ",  ldlg.getUsername())
+		username = ldlg.getUsername()
+		os.system('ssh -f -N -M -S temp_socket -L 10131:itrac1609-v.cern.ch:10121 -L 10132:itrac1601-v.cern.ch:10121 {}@lxplus.cern.ch'.format(username))
+		# Close upon exiting
+		def close_ssh():
+			os.system('ssh -S temp_socket -O exit lxplus.cern.ch')
+		atexit.register(close_ssh)
+
 
 	def setupPagesUI(self):
 		self.page_search           = widget_search(None)           ; self.swPages.addWidget(self.page_search)
@@ -353,6 +368,10 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		# If username+password given, submit.
 		# BUT:  How can username/password be fed to loader?
 
+		# NEW:
+		# Find directory w/ a certain date, and upload ALL files in it.
+
+		# OUTDATED:
 		# FIRST:  Check to see whether there's any modified XML files
 		xmlStepList = [self.func_view_baseplate, self.func_view_sensor, self.func_view_PCB, self.func_view_sensor_step]
 		xmlFilesModified = 0
@@ -382,6 +401,48 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 			print("Upload unsuccessful!")
 
 
+# Class for requesting GUI username at start (for ssh tunnel)
+class UserDialog(wdgt.QDialog):
+	def __init__(self, *args, **kwargs):
+		super(UserDialog, self).__init__(*args, **kwargs)
+
+		self.setWindowTitle("SSH tunnel:  username required")
+		
+		self.textName = wdgt.QLineEdit(self)
+		self.buttonLogin = wdgt.QPushButton('Connect', self)
+		self.buttonCancel = wdgt.QPushButton('Cancel', self)
+		self.buttonLogin.clicked.connect(self.handleLogin)
+		self.buttonCancel.clicked.connect(self.handleCancel)
+		layout = wdgt.QVBoxLayout(self)
+		layout.addWidget(self.textName)
+		layout.addWidget(self.buttonLogin)
+		layout.addWidget(self.buttonCancel)
+
+		self.cancelled = False
+
+	def handleLogin(self):
+		self.username = self.textName.text()
+		print("Got username {}".format(self.username))
+		
+		if self.username != "":
+			self.accept()
+		else:
+			self.reject()
+
+	def handleCancel(self):
+		print("Login canceled")
+		self.username = None
+		self.cancelled = True
+		self.reject()
+
+	def isCancelled(self):
+		return self.cancelled
+
+	def getUsername(self):
+		return self.username
+
+
+# Class for DB upload login
 class LoginDialog(wdgt.QDialog):
 
 	def __init__(self, *args, **kwargs):
@@ -407,10 +468,18 @@ class LoginDialog(wdgt.QDialog):
 		username = self.textName.text()
 		password = self.textPass.text()
 		print("Got username {}, password {}".format(username, password))
-		
+		print("TEMP:  May need to authenticate in terminal")
+
 		# PERFORM ATTEMPTED UPLOAD
 		# If all good, then:
-		self.accept()
+		#for f in :
+		#	lc = LoaderClient(["--url", "https://cmsdca.cern.ch/hgc_loader/hgc/int2r", "--login", "--verbose", f])
+		#	load_status = lc.run()
+
+		#if load_status == 0:
+		#	self.accept()
+
+		#self.accept()
 		# Otherwise...
 		# self.reject()
 

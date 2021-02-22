@@ -2,6 +2,7 @@ import os
 import json
 import numpy
 import time
+import subprocess
 
 #NEW for xml file generation:
 from PyQt5 import QtCore
@@ -11,6 +12,10 @@ from xml.etree.ElementTree import ElementTree
 from xml.etree.ElementTree import Element
 from xml.etree.ElementTree import parse
 import csv
+
+import rhapi as rh
+from xml.dom import minidom
+
 
 BASEPLATE_MATERIALS_NO_KAPTON = ['pcb']
 
@@ -74,6 +79,88 @@ def loadconfig(file=None):
 				json.dump({}, opfl)
 
 loadconfig()
+
+
+
+
+### THIS IS PRELIMINARY ###
+
+###############################################
+#### Function to request XML files from DB ####
+###############################################
+
+# Request all files from the DB that match the search conditions.
+# Download all results, place them in the correct directory
+#    (Should be done according to date later on)
+# Also, call translate_XML...
+
+# ***MAJOR QUESTION:***  Download json files instead of XML, then convert?  Easier to read...
+
+def request_XML(table_name, search_conditions=None):
+	# For now, MUST set up ssh tunnel manually.  Will ask for suggestions on this.
+	open_SSH_tunnel()
+
+	# MAYBE LATER:
+	# First, make sure that the ssh tunnel has been set up.
+	# If not, request username and set it up!
+
+	# sshtunnel package has some awkward dependencies...don't want to use this if possible.
+
+	sql_template = 'select * from hgc_int2r.{} p'
+
+	sql_request = sql_template.format(table_name)
+	if not search_conditions is None:
+		sql_request = sql_request + ' where'
+		# search_conditions is a dict:  {param_name:param_value}
+		for param, value in search_conditions.items():
+			sql_request = sql_request + ' {}={}'.format(param, value)
+	print("TEMP:  Using sql command")
+	print(sql_request)
+
+	try:
+		data = api.xml(sql_request, verbose=True)
+	except rh.RhApiRowLimitError as e:
+		print("Error:  Could not download files from DB:")
+		print(e)
+		return False
+
+	api = rh.RhApi(url='https://cmsdca.cern.ch/hgc_rhapi', debug=True, sso='login')
+	xml_string = minidom.parseString(data).toprettyxml(indent="    ")
+	# Output is an empty XML file, header len 61
+	if len(xml_str) < 62:
+		print("No files match the search criteria")
+		return False
+	
+	downloaded_files = []
+
+	if downloaded_files:
+		for f in downloaded_files:
+			translate_XML(f)
+		return True
+	else:
+		return False
+
+# Accepts a path to a XML file
+# Load the file, determine the object name, then convert to a json file
+#    ...then save that json file to the correct location (based on date)
+def translate_XML(filename):
+	tree = ElementTree()
+	tree.parse(filename)
+	# NOTE:  It's probably easier to just load the data into the corresp object,
+	# then save it...
+	# ...unless there's a general approach?  (Probably not...)
+	# MAYBE:  Create dict of all field:var pairs?  For each json var, search through
+	#         entire XML file for corresponding field.
+	#         (Other way wouldn't work; XML has structure)
+	#         - would need a case to handle multiple fields (comments, etc)
+
+# Functionality moved to main:
+#def open_SSH_tunnel():
+#	# Open up a tunnel for DB access:
+#	# ssh -L 10131:itrac1609-v.cern.ch:10121 -L 10132:itrac1601-v.cern.ch:10121 phmaster@lxplus.cern.ch
+#	# NOTE:  This will probably need revision.  Just want "good enough" for now.
+#	subprocess.run(["ssh", "-L", "10131:itrac1609-v.cern.ch:10121", "-L", "10132:itrac1601-v.cern.ch:10121", "{}@lxplus.cern.ch".format(username)])
+
 
 
 
@@ -1014,15 +1101,16 @@ class pcb(fsobj):
 
 		# details / measurements / characteristics
 		"insertion_user",
-		#"serial",   # NEW
-		"barcode",  # NEW
+		"barcode", 
 		"manufacturer", # 
 		"type",         # 
+		"resolution_type", # NEW
+		"num_rocs",     # NEW
 		"size",         # 
 		"channels",     # 
 		"shape",        # 
 		"chirality",    # 
-		#"rotation",     # 
+
 
 		# pcb qualification
 		"daq",        # name of dataset
@@ -1154,7 +1242,8 @@ class protomodule(fsobj):
 		"step_kapton", # ID of kapton step (from baseplate)
 
 		# protomodule qualification
-		"offset_translation", # translational offset of placement
+		"offset_translation_x", # translational offset of placement
+		"offset_translation_y",
 		"offset_rotation",    # rotation offset of placement
 		"flatness",           # flatness of sensor surface after curing
 		"check_cracks",       # None if not yet checked; True if passed; False if failed
@@ -1483,6 +1572,19 @@ class step_kapton(fsobj):
 			return self.cure_stop - self.cure_start
 	"""
 
+	# New:  Convert time_t to correctly-formatted date string
+	@property
+	def run_start_xml(self):
+		if self.run_start is None:
+			return None
+		localtime = list(time.localtime(self.run_start))
+		qdate = QtCore.QDate(*localtime[0:3])
+		qtime = QtCore.QTime(*localtime[3:6])
+		datestr = "{}-{}-{} {}:{}:{}".format(qdate.year(), qdate.month(), qdate.day(), \
+                                             qtime.hour(), qtime.minute(), qtime.second())
+		return datestr
+
+
 	def save(self):
 		super(step_kapton, self).save()
 		inst_baseplate = baseplate()
@@ -1549,6 +1651,19 @@ class step_sensor(fsobj):
 			return self.cure_stop - self.cure_start
 	"""
 
+	# New:  Convert time_t to correctly-formatted date string
+	@property
+	def run_start_xml(self):
+		if self.run_start is None:
+			return None
+		localtime = list(time.localtime(self.run_start))
+		qdate = QtCore.QDate(*localtime[0:3])
+		qtime = QtCore.QTime(*localtime[3:6])
+		datestr = "{}-{}-{} {}:{}:{}".format(qdate.year(), qdate.month(), qdate.day(), \
+                                             qtime.hour(), qtime.minute(), qtime.second())
+		return datestr
+
+
 	# WIP
 
 	def save(self):
@@ -1567,6 +1682,8 @@ class step_sensor(fsobj):
 		# Grab an arbitrary baseplate to get the size
 		baseplate_ = baseplate()
 		baseplate_.load(self.baseplates[0])
+
+
 		type_dict = {
 						'EXTENSION_TABLE_NAME':'HGC_PRTO_MOD_ASMBLY',
 						'NAME':'HGC {} Inch Proto Module Assembly'.format('Six' if baseplate_.size==6 else 'Eight'),
@@ -1574,7 +1691,7 @@ class step_sensor(fsobj):
 		run_dict =  {
 						'RUN_TYPE':'HGC {}inch Proto Module Assembly'.format(baseplate_.size),
 						'RUN_NUMBER':str(self.ID),
-						'RUN_BEGIN_TIMESTAMP':str(self.run_start),
+						'RUN_BEGIN_TIMESTAMP':self.run_start_xml,
 						'RUN_END_TIMESTAMP':"PLACEHOLDER", #self.run_stop,
 						'INITIATED_BY_USER':self.user_performed,
 						'LOCATION':", ".format(self.institution, self.location),
@@ -1691,18 +1808,18 @@ class step_sensor(fsobj):
 								'SNSR_CMP_COL':str((i % 2) + 1),   #Should == PLT_ASM_ROW, etc above
 								
 								# NOTE:  I assume these are measured during the placement step, not taken from view_sensor.ui.  Need to check.
-								'SNSR_X_OFFST':'TEMP',  #NOTE:  WIP
-								'SNSR_Y_OFFSET':'TEMP',  #NOTE:  WIP
-								'SNSR_ANG_OFFSET':'TEMP',  #NOTE:  WIP
+								'SNSR_X_OFFST':str(inst_protomodule.offset_translation_x),  #NOTE:  WIP
+								'SNSR_Y_OFFST':str(inst_protomodule.offset_translation_y),  #NOTE:  WIP
+								'SNSR_ANG_OFFSET':str(snsr.offset_rotation),  #NOTE:  WIP
 								'SNSR_TOOL_NAME':'{}_PCKUP_TOOL_{}'.format(snsr_tool.location, snsr_tool.ID),
 								'SNSR_TOOL_HT_SET':'TEMP',  #NOTE:  Also WIP
 								'SNSR_TOOL_HT_CHK':'TEMP',
 								
 								# Need to test QDate.year--should work if type(date_received)==QDate
-								'GLUE_TYPE':'Araldite {}'.format(glue_batch.date_received[0]),
-								'GLUE_BATCH_NUM':str(self.batch_araldite),
+								'GLUE_TYPE':'Araldite',   # {}".format(glue_batch.date_received[0]),
+								'GLUE_BATCH_NUM':'Batch_{:03d}'.format(self.batch_araldite),
 								'SLVR_EPXY_TYPE':'Loctite Ablestik',
-								'SLVR_EXPY_BATCH_NUM':str(self.batch_loctite),
+								'SLVR_EXPY_BATCH_NUM':'Batch_{:03d}'.format(self.batch_loctite),
 							}
 					part_dict = {
 								'KIND_OF_PART':'HGC {} Inch Silicon Proto Module'.format('Six' if snsr.size==6 else 'Eight'),
@@ -1770,7 +1887,7 @@ class step_pcb(fsobj):
 		'location', #Institution where step was performed
 		
 		'run_start',  # unix time @ start of run
-		'run_stop',   # unix time @ start of run
+		#'run_stop',   # unix time @ start of run
 		
 		'cure_start',       # unix time @ start of curing
 		'cure_stop',        # unix time @ end of curing
@@ -1787,13 +1904,28 @@ class step_pcb(fsobj):
 		'batch_araldite',     # ID of araldite batch used
 	]
 
-
+	"""
 	@property
 	def cure_duration(self):
 		if (self.cure_stop is None) or (self.cure_start is None):
 			return None
 		else:
 			return self.cure_stop - self.cure_start
+	"""
+
+	# New:  Convert time_t to correctly-formatted date string
+	@property
+	def run_start_xml(self):
+		if self.run_start is None:
+			return None
+		localtime = list(time.localtime(self.run_start))
+		qdate = QtCore.QDate(*localtime[0:3])
+		qtime = QtCore.QTime(*localtime[3:6])
+		datestr = "{}-{}-{} {}:{}:{}".format(qdate.year(), qdate.month(), qdate.day(), \
+                                             qtime.hour(), qtime.minute(), qtime.second())
+		return datestr
+
+
 
 	def save(self):
 		super(step_pcb,self).save()
