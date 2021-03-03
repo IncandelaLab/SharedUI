@@ -44,8 +44,11 @@ class simple_fsobj_vc(object):
 		if self.fsobj_exists:
 			self.pbEditNew.setText("edit")
 
-			self.dReceived.setDate(QtCore.QDate(*self.fsobj.date_received))
-			self.dExpires.setDate(QtCore.QDate(*self.fsobj.date_expires))
+			# Load date:
+			ydm = self.fsobj.date_received.split('-')
+			self.dReceived.setDate(QtCore.QDate(ydm[0], ydm[1], ydm[2]))  #*self.fsobj.date_received))
+			ydm = self.fsobj.date_expires.split('-')
+			self.dExpires.setDate(QtCore.QDate(ydm[0], ydm[1], ydm[2]))   #*self.fsobj.date_expires))
 
 			self.ckIsEmpty.setChecked(self.fsobj.is_empty)
 
@@ -78,8 +81,10 @@ class simple_fsobj_vc(object):
 			comments.append(self.listComments.item(i).text())
 		self.fsobj.comments = comments
 
-		self.fsobj.date_received = self.dReceived.date().getDate()
-		self.fsobj.date_expires  = self.dExpires.date().getDate()
+		dateR = self.dReceived.date()
+		self.fsobj.date_received = "{}-{}-{}".format(dateR.year(), dateR.month(), dateR.day())  #self.dReceived.date().getDate()
+		dateE = self.dExpires.date()
+		self.fsobj.date_expires  = "{}-{}-{}".format(dateE.year(), dateE.month(), dateE.day())  #self.dExpires.date().getDate()
 
 		self.fsobj.is_empty = self.ckIsEmpty.isChecked()
 

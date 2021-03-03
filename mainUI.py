@@ -174,7 +174,12 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		print("Rigging UI...")
 		self.rig()
 		print("Finished rigging UI.")
-		self.setUIPage('baseplates')
+
+		# NOTE:  This has been temporarily changed!
+		#self.setUIPage('baseplates')
+		self.setUIPage('tooling')
+
+
 		#self.setUIPage('search for parts')
 
 		self.setWindowTitle("Module Assembly User Interface")

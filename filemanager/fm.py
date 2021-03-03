@@ -11,6 +11,7 @@ import xml.etree.ElementTree as etree
 from xml.etree.ElementTree import ElementTree
 from xml.etree.ElementTree import Element
 from xml.etree.ElementTree import parse
+from xml.etree.ElementTree import tostring
 import csv
 
 import rhapi as rh
@@ -59,6 +60,7 @@ def loadconfig(file=None):
 			))
 
 	# NEW for searching:  Need to store list of all searchable object IDs.  Easiest approach is to dump a list via json.
+	print("CALLING LOADCONFIG")
 	partlistdir = os.sep.join([DATADIR, 'partlist'])
 	if not os.path.exists(partlistdir):
 		os.makedirs(partlistdir)
@@ -69,6 +71,7 @@ def loadconfig(file=None):
 	obj_list = ['baseplate', 'sensor', 'pcb', 'protomodule', 'module', 'shipment',
 				'batch_araldite', 'batch_loctite', 'batch_sylgard_thick',
 				'batch_sylgard_thin', 'batch_bond_wire',
+				'tool_sensor', 'tool_pcb', 'tray_assembly', 'tray_component_sensor', 'tray_component_pcb',
 				'step_kapton', 'step_sensor', 'step_pcb']
 	for part in obj_list:
 		fname = os.sep.join([partlistdir, part+'s.json'])
@@ -191,6 +194,11 @@ class fsobj(object):
 		'baseplate':'HGC Eight Inch Plate',  #COMPLICATION
 	}
 
+	# NEW
+	XML_STRUCT_DICT = None  # Should not use the base class!
+
+	# List of all class vars that are saved as a list--e.g. comments, shipment parts, etc.
+	ITEMLIST_LIST = ['comments']
 
 	def __init__(self):
 		super(fsobj, self).__init__()
@@ -230,6 +238,8 @@ class fsobj(object):
 			json.dump(data, opfl)
 
 
+	# NOW OUTDATED; see below for new version
+	"""
 	def save(self, objname = 'fsobj'):  #NOTE:  objname param is new
 		# NOTE:  Can't check item existence via filepath existence, bc filepath isn't known until after item creation!
 		# Instead, go into partlist dict and check to see whether item exists:
@@ -240,16 +250,15 @@ class fsobj(object):
 			if not self.ID in data.keys():
 				# Object does not exist, so can't get filedir from get_filedir_filename()
 				# ...until the date has been set via add_part_to_list.  Do that now.
-				self.add_part_to_list()
-				
+				self.add_part_to_list()				
 
 		filedir, filename = self.get_filedir_filename(self.ID)
 		file = os.sep.join([filedir, filename])
 		if not os.path.exists(filedir):
 			os.makedirs(filedir)
-		#if not os.path.exists(file):  # Now redundant w/ above
-		#	self.add_part_to_list()
 
+
+		# OLD, FOR JSON:
 		with open(file, 'w') as opfl:
 			if hasattr(self, 'PROPERTIES_DO_NOT_SAVE'):
 				contents = vars(self)
@@ -257,8 +266,25 @@ class fsobj(object):
 				json.dump(filtered_contents, opfl, indent=4)
 			else:
 				json.dump(vars(self), opfl, indent=4)
+		"""
 
-
+	# Utility used for load():  Set vars of obj using struct_dict, xml_tree
+	def _load_from_dict(self, struct_dict, xml_tree):
+		for item_name, item in struct_dict.items():
+			# item_name = XML tag name, item = name of var/prop to assign
+			if type(item) is dict:
+				self._load_from_dict(item, xml_tree)
+			# If item must be stored as a list in the class:
+			elif item in self.ITEMLIST_LIST:  #len(xml_tree.findall(item_name)) > 1:  # If multiple items found:
+				print("FOUND COMMENTS/LIST.  Assigning...")
+				print("Searching for items:", item_name)  # Search tree recursively, not just child elements
+				itemdata = xml_tree.findall('.//'+item_name)  # List of all contents of matching tags
+				itemdata = [it.text for it in itemdata]
+				print("Itemdata is now", itemdata)
+				setattr(self, item, itemdata)  # Should be a list containing contents; just assign it to the var
+			else:
+				itemdata = xml_tree.find('.//'+item_name)
+				setattr(self, item, itemdata)
 
 	def load(self, ID, on_property_missing = "warn"):
 		part_name = self.__class__.__name__
@@ -270,17 +296,35 @@ class fsobj(object):
 				return False
 		# (else:)
 
-		#if ID == -1:
-		#	self.clear()
-		#	return False
-
-		filedir, filename = self.get_filedir_filename(ID)
-		file = os.sep.join([filedir, filename])
-
-		if not os.path.exists(file):
+		if ID == -1:
 			self.clear()
 			return False
 
+		filedir, filename = self.get_filedir_filename(ID)
+		xml_file = os.sep.join([filedir, filename])
+
+		if not os.path.exists(xml_file):
+			self.clear()
+			return False
+
+		xml_tree = parse(xml_file)
+
+		# USE XML_STRUCT_DICT to find vars in the XML tree and assign them to vars/properties
+		# Changes:
+		# - Don't need to worry about PROPERTIES_DO_NOT_SAVE; ignore them
+		# - ...can basically ignorne the below, because the new method is radically different
+
+		# Recursively look through dict.  For each element found, assign XML value to corresponding var/property.
+		# - If dict, recusive case.
+		# - If list, create multiple elements w/ same tag.
+		# - Else assign normally.
+
+		self._load_from_dict(self.XML_STRUCT_DICT, xml_tree)
+
+		return True
+
+		# OUTDATED; needs to be updated for new XML-only method
+		"""
 		with open(file, 'r') as opfl:
 			data = json.load(opfl)
 
@@ -333,6 +377,8 @@ class fsobj(object):
 						raise ValueError(err)
 
 		return True
+		"""
+
 
 
 	def new(self, ID):
@@ -352,6 +398,8 @@ class fsobj(object):
 		# For clearing, we don't check or set defaults
 		# All properties, including ID, are set to None
 		# Attempts to use an object when it has been cleared are meant to produce errors
+
+
 
 
 	def generate_xml(self, input_dict):
@@ -385,20 +433,27 @@ class fsobj(object):
 		parent = Element(element_name)
 		
 		for item_name, item in input_dict.items():
+			# CHANGE FOR NEW XML SYSTEM:
+			# item is a list (comments), dict (another XML layer), or string (var)
+			# If string, use getattr()
+
 			if type(item) == dict:
 				# Recursive case: Create an element from the child dictionary.
 				child = self.dict_to_element(item, item_name)
 				parent.append(child)
-			elif type(item) == list:
+			elif type(getattr(self, item, None)) == list:  #type(item) == list:
 				# Base case 1:  List of comments.  Create an element for each one.
-				for comment in item:
+				print("Found comment list: ", getattr(self, item, None))
+				for comment in getattr(self, item, None):
 					child = Element(item_name)
 					child.text = comment
 					parent.append(child)
 			else:
 				# Base case 2:
 				child = Element(item_name)
-				child.text = item
+				child.text = str(getattr(self, item, None))  # item should be the var name!
+				# This SHOULD work with properties!
+				print("    Creating element {} with contents {}".format(item_name, child.text))
 				parent.append(child)
 				# Special case for PARTs:
 				if item_name == 'PART':
@@ -407,18 +462,46 @@ class fsobj(object):
 		return parent
 
 
-	# NEW--to avoid repetition
-	# Must be implemented separately for tools, if those are eventually needed...
-	def save_xml(self, xml_tree):
+	# NEWLY REWORKED
+	# Should be fully general--all objects can use this if XML_STRUCT_DICT works.
+	# Need separate implementation for tools?
+	# NOTE:  Can pass new_struct_dict if multiple XML files must be saved for a part/assembly step.
+	def save(self, new_struct_dict=None, new_fname=None):  #save_xml(self, xml_tree):
+		if new_struct_dict is None and not new_fname is None:
+			print("ERROR IN SAVE():  Got a new struct dict, but not a corresponding filename!")
+
+		# NOTE:  Can't check item existence via filepath existence, bc filepath isn't known until after item creation!
+		# Instead, go into partlist dict and check to see whether item exists:
+		part_name = self.__class__.__name__
+		self.partlistfile = os.sep.join([ DATADIR, 'partlist', part_name+'s.json' ])
+		with open(self.partlistfile, 'r') as opfl:
+			data = json.load(opfl)
+			if not self.ID in data.keys():
+				# Object does not exist, so can't get filedir from get_filedir_filename()
+				# ...until the date has been set via add_part_to_list.  Do that now.
+				self.add_part_to_list()
+		# Now redundant
+		#filedir, filename = self.get_filedir_filename(self.ID)
+		#file = os.sep.join([filedir, filename])
+		#if not os.path.exists(filedir):
+		#	os.makedirs(filedir)
+
+		# Generate XML tree:
+		struct_dict = self.XML_STRUCT_DICT if new_struct_dict is None else new_struct_dict
+		xml_tree = self.generate_xml(struct_dict)  #self.XML_STRUCT_DICT)
+
 		# Save xml file:
 		# Store in same directory as .json files, w/ same name:
-		filedir, filename = self.get_filedir_filename(self.ID)
-		filename = filename.replace('.json', '.xml')
+		filedir, filename = self.get_filedir_filename()  # self.ID) # shouldn't need this
+		#filename = filename.replace('.json', '.xml')
 		if not os.path.exists(filedir):
 			os.makedirs(filedir)
 		print("Saving XML file to ", filedir+'/'+filename)
-		xml_tree.write(open(filedir+'/'+filename.replace('.json', '.xml'), 'wb'))
-
+		root = xml_tree.getroot()
+		xmlstr = minidom.parseString(tostring(root)).toprettyxml(indent = '    ')  #tostring imported from xml.etree.ElementTree
+		#xml_tree.write(open(filedir+'/'+filename), 'wb')  #.replace('.json', '.xml'), 'wb'))
+		with open(filedir+'/'+filename, 'w') as f:
+			f.write(xmlstr)
 
 
 
@@ -430,13 +513,17 @@ class fsobj(object):
 
 
 class fsobj_tool(fsobj):
-	"""PROPERTIES_COMMON = {
+
+	# This is the same for all tools!
+	XML_STRUCT_DICT = {'TOOL':{
+		'ID':'ID',
+		'INSTITUTION':'institution',
+		'COMMENT':'comments'
+	}}
+
+	PROPERTIES = [
 		'institution',
 	]
-
-	DEFAULTS_COMMON = {
-		'institution':None,
-	}"""
 
 	# NEW--used only for tooling parts.
 	def get_filedir_filename(self, ID = None, institution = None):
@@ -451,98 +538,10 @@ class fsobj_tool(fsobj):
 		filename = self.FILENAME.format(ID=ID, institution=institution)
 		return filedir, filename
 
-	def save(self):
 
-		#NOTE:  Tools require special treatment.
-		#       IDs are NOT unique.  ID+location is unique.  Need to use this instead to name the file.
-		filedir, filename = self.get_filedir_filename(self.ID, self.institution)
-		file = os.sep.join([filedir, filename])
-		if not os.path.exists(filedir):
-			os.makedirs(filedir)
+	# save() should work as usual; get_filedir_filename can be called without args
 
-		with open(file, 'w') as opfl:
-			if hasattr(self, 'PROPERTIES_DO_NOT_SAVE'):
-				contents = vars(self)
-				filtered_contents = {_:contents[_] for _ in contents.keys() if _ not in self.PROPERTIES_DO_NOT_SAVE}
-				json.dump(filtered_contents, opfl, indent=4)
-			else:
-				json.dump(vars(self), opfl, indent=4)
-
-	
-	def load(self, ID, institution, on_property_missing = "warn"):
-		# NOTE:  May have to be redone for XML.
-		if ID == -1:
-			self.clear()
-			return False
-		if institution == None:
-			self.clear()
-			return False
-
-		# Main difference is here:
-		filedir, filename = self.get_filedir_filename(ID, institution)
-		file = os.sep.join([filedir, filename])
-
-		if not os.path.exists(file):
-			self.clear()
-			return False
-
-		with open(file, 'r') as opfl:
-			data = json.load(opfl)
-
-		if not (data['ID'] == ID):
-			err = "ID in data file ({}) does not match ID of filename ({})".format(data['ID'],ID)
-			raise ValueError(err)
-		if not (data['institution'] == institution):
-			err = "institution in data file ({}) does not match institution of filename ({})".format(data['institution'], institution)
-
-		self.ID = ID
-		self.institution = institution
-
-		data_keys = data.keys()
-		PROPERTIES = self.PROPERTIES + self.PROPERTIES_COMMON
-		DEFAULTS = {**self.DEFAULTS_COMMON, **getattr(self, 'DEFAULTS', {})}
-
-		props_in_data = [prop in data_keys for prop in PROPERTIES]
-		if hasattr(self, "PROPERTIES_DO_NOT_SAVE"):
-			props_in_pdns = [prop in self.PROPERTIES_DO_NOT_SAVE for prop in PROPERTIES]
-		else:
-			props_in_pdns = [False for prop in PROPERTIES]
-
-		for i,prop in enumerate(PROPERTIES):
-			prop_in_data = props_in_data[i]
-			prop_in_pdns = props_in_pdns[i]
-
-			if prop_in_data:
-
-				if prop_in_pdns:
-					err = "object {} with ID {} data file {} has property {}, which is in PROPERTIES_DO_NOT_SAVE".format(type(self).__name__, ID, file, prop)
-					raise ValueError(err)
-
-				else:
-					setattr(self, prop, data[prop])
-
-			else:
-				prop_default = DEFAULTS[prop] if prop in DEFAULTS.keys() else None
-
-				if prop_in_pdns:
-					setattr(self, prop, prop_default)
-
-				else:
-					if on_property_missing == "warn":
-						print("Warning: object {} with ID {} missing property {}. Setting to {}.".format(type(self).__name__, ID, prop, prop_default))
-						setattr(self, prop, prop_default)
-					elif on_property_missing == "error":
-						err = "object {} with ID {} missing property {}".format(type(self).__name__, ID, prop)
-						raise ValueError(err)
-					elif on_property_missing == "no_warn":
-						setattr(self, prop, prop_default)
-					else:
-						err = "object {} with ID {} missing property {}. on_property_missing is {}; should be 'warn', 'error', or 'no_warn'".format(type(self).__name__, ID, prop, on_property_missing)
-						raise ValueError(err)
-
-		return True
-
-
+	# So should load()...I think?
 
 	def new(self, ID, institution):
 		self.ID = ID
@@ -571,11 +570,13 @@ class tool_sensor(fsobj_tool):
 	OBJECTNAME = "sensor tool"
 	FILEDIR = os.sep.join(['tooling','tool_sensor'])
 	#FILENAME = 'tool_sensor_{ID:0>5}.json'
-	FILENAME = 'tool_sensor_{institution}_{ID:0>5}.json'
+	FILENAME = 'tool_sensor_{institution}_{ID:0>5}.xml'
 	PROPERTIES = [
 		#'size',
 		'location',
 	]
+
+
 
 	# NOTE:  This and below objects must be saved with save_tooling(), not save().
 
@@ -584,7 +585,7 @@ class tool_pcb(fsobj_tool):
 	OBJECTNAME = "PCB tool"
 	FILEDIR = os.sep.join(['tooling','tool_pcb'])
 	#FILENAME = 'tool_pcb_{ID:0>5}.json'
-	FILENAME = 'tool_pcb_{institution}_{ID:0>5}.json'
+	FILENAME = 'tool_pcb_{institution}_{ID:0>5}.xml'
 	PROPERTIES = [
 		#'size',  # Removed; everything should be 8 in
 		'location',
@@ -595,7 +596,7 @@ class tray_assembly(fsobj_tool):
 	OBJECTNAME = "assembly tray"
 	FILEDIR = os.sep.join(['tooling','tray_assembly'])
 	#FILENAME = 'tray_assembly_{ID:0>5}.json'
-	FILENAME = 'tray_assembly_{institution}_{ID:0>5}.json'
+	FILENAME = 'tray_assembly_{institution}_{ID:0>5}.xml'
 	PROPERTIES = [
 		#'size',
 		'location',
@@ -606,7 +607,7 @@ class tray_component_sensor(fsobj_tool):
 	OBJECTNAME = "sensor tray"
 	FILEDIR = os.sep.join(['tooling','tray_component_sensor'])
 	#FILENAME = 'tray_component_sensor_{ID:0>5}.json'
-	FILENAME = 'tray_component_sensor_{institution}_{ID:0>5}.json'
+	FILENAME = 'tray_component_sensor_{institution}_{ID:0>5}.xml'
 	PROPERTIES = [
 		#'size',
 		'location',
@@ -617,7 +618,7 @@ class tray_component_pcb(fsobj_tool):
 	OBJECTNAME = "pcb tray"
 	FILEDIR = os.sep.join(['tooling','tray_component_pcb'])
 	#FILENAME = 'tray_component_pcb_{ID:0>5}.json'
-	FILENAME = 'tray_component_pcb_{institution}_{ID:0>5}.json'
+	FILENAME = 'tray_component_pcb_{institution}_{ID:0>5}.xml'
 	PROPERTIES = [
 		#'size',
 		'location',
@@ -650,6 +651,27 @@ class shipment(fsobj):
 		"protomodules",
 		"modules",
 	]
+
+	"""
+	XML_STRUCT_DICT = {'SHIPMENT':{
+		'ID':'ID',
+		'SENDER':'sender',
+		'RECIEVER':'receiver',
+		"date_sent",
+		"date_received",
+
+		"sendOrReceive",  #NEW, may be unnecessary
+		"fedex_id", # NEW
+
+		"kaptons",
+		"baseplates",
+		"sensors",
+		"pcbs",
+		"protomodules",
+		"modules",
+
+	}}
+	"""
 
 	def save(self):
 		super(shipment,self).save()
@@ -1997,56 +2019,93 @@ class step_pcb(fsobj):
 class batch_araldite(fsobj):
 	OBJECTNAME = "araldite batch"
 	FILEDIR = os.sep.join(['supplies','batch_araldite','{date}'])
-	FILENAME = 'batch_araldite_{ID:0>5}.json'
+	FILENAME = 'batch_araldite_{ID:0>5}.xml'
 	PROPERTIES = [
 		'date_received',
 		'date_expires',
 		'is_empty',
 	]
+
+	XML_STRUCT_DICT = {'BATCH':{
+		'ID':'ID',
+		'RECEIVE_DATE':'date_received',
+		'EXPIRE_DATE':'date_expires',
+		'IS_EMPTY':'is_empty',
+		'COMMENTS':'comments'
+	}}
+	# Dates should have the format "{}-{}-{} {}:{}:{}".  NOT a property; the UI pages handle the loading.
 
 
 class batch_loctite(fsobj):
 	OBJECTNAME = "loctite batch"
 	FILEDIR = os.sep.join(['supplies','batch_loctite','{date}'])
-	FILENAME = 'batch_loctite_{ID:0>5}.json'
+	FILENAME = 'batch_loctite_{ID:0>5}.xml'
 	PROPERTIES = [
 		'date_received',
 		'date_expires',
 		'is_empty',
 	]
+	XML_STRUCT_DICT = {'BATCH':{
+		'ID':'ID',
+		'RECEIVE_DATE':'date_received',
+		'EXPIRE_DATE':'date_expires',
+		'IS_EMPTY':'is_empty',
+		'COMMENTS':'comments'
+	}}
 
 
 class batch_sylgard_thick(fsobj):
 	OBJECTNAME = "sylgard (thick) batch"
 	FILEDIR = os.sep.join(['supplies','batch_sylgard_thick','{date}'])
-	FILENAME = 'batch_sylgard_thick_{ID:0>5}.json'
+	FILENAME = 'batch_sylgard_thick_{ID:0>5}.xml'
 	PROPERTIES = [
 		'date_received',
 		'date_expires',
 		'is_empty',
 	]
+	XML_STRUCT_DICT = {'BATCH':{
+		'ID':'ID',
+		'RECEIVE_DATE':'date_received',
+		'EXPIRE_DATE':'date_expires',
+		'IS_EMPTY':'is_empty',
+		'COMMENTS':'comments'
+	}}
 
 
 class batch_sylgard_thin(fsobj):
 	OBJECTNAME = "sylgard (thin) batch"
 	FILEDIR = os.sep.join(['supplies','batch_sylgard_thin','{date}'])
-	FILENAME = 'batch_sylgard_thin_{ID:0>5}.json'
+	FILENAME = 'batch_sylgard_thin_{ID:0>5}.xml'
 	PROPERTIES = [
 		'date_received',
 		'date_expires',
 		'is_empty',
 	]
+	XML_STRUCT_DICT = {'BATCH':{
+		'ID':'ID',
+		'RECEIVE_DATE':'date_received',
+		'EXPIRE_DATE':'date_expires',
+		'IS_EMPTY':'is_empty',
+		'COMMENTS':'comments'
+	}}
 
 
 class batch_bond_wire(fsobj):
 	OBJECTNAME = "bond wire batch"
 	FILEDIR = os.sep.join(['supplies','batch_bond_wire','{date}'])
-	FILENAME = 'batch_bond_wire_{ID:0>5}.json'
+	FILENAME = 'batch_bond_wire_{ID:0>5}.xml'
 	PROPERTIES = [
 		'date_received',
 		'date_expires',
 		'is_empty',
 	]
+	XML_STRUCT_DICT = {'BATCH':{
+		'ID':'ID',
+		'RECEIVE_DATE':'date_received',
+		'EXPIRE_DATE':'date_expires',
+		'IS_EMPTY':'is_empty',
+		'COMMENTS':'comments'
+	}}
 
 
 
