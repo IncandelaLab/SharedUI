@@ -47,15 +47,18 @@ class simple_fsobj_vc(object):
 		self.pbAddComment    = pbAddComment
 
 	def update_info(self,ID=None,institution=None,*args,**kwargs):
+		print("Calling update_info() in tooling page")
 		if ID is None:
 			ID = self.sbID.value()
 		else:
 			self.sbID.setValue(ID)
 		if institution is None:
+			print("Insittution is none:  calling update_info and saving institution!")
 			institution = self.cbInstitution.currentText()
 		else:
 			self.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(institution, -1))
 
+		print("Loading with institution ", institution)
 		self.fsobj_exists = self.fsobj_tool.load(ID, institution)
 
 		if self.fsobj_exists:
@@ -84,12 +87,15 @@ class simple_fsobj_vc(object):
 
 	def start_editing(self,*args,**kwargs):
 		if not self.fsobj_exists:
+			print("Creating new tool @ start_editing: ", self.cbInstitution.currentText())
 			self.fsobj_tool.new(self.sbID.value(), self.cbInstitution.currentText())
 
 	def cancel_editing(self,*args,**kwargs):
 		self.update_info()
 
 	def save_editing(self,*args,**kwargs):
+		print("SAVING TOOL")
+		print("CURRENT INST IS", self.fsobj_tool.institution)
 		comments = []
 		for i in range(self.listComments.count()):
 			comments.append(self.listComments.item(i).text())
@@ -443,6 +449,7 @@ class func(object):
 
 	@enforce_mode('view')
 	def start_editing_sensor_tool(self,*args,**kwargs):
+		if self.page.cbSensorToolInstitution.currentText() == "":  return
 		self.mode = 'editing_sensor_tool'
 		self.tool_sensor.start_editing()
 		self.update_elements()
@@ -471,6 +478,7 @@ class func(object):
 
 	@enforce_mode('view')
 	def start_editing_pcb_tool(self,*args,**kwargs):
+		if self.page.cbPcbToolInstitution.currentText() == "":  return
 		self.mode = 'editing_pcb_tool'
 		self.tool_pcb.start_editing()
 		self.update_elements()
@@ -499,6 +507,7 @@ class func(object):
 
 	@enforce_mode('view')
 	def start_editing_sensor_tray(self,*args,**kwargs):
+		if self.page.cbSensorTrayInstitution.currentText() == "":  return
 		self.mode = 'editing_sensor_tray'
 		self.tray_component_sensor.start_editing()
 		self.update_elements()
@@ -527,6 +536,7 @@ class func(object):
 
 	@enforce_mode('view')
 	def start_editing_pcb_tray(self,*args,**kwargs):
+		if self.page.cbPcbTrayInstitution.currentText() == "":  return
 		self.mode = 'editing_pcb_tray'
 		self.tray_component_pcb.start_editing()
 		self.update_elements()
@@ -555,6 +565,7 @@ class func(object):
 
 	@enforce_mode('view')
 	def start_editing_assembly_tray(self,*args,**kwargs):
+		if self.page.cbAssemblyTrayInstitution.currentText() == "":  return
 		self.mode = 'editing_assembly_tray'
 		self.tray_assembly.start_editing()
 		self.update_elements()

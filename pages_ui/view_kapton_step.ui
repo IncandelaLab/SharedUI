@@ -87,7 +87,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QPushButton" name="pbGoBaseplate1">
+  <widget class="QPushButton" name="pbGoSensor1">
    <property name="geometry">
     <rect>
      <x>300</x>
@@ -100,7 +100,7 @@
     <string>go to</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pbGoBaseplate2">
+  <widget class="QPushButton" name="pbGoSensor2">
    <property name="geometry">
     <rect>
      <x>300</x>
@@ -113,7 +113,7 @@
     <string>go to</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pbGoBaseplate3">
+  <widget class="QPushButton" name="pbGoSensor3">
    <property name="geometry">
     <rect>
      <x>300</x>
@@ -126,7 +126,7 @@
     <string>go to</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pbGoBaseplate6">
+  <widget class="QPushButton" name="pbGoSensor6">
    <property name="geometry">
     <rect>
      <x>300</x>
@@ -139,7 +139,7 @@
     <string>go to</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pbGoBaseplate4">
+  <widget class="QPushButton" name="pbGoSensor4">
    <property name="geometry">
     <rect>
      <x>300</x>
@@ -152,7 +152,7 @@
     <string>go to</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pbGoBaseplate5">
+  <widget class="QPushButton" name="pbGoSensor5">
    <property name="geometry">
     <rect>
      <x>300</x>
@@ -305,7 +305,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>baseplate serial</string>
+    <string>sensor serial</string>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -975,7 +975,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QLineEdit" name="leBaseplate1">
+  <widget class="QLineEdit" name="leSensor1">
    <property name="geometry">
     <rect>
      <x>210</x>
@@ -985,7 +985,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QLineEdit" name="leBaseplate2">
+  <widget class="QLineEdit" name="leSensor2">
    <property name="geometry">
     <rect>
      <x>210</x>
@@ -995,7 +995,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QLineEdit" name="leBaseplate3">
+  <widget class="QLineEdit" name="leSensor3">
    <property name="geometry">
     <rect>
      <x>210</x>
@@ -1005,7 +1005,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QLineEdit" name="leBaseplate4">
+  <widget class="QLineEdit" name="leSensor4">
    <property name="geometry">
     <rect>
      <x>210</x>
@@ -1015,7 +1015,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QLineEdit" name="leBaseplate5">
+  <widget class="QLineEdit" name="leSensor5">
    <property name="geometry">
     <rect>
      <x>210</x>
@@ -1025,7 +1025,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QLineEdit" name="leBaseplate6">
+  <widget class="QLineEdit" name="leSensor6">
    <property name="geometry">
     <rect>
      <x>210</x>

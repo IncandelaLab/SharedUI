@@ -12,6 +12,7 @@ from xml.etree.ElementTree import ElementTree
 from xml.etree.ElementTree import Element
 from xml.etree.ElementTree import parse
 from xml.etree.ElementTree import tostring
+from xml.etree.ElementTree import fromstring
 import csv
 
 import rhapi as rh
@@ -86,87 +87,6 @@ loadconfig()
 
 
 
-### THIS IS PRELIMINARY ###
-
-###############################################
-#### Function to request XML files from DB ####
-###############################################
-
-# Request all files from the DB that match the search conditions.
-# Download all results, place them in the correct directory
-#    (Should be done according to date later on)
-# Also, call translate_XML...
-
-# ***MAJOR QUESTION:***  Download json files instead of XML, then convert?  Easier to read...
-
-def request_XML(table_name, search_conditions=None):
-	# For now, MUST set up ssh tunnel manually.  Will ask for suggestions on this.
-	open_SSH_tunnel()
-
-	# MAYBE LATER:
-	# First, make sure that the ssh tunnel has been set up.
-	# If not, request username and set it up!
-
-	# sshtunnel package has some awkward dependencies...don't want to use this if possible.
-
-	sql_template = 'select * from hgc_int2r.{} p'
-
-	sql_request = sql_template.format(table_name)
-	if not search_conditions is None:
-		sql_request = sql_request + ' where'
-		# search_conditions is a dict:  {param_name:param_value}
-		for param, value in search_conditions.items():
-			sql_request = sql_request + ' {}={}'.format(param, value)
-	print("TEMP:  Using sql command")
-	print(sql_request)
-
-	try:
-		data = api.xml(sql_request, verbose=True)
-	except rh.RhApiRowLimitError as e:
-		print("Error:  Could not download files from DB:")
-		print(e)
-		return False
-
-	api = rh.RhApi(url='https://cmsdca.cern.ch/hgc_rhapi', debug=True, sso='login')
-	xml_string = minidom.parseString(data).toprettyxml(indent="    ")
-	# Output is an empty XML file, header len 61
-	if len(xml_str) < 62:
-		print("No files match the search criteria")
-		return False
-	
-	downloaded_files = []
-
-	if downloaded_files:
-		for f in downloaded_files:
-			translate_XML(f)
-		return True
-	else:
-		return False
-
-# Accepts a path to a XML file
-# Load the file, determine the object name, then convert to a json file
-#    ...then save that json file to the correct location (based on date)
-def translate_XML(filename):
-	tree = ElementTree()
-	tree.parse(filename)
-	# NOTE:  It's probably easier to just load the data into the corresp object,
-	# then save it...
-	# ...unless there's a general approach?  (Probably not...)
-	# MAYBE:  Create dict of all field:var pairs?  For each json var, search through
-	#         entire XML file for corresponding field.
-	#         (Other way wouldn't work; XML has structure)
-	#         - would need a case to handle multiple fields (comments, etc)
-
-# Functionality moved to main:
-#def open_SSH_tunnel():
-#	# Open up a tunnel for DB access:
-#	# ssh -L 10131:itrac1609-v.cern.ch:10121 -L 10132:itrac1601-v.cern.ch:10121 phmaster@lxplus.cern.ch
-#	# NOTE:  This will probably need revision.  Just want "good enough" for now.
-#	subprocess.run(["ssh", "-L", "10131:itrac1609-v.cern.ch:10121", "-L", "10132:itrac1601-v.cern.ch:10121", "{}@lxplus.cern.ch".format(username)])
-
-
-
-
 ###############################################
 ############## fsobj base class ###############
 ###############################################
@@ -194,6 +114,15 @@ class fsobj(object):
 		'baseplate':'HGC Eight Inch Plate',  #COMPLICATION
 	}
 
+	# NEW:
+	#PARTS_LIST = ['baseplate':, 'sensor', 'pcb', 'protomodule', 'module']
+	# Similarly...
+	# Must be a dict, since need to access different tables for each one!
+	# First table is the basic table; second table is the cond info
+	#CONDS_DICT = {'step_sensor': ['c4220', 'c4260'],
+	#			  'step_pcb':    ['c4240', 'c4280']
+	#			 }
+
 	# NEW
 	XML_STRUCT_DICT = None  # Should not use the base class!
 
@@ -207,14 +136,16 @@ class fsobj(object):
 	def __str__(self):
 		return "<{} {}>".format(self.OBJECTNAME, self.ID)
 
-	def get_filedir_filename(self, ID = None):
+	def get_filedir_filename(self, ID = None, dt = None):
 		if ID is None:
 			ID = self.ID
-		#filedir  = os.sep.join([ DATADIR, self.FILEDIR.format(ID=ID, century = CENTURY.format(ID//100)) ])
-		# filedir now depends on date information, defined upon first save() and stored via add_part_to_list
-		with open(self.partlistfile, 'r') as opfl:
-			data = json.load(opfl)
-			date = data[str(ID)]
+		if dt is None:
+			# filedir now depends on date information, defined upon first save() and stored via add_part_to_list
+			with open(self.partlistfile, 'r') as opfl:
+				data = json.load(opfl)
+				date = data[str(ID)]
+		else:
+			date = dt
 
 		filedir = os.sep.join([ DATADIR, self.FILEDIR.format(ID=ID, date=date) ])
 		filename = self.FILENAME.format(ID=ID)
@@ -222,7 +153,8 @@ class fsobj(object):
 
 
 	# NEW:  For search page
-	def add_part_to_list(self):
+	def add_part_to_list(self, date=None):
+		# NOTE:  Date must have format {m}-{d}-{y}
 		part_name = self.__class__.__name__
 		self.partlistfile = os.sep.join([ DATADIR, 'partlist', part_name+'s.json' ])
 		with open(self.partlistfile, 'r') as opfl:
@@ -233,7 +165,11 @@ class fsobj(object):
 				# Note creation date and pass it to the dict
 				dcreated = time.localtime()
 				if self.ID == None:  print("ERROR:  self.ID in add_part_to_list is None!!!")
-				data[str(self.ID)] = '{}-{}-{}'.format(dcreated.tm_mon, dcreated.tm_mday, dcreated.tm_year)
+				if date:
+					dc = date
+				else:
+					dc = '{}-{}-{}'.format(dcreated.tm_mon, dcreated.tm_mday, dcreated.tm_year)
+				data[str(self.ID)] = dc
 		with open(self.partlistfile, 'w') as opfl:
 			json.dump(data, opfl)
 
@@ -268,6 +204,15 @@ class fsobj(object):
 				json.dump(vars(self), opfl, indent=4)
 		"""
 
+	# USE XML_STRUCT_DICT to find vars in the XML tree and assign them to vars/properties
+	# Changes:
+	# - Don't need to worry about PROPERTIES_DO_NOT_SAVE; ignore them
+	# - ...can basically ignorne the below, because the new method is radically different
+
+	# Recursively look through dict.  For each element found, assign XML value to corresponding var/property.
+	# - If dict, recusive case.
+	# - If list, create multiple elements w/ same tag.
+	# - Else assign normally.
 	# Utility used for load():  Set vars of obj using struct_dict, xml_tree
 	def _load_from_dict(self, struct_dict, xml_tree):
 		for item_name, item in struct_dict.items():
@@ -276,29 +221,39 @@ class fsobj(object):
 				self._load_from_dict(item, xml_tree)
 			# If item must be stored as a list in the class:
 			elif item in self.ITEMLIST_LIST:  #len(xml_tree.findall(item_name)) > 1:  # If multiple items found:
-				print("FOUND COMMENTS/LIST.  Assigning...")
-				print("Searching for items:", item_name)  # Search tree recursively, not just child elements
 				itemdata = xml_tree.findall('.//'+item_name)  # List of all contents of matching tags
+				# NOTE:  Items could be text or ints!  Convert accordingly.
 				itemdata = [it.text for it in itemdata]
-				print("Itemdata is now", itemdata)
+				if itemdata != []:
+					if itemdata[0].isdigit():  itemdata = [int(it.text) for it in itemdata]
 				setattr(self, item, itemdata)  # Should be a list containing contents; just assign it to the var
 			else:
-				itemdata = xml_tree.find('.//'+item_name)
-				setattr(self, item, itemdata)
+				print("_load_from_dict: ordinary item found!")
+				itemdata = xml_tree.find('.//'+item_name)  # NOTE:  itemdata is an Element, not text!
+				print("Item text is", itemdata.text, "; item is", item)
+				if itemdata.text.isdigit():  # If int:
+					idt = int(itemdata.text)
+				elif itemdata.text.replace('.','',1).isdigit():  # If float:
+					idt = float(itemdata.text)
+				elif itemdata.text == 'True':  idt = True
+				elif itemdata.text == 'False': idt = False
+				else:  # If string
+					idt = itemdata.text
+				setattr(self, item, idt)
 
 	def load(self, ID, on_property_missing = "warn"):
+		if ID == -1:
+			self.clear()
+			return False
+
 		part_name = self.__class__.__name__
 		self.partlistfile = os.sep.join([ DATADIR, 'partlist', part_name+'s.json' ])
 		with open(self.partlistfile, 'r') as opfl:
 			data = json.load(opfl)
 			if not str(ID) in data.keys():
+				# FOR NOW:
 				self.clear()
 				return False
-		# (else:)
-
-		if ID == -1:
-			self.clear()
-			return False
 
 		filedir, filename = self.get_filedir_filename(ID)
 		xml_file = os.sep.join([filedir, filename])
@@ -309,75 +264,9 @@ class fsobj(object):
 
 		xml_tree = parse(xml_file)
 
-		# USE XML_STRUCT_DICT to find vars in the XML tree and assign them to vars/properties
-		# Changes:
-		# - Don't need to worry about PROPERTIES_DO_NOT_SAVE; ignore them
-		# - ...can basically ignorne the below, because the new method is radically different
-
-		# Recursively look through dict.  For each element found, assign XML value to corresponding var/property.
-		# - If dict, recusive case.
-		# - If list, create multiple elements w/ same tag.
-		# - Else assign normally.
-
 		self._load_from_dict(self.XML_STRUCT_DICT, xml_tree)
 
 		return True
-
-		# OUTDATED; needs to be updated for new XML-only method
-		"""
-		with open(file, 'r') as opfl:
-			data = json.load(opfl)
-
-		if not (data['ID'] == ID):
-			err = "ID in data file ({}) does not match ID of filename ({})".format(data['ID'],ID)
-			raise ValueError(err)
-
-		self.ID = ID
-
-		data_keys = data.keys()
-		PROPERTIES = self.PROPERTIES + self.PROPERTIES_COMMON
-		DEFAULTS = {**self.DEFAULTS_COMMON, **getattr(self, 'DEFAULTS', {})}
-
-		props_in_data = [prop in data_keys for prop in PROPERTIES]
-		if hasattr(self, "PROPERTIES_DO_NOT_SAVE"):
-			props_in_pdns = [prop in self.PROPERTIES_DO_NOT_SAVE for prop in PROPERTIES]
-		else:
-			props_in_pdns = [False for prop in PROPERTIES]
-
-		for i,prop in enumerate(PROPERTIES):
-			prop_in_data = props_in_data[i]
-			prop_in_pdns = props_in_pdns[i]
-
-			if prop_in_data:
-
-				if prop_in_pdns:
-					err = "object {} with ID {} data file {} has property {}, which is in PROPERTIES_DO_NOT_SAVE".format(type(self).__name__, ID, file, prop)
-					raise ValueError(err)
-
-				else:
-					setattr(self, prop, data[prop])
-
-			else:
-				prop_default = DEFAULTS[prop] if prop in DEFAULTS.keys() else None
-
-				if prop_in_pdns:
-					setattr(self, prop, prop_default)
-
-				else:
-					if on_property_missing == "warn":
-						print("Warning: object {} with ID {} missing property {}. Setting to {}.".format(type(self).__name__, ID, prop, prop_default))
-						setattr(self, prop, prop_default)
-					elif on_property_missing == "error":
-						err = "object {} with ID {} missing property {}".format(type(self).__name__, ID, prop)
-						raise ValueError(err)
-					elif on_property_missing == "no_warn":
-						setattr(self, prop, prop_default)
-					else:
-						err = "object {} with ID {} missing property {}. on_property_missing is {}; should be 'warn', 'error', or 'no_warn'".format(type(self).__name__, ID, prop, on_property_missing)
-						raise ValueError(err)
-
-		return True
-		"""
 
 
 
@@ -426,7 +315,8 @@ class fsobj(object):
 
 
 	def dict_to_element(self, input_dict, element_name):
-		# Reads a dictionary, and returns an XML element 'element_name' filled with the contents of that dictionary.
+		# Reads a dictionary, and returns an XML element 'element_name' filled with the contents of the current object
+		# structured according to that dictionary.
 		# NOTE:  This must be able to work recursively.  I.e. if one of the objs in the input_dict is a dict,
 		#    it reads *that* dictionary and creates an element for it, +appends it to current element.  Etc.
 
@@ -436,7 +326,7 @@ class fsobj(object):
 			# CHANGE FOR NEW XML SYSTEM:
 			# item is a list (comments), dict (another XML layer), or string (var)
 			# If string, use getattr()
-
+			print("dict_to_element:  SAVING: ", item_name, item)
 			if type(item) == dict:
 				# Recursive case: Create an element from the child dictionary.
 				child = self.dict_to_element(item, item_name)
@@ -449,9 +339,11 @@ class fsobj(object):
 					child.text = comment
 					parent.append(child)
 			else:
+				print("INSERTING BASE ITEM", item_name, item)
 				# Base case 2:
 				child = Element(item_name)
 				child.text = str(getattr(self, item, None))  # item should be the var name!
+				# Fill attrs that don't exist w/ None
 				# This SHOULD work with properties!
 				print("    Creating element {} with contents {}".format(item_name, child.text))
 				parent.append(child)
@@ -492,7 +384,7 @@ class fsobj(object):
 
 		# Save xml file:
 		# Store in same directory as .json files, w/ same name:
-		filedir, filename = self.get_filedir_filename()  # self.ID) # shouldn't need this
+		filedir, filename = self.get_filedir_filename()  # self.ID)  #This should be unnecessary...
 		#filename = filename.replace('.json', '.xml')
 		if not os.path.exists(filedir):
 			os.makedirs(filedir)
@@ -518,6 +410,7 @@ class fsobj_tool(fsobj):
 	XML_STRUCT_DICT = {'TOOL':{
 		'ID':'ID',
 		'INSTITUTION':'institution',
+		'LOCATION':'location',
 		'COMMENT':'comments'
 	}}
 
@@ -533,15 +426,67 @@ class fsobj_tool(fsobj):
 		if ID is None:
 			ID = self.ID
 		if institution is None:
-			instiution = self.institution
+			institution = self.institution
 		filedir  = os.sep.join([ DATADIR, self.FILEDIR.format(ID=ID, institution=institution, century = CENTURY.format(ID//100)) ])
 		filename = self.FILENAME.format(ID=ID, institution=institution)
 		return filedir, filename
 
+	# NEW:  For search page
+	# Added
+	def add_part_to_list(self):
+		part_name = self.__class__.__name__
+		self.partlistfile = os.sep.join([ DATADIR, 'partlist', part_name+'s.json' ])
+		with open(self.partlistfile, 'r') as opfl:
+			data = json.load(opfl)
+			if not self.ID in data.keys():
+				dcreated = time.localtime()
+				if self.ID == None:  print("ERROR:  self.ID in add_part_to_list (tool) is None!")
+				if self.institution == None:  print("ERROR:  self.institution in add_part_to_list (tool) is None!")
+				# Key difference here:  Key is (ID, institution)
+				data["{}_{}".format(self.ID, self.institution)] = '{}-{}-{}'.format(dcreated.tm_mon, dcreated.tm_mday, dcreated.tm_year)
+		with open(self.partlistfile, 'w') as opfl:
+			json.dump(data, opfl)
 
-	# save() should work as usual; get_filedir_filename can be called without args
 
-	# So should load()...I think?
+	def load(self, ID, institution, on_property_missing = "warn"):
+		part_name = self.__class__.__name__
+		self.partlistfile = os.sep.join([ DATADIR, 'partlist', part_name+'s.json' ])
+		print("LOADING TOOL")
+		with open(self.partlistfile, 'r') as opfl:
+			data = json.load(opfl)
+			if not "{}_{}".format(ID, institution) in data.keys():  # Key modification
+				print("TOOL LOAD FAILED, was looking for " + "{}_{}".format(ID, institution))
+				print("data.keys() =", data.keys())
+				self.clear()
+				return False
+		# (else:)
+		print("FOUND TOOL!")
+
+		if ID == -1:
+			self.clear()
+			return False
+		if institution == None:
+			self.clear()
+			return False
+
+		filedir, filename = self.get_filedir_filename(ID, institution)
+		xml_file = os.sep.join([filedir, filename])
+
+		print("Loading from file:", xml_file)
+
+		if not os.path.exists(xml_file):
+			self.clear()
+			return False
+
+		xml_tree = parse(xml_file)
+
+		self._load_from_dict(self.XML_STRUCT_DICT, xml_tree)
+
+		print("Finished loading, ID type is ", type(self.ID))
+		print("...and location is", self.location)
+
+		return True
+
 
 	def new(self, ID, institution):
 		self.ID = ID
@@ -559,6 +504,293 @@ class fsobj_tool(fsobj):
 		DEFAULTS   = {**self.DEFAULTS, **self.DEFAULTS_COMMON}
 		for prop in PROPERTIES:
 			setattr(self, prop, DEFAULTS.get(prop, None))
+
+
+###### NEW:  PARENT CLASSES FOR PARTS AND ASSEMBLY STEPS #######
+
+class fsobj_part(fsobj):
+	# Var storing names of table to request XML files from
+	PART_TABLE = 'parts'  # By default
+	# Also requires XML_STRUCT_DICT
+
+	# This is the same for all parts!  (For now)
+	# Are there additional attrs to request...?
+	XML_STRUCT_DICT = { "data":{"row":{
+		"ID":"id_number",
+		"SERIAL_NUMBER":"ID",
+		"KIND_OF_PART_ID":"kind_of_part_id",  #TBD:  Property...BUT sensors will never be created from scratch, so can probably just ignore this!
+		"KIND_OF_PART":"kind_of_part", #TBD:  Property
+		"LOCATION_ID":"location_id", # same...
+		"DESCRIPTION":"description",  # Can probably leave this blank...
+	}}}
+
+
+	# save() functions normally -- only 1 XML file is required.
+	# load() requires downloading ability, but is otherwise normal.
+
+	def load(self, ID, on_property_missing = "warn"):
+		print("LOADING PART")
+		if ID == -1:
+			self.clear()
+			return False
+
+		part_name = self.__class__.__name__
+		self.partlistfile = os.sep.join([ DATADIR, 'partlist', part_name+'s.json' ])
+		with open(self.partlistfile, 'r') as opfl:
+			data = json.load(opfl)
+			if not str(ID) in data.keys():
+				print("PART NOT FOUND.  REQUESTING FROM DB...")
+				search_conditions = {'SERIAL_NUMBER':'\''+ID+'\''}  # Only condition needed; ID must be surrounded by quotes
+				# For each XML file/table needed, make a request:
+				# Should automatically determine where file should be saved AND add part to list
+				self.ID = ID
+				part_request = self.request_XML(self.PART_TABLE, search_conditions)
+				print("request_XML completed")
+				if not part_request:
+					print("Part not found.  Returning false...")
+					self.clear()
+					return False
+				#self.add_part_to_list()  # done in request_xml; also takes care of filename.
+				#dcreated = time.localtime()
+				#dt = '{}-{}-{}'.format(dcreated.tm_mon, dcreated.tm_mday, dcreated.tm_year)
+			else:
+				dt = data[ID]  # date created
+
+		filedir, filename = self.get_filedir_filename(ID)  #, date=dt)
+		xml_file = os.sep.join([filedir, filename])
+
+		if not os.path.exists(xml_file):
+			print("ERROR:  Step is present in partlistfile OR downloaded, but XML file {} does not exist!".format(xml_file))
+			self.clear()
+			return False
+
+		xml_tree = parse(xml_file)
+		self._load_from_dict(self.XML_STRUCT_DICT, xml_tree)
+
+		return True
+
+
+	# NEW: Must save to correct location!
+	def request_XML(self, table_name, search_conditions, suffix=None):
+		print("CALLING request_XML")
+		# Same as the assembly version, EXCEPT TIME_START -> .
+
+		# NOTE NOTE NOTE:  Must save file in correct location AND add_part_to_list!
+		# suffix is added to the end of the filename (will be _cond)
+		#filedir, filename = self.get_filedir_filename(self.ID)
+		#condname = filename.replace('.xml', '_cond.xml')
+
+		sql_template = 'select * from hgc_int2r.{} p'
+		sql_request = sql_template.format(table_name)
+		sql_request = sql_request + ' where'
+		# search_conditions is a dict:  {param_name:param_value}
+		for param, value in search_conditions.items():
+			sql_request = sql_request + ' p.{}={}'.format(param, value)
+		print("TEMP:  Using sql command")
+		print(sql_request)
+
+		try:
+			api = rh.RhApi(url='https://cmsdca.cern.ch/hgc_rhapi', debug=True, sso='login')
+			data = api.xml(sql_request, verbose=True)
+		except rh.RhApiRowLimitError as e:
+			print("Error:  Could not download files from DB:")
+			print(e)
+			return False
+
+		xml_string = minidom.parseString(data).toprettyxml(indent="    ")
+		# Output is an empty XML file, header len 61
+		# NOTE:  Should be a SINGLE XML result!
+		if len(xml_string) < 62:
+			print("No files match the search criteria")
+			print("TEMP:  XML string is")
+			print(xml_string)
+			return False
+		# Store requested file
+		xml_tree = fromstring(xml_string)
+		ID = xml_tree.find('.//SERIAL_NUMBER').text
+		dcreated = time.localtime()
+		date = '{}-{}-{}'.format(dcreated.tm_mon, dcreated.tm_mday, dcreated.tm_year)   #xml_tree.find('.//TIME_START')
+		# file date format = {}-{}-{}, mdy
+		# XML date format = 26-MAR-18
+		# https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior
+		#dt = datetime.datetime.strptime(date, '%d-%b-%y')
+
+		print("TEST:  found date", date)
+		filedir, filename = self.get_filedir_filename(ID, date)
+
+		if suffix:  filename = filename.replace('.xml', suffix+'.xml')
+
+		if not os.path.exists(filedir):
+			os.makedirs(filedir)
+		print("WRITING TO FILE:", os.path.join(filedir, filename))
+		with open(os.path.join(filedir, filename), 'w') as f:
+			f.write(xml_string)
+
+		self.add_part_to_list(date=date)
+
+		return True
+
+
+
+class fsobj_assembly(fsobj):
+	# Vars storing names of tables to request XML files from
+	ASSM_TABLE = None
+	COND_TABLE = None
+	# Also requires XML_STRUCT_DICT, XML_COND_DICT
+
+	def save(self, new_struct_dict=None, new_fname=None):
+		# Needs special treatment:  Must write to 2 files, not just one!
+		# Ignoring new_struct_dict here...may not need it anymore.
+
+		# CURRENT PLAN:  Use 2 DICTS, one for each file.  Write to the first normally; write to the second manually.
+
+		if new_struct_dict is None and not new_fname is None:
+			print("ERROR IN SAVE() (assembly):  Got a new struct dict, but not a corresponding filename!")
+
+		super(fsobj, self).save(new_struct_dict=new_struct_dict, new_fname=new_fname)
+		# This one handles self.XML_STRUCT_DICT...
+		# ...now handle self.XML_COND_DICT:
+
+		# Generate XML tree:
+		struct_dict = self.XML_COND_DICT
+		xml_tree = self.generate_xml(struct_dict)  #self.XML_STRUCT_DICT)
+		# NOTE:  Attrs missing from the assembly object will just be set to str(None) in the XML file
+
+		# Save xml file:
+		# Store in same directory as .json files, w/ same name:
+		filedir, filename = self.get_filedir_filename()  # self.ID)  #This should be unnecessary...
+		fname_cond = filename.replace('.xml', '_cond.xml')
+		if not os.path.exists(filedir):
+			print("WEIRD ERROR: filedir {} for cond file does not exist after calling super().save()!".format(filedir))
+			os.makedirs(filedir)
+		print("Saving XML file to ", filedir+'/'+filename)
+		root = xml_tree.getroot()
+		xmlstr = minidom.parseString(tostring(root)).toprettyxml(indent = '    ')  #tostring imported from xml.etree.ElementTree
+		#xml_tree.write(open(filedir+'/'+filename), 'wb')  #.replace('.json', '.xml'), 'wb'))
+		with open(filedir+'/'+filename, 'w') as f:
+			f.write(xmlstr)
+
+
+
+	def load(self, ID, on_property_missing = "warn"):
+		if ID == -1:
+			self.clear()
+			return False
+
+		part_name = self.__class__.__name__
+		self.partlistfile = os.sep.join([ DATADIR, 'partlist', part_name+'s.json' ])
+		with open(self.partlistfile, 'r') as opfl:
+			data = json.load(opfl)
+			if not str(ID) in data.keys():
+				print("ASSEMBLY STEP NOT FOUND.  REQUESTED CONDITION TABLES:")
+				search_conditions = {'ID':self.ID}  # Only condition needed
+				# For each XML file/table needed, make a request:
+				# Should automatically determine where file should be saved AND add part to list
+				assm_request = self.request_XML(self.ASSM_TABLE, search_conditions)
+
+				cond_request = self.request_XML(self.COND_TABLE, search_conditions, suffix="_cond")
+
+				if assm_request != cond_request:  # One file is found, the other isn't:
+					print("ERROR:  Only one of 2 requested files was found!")
+					print("Base file found: ", assm_request)
+					print("Cond file found: ", cond_request)
+					self.clear()
+					return False
+				elif not (assm_request and cond_request):
+					print("Assembly step not found.  Returning false...")
+					self.clear()
+					return False
+				# Otherwise, both files are found!  Load from both of them.
+				self.add_part_to_list()
+				self.add_part_to_list()
+				dcreated = time.localtime()
+				dt = '{}-{}-{}'.format(dcreated.tm_mon, dcreated.tm_mday, dcreated.tm_year)
+			else:
+				dt = data[ID]  # date created
+
+
+		filedir, filename = self.get_filedir_filename(ID, date=dt)
+		condname = filename.replace('.xml', '_cond.xml')
+		xml_file      = os.sep.join([filedir, filename])
+		xml_file_cond = os.sep.join([filedir, condname])
+
+		if not os.path.exists(xml_file):
+			print("ERROR:  Step is present in partlistfile OR downloaded, but XML file {} does not exist!".format(xml_file))
+			self.clear()
+			return False
+
+		xml_tree = parse(xml_file)
+		self._load_from_dict(self.XML_STRUCT_DICT, xml_tree)
+
+		# Don't want to call _load_from_dict on the cond file, so...
+		# Load the desired vars manually.
+		xml_tree = parse(xml_file_cond)
+
+		cond_vars = {'TIME_START':'cure_start', 'TIME_STOP':'cure_stop',
+					 'TEMP_DEGC':'cure_temperature', 'HUMIDITY_PRCNT':'cure_humidity'}
+		for tag, var in cond_vars.items():
+			itemdata = xml_tree.find('.//'+tag)
+			if itemdata.text.replace('.','',1).isdigit():
+				idt = float(itemdata.text)
+			else:
+				idt = itemdata.text
+			setattr(self, var, idt)
+
+		return True
+
+
+	# NEW: Must save to correct location!
+	def request_XML(self, table_name, search_conditions, suffix=None):
+		# NOTE NOTE NOTE:  Must save file in correct location AND add_part_to_list!
+		# suffix is added to the end of the filename (will be _cond)
+		filedir, filename = self.get_filedir_filename(ID)
+		condname = filename.replace('.xml', '_cond.xml')
+
+		sql_template = 'select * from hgc_int2r.{} p'
+		sql_request = sql_template.format(table_name)
+		sql_request = sql_request + ' where'
+		# search_conditions is a dict:  {param_name:param_value}
+		for param, value in search_conditions.items():
+			sql_request = sql_request + ' {}={}'.format(param, value)
+		print("TEMP:  Using sql command")
+		print(sql_request)
+
+		try:
+			api = rh.RhApi(url='https://cmsdca.cern.ch/hgc_rhapi', debug=True, sso='login')
+			data = api.xml(sql_request, verbose=True)
+		except rh.RhApiRowLimitError as e:
+			print("Error:  Could not download files from DB:")
+			print(e)
+			return False
+
+		xml_string = minidom.parseString(data).toprettyxml(indent="    ")
+		# Output is an empty XML file, header len 61
+		# NOTE:  Should be a SINGLE XML result!
+		if len(xml_str) < 62:
+			print("No files match the search criteria")
+			print("TEMP:  XML string is")
+			print(xml_str)
+			return False
+		# Store requested file
+		xml_tree = fromstring(xml_str)
+		ID = int(xml_tree.find('.//ID').text)
+		date = xml_tree.find('.//TIME_START')
+		# file date format = {}-{}-{}, mdy
+		# XML date format = 26-MAR-18
+		# https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior
+		dt = datetime.strptime(date, '%d-%b-%y')
+		print("TEST:  found date", dt.strftime('%m-%d-%Y'))
+		filedir, filename = self.get_filedir_filename(ID, date)
+
+		if suffix:  filename = filename.replace('.xml', suffix+'.xml')
+
+		print("WRITING TO FILE:", os.path.join([filedir, filename]))
+		with open(os.path.join([filedir, filename]), 'w') as f:
+			f.write(xml_str)
+
+		self.add_part_to_list(datetime.strftime('%m-%d-%Y'))
+
+		return True
 
 
 
@@ -765,10 +997,11 @@ class shipment(fsobj):
 #####  components, protomodules, modules  #####
 ###############################################
 
-class baseplate(fsobj):
+class baseplate(fsobj_part):
 	OBJECTNAME = "baseplate"
 	FILEDIR = os.sep.join(['baseplates','{date}'])
-	FILENAME = "baseplate_{ID}.json"
+	FILENAME = "baseplate_{ID}.xml"
+
 	PROPERTIES = [
 		# shipments and location
 		"institution",
@@ -797,14 +1030,15 @@ class baseplate(fsobj):
 		"thickness",           # measure thickness of baseplate
 
 		# kapton application (1)
-		"step_kapton", # ID of step_kapton that applied the kapton to it
+		#"step_kapton", # ID of step_kapton that applied the kapton to it
+		# REMOVED
 
 		# kaptonized baseplate qualification (1)
 		#"check_leakage",    # None if not checked yet; True if passed; False if failed
 		#"check_surface",    # None if not checked yet; True if passed; False if failed
 		"check_edges_firm", # None if not checked yet; True if passed; False if failed
 		"check_glue_spill", # None if not checked yet; True if passed; False if failed
-		"kapton_flatness",  # flatness of kapton layer after curing
+		#"kapton_flatness",  # flatness of kapton layer after curing
 
 		# kapton application (2) - for double kapton baseplates
 		# REMOVED -- see above
@@ -818,7 +1052,14 @@ class baseplate(fsobj):
 		"module", # what module (ID) it's a part of; None if not part of any
 
 		# NEW to match XML script
-		"insertion_user",
+		"insertion_user", # may not need this...
+
+		# NEW:  Data to be read from base XML file
+		"id_number",
+		"kind_of_part_id",
+		"kind_of_part",
+		"location_id",
+		"description",
 	]
 
 	DEFAULTS = {
@@ -833,68 +1074,6 @@ class baseplate(fsobj):
 		"comments",
 		"insertion_user",
 	]
-
-
-	@property
-	def flatness(self):
-		# BASEPLATE flatness, not kapton flatness!
-		if self.corner_heights is None:
-			return None
-		else:
-			if None in self.corner_heights:
-				return None
-			else:
-				return max(self.corner_heights) - min(self.corner_heights)
-
-	def ready_step_kapton(self, step_kapton = None, max_flatness = None, max_kapton_flatness = None):
-		if step_kapton == self.step_kapton:
-			return True, "already part associated with this kapton step"
-
-		if not (self.step_sensor is None):
-			return False, "already part of a protomodule (has a sensor step)"
-
-		if not self.step_kapton is None:
-			# step_kapton has already been assigned, and it isn't the one that's currently being added!
-			return False, "baseplate already has an assigned kapton step!"
-		
-		if self.material == "PCB":
-			return False, "baseplate is a PCB baseplate"
-
-		# Kapton qualification checks:
-		errstr = ""
-		checks = [
-			#self.check_leakage    == "pass",
-			#self.check_surface    == "pass",
-			self.check_edges_firm == "pass",
-			self.check_glue_spill == "pass",
-			self.kapton_flatness  != None,
-			]
-		if self.kapton_flatness is None:
-			errstr+=" kapton flatness doesn't exist."
-			checks.append(False)
-		elif not (max_kapton_flatness is None) and (self.kapton_flatness > max_kapton_flatness):
-			errstr.append(" kapton flatness {} exceeds max of {}.".format(self.kapton_flatness, max_kapton_flatness))
-			checks.append(False)
-
-		# Baseplate qualification+preparation checks:
-		#if not self.kapton_tape_applied:
-		#	errstr+=" kapton tape not applied."
-		#	checks.append(False)
-		if not self.thickness:
-			errstr+=" thickness doesn't exist."
-			checks.append(False)
-		if self.flatness is None:
-			errstr+=" flatness doesn't exist."
-			checks.append(False)
-		elif not (max_flatness is None):
-			if max_flatness<self.flatness:
-				errstr+="kapton flatness "+str(self.flatness)+" exceeds max "+str(max_flatness)+"."
-				checks.append(False)
-
-		if not all(checks):
-			return False, "baseplate qualification failed or incomplete. "+errstr
-		else:
-			return True, ""
 
 
 	def ready_step_sensor(self, step_sensor = None, max_flatness = None):
@@ -973,59 +1152,12 @@ class baseplate(fsobj):
 		"""
 		return True, ""
 
-	
-	def save(self):  #NEW for XML generation
-		
-		# FIRST:  If not all necessary vars are defined, don't save the XML file.
-		required_vars = [self.size, self.comments, self.location, self.institution]
-		#contents = vars(self)
-		for vr in required_vars:
-			if vr is None:
-				# If any undef var found, save the json file only and return
-				print("NOTE:  missing required data, baseplate XML not saved.")
-				super(baseplate, self).save()
-				print("Saved baseplate!")
-				return
-
-		# TAKE 2:  This time, use gen_xml(input_dict) to streamline things.
-		# Match XML schema in  https://cmsdca.cern.ch/hgc_loader/hgc/int2r/doc/doc#type_part
-		part_dict = {
-			#'PART_ID':               str(self.ID),  
-			'KIND_OF_PART':          'HGC {} Inch Kaptonized Plate'.format('Six' if self.size=='6' else 'Eight'),
-			'MANUFACTURER':          self.manufacturer,
-			'BARCODE':               'PLACEHOLDERVAL',
-			'SERIAL_NUMBER':         str(self.ID),
-			'VERSION':               self.material,   #THIS MAY BE WRONG
-			'LOCATION':              self.location,
-			'INSTITUTION':           self.institution,
-			'RECORD_INSERTION_USER': self.insertion_user,
-			'COMMENT_DESCRIPTION':   self.comments,
-		}
-		parts_dict = {
-			'PART': part_dict,
-		}
-		root_dict = {
-			'PARTS': parts_dict,
-		}
-
-		# CREATE XML FILE OBJECT:
-		xml_tree = self.generate_xml(root_dict)
-
-		# ORDER CHANGED--this should be necessary
-		super(baseplate, self).save()
-
-		# Save:
-		self.save_xml(xml_tree)
-
-		# Save old json file:
-		#super(baseplate, self).save()
 
 
-
-class sensor(fsobj):
+class sensor(fsobj_part):
 	OBJECTNAME = "sensor"
 	FILEDIR = os.sep.join(['sensors','{date}'])
-	FILENAME = "sensor_{ID}.json"
+	FILENAME = "sensor_{ID}.xml"
 	PROPERTIES = [
 		# shipments and location
 		"institution",
@@ -1051,17 +1183,89 @@ class sensor(fsobj):
 		#NEW, WIP
 		#"semi_type",   #semiconductor type--either P or N
 
+		# NOTE:  kapton step has been moved to sensor!
+		"step_kapton",
+		"kapton_flatness",
+		"check_edges_firm",
+		"check_glue_spill",
+		"thickness",
+		"corner_heights",
+
 		# associations to other objects
 		"module", # which module this sensor is a part of
 
 		# New to match Akshay's script
 		"insertion_user",
+		# NEW:  Data to be read from base XML file
+		"id_number",
+		"kind_of_part_id",
+		"kind_of_part",
+		"location_id",
+		"description",
 	]
 
 	DEFAULTS = {
 		"shipments":[],
 		"size":    '8',  # DO NOT MODIFY
 	}
+
+	@property
+	def flatness(self):
+		# BASEPLATE flatness, not kapton flatness!
+		if self.corner_heights is None:
+			return None
+		else:
+			if None in self.corner_heights:
+				return None
+			else:
+				return max(self.corner_heights) - min(self.corner_heights)
+
+
+	# NEWLY MOVED FROM BASEPLATE!!!
+	def ready_step_kapton(self, step_kapton = None, max_flatness = None, max_kapton_flatness = None):
+		if step_kapton == self.step_kapton:
+			return True, "already part associated with this kapton step"
+
+		if not (self.step_sensor is None):
+			return False, "already part of a protomodule (has a sensor step)"
+
+		if not self.step_kapton is None:
+			# step_kapton has already been assigned, and it isn't the one that's currently being added!
+			return False, "baseplate already has an assigned kapton step!"
+		
+		# Kapton qualification checks:
+		errstr = ""
+		checks = [
+			self.check_edges_firm == "pass",
+			self.check_glue_spill == "pass",
+			self.kapton_flatness  != None,
+		]
+		if self.kapton_flatness is None:
+			errstr+=" kapton flatness doesn't exist."
+			checks.append(False)
+		elif not (max_kapton_flatness is None) and (self.kapton_flatness > max_kapton_flatness):
+			errstr.append(" kapton flatness {} exceeds max of {}.".format(self.kapton_flatness, max_kapton_flatness))
+			checks.append(False)
+
+		# Baseplate qualification+preparation checks:
+		#if not self.kapton_tape_applied:
+		#	errstr+=" kapton tape not applied."
+		#	checks.append(False)
+		if not self.thickness:
+			errstr+=" thickness doesn't exist."
+			checks.append(False)
+		if self.flatness is None:
+			errstr+=" flatness doesn't exist."
+			checks.append(False)
+		elif not (max_flatness is None):
+			if max_flatness<self.flatness:
+				errstr+="kapton flatness "+str(self.flatness)+" exceeds max "+str(max_flatness)+"."
+				checks.append(False)
+
+		if not all(checks):
+			return False, "sensor qualification failed or incomplete. "+errstr
+		else:
+			return True, ""
 
 	def save(self):  #NEW for XML generation
 		
@@ -1111,10 +1315,10 @@ class sensor(fsobj):
 		
 
 
-class pcb(fsobj):
+class pcb(fsobj_part):
 	OBJECTNAME = "PCB"
-	FILEDIR = os.sep.join(['pcbs','{date}','pcb_{ID}'])
-	FILENAME = "pcb_{ID}.json"
+	FILEDIR = os.sep.join(['pcbs','{date}'])  #,'pcb_{ID}'])
+	FILENAME = "pcb_{ID}.xml"
 	PROPERTIES = [
 		# shipments and location
 		"institution",
@@ -1147,6 +1351,13 @@ class pcb(fsobj):
 
 		# Associations to datasets
 		"daq_data", # list of all DAQ datasets
+
+		# NEW:  Data to be read from base XML file
+		"id_number",
+		"kind_of_part_id",
+		"kind_of_part",
+		"location_id",
+		"description",
 	]
 
 	PROPERTIES_DO_NOT_SAVE = [
@@ -1236,10 +1447,10 @@ class pcb(fsobj):
 
 
 
-class protomodule(fsobj):
+class protomodule(fsobj_part):
 	OBJECTNAME = "protomodule"
 	FILEDIR = os.sep.join(['protomodules','{date}'])
-	FILENAME = 'protomodule_{ID}.json'
+	FILENAME = 'protomodule_{ID}.xml'
 	PROPERTIES = [
 		# shipments and location
 		"institution",
@@ -1261,7 +1472,7 @@ class protomodule(fsobj):
 		"step_sensor", # ID of sensor step
 		"baseplate",   # ID of baseplate
 		"sensor",      # ID of sensor
-		"step_kapton", # ID of kapton step (from baseplate)
+		"step_kapton", # ID of kapton step (from SENSOR)
 
 		# protomodule qualification
 		"offset_translation_x", # translational offset of placement
@@ -1274,6 +1485,13 @@ class protomodule(fsobj):
 		# pcb step
 		"step_pcb", # ID of pcb step
 		"module",   # ID of module
+
+		# NEW:  Data to be read from base XML file
+		"id_number",
+		"kind_of_part_id",
+		"kind_of_part",
+		"location_id",
+		"description",
 	]
 
 	DEFAULTS = {
@@ -1285,10 +1503,10 @@ class protomodule(fsobj):
 # NOTE:  Does not currently have a XML file!  Akshay's script just generated the assembly/condition file.
 
 
-class module(fsobj):
+class module(fsobj_part):
 	OBJECTNAME = "module"
 	FILEDIR    = os.sep.join(['modules','{date}','module_{ID}'])
-	FILENAME   = 'module_{ID}.json'
+	FILENAME   = 'module_{ID}.xml'
 	PROPERTIES = [
 		# shipments and location
 		"institution",
@@ -1396,6 +1614,13 @@ class module(fsobj):
 		# datasets
 		"iv_data",  #
 		"daq_data", #
+
+		# NEW:  Data to be read from base XML file
+		"id_number",
+		"kind_of_part_id",
+		"kind_of_part",
+		"location_id",
+		"description",
 	]
 	
 	PROPERTIES_DO_NOT_SAVE = [
@@ -1558,10 +1783,10 @@ class module(fsobj):
 ###############  assembly steps  ##############
 ###############################################
 
-class step_kapton(fsobj):
+class step_kapton(fsobj):  # NOTE:  Not an assembly object!  (doesn't have 2 XML files, not in DB)
 	OBJECTNAME = "kapton step"
 	FILEDIR    = os.sep.join(['steps','kapton','{date}'])
-	FILENAME   = 'kapton_assembly_step_{ID:0>5}.json'
+	FILENAME   = 'kapton_assembly_step_{ID:0>5}.xml'
 	PROPERTIES = [
 		'user_performed', # name of user who performed step
 		'institution', # institution where step was performed
@@ -1578,7 +1803,8 @@ class step_kapton(fsobj):
 
 		'kaptons_inspected', # list of kapton inspection results, ordered by component tray location. should all be True (don't use a kapton if it doesn't pass)
 		'tools',      # list of pickup tool IDs, ordered by pickup tool location
-		'baseplates', # list of baseplate   IDs, ordered by assembly tray position
+		#'baseplates', # list of baseplate   IDs, ordered by assembly tray position
+		'sensors',  # NEW:  List of sensors!
 
 		'tray_component_sensor', # ID of component tray used
 		'tray_assembly',         # ID of assembly tray used
@@ -1607,21 +1833,22 @@ class step_kapton(fsobj):
 		return datestr
 
 
+
 	def save(self):
 		super(step_kapton, self).save()
-		inst_baseplate = baseplate()
+		inst_sensor = sensor()
 
 		for i in range(6):
-			baseplate_exists = False if self.baseplates[i] is None else inst_baseplate.load(self.baseplates[i])
-			if baseplate_exists:
+			sensor_exists = False if self.sensors[i] is None else inst_sensor.load(self.sensors[i])
+			if sensor_exists:
 
 				# If baseplate has no step_kapton or if its step_kapton is the one being edited now:
-				if (inst_baseplate.step_kapton is None) or (inst_baseplate.step_kapton == self.ID):
-					inst_baseplate.step_kapton = self.ID
-					inst_baseplate.save()
-					inst_baseplate.clear()
+				if (inst_sensor.step_kapton is None) or (inst_sensor.step_kapton == self.ID):
+					inst_sensor.step_kapton = self.ID
+					inst_sensor.save()
+					inst_sensor.clear()
 				else:
-					print("ERROR:  Baseplate {} has already been assigned a kapton step!")
+					print("ERROR:  Sensor {} has already been assigned a kapton step!".format(inst_sensor.ID))
 					print("*WARNING:  ready_step_kapton should prevent this from working!")
 					assert(False)
 
@@ -1633,10 +1860,10 @@ class step_kapton(fsobj):
 
 
 
-class step_sensor(fsobj):
+class step_sensor(fsobj_assembly):
 	OBJECTNAME = "sensor step"
 	FILEDIR    = os.sep.join(['steps','sensor','{date}'])
-	FILENAME   = 'sensor_assembly_step_{ID:0>5}.json'
+	FILENAME   = 'sensor_assembly_step_{ID:0>5}.xml'
 	PROPERTIES = [
 		'user_performed', # name of user who performed step
 		#'date_performed', # date step was performed
@@ -1662,6 +1889,10 @@ class step_sensor(fsobj):
 		'tray_assembly',         # ID of assembly  tray used
 		'batch_araldite',        # ID of araldite batch used
 		'batch_loctite',         # ID of loctite  batch used
+
+		# TEMP:
+		'kind_of_part_id',
+		'kind_of_part',
 	]
 
 
@@ -1672,6 +1903,12 @@ class step_sensor(fsobj):
 		else:
 			return self.cure_stop - self.cure_start
 	"""
+	@property
+	def temp_property(self):
+		return None
+	@temp_property.setter
+	def temp_property(self, value):
+		pass
 
 	# New:  Convert time_t to correctly-formatted date string
 	@property
@@ -1684,6 +1921,186 @@ class step_sensor(fsobj):
 		datestr = "{}-{}-{} {}:{}:{}".format(qdate.year(), qdate.month(), qdate.day(), \
                                              qtime.hour(), qtime.minute(), qtime.second())
 		return datestr
+
+	# WIP
+	@property
+	def kind_of_part_id(self):
+		# TODO:
+		# Load created protomodule and return the type!  Will require a protomodule property.
+		return str(self.kind_of_part_id)
+
+	@kind_of_part_id.setter
+	def kind_of_part_id(self, value):
+		print("PROPERTY SETTER:  Setting kind of part ID")
+		# TODO:  Set part geometry/etc in accordance w/ input value
+		self.kind_of_part_id = str(value)
+
+	#@property
+	#def kind_of_part(self):
+	#	return ''
+
+	@property
+	def assembly_tray_name(self):
+		return 
+
+	@assembly_tray_name.setter(self):
+		pass
+
+	@property
+	def baseplate_serial(self):
+		pass
+
+	@property
+	def assembly_row(self):
+		pass
+
+	@property
+	def assembly_col(self):
+		pass
+
+	@property
+	def comp_tray_name(self):
+		pass
+
+	@property
+	def sensor_tool_name(self):
+		pass
+
+
+	# FOR NEW ASSEMBLY CLASS:
+	ASSM_TABLE = 'c4220'
+	COND_TABLE = 'c4260'
+
+	# Vars for tables - constants
+	COND_ID = 4220
+	COND_NAME = 'HGC Six Inch Proto Module Assembly'
+	TEMP = None
+	KIND_ID = 4200
+	GLUE_TYPE = 'Araldite'
+	SLVR_EPXY_TYPE = 'Locetite Ablestik'
+
+	XML_STRUCT_DICT = {'data':{'row':{  # WIP
+		# Leave out ID--should be assigned by DB loader! (?)
+		'KIND_OF_CONDITION_ID':	'COND_ID',  # PROPERTY:  from protomod type
+		'KIND_OF_CONDITION':	'COND_NAME',  # SAME
+		'CONDITION_DATA_SET_ID':'temp_property',  # TBD
+		'KIND_OF_PART_ID':		'kind_of_part_id',  # PROPERRY:  from protomod
+		'KIND_OF_PART':			'kind_of_part',  # PROPERTY:  from protmod
+		#'PART_ID':				'protomodule',  # PROPERTY...but this gets set in the DB??
+		'PART_SERIAL_NUMBER':	'protomodule_id',  # from protomod
+		'ASMBL_TRAY_NAME':		'assembly_tray_name',
+		'PLT_SER_NUM':			'baseplate_serial',
+		'PLT_ASM_ROW':			'assembly_row',
+		'PLT_ASM_COL':			'assembly_col',
+		'PLT_FLTNES_MM':		'baseplate_flatness',
+		'PLT_THKNES_MM':		'baseplate_thickness',
+		'COMP_TRAY_NAME':		'comp_tray_name',
+		'SNSR_SER_NUM':			'sensor_serial',
+		'SNSR_CMP_ROW':			'assembly_row',  # These should always be the same as above...right?
+		'SNSR_CMP_COL':			'assembly_col',
+		'SNSR_X_OFFST':			'temp_property',  # Not sure if this is necessary...
+		'SNSR_Y_OFFST':			'temp_property',
+		'SNSR_ANG_OFFST':		'temp_property',
+		'SNSR_TOOL_NAME':		'sensor_tool_name',
+		'SNSR_TOOL_HT_SET':		'temp_property',  # Necessary??
+		'SNSR_TOOL_HT_CHK':		'temp_property',
+		'GLUE_TYPE':			'GLUE_TYPE',
+		'GLUE_BATCH_NUM':		'batch_araldite',
+		'SLVR_EPXY_TYPE':		'SLVR_EPXY_TYPE',
+		'SLVR_EPXY_BATCH_NUM':	'batch_loctite',
+	}}}
+
+	# NOTE:  This may be wrong!  Got it from the schema online...
+	XML_COND_DICT = {'data':{'row':{  # WIP
+		'':'',
+	}}}
+
+
+
+
+		type_dict = {
+						'EXTENSION_TABLE_NAME':'HGC_PRTO_MOD_ASMBLY',
+						'NAME':'HGC {} Inch Proto Module Assembly'.format('Six' if baseplate_.size==6 else 'Eight'),
+					}
+		run_dict =  {
+						'RUN_TYPE':'HGC {}inch Proto Module Assembly'.format(baseplate_.size),
+						'RUN_NUMBER':str(self.ID),
+						'RUN_BEGIN_TIMESTAMP':self.run_start_xml,
+						'RUN_END_TIMESTAMP':"PLACEHOLDER", #self.run_stop,
+						'INITIATED_BY_USER':self.user_performed,
+						'LOCATION':"{}, {}".format(self.institution, self.location),
+						'COMMENT_DESCRIPTION':'Build {}inch proto modules'.format(baseplate_.size),
+					}
+		header_dict = {
+						'TYPE':type_dict,
+						'RUN':run_dict,
+					}
+		root_dict['HEADER'] = header_dict
+
+		# COND file:
+		root_cond = Element('ROOT')
+		root_cond.set('xmlns:xsi','http://www.w3.org/2001/XMLSchema-instance')
+		type_dict_cond = {
+						'EXTENSION_TABLE_NAME':'HGC_PRTO_MOD_ASMBLY_COND',
+						'NAME':'HGC {} Inch Proto Module Curing Cond'.format('Six' if baseplate_.size==6 else 'Eight'),
+					}
+		run_dict_cond = {
+						'RUN_NAME':'HGC {}inch Proto Module Assembly'.format(baseplate_.size),
+						#'RUN_NUMBER':self.ID,
+						'RUN_BEGIN_TIMESTAMP':self.run_start,  #WIP (add to GUI)
+						'RUN_END_TIMESTAMP':"PLACEHOLDER",  #self.run_stop,  #WIP
+						'INITIATED_BY_USER':self.user_performed,
+						'LOCATION':self.location,  #WIP (add to GUI)
+						'COMMENT_DESCRIPTION':'Build {}inch proto modules'.format(baseplate_.size),
+					}
+		header_dict_cond = {
+						'TYPE':type_dict,
+						'RUN':run_dict,
+					  }
+		root_dict_cond['HEADER'] = header_dict_cond
+
+					data_dict = {
+								# WIP:
+								'ASMBL_TRAY_NAME':'{}_ASMBLY_TRAY_{}'.format(asmbl_tray.location, asmbl_tray.ID),
+								# Reminder:  PLT==baseplate
+								'PLT_SER_NUM':'{}'.format(inst_baseplate.ID),
+								'PLT_ASM_ROW':str((i // 3) + 1),
+								'PLT_ASM_COL':str((i % 2) + 1),
+								# NOTE:  Make sure .flatness() works
+								'PLT_FLTNES_MM':str(inst_baseplate.flatness),
+								'PLT_THKNES_MM':str(inst_baseplate.thickness),
+								# ADD location to:
+								'COMP_TRAY_NAME':'{}_COMP_TRAY_{}'.format(comp_tray.institution, comp_tray.ID),
+								'SNSR_SER_NUM':str(snsr.ID),
+								'SNSR_CMP_ROW':str((i // 3) + 1),
+								'SNSR_CMP_COL':str((i % 2) + 1),   #Should == PLT_ASM_ROW, etc above
+								
+								# NOTE:  I assume these are measured during the placement step, not taken from view_sensor.ui.  Need to check.
+								'SNSR_X_OFFST':str(inst_protomodule.offset_translation_x),  #NOTE:  WIP
+								'SNSR_Y_OFFST':str(inst_protomodule.offset_translation_y),  #NOTE:  WIP
+								'SNSR_ANG_OFFSET':str(snsr.offset_rotation),  #NOTE:  WIP
+								'SNSR_TOOL_NAME':'{}_PCKUP_TOOL_{}'.format(snsr_tool.location, snsr_tool.ID),
+								'SNSR_TOOL_HT_SET':'TEMP',  #NOTE:  Also WIP
+								'SNSR_TOOL_HT_CHK':'TEMP',
+								
+								# Need to test QDate.year--should work if type(date_received)==QDate
+								'GLUE_TYPE':'Araldite',   # {}".format(glue_batch.date_received[0]),
+								'GLUE_BATCH_NUM':'Batch_{:03d}'.format(self.batch_araldite),
+								'SLVR_EPXY_TYPE':'Loctite Ablestik',
+								'SLVR_EXPY_BATCH_NUM':'Batch_{:03d}'.format(self.batch_loctite),
+							}
+					part_dict = {
+								'KIND_OF_PART':'HGC {} Inch Silicon Proto Module'.format('Six' if snsr.size==6 else 'Eight'),
+								'SERIAL_NUMBER':'{}_HGC_TST_PRTMOD_{}'.format(self.location, self.ID),
+							}
+					dataset_dict = {
+								'COMMENT_DESCRIPTION':'{}_HGC_TST_PRTMOD_{} Assembly'.format(self.institution, self.ID),
+								'VERSION':'1',  # Assumed
+								'PART':part_dict,
+								'DATA':data_dict,
+							}
+
+
 
 
 	# WIP
@@ -1813,6 +2230,8 @@ class step_sensor(fsobj):
 					snsr.load(self.sensors[i])
 					snsr_tool = tool_sensor()
 					snsr_tool.load(self.tools[i], self.institution)
+
+					
 					data_dict = {
 								# WIP:
 								'ASMBL_TRAY_NAME':'{}_ASMBLY_TRAY_{}'.format(asmbl_tray.location, asmbl_tray.ID),
@@ -1880,6 +2299,8 @@ class step_sensor(fsobj):
 								}
 					
 					data_sets_cond.append(dataset_dict_cond)
+					
+
 
 			inst_baseplate.clear()
 			inst_sensor.clear()
@@ -1887,21 +2308,21 @@ class step_sensor(fsobj):
 
 		# SAVE output:
 
-		root_dict['DATA_SET'] = data_sets
-		root_dict_cond['DATA_SET'] = data_sets_cond
+		#root_dict['DATA_SET'] = data_sets
+		#root_dict_cond['DATA_SET'] = data_sets_cond
 
-		xml_tree      = self.generate_xml(root_dict)
-		xml_tree_cond = self.generate_xml(root_dict_cond)
+		#xml_tree      = self.generate_xml(root_dict)
+		#xml_tree_cond = self.generate_xml(root_dict_cond)
 
-		self.save_xml(xml_tree)
-		self.save_xml(xml_tree_cond)
+		#self.save_xml(xml_tree)
+		#self.save_xml(xml_tree_cond)
 
 
 
-class step_pcb(fsobj):
+class step_pcb(fsobj_assembly):
 	OBJECTNAME = "PCB step"
 	FILEDIR = os.sep.join(['steps','pcb','{date}'])
-	FILENAME = 'pcb_assembly_step_{ID:0>5}.json'
+	FILENAME = 'pcb_assembly_step_{ID:0>5}.xml'
 	PROPERTIES = [
 		'user_performed', # name of user who performed step
 		#'date_performed', # date step was performed
@@ -1995,7 +2416,7 @@ class step_pcb(fsobj):
 				inst_module.sensor      = inst_sensor.ID      if sensor_exists      else None
 				inst_module.pcb         = inst_pcb.ID         if pcb_exists         else None
 				inst_module.protomodule = inst_protomodule.ID if protomodule_exists else None
-				inst_module.step_kapton   = inst_baseplate.step_kapton   if baseplate_exists   else None
+				inst_module.step_kapton   = inst_sensor.step_kapton    if sensor_exists      else None
 				inst_module.step_sensor = inst_protomodule.step_sensor if protomodule_exists else None
 				inst_module.step_pcb    = self.ID
 				inst_module.channels    = inst_sensor.channels       if sensor_exists    else None

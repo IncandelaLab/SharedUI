@@ -24,8 +24,8 @@ I_TRAY_ASSEMBLY_DNE  = "assembly tray does not exist or is not selected"
 I_BATCH_ARALDITE_DNE     = "araldite batch does not exist or is not selected"
 I_BATCH_ARALDITE_EXPIRED = "araldite batch has expired"
 
-# baseplates
-I_BASEPLATE_NOT_READY  = "baseplate(s) in position(s) {} is not ready for kapton application. reason: {}"
+# sensors
+I_SENSOR_NOT_READY  = "sensor(s) in position(s) {} is not ready for kapton application. reason: {}"
 
 # kapton inspection
 I_KAPTON_INSPECTION_NOT_DONE = "kapton inspection not done for position(s) {}"
@@ -35,9 +35,9 @@ I_KAPTON_INSPECTION_ON_EMPTY = "kapton inspection checked for empty position(s) 
 I_NO_PARTS_SELECTED = "no parts have been selected"
 I_ROWS_INCOMPLETE   = "positions {} are partially filled"
 I_TOOL_SENSOR_DNE      = "sensor tool(s) in position(s) {} do not exist"
-I_BASEPLATE_DNE        = "baseplate(s) in position(s) {} do not exist"
+I_SENSOR_DNE        = "sensor(s) in position(s) {} do not exist"
 I_TOOL_SENSOR_DUPLICATE = "same sensor tool is selected on multiple positions: {}"
-I_BASEPLATE_DUPLICATE   = "same baseplate is selected on multiple positions: {}"
+I_SENSOR_DUPLICATE   = "same sensor is selected on multiple positions: {}"
 
 # compatibility
 I_SIZE_MISMATCH = "size mismatch between some selected objects"
@@ -59,7 +59,7 @@ class func(object):
 		self.setMainSwitchingEnabled = setSwitchingEnabled
 
 		self.tools_sensor = [fm.tool_sensor() for _ in range(6)]
-		self.baseplates   = [fm.baseplate()   for _ in range(6)]
+		self.sensors   = [fm.sensor()   for _ in range(6)]
 		self.tray_component_sensor = fm.tray_component_sensor()
 		self.tray_assembly         = fm.tray_assembly()
 		self.batch_araldite        = fm.batch_araldite()
@@ -130,30 +130,21 @@ class func(object):
 			self.page.pbGoTool5,
 			self.page.pbGoTool6,
 		]
-		"""
-		self.sb_baseplates = [
-			self.page.sbBaseplate1,
-			self.page.sbBaseplate2,
-			self.page.sbBaseplate3,
-			self.page.sbBaseplate4,
-			self.page.sbBaseplate5,
-			self.page.sbBaseplate6,
-		]"""
-		self.le_baseplates = [
-			self.page.leBaseplate1,
-			self.page.leBaseplate2,
-			self.page.leBaseplate3,
-			self.page.leBaseplate4,
-			self.page.leBaseplate5,
-			self.page.leBaseplate6,
+		self.le_sensors = [
+			self.page.leSensor1,
+			self.page.leSensor2,
+			self.page.leSensor3,
+			self.page.leSensor4,
+			self.page.leSensori5,
+			self.page.leSensor6,
 		]
-		self.pb_go_baseplates = [
-			self.page.pbGoBaseplate1,
-			self.page.pbGoBaseplate2,
-			self.page.pbGoBaseplate3,
-			self.page.pbGoBaseplate4,
-			self.page.pbGoBaseplate5,
-			self.page.pbGoBaseplate6,
+		self.pb_go_sensors = [
+			self.page.pbGoSensor1,
+			self.page.pbGoSensor2,
+			self.page.pbGoSensor3,
+			self.page.pbGoSensor4,
+			self.page.pbGoSensor5,
+			self.page.pbGoSensor6,
 		]
 		self.ck_kaptons_inspected = [
 			self.page.ckKaptonInspected1,
@@ -166,11 +157,10 @@ class func(object):
 
 		for i in range(6):
 			self.pb_go_tools[i].clicked.connect(self.goTool)
-			self.pb_go_baseplates[i].clicked.connect(self.goBaseplate)
+			self.pb_go_sensors[i].clicked.connect(self.goSensor)
 
 			self.sb_tools[i].editingFinished.connect(             self.loadToolSensor )
-			#self.sb_baseplates[i].editingFinished.connect(        self.loadBaseplate  )
-			self.le_baseplates[i].textChanged.connect( self.loadBaseplate )  # Could also use editingFinshed
+			self.le_sensors[i].textChanged.connect( self.loadSensor )  # Could also use editingFinshed
 			self.ck_kaptons_inspected[i].clicked.connect( self.updateIssues   )
 
 		self.page.cbInstitution.currentIndexChanged.connect( self.loadAllTools )
@@ -233,14 +223,12 @@ class func(object):
 				for i in range(6):
 					self.sb_tools[i].setValue(-1)
 
-			if not (self.step_kapton.baseplates is None):
+			if not (self.step_kapton.sensors is None):
 				for i in range(6):
-					#self.sb_baseplates[i].setValue(self.step_kapton.baseplates[i] if not (self.step_kapton.baseplates[i] is None) else -1)
-					self.le_baseplates[i].setText(self.step_kapton.baseplates[i] if not (self.step_kapton.baseplates[i] is None) else "")
+					self.le_sensors[i].setText(self.step_kapton.sensors[i] if not (self.step_kapton.sensors[i] is None) else "")
 			else:
 				for i in range(6):
-					#self.sb_baseplates[i].setValue(-1)
-					self.le_baseplates[i].setText("")
+					self.le_sensors[i].setText("")
 
 			if not (self.step_kapton.kaptons_inspected is None):
 				for i in range(6):
@@ -263,14 +251,11 @@ class func(object):
 			self.page.sbTrayAssembly.setValue(-1)
 			for i in range(6):
 				self.sb_tools[i].setValue(-1)
-				#self.sb_baseplates[i].setValue(-1)
-				self.le_baseplates[i].setText("")
+				self.le_sensors[i].setText("")
 				self.ck_kaptons_inspected[i].setChecked(False)
 
 		for i in range(6):
 			if self.sb_tools[i].value() == -1:  self.sb_tools[i].clear()
-			#if self.sb_baseplates[i].value() == -1:  self.sb_baseplates[i].clear()
-			# Not necessary for le_baseplates
 
 		if self.page.sbBatchAraldite.value() == -1:  self.page.sbBatchAraldite.clear()
 		if self.page.sbTrayComponent.value() == -1:  self.page.sbTrayComponent.clear()
@@ -284,8 +269,7 @@ class func(object):
 		mode_editing  = self.mode == 'editing'
 		mode_creating = self.mode == 'creating'
 		tools_exist      = [_.value()>=0 for _ in self.sb_tools     ]
-		#baseplates_exist = [_.value()>=0 for _ in self.sb_baseplates]
-		baseplates_exist = [_.text()!="" for _ in self.le_baseplates]
+		sensors_exist = [_.text()!="" for _ in self.le_sensors]
 		step_kapton_exists = self.step_kapton_exists
 
 		self.setMainSwitchingEnabled(mode_view)
@@ -310,10 +294,9 @@ class func(object):
 
 		for i in range(6):
 			self.sb_tools[i].setReadOnly(mode_view)
-			#self.sb_baseplates[i].setReadOnly(mode_view)
-			self.le_baseplates[i].setReadOnly(mode_view)
+			self.le_sensors[i].setReadOnly(mode_view)
 			self.pb_go_tools[i].setEnabled(     mode_view and tools_exist[i]     )
-			self.pb_go_baseplates[i].setEnabled(mode_view and baseplates_exist[i])
+			self.pb_go_sensors[i].setEnabled(mode_view and sensors_exist[i])
 			self.ck_kaptons_inspected[i].setEnabled(mode_creating or mode_editing)
 
 		self.page.pbNew.setEnabled(    mode_view and not step_kapton_exists )
@@ -326,8 +309,7 @@ class func(object):
 	def loadAllObjects(self,*args,**kwargs):
 		for i in range(6):
 			self.tools_sensor[i].load(  self.sb_tools[i].value(),          self.page.cbInstitution.currentText())
-			#self.baseplates[i].load(    self.sb_baseplates[i].value())
-			self.baseplates[i].load(    self.le_baseplates[i].text())
+			self.sensors[i].load(    self.le_sensors[i].text())
 		self.tray_component_sensor.load(self.page.sbTrayComponent.value(), self.page.cbInstitution.currentText())
 		self.tray_assembly.load(        self.page.sbTrayAssembly.value(),  self.page.cbInstitution.currentText())
 		self.batch_araldite.load(       self.page.sbBatchAraldite.value())
@@ -346,7 +328,7 @@ class func(object):
 	def unloadAllObjects(self,*args,**kwargs):
 		for i in range(6):
 			self.tools_sensor[i].clear()
-			self.baseplates[i].clear()
+			self.sensors[i].clear()
 		self.tray_component_sensor.clear()
 		self.tray_assembly.clear()
 		self.batch_araldite.clear()
@@ -359,11 +341,10 @@ class func(object):
 		self.updateIssues()
 
 	@enforce_mode(['editing','creating'])
-	def loadBaseplate(self, *args, **kwargs):
+	def loadSensor(self, *args, **kwargs):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
-		#self.baseplates[which].load(self.sb_baseplates[which].value())
-		self.baseplates[which].load(self.le_baseplates[which].text())
+		self.sensors[which].load(self.le_sensors[which].text())
 		self.updateIssues()
 
 	@enforce_mode(['editing','creating'])
@@ -417,24 +398,23 @@ class func(object):
 
 		# rows
 		sensor_tools_selected = [_.value()     for _ in self.sb_tools            ]
-		#baseplates_selected   = [_.value()     for _ in self.sb_baseplates       ]
-		baseplates_selected   = [_.text()      for _ in self.le_baseplates       ]
+		sensors_selected   = [_.text()      for _ in self.le_sensors       ]
 		kaptons_inspected     = [_.isChecked() for _ in self.ck_kaptons_inspected]
 
 		sensor_tool_duplicates = [_ for _ in range(6) if sensor_tools_selected[_] >= 0 and sensor_tools_selected.count(sensor_tools_selected[_])>1]
-		baseplate_duplicates   = [_ for _ in range(6) if baseplates_selected[_]   != "" and baseplates_selected.count(  baseplates_selected[_]  )>1]
+		sensor_duplicates   = [_ for _ in range(6) if sensors_selected[_]   != "" and sensors_selected.count(  sensors_selected[_]  )>1]
 
 		if sensor_tool_duplicates:
 			issues.append(I_TOOL_SENSOR_DUPLICATE.format(', '.join([str(_+1) for _ in sensor_tool_duplicates])))
-		if baseplate_duplicates:
-			issues.append(I_BASEPLATE_DUPLICATE.format(', '.join([str(_+1) for _ in baseplate_duplicates])))
+		if sensor_duplicates:
+			issues.append(I_SENSOR_DUPLICATE.format(', '.join([str(_+1) for _ in sensor_duplicates])))
 
 		rows_empty = []
 		rows_full = []
 		rows_incomplete = []
 		rows_kapton_inspection_on_empty = []
 		rows_kapton_inspection_not_done = []
-		rows_baseplate_dne = []
+		rows_sensor_dne = []
 		rows_tool_sensor_dne = []
 
 		for i in range(6):
@@ -446,19 +426,19 @@ class func(object):
 				if self.tools_sensor[i].ID is None:
 					rows_tool_sensor_dne.append(i)
 
-			if baseplates_selected[i] != "":
+			if sensors_selected[i] != "":
 				num_parts += 1
-				objects.append(self.baseplates[i])
-				if self.baseplates[i].ID is None:
-					rows_baseplate_dne.append(i)
+				objects.append(self.sensors[i])
+				if self.sensors[i].ID is None:
+					rows_sensor_dne.append(i)
 				else:
 					#NOTE:  Max flatness is 250 um.  I think.
 					max_flatness = 0.250 #mm
 					max_kapton_flatness = None
-					ready, reason = self.baseplates[i].ready_step_kapton(self.page.sbID.value(), \
+					ready, reason = self.sensors[i].ready_step_kapton(self.page.sbID.value(), \
 																		 max_flatness, max_kapton_flatness)
 					if not ready:
-						issues.append(I_BASEPLATE_NOT_READY.format(i,reason))
+						issues.append(I_SENSOR_NOT_READY.format(i,reason))
 
 			if num_parts == 0:
 				rows_empty.append(i)
@@ -483,8 +463,8 @@ class func(object):
 		if rows_kapton_inspection_not_done:
 			issues.append(I_KAPTON_INSPECTION_NOT_DONE.format(', '.join([str(_+1) for _ in rows_kapton_inspection_not_done])))
 
-		if rows_baseplate_dne:
-			issues.append(I_BASEPLATE_DNE.format(', '.join([str(_+1) for _ in rows_baseplate_dne])))
+		if rows_sensor_dne:
+			issues.append(I_SENSOR_DNE.format(', '.join([str(_+1) for _ in rows_sensor_dne])))
 		if rows_tool_sensor_dne:
 			issues.append(I_TOOL_SENSOR_DNE.format(', '.join([str(_+1) for _ in rows_tool_sensor_dne])))
 
@@ -569,27 +549,25 @@ class func(object):
 		self.step_kapton.cure_temperature = str(self.page.leCureTemperature.text())
 
 		tools = []
-		baseplates = []
+		sensors = []
 		kaptons_inspected = []
 		for i in range(6):
 			tools.append(self.sb_tools[i].value() if self.sb_tools[i].value() >= 0 else None)
-			#baseplates.append(self.sb_baseplates[i].value() if self.sb_baseplates[i].value() >= 0 else None)
-			baseplates.append(self.le_baseplates[i].text() if self.le_baseplates[i].text != "" else None)
-			#kaptons_inspected.append(self.ck_kaptons_inspected[i].isChecked() if self.sb_baseplates[i].value() >= 0 else None)
-			kaptons_inspected.append(self.ck_kaptons_inspected[i].isChecked() if self.le_baseplates[i].text() != "" else None)
+			sensors.append(self.le_sensors[i].text() if self.le_sensors[i].text != "" else None)
+			kaptons_inspected.append(self.ck_kaptons_inspected[i].isChecked() if self.le_sensors[i].text() != "" else None)
 		self.step_kapton.tools = tools
-		self.step_kapton.baseplates = baseplates
+		self.step_kapton.sensors = sensors
 		self.step_kapton.kaptons_inspected = kaptons_inspected
 
 		self.step_kapton.tray_component_sensor = self.page.sbTrayComponent.value() if self.page.sbTrayComponent.value() >= 0 else None
 		self.step_kapton.tray_assembly         = self.page.sbTrayAssembly.value()  if self.page.sbTrayAssembly.value()  >= 0 else None
 		self.step_kapton.batch_araldite        = self.page.sbBatchAraldite.value() if self.page.sbBatchAraldite.value() >= 0 else None
 
-		# Update baseplates to point to this step:
+		# Update sensors to point to this step:
 		for i in range(6):
-			if not self.baseplates[i].ID is None:
-				self.baseplates[i].step_kapton = self.step_kapton.ID
-				self.baseplates[i].save()
+			if not self.sensors[i].ID is None:
+				self.sensors[i].step_kapton = self.step_kapton.ID
+				self.sensors[i].save()
 
 
 		print("Saving kapton step")
@@ -604,12 +582,11 @@ class func(object):
 		tool = self.sb_tools[which].value()
 		self.setUIPage('tooling',tool_sensor=tool)
 
-	def goBaseplate(self,*args,**kwargs):
+	def goSensor(self,*args,**kwargs):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
-		#baseplate = self.sb_baseplates[which].value()
-		baseplate = self.le_baseplates[which].text()
-		self.setUIPage('baseplates',ID=baseplate)
+		sensor = self.le_sensors[which].text()
+		self.setUIPage('sensors',ID=sensor)
 
 	def goBatchAraldite(self,*args,**kwargs):
 		batch_araldite = self.page.sbBatchAraldite.value()

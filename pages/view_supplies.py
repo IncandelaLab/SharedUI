@@ -46,9 +46,9 @@ class simple_fsobj_vc(object):
 
 			# Load date:
 			ydm = self.fsobj.date_received.split('-')
-			self.dReceived.setDate(QtCore.QDate(ydm[0], ydm[1], ydm[2]))  #*self.fsobj.date_received))
+			self.dReceived.setDate(QtCore.QDate(int(ydm[0]), int(ydm[1]), int(ydm[2])))  #*self.fsobj.date_received))
 			ydm = self.fsobj.date_expires.split('-')
-			self.dExpires.setDate(QtCore.QDate(ydm[0], ydm[1], ydm[2]))   #*self.fsobj.date_expires))
+			self.dExpires.setDate(QtCore.QDate(int(ydm[0]), int(ydm[1]), int(ydm[2])))   #*self.fsobj.date_expires))
 
 			self.ckIsEmpty.setChecked(self.fsobj.is_empty)
 
