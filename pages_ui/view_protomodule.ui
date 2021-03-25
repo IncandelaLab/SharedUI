@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>100</y>
+     <y>118</y>
      <width>261</width>
      <height>531</height>
     </rect>
@@ -469,7 +469,7 @@
      <x>10</x>
      <y>10</y>
      <width>261</width>
-     <height>71</height>
+     <height>91</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -482,7 +482,7 @@
     <property name="geometry">
      <rect>
       <x>90</x>
-      <y>30</y>
+      <y>50</y>
       <width>71</width>
       <height>21</height>
      </rect>
@@ -495,7 +495,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>30</y>
+      <y>50</y>
       <width>81</width>
       <height>21</height>
      </rect>
@@ -508,7 +508,7 @@
     <property name="geometry">
      <rect>
       <x>170</x>
-      <y>30</y>
+      <y>50</y>
       <width>71</width>
       <height>21</height>
      </rect>
@@ -553,7 +553,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>50</y>
+      <y>70</y>
       <width>111</width>
       <height>20</height>
      </rect>
@@ -563,6 +563,19 @@
     </property>
     <property name="readOnly">
      <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbLoad">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>20</y>
+      <width>131</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Load / check DB</string>
     </property>
    </widget>
   </widget>

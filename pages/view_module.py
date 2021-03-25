@@ -113,7 +113,9 @@ class func(object):
 	@enforce_mode('setup')
 	def rig(self):
 		#self.page.sbID.valueChanged.connect(self.update_info)
-		self.page.leID.textChanged.connect(self.update_info)
+		#self.page.leID.textChanged.connect(self.update_info)
+
+		self.page.pbLoad.clicked.connect(self.loadPart)
 
 		#self.page.pbNew.clicked.connect(self.startCreating)
 		self.page.pbEdit.clicked.connect(self.startEditing)
@@ -216,6 +218,9 @@ class func(object):
 
 	@enforce_mode(['view','editing','creating'])
 	def updateElements(self):
+		if not self.mode == "view":
+			self.page.leStatus.setText(self.mode)
+
 		module_exists   = self.module_exists
 		shipments_exist = self.page.listShipments.count() > 0
 		daq_data_exists = self.page.listDaqData.count()   > 0
@@ -236,6 +241,8 @@ class func(object):
 
 		self.setMainSwitchingEnabled(mode_view) 
 		self.page.leID.setReadOnly(not mode_view)
+
+		self.page.pbLoad.setEnabled(mode_view)
 
 		self.page.pbEdit  .setEnabled( mode_view and     module_exists )
 		self.page.pbSave  .setEnabled( mode_creating or mode_editing   )
@@ -289,9 +296,32 @@ class func(object):
 		self.page.pbDaqGoPlotter.setEnabled(   mode_view and daq_data_exists)
 
 
+	# NEW:
+	@enforce_mode('view')
+	def loadPart(self,*args,**kwargs):
+		if self.page.leID.text == "":
+			self.page.leStatus.setText("input an ID")
+			return
+		# Check whether baseplate exists:
+		tmp_module = fm.module()
+		tmp_ID = self.page.leID.text()
+		tmp_exists = tmp_module.load(tmp_ID)
+		if not tmp_exists:  # DNE; good to create
+			#ID = self.page.leID.text()
+			#self.sensor.new(ID)
+			#self.mode = 'creating'  # update_info needs mode==view
+			self.page.leStatus.setText("module DNE")
+			self.update_info()
+		else:
+			self.module = tmp_module
+			self.page.leStatus.setText("module exists")
+			self.update_info()
+
+
 	@enforce_mode('view')
 	def startCreating(self,*args,**kwargs):
 		print("ERROR:  This is outdated and should not be used.")
+		assert(False)
 		if not self.module_exists:
 			ID = self.page.sbID.value()
 			self.mode = 'creating'

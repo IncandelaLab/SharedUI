@@ -112,7 +112,11 @@ class func(object):
 	def rig(self):
 		#self.page.sbID.valueChanged.connect(self.update_info)
 		# Experimental:
-		self.page.leID.textChanged.connect( self.update_info )
+		#self.page.leID.textChanged.connect( self.update_info )
+		# REMOVED, replaced by...
+
+		# NEW:  Don't want to automatically search the DB every time someone types in a character
+		self.page.pbLoad.clicked.connect(self.loadPart)
 
 		self.page.pbNew.clicked.connect(self.startCreating)
 		self.page.pbEdit.clicked.connect(self.startEditing)
@@ -212,7 +216,8 @@ class func(object):
 	@enforce_mode(['view','editing_corners','editing','creating'])
 	def updateElements(self):
 		# NEW:
-		self.page.leStatus.setText(self.mode)
+		if not self.mode == "view":
+			self.page.leStatus.setText(self.mode)
 
 		exists = self.baseplate_exists
 		shipments_exist = self.page.listShipments.count() > 0
@@ -233,6 +238,8 @@ class func(object):
 		self.page.leID.setReadOnly(not mode_view)
 
 		# MODIFIED:
+		self.page.pbLoad.setEnabled(   mode_view )
+
 		self.page.pbNew.setEnabled(    mode_view and not exists )
 		self.page.pbEdit.setEnabled(   mode_view and     exists )
 		self.page.pbSave.setEnabled(   mode_creating or mode_editing )
@@ -256,18 +263,41 @@ class func(object):
 
 		for corner in self.corners:
 			corner.setReadOnly(not (mode_creating or mode_editing))
-		self.page.dsbThickness.setReadOnly(not (mode_creating or mode_editing))
+		#self.page.dsbThickness.setReadOnly(not (mode_creating or mode_editing))
 
-		self.page.pbGoStepKapton.setEnabled(mode_view and step_kapton_exists)
+		#self.page.pbGoStepKapton.setEnabled(mode_view and step_kapton_exists)
 		#self.page.cbCheckEdgesFirm.setEnabled(mode_creating or mode_editing)
 		#self.page.cbCheckGlueSpill.setEnabled(mode_creating or mode_editing)
 		#self.page.dsbKaptonFlatness.setReadOnly(not (mode_creating or mode_editing))
 
-		self.page.pbGoStepSensor.setEnabled(mode_view and step_senor_exists)
+		self.page.pbGoStepSensor.setEnabled(mode_view and step_sensor_exists)
 		self.page.pbGoProtomodule.setEnabled(mode_view and protomodule_exists)
 		self.page.pbGoModule.setEnabled(mode_view and module_exists)
 
 
+
+	# NEW:
+	@enforce_mode('view')
+	def loadPart(self,*args,**kwargs):
+		if self.page.leID.text == "":
+			self.page.leStatus.setText("input an ID")
+			return
+		# Check whether baseplate exists:
+		tmp_baseplate = fm.baseplate()
+		tmp_ID = self.page.leID.text()
+		tmp_exists = tmp_baseplate.load(tmp_ID)
+		#if not self.baseplate_exists:
+		if not tmp_exists:  # DNE; good to create
+			#ID = self.page.leID.text()
+			#self.baseplate.new(ID)
+			#self.mode = 'creating'  # update_info needs mode==view
+			self.page.leStatus.setText("baseplate DNE")
+			self.update_info()
+		else:
+			# pass
+			self.baseplate = tmp_baseplate
+			self.page.leStatus.setText("baseplate exists")
+			self.update_info()
 
 
 	@enforce_mode('view')

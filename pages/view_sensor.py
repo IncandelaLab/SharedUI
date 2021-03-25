@@ -108,7 +108,8 @@ class func(object):
 	@enforce_mode('setup')
 	def rig(self):
 		#self.page.sbID.valueChanged.connect(self.update_info)
-		self.page.leID.textChanged.connect(self.update_info)
+		#self.page.leID.textChanged.connect(self.update_info)
+		self.page.pbLoad.clicked.connect(self.loadPart)
 
 		self.page.pbNew.clicked.connect(self.startCreating)
 		self.page.pbEdit.clicked.connect(self.startEditing)
@@ -206,7 +207,8 @@ class func(object):
 
 	@enforce_mode(['view','editing','creating'])
 	def updateElements(self):
-		self.page.leStatus.setText(self.mode)
+		if not self.mode == "view":
+			self.page.leStatus.setText(self.mode)
 
 		mode_view     = self.mode == 'view'
 		mode_editing  = self.mode == 'editing'
@@ -224,6 +226,8 @@ class func(object):
 		self.setMainSwitchingEnabled(mode_view)
 		#self.page.sbID.setEnabled(mode_view)
 		self.page.leID.setReadOnly(not mode_view)
+
+		self.page.pbLoad.setEnabled(mode_view)
 
 		self.page.pbNew.setEnabled(     mode_view and not sensor_exists )
 		self.page.pbEdit.setEnabled(    mode_view and     sensor_exists )
@@ -257,6 +261,29 @@ class func(object):
 		self.page.pbGoStepSensor.setEnabled( mode_view and step_sensor_exists)
 		self.page.pbGoProtomodule.setEnabled(mode_view and protomodule_exists)
 		self.page.pbGoModule.setEnabled(     mode_view and module_exists     )
+
+
+	# NEW:
+	@enforce_mode('view')
+	def loadPart(self,*args,**kwargs):
+		if self.page.leID.text == "":
+			self.page.leStatus.setText("input an ID")
+			return
+		# Check whether baseplate exists:
+		tmp_sensor = fm.sensor()
+		tmp_ID = self.page.leID.text()
+		tmp_exists = tmp_sensor.load(tmp_ID)
+		if not tmp_exists:  # DNE; good to create
+			#ID = self.page.leID.text()
+			#self.sensor.new(ID)
+			#self.mode = 'creating'  # update_info needs mode==view
+			self.page.leStatus.setText("sensor DNE")
+			self.update_info()
+		else:
+			# pass
+			self.sensor = tmp_sensor
+			self.page.leStatus.setText("sensor exists")
+			self.update_info()
 
 
 	@enforce_mode('view')

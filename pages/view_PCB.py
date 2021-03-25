@@ -118,7 +118,9 @@ class func(object):
 	@enforce_mode('setup')
 	def rig(self):
 		#self.page.sbID.valueChanged.connect(self.update_info)
-		self.page.leID.textChanged.connect(self.update_info)
+		#self.page.leID.textChanged.connect(self.update_info)
+
+		self.page.pbLoad.clicked.connect(self.loadPart)
 
 		self.page.pbNew.clicked.connect(self.startCreating)
 		self.page.pbEdit.clicked.connect(self.startEditing)
@@ -195,7 +197,8 @@ class func(object):
 
 	@enforce_mode(['view','editing','creating'])
 	def updateElements(self,use_info=False):
-		self.page.leStatus.setText(self.mode)
+		if not self.mode == "view":
+			self.page.leStatus.setText(self.mode)
 
 		pcb_exists      = self.pcb_exists
 		shipments_exist = self.page.listShipments.count() > 0
@@ -213,6 +216,8 @@ class func(object):
 		#self.page.sbID.setEnabled(mode_view)
 		self.page.leID.setReadOnly(not mode_view)
 		
+		self.page.pbLoad.setEnabled(mode_view)
+
 		self.page.pbNew.setEnabled(    mode_view and not pcb_exists  )
 		self.page.pbEdit.setEnabled(   mode_view and     pcb_exists  )
 		self.page.pbSave.setEnabled(   mode_editing or mode_creating )
@@ -245,6 +250,27 @@ class func(object):
 		self.page.pbAddToPlotter.setEnabled(mode_view and daq_data_exists)
 		self.page.pbGoPlotter.setEnabled(   mode_view and daq_data_exists)
 
+
+	# NEW:
+	@enforce_mode('view')
+	def loadPart(self,*args,**kwargs):
+		if self.page.leID.text == "":
+			self.page.leStatus.setText("input an ID")
+			return
+		# Check whether baseplate exists:
+		tmp_pcb = fm.pcb()
+		tmp_ID = self.page.leID.text()
+		tmp_exists = tmp_pcb.load(tmp_ID)
+		if not tmp_exists:  # DNE; good to create
+			#ID = self.page.leID.text()
+			#self.sensor.new(ID)
+			#self.mode = 'creating'  # update_info needs mode==view
+			self.page.leStatus.setText("PCB DNE")
+			self.update_info()
+		else:
+			self.pcb = tmp_pcb
+			self.page.leStatus.setText("PCB exists")
+			self.update_info()
 
 	@enforce_mode('view')
 	def startCreating(self,*args,**kwargs):

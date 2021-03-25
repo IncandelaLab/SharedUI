@@ -228,7 +228,7 @@ class fsobj(object):
 					if itemdata[0].isdigit():  itemdata = [int(it.text) for it in itemdata]
 				setattr(self, item, itemdata)  # Should be a list containing contents; just assign it to the var
 			else:
-				print("_load_from_dict: ordinary item found!")
+				print("_load_from_dict: ordinary item {} found!".format(item_name))
 				itemdata = xml_tree.find('.//'+item_name)  # NOTE:  itemdata is an Element, not text!
 				print("Item text is", itemdata.text, "; item is", item)
 				if itemdata.text.isdigit():  # If int:
@@ -330,7 +330,19 @@ class fsobj(object):
 			if type(item) == dict:
 				# Recursive case: Create an element from the child dictionary.
 				child = self.dict_to_element(item, item_name)
+				# Special case for PARTs:
+				if item_name == "PART":
+					child.set('mode','auto')
 				parent.append(child)
+			elif type(item) == list:
+				# Second recursive case:  for multiple parts
+				# "PART":[{part_dict_1}, {part_dict_2}]; both have to be labeled w/ "PART"
+				for it in item:
+					# For each item, create elements recursively and append to parent
+					ch = self.dict_to_element(it, item_name)
+					if item_name == "PART":
+						ch.set('mode', 'auto')
+					parent.append(ch)
 			elif type(getattr(self, item, None)) == list:  #type(item) == list:
 				# Base case 1:  List of comments.  Create an element for each one.
 				print("Found comment list: ", getattr(self, item, None))
@@ -347,9 +359,6 @@ class fsobj(object):
 				# This SHOULD work with properties!
 				print("    Creating element {} with contents {}".format(item_name, child.text))
 				parent.append(child)
-				# Special case for PARTs:
-				if item_name == 'PART':
-					child.set('mode','auto')
 
 		return parent
 
@@ -358,9 +367,9 @@ class fsobj(object):
 	# Should be fully general--all objects can use this if XML_STRUCT_DICT works.
 	# Need separate implementation for tools?
 	# NOTE:  Can pass new_struct_dict if multiple XML files must be saved for a part/assembly step.
-	def save(self, new_struct_dict=None, new_fname=None):  #save_xml(self, xml_tree):
-		if new_struct_dict is None and not new_fname is None:
-			print("ERROR IN SAVE():  Got a new struct dict, but not a corresponding filename!")
+	def save(self):  #save_xml(self, xml_tree):
+		#if new_struct_dict is None and not new_fname is None:
+		#	print("ERROR IN SAVE():  Got a new struct dict, but not a corresponding filename!")
 
 		# NOTE:  Can't check item existence via filepath existence, bc filepath isn't known until after item creation!
 		# Instead, go into partlist dict and check to see whether item exists:
@@ -379,7 +388,7 @@ class fsobj(object):
 		#	os.makedirs(filedir)
 
 		# Generate XML tree:
-		struct_dict = self.XML_STRUCT_DICT if new_struct_dict is None else new_struct_dict
+		struct_dict = self.XML_STRUCT_DICT
 		xml_tree = self.generate_xml(struct_dict)  #self.XML_STRUCT_DICT)
 
 		# Save xml file:
@@ -513,24 +522,53 @@ class fsobj_part(fsobj):
 	PART_TABLE = 'parts'  # By default
 	# Also requires XML_STRUCT_DICT
 
-	# This is the same for all parts!  (For now)
+	# This WAS the same for all parts, turns out some have MANUFACTURERs while baseplates don't...
 	# Are there additional attrs to request...?
-	XML_STRUCT_DICT = { "data":{"row":{
-		"ID":"id_number",
-		"SERIAL_NUMBER":"ID",
-		"KIND_OF_PART_ID":"kind_of_part_id",  #TBD:  Property...BUT sensors will never be created from scratch, so can probably just ignore this!
-		"KIND_OF_PART":"kind_of_part", #TBD:  Property
-		"LOCATION_ID":"location_id", # same...
-		"DESCRIPTION":"description",  # Can probably leave this blank...
-	}}}
+	XML_STRUCT_DICT = None
 
 
-	# save() functions normally -- only 1 XML file is required.
+	# Must customize XML_UPLOAD_DICT slightly for each part type
+	XML_UPLOAD_DICT = None
+
+
+	# save() must also create and save the XML file for uploading...
+
+	def save(self):
+		# Ordinary save; should take care of XML stuff normally.
+		super(fsobj_part, self).save()
+		
+		# Get upload XML struct from self.XML_UPLOAD_DICT
+		part_name = self.__class__.__name__
+		self.partlistfile = os.sep.join([ DATADIR, 'partlist', part_name+'s.json' ])
+		with open(self.partlistfile, 'r') as opfl:
+			data = json.load(opfl)
+			if not self.ID in data.keys():
+				self.add_part_to_list()
+
+		# Generate XML tree:
+		struct_dict = self.XML_UPLOAD_DICT
+		xml_tree = self.generate_xml(struct_dict)
+
+		# Save xml file:
+		# Store in same directory as .json files, w/ same name:
+		filedir, filename = self.get_filedir_filename()  # self.ID)  #This should be unnecessary...
+		filename = filename.replace('.xml', '_upload.xml')
+		print("Saving UPLOAD XML file to ", filedir+'/'+filename)
+		root = xml_tree.getroot()
+		xmlstr = minidom.parseString(tostring(root)).toprettyxml(indent = '    ')  #tostring imported from xml.etree.ElementTree
+		# Need to correct header...
+		xmlstr = xmlstr.replace("version=\"1.0\" ", "version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"")
+		with open(filedir+'/'+filename, 'w') as f:
+			#f.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>")
+			f.write(xmlstr)
+
+
+
 	# load() requires downloading ability, but is otherwise normal.
 
 	def load(self, ID, on_property_missing = "warn"):
 		print("LOADING PART")
-		if ID == -1:
+		if ID == "":
 			self.clear()
 			return False
 
@@ -602,8 +640,6 @@ class fsobj_part(fsobj):
 		# NOTE:  Should be a SINGLE XML result!
 		if len(xml_string) < 62:
 			print("No files match the search criteria")
-			print("TEMP:  XML string is")
-			print(xml_string)
 			return False
 		# Store requested file
 		xml_tree = fromstring(xml_string)
@@ -636,18 +672,19 @@ class fsobj_assembly(fsobj):
 	# Vars storing names of tables to request XML files from
 	ASSM_TABLE = None
 	COND_TABLE = None
+	
 	# Also requires XML_STRUCT_DICT, XML_COND_DICT
 
-	def save(self, new_struct_dict=None, new_fname=None):
-		# Needs special treatment:  Must write to 2 files, not just one!
+	def save(self):
+		# Needs special treatment:  Must write to *4* files, not just 1/2!
 		# Ignoring new_struct_dict here...may not need it anymore.
 
 		# CURRENT PLAN:  Use 2 DICTS, one for each file.  Write to the first normally; write to the second manually.
 
-		if new_struct_dict is None and not new_fname is None:
-			print("ERROR IN SAVE() (assembly):  Got a new struct dict, but not a corresponding filename!")
+		#if new_struct_dict is None and not new_fname is None:
+		#	print("ERROR IN SAVE() (assembly):  Got a new struct dict, but not a corresponding filename!")
 
-		super(fsobj, self).save(new_struct_dict=new_struct_dict, new_fname=new_fname)
+		super(fsobj, self).save()
 		# This one handles self.XML_STRUCT_DICT...
 		# ...now handle self.XML_COND_DICT:
 
@@ -666,8 +703,27 @@ class fsobj_assembly(fsobj):
 		print("Saving XML file to ", filedir+'/'+filename)
 		root = xml_tree.getroot()
 		xmlstr = minidom.parseString(tostring(root)).toprettyxml(indent = '    ')  #tostring imported from xml.etree.ElementTree
-		#xml_tree.write(open(filedir+'/'+filename), 'wb')  #.replace('.json', '.xml'), 'wb'))
 		with open(filedir+'/'+filename, 'w') as f:
+			f.write(xmlstr)
+
+		# NEXT, write the upload files!
+		fname_base = fname.replace('.xml', '_upload.xml')
+		fname_cond = fname_cond.replace('.xml', '_upload.xml')
+		# Base file:
+		xml_tree = self.generate_xml(XML_STRUCT_DICT_UPLOAD)
+		root = xml_tree.getroot()
+		xmlstr = minidom.parseString(tostring(root)).toprettyxml(indent = '    ')  #tostring imported from xml.etree.ElementTree
+		xmlstr = xmlstr.replace("version=\"1.0\" ", "version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"")
+		with open(filedir+'/'+fname_base, 'w') as f:
+			#f.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>")
+			f.write(xmlstr)
+		# Cond file:
+		xml_tree = self.generate_xml(self.XML_COND_DICT_UPLOAD)
+		root = xml_tree.getroot()
+		xmlstr = minidom.parseString(tostring(root)).toprettyxml(indent = '    ')  #tostring imported from xml.etree.ElementTree
+		xmlstr = xmlstr.replace("version=\"1.0\" ", "version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"")
+		with open(filedir+'/'+filename, 'w') as f:
+			#f.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>")
 			f.write(xmlstr)
 
 
@@ -683,6 +739,7 @@ class fsobj_assembly(fsobj):
 			data = json.load(opfl)
 			if not str(ID) in data.keys():
 				print("ASSEMBLY STEP NOT FOUND.  REQUESTED CONDITION TABLES:")
+				self.ID = ID
 				search_conditions = {'ID':self.ID}  # Only condition needed
 				# For each XML file/table needed, make a request:
 				# Should automatically determine where file should be saved AND add part to list
@@ -743,15 +800,19 @@ class fsobj_assembly(fsobj):
 	def request_XML(self, table_name, search_conditions, suffix=None):
 		# NOTE NOTE NOTE:  Must save file in correct location AND add_part_to_list!
 		# suffix is added to the end of the filename (will be _cond)
-		filedir, filename = self.get_filedir_filename(ID)
-		condname = filename.replace('.xml', '_cond.xml')
+		if self.ID == None or self.ID == -1:
+			print("self.ID is None or \"\"; ignoring")
+			return False
+
+		#filedir, filename = self.get_filedir_filename(self.ID)
+		#condname = filename.replace('.xml', '_cond.xml')
 
 		sql_template = 'select * from hgc_int2r.{} p'
 		sql_request = sql_template.format(table_name)
 		sql_request = sql_request + ' where'
 		# search_conditions is a dict:  {param_name:param_value}
 		for param, value in search_conditions.items():
-			sql_request = sql_request + ' {}={}'.format(param, value)
+			sql_request = sql_request + ' p.{}={}'.format(param, value)
 		print("TEMP:  Using sql command")
 		print(sql_request)
 
@@ -1055,6 +1116,7 @@ class baseplate(fsobj_part):
 		"insertion_user", # may not need this...
 
 		# NEW:  Data to be read from base XML file
+		# Will be given straight to the upload file, or held onto
 		"id_number",
 		"kind_of_part_id",
 		"kind_of_part",
@@ -1069,11 +1131,30 @@ class baseplate(fsobj_part):
 
 	#NEW:  List of vars that are manually given to the XML file via Akshay's script and 
 	#      should not be saved automatically by the loop over PROPERTIES
-	PROPERTIES_SAVED_MANUALLY = [
+	"""PROPERTIES_SAVED_MANUALLY = [
 		"identifier",
 		"comments",
 		"insertion_user",
-	]
+	]"""
+
+	XML_STRUCT_DICT = { "data":{"row":{
+		"ID":"id_number",
+		# PART_PARENT_ID:  Don't care about this (not needed for upload)
+		"KIND_OF_PART_ID":"kind_of_part_id",
+		"KIND_OF_PART":"kind_of_part", #TBD:  Property
+		"LOCATION_ID":"location_id", # same...
+		"SERIAL_NUMBER":"ID",
+		"DESCRIPTION":"description",  # Can probably leave this blank...
+	}}}
+
+	XML_UPLOAD_DICT = {"PARTS":{"PART":{
+		"KIND_OF_PART":"kind_of_part",
+		"RECORD_INSERTION_USER":"insertion_user",
+		"SERIAL_NUMBER":"ID",
+		"COMMENT_DESCRIPTION":"description",
+		"LOCATION":"institution",
+	}}}
+
 
 
 	def ready_step_sensor(self, step_sensor = None, max_flatness = None):
@@ -1167,7 +1248,7 @@ class sensor(fsobj_part):
 		# characteristics (defined upon reception)
 		#"serial",
 		"barcode",
-		#"manufacturer", # REMOVED; apparently this is all the same?
+		"manufacturer",
 		"type",         # NEW:  This is now chosen from a drop-down menu
 		"size",         # 
 		"channels",     # 
@@ -1208,6 +1289,33 @@ class sensor(fsobj_part):
 		"shipments":[],
 		"size":    '8',  # DO NOT MODIFY
 	}
+
+	XML_STRUCT_DICT = { "data":{"row":{
+		"ID":"id_number",
+		"KIND_OF_PART_ID":"kind_of_part_id",
+		"KIND_OF_PART":"kind_of_part", #TBD:  Property
+		"LOCATION_ID":"location_id", # same...
+		"MANUFACTURER":"manufacturer",
+		"SERIAL_NUMBER":"ID",
+		"DESCRIPTION":"description",  # Can probably leave this blank...
+	}}}
+
+	XML_UPLOAD_DICT = {"PARTS":{"PART":{
+		"KIND_OF_PART":"kind_of_part",
+		"RECORD_INSERTION_USER":"insertion_user",
+		"SERIAL_NUMBER":"ID",
+		"COMMENT_DESCRIPTION":"description",
+		"LOCATION":"institution",
+		"MANUFACTURER":"manufacturer",
+		#"PREDEFINED_ATTRIBUTES":{  # Ignore this for now...
+		#	"ATTRIBUTE":{
+		#		"NAME":"HGC Silicon Sensor Type",
+		#		"VALUE":"200DD",
+		#	}
+		#}
+	}}}
+
+		
 
 	@property
 	def flatness(self):
@@ -1358,6 +1466,10 @@ class pcb(fsobj_part):
 		"kind_of_part",
 		"location_id",
 		"description",
+
+		"manufacturer",  # for output XML
+		"version",
+		"batch_number",
 	]
 
 	PROPERTIES_DO_NOT_SAVE = [
@@ -1368,9 +1480,32 @@ class pcb(fsobj_part):
 		"shipments":[],
 		"daq_data":[],
 		"size":     '8',
+		"comment_description":  "TEST",
 	}
 
+	XML_STRUCT_DICT = { "data":{"row":{
+		"ID":"id_number",
+		"KIND_OF_PART_ID":"kind_of_part_id",
+		"KIND_OF_PART":"kind_of_part", #TBD:  Property
+		"LOCATION_ID":"location_id", # same...
+		"MANUFACTURER":"manufacturer",
+		"SERIAL_NUMBER":"ID",
+		"VERSION":"version",
+		"BATCH_NUMBER":"batch_number",
+	}}}
+
+	XML_UPLOAD_DICT = {"PARTS":{"PART":{
+		"KIND_OF_PART":"kind_of_part",
+		"RECORD_INSERTION_USER":"insertion_user",
+		"SERIAL_NUMBER":"ID",
+		"COMMENT_DESCRIPTION":"comment_description",
+		"LOCATION":"institution",
+		"MANUFACTURER":"manufacturer",
+	}}}
+
 	DAQ_DATADIR = 'daq'
+
+
 
 	def fetch_datasets(self):
 		if self.ID is None:
@@ -1488,19 +1623,93 @@ class protomodule(fsobj_part):
 
 		# NEW:  Data to be read from base XML file
 		"id_number",
+		"part_parent_id",
 		"kind_of_part_id",
 		"kind_of_part",
 		"location_id",
-		"description",
+		"comment_description",
+
+		"wirebonded",  # Maybe not needed here??
 	]
 
 	DEFAULTS = {
 		"shipments":[],
 		"size":     '8',
+		"comment_description":"top layer: pcb",  # SUBJECT TO CHANGE
 	}
 
+	
+	XML_STRUCT_DICT = { "data":{"row":{
+		"ID":"id_number",
+		"PART_PARENT_ID":"part_parent_id",
+		"KIND_OF_PART_ID":"kind_of_part_id",
+		"KIND_OF_PART":"kind_of_part",
+		"LOCATION_ID":"location_id",
+		"SERIAL_NUMBER":"ID",
+	}}}
 
-# NOTE:  Does not currently have a XML file!  Akshay's script just generated the assembly/condition file.
+	XML_UPLOAD_DICT = {"PARTS":{"PART":{
+		"KIND_OF_PART":"kind_of_part",
+		"SERIAL_NUMBER":"ID",
+		#"COMMENT_DESCRIPTION":"comment_description",
+		"LOCATION":"location",
+		"RECORD_INSERTION_USER":"insertion_user",
+		#"PREDEFINED_ATTRIBUTES":{   # Ignore for now per Umesh
+		#	"ATTRIBUTE":{
+		#		"NAME":"AsmTrayPosn",
+		#		"VALUE":"assem_tray_posn",
+		#	}
+		#}
+		"CHILDREN":{
+			"PART":[{
+				"KIND_OF_PART":"baseplate_type",
+				"SERIAL_NUMBER":"baseplate",
+			},
+			{
+				"KIND_OF_PART":"sensor_type",
+				"SERIAL_NUMBER":"sensor",
+			}]
+		}
+	}}}
+
+
+	@property
+	def assm_tray_pos(self):
+		# If has a sensor step, grab the position of this sensor and return it here...
+		# "TRPOSN_11" in XML file makes no sense...temporarily using X_Y.
+		if self.step_sensor is None:
+			print("assm_tray_posn:  no sensor step yet")
+			return "None"
+		temp_sensor_step = step_sensor()
+		found = temp_sensor_step.load(self.step_sensor)
+		if not found:
+			print("ERROR in assm_tray_pos:  protomodule has sensor step {}, but none found!".format(self.step_senosr))
+			return "None"
+		else:
+			position = temp_sensor_step.sensors.index(self.ID)
+			return "{}_{}".format(position%2, position//3)
+
+	@property
+	def baseplate_type(self):
+		if self.baseplate is None:
+			print("In baseplate_type:  protomod has no baseplate!")
+			return None
+		temp_baseplate = baseplate()
+		if not temp_baseplate.load(self.baseplate):
+			print("ERROR:  failed to load baseplate {} in baseplate_type!".format(self.baseplate))
+			return None
+		return temp_baseplate.description
+
+	@property
+	def sensor_type(self):
+		if self.sensor is None:
+			print("In sensor_type:  protomod has no sensor!")
+			return None
+		temp_sensor = sensor()
+		if not temp_sensor.load(self.sensor):
+			print("ERROR:  failed to load sensor {} in sensor_type!".format(self.sensor))
+			return None
+		return temp_sensor.description
 
 
 class module(fsobj_part):
@@ -1617,6 +1826,7 @@ class module(fsobj_part):
 
 		# NEW:  Data to be read from base XML file
 		"id_number",
+		"part_parent_id",
 		"kind_of_part_id",
 		"kind_of_part",
 		"location_id",
@@ -1636,12 +1846,95 @@ class module(fsobj_part):
 		"size":    '8',
 	}
 
+	XML_STRUCT_DICT = { "data":{"row":{
+		"ID":"id_number",
+		"PART_PARENT_ID":"part_parent_id",
+		"KIND_OF_PART_ID":"kind_of_part_id",
+		"KIND_OF_PART":"kind_of_part",
+		"LOCATION_ID":"location_id",
+		"SERIAL_NUMBER":"ID",
+		"DESCRIPTION":"description",
+	}}}
+
+	XML_UPLOAD_DICT = {"PARTS":{"PART":{
+		"KIND_OF_PART":"kind_of_part",
+		"SERIAL_NUMBER":"ID",
+		"COMMENT_DESCRIPTION":"description",
+		"LOCATION":"location",
+		"RECORD_INSERTION_USER":"insertion_user",
+		"PREDEFINED_ATTRIBUTES":{
+			"ATTRIBUTE":{
+				"NAME":"AsmTrayPosn",
+				"VALUE":"assem_tray_posn",
+			},
+			"ATTRIBUTE":{
+				"NAME":"WireBonded",
+				"VALUE":"wirebonding_final_inspection_ok",
+			}
+		},
+		"CHILDREN":{
+			"PART":[{
+				"KIND_OF_PART":"protomodule_type",
+				"SERIAL_NUMBER":"protomodule",
+			},
+			{
+				"KIND_OF_PART":"pcb_type",
+				"SERIAL_NUMBER":"pcb",
+			}]
+		}
+	}}}
+
 	IV_DATADIR      = 'iv'
 	IV_BINS_DATADIR = 'bins'
 	DAQ_DATADIR     = 'daq'
 
 	BA_FILENAME = 'ba {which}'
 	BD_FILENAME = 'bd {which}'
+
+
+	# TEMPORARY:  May want to fix this...
+	@property
+	def wirebonded(self):
+		return False
+
+	@property
+	def assm_tray_pos(self):
+		# If has a sensor step, grab the position of this sensor and return it here...
+		# "TRPOSN_11" in XML file makes no sense...temporarily using X_Y.
+		if self.step_sensor is None:
+			print("assm_tray_posn:  no sensor step yet")
+			return "None"
+		temp_sensor_step = step_sensor()
+		found = temp_sensor_step.load(self.step_sensor)
+		if not found:
+			print("ERROR in assm_tray_pos:  protomodule has sensor step {}, but none found!".format(self.step_senosr))
+			return "None"
+		else:
+			position = temp_sensor_step.sensors.index(self.ID)
+			return "{}_{}".format(position%2, position//3)
+
+	@property
+	def protomodule_type(self):
+		if self.protomodule is None:
+			print("ERROR in protomodule_type:  protomodule is None!")
+			return None
+		temp_protomodule = protomodule()
+		if not temp_protomodule.load(self.protomodule):
+			print("ERROR:  Could not find child protomodule {}!".format(self.protomodule))
+			return None
+		return temp_protomodule.kind_of_part
+
+	@property
+	def pcb_type(self):
+		if self.pcb is None:
+			print("ERROR in pcb_type:  pcb is None!")
+			return None
+		temp_pcb = pcb()
+		if not temp_pcb.load(self.pcb):
+			print("ERROR:  Could not find child PCB {}!".format(self.pcb))
+			return None
+		return temp_pcb.kind_of_part
+
 
 	def fetch_datasets(self):
 		if self.ID is None:
@@ -1903,6 +2196,10 @@ class step_sensor(fsobj_assembly):
 		else:
 			return self.cure_stop - self.cure_start
 	"""
+
+	# NOTE WARNING:  Commenting all WIP changes for now
+
+	
 	@property
 	def temp_property(self):
 		return None
@@ -1922,23 +2219,12 @@ class step_sensor(fsobj_assembly):
                                              qtime.hour(), qtime.minute(), qtime.second())
 		return datestr
 
-	# WIP
-	@property
-	def kind_of_part_id(self):
-		# TODO:
-		# Load created protomodule and return the type!  Will require a protomodule property.
-		return str(self.kind_of_part_id)
 
-	@kind_of_part_id.setter
-	def kind_of_part_id(self, value):
-		print("PROPERTY SETTER:  Setting kind of part ID")
-		# TODO:  Set part geometry/etc in accordance w/ input value
-		self.kind_of_part_id = str(value)
 
 	#@property
 	#def kind_of_part(self):
 	#	return ''
-
+	"""
 	@property
 	def assembly_tray_name(self):
 		return 
@@ -1965,7 +2251,7 @@ class step_sensor(fsobj_assembly):
 	@property
 	def sensor_tool_name(self):
 		pass
-
+	"""
 
 	# FOR NEW ASSEMBLY CLASS:
 	ASSM_TABLE = 'c4220'
@@ -1979,14 +2265,16 @@ class step_sensor(fsobj_assembly):
 	GLUE_TYPE = 'Araldite'
 	SLVR_EPXY_TYPE = 'Locetite Ablestik'
 
+	# List of new vars to add:  cond_id, kind_of_condition, cond_data_set_id, part_id, protomodule_id, 
+
 	XML_STRUCT_DICT = {'data':{'row':{  # WIP
 		# Leave out ID--should be assigned by DB loader! (?)
-		'KIND_OF_CONDITION_ID':	'COND_ID',  # PROPERTY:  from protomod type
-		'KIND_OF_CONDITION':	'COND_NAME',  # SAME
-		'CONDITION_DATA_SET_ID':'temp_property',  # TBD
+		'KIND_OF_CONDITION_ID':	'cond_id',  # PROPERTY:  from protomod type
+		'KIND_OF_CONDITION':	'kind_of_condition',  # SAME
+		'CONDITION_DATA_SET_ID':'cond_data_set_id',
 		'KIND_OF_PART_ID':		'kind_of_part_id',  # PROPERRY:  from protomod
 		'KIND_OF_PART':			'kind_of_part',  # PROPERTY:  from protmod
-		#'PART_ID':				'protomodule',  # PROPERTY...but this gets set in the DB??
+		'PART_ID':				'part_id',  # PROPERTY...but this gets set in the DB??
 		'PART_SERIAL_NUMBER':	'protomodule_id',  # from protomod
 		'ASMBL_TRAY_NAME':		'assembly_tray_name',
 		'PLT_SER_NUM':			'baseplate_serial',
@@ -2017,7 +2305,7 @@ class step_sensor(fsobj_assembly):
 
 
 
-
+	"""
 		type_dict = {
 						'EXTENSION_TABLE_NAME':'HGC_PRTO_MOD_ASMBLY',
 						'NAME':'HGC {} Inch Proto Module Assembly'.format('Six' if baseplate_.size==6 else 'Eight'),
@@ -2099,7 +2387,7 @@ class step_sensor(fsobj_assembly):
 								'PART':part_dict,
 								'DATA':data_dict,
 							}
-
+	"""
 
 
 
@@ -2317,6 +2605,7 @@ class step_sensor(fsobj_assembly):
 		#self.save_xml(xml_tree)
 		#self.save_xml(xml_tree_cond)
 
+		
 
 
 class step_pcb(fsobj_assembly):
@@ -2356,6 +2645,9 @@ class step_pcb(fsobj_assembly):
 			return self.cure_stop - self.cure_start
 	"""
 
+
+
+	"""
 	# New:  Convert time_t to correctly-formatted date string
 	@property
 	def run_start_xml(self):
@@ -2430,7 +2722,7 @@ class step_pcb(fsobj_assembly):
 					print("WARNING: trying to save step_pcb {}. Some parts do not exist. Could not create all associations.".format(self.ID))
 					print("baseplate:{} sensor:{} pcb:{} protomodule:{} module:{}".format(inst_baseplate.ID,inst_sensor.ID,inst_pcb.ID,inst_protomodule.ID,inst_module.ID))
 
-
+	"""
 
 
 ###############################################

@@ -99,7 +99,9 @@ class func(object):
 	@enforce_mode('setup')
 	def rig(self):
 		#self.page.sbID.valueChanged.connect(self.update_info)
-		self.page.leID.textChanged.connect(self.update_info)
+		#self.page.leID.textChanged.connect(self.update_info)
+
+		self.page.pbLoad.clicked.connect(self.loadPart)
 
 		# No longer used; only created in production steps
 		#self.page.pbNew.clicked.connect(self.startCreating)
@@ -182,7 +184,8 @@ class func(object):
 
 	@enforce_mode(['view','editing','creating'])
 	def updateElements(self):
-		self.page.leStatus.setText(self.mode)
+		if not self.mode == "view":
+			self.page.leStatus.setText(self.mode)
 
 		protomodule_exists = self.protomodule_exists
 		shipments_exist    = self.page.listShipments.count() > 0
@@ -203,6 +206,8 @@ class func(object):
 		self.setMainSwitchingEnabled(mode_view)
 		#self.page.sbID.setEnabled(mode_view)
 		self.page.leID.setReadOnly(not mode_view)
+
+		self.page.pbLoad.setEnacled(mode_view)
 
 		#self.page.pbNew.setEnabled(     mode_view and not protomodule_exists )
 		self.page.pbEdit.setEnabled(    mode_view and     protomodule_exists )
@@ -238,7 +243,26 @@ class func(object):
 
 
 
-
+	# NEW:
+	@enforce_mode('view')
+	def loadPart(self,*args,**kwargs):
+		if self.page.leID.text == "":
+			self.page.leStatus.setText("input an ID")
+			return
+		# Check whether baseplate exists:
+		tmp_protomodule = fm.protomodule()
+		tmp_ID = self.page.leID.text()
+		tmp_exists = tmp_protomodule.load(tmp_ID)
+		if not tmp_exists:  # DNE; good to create
+			#ID = self.page.leID.text()
+			#self.sensor.new(ID)
+			#self.mode = 'creating'  # update_info needs mode==view
+			self.page.leStatus.setText("protomodule DNE")
+			self.update_info()
+		else:
+			self.protomodule = tmp_protomodule
+			self.page.leStatus.setText("protomodule exists")
+			self.update_info()
 
 
 
