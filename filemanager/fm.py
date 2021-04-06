@@ -47,7 +47,7 @@ LOCATION_DICT = {  # For loading from LOCATION_ID XML tag
 	1400: "UCSB",
 	1420: "CERN",
 	1440: "HEPHY",
-	1460 "UMN",
+	1460: "UMN",
 }
 
 
@@ -562,10 +562,11 @@ class fsobj_part(fsobj):
 
 	# NEW:  Want to ....
 	def __init__(self):  # Maybe this could be done OUTSIDE of init...but not sure I want to risk it.
+		super(fsobj_part, self).__init__()
 		# Add all other vars to XML_STRUCT_DICT
 		# (so they will be saved accordingly)
-		for var in PROPERTIES:
-			if var not in XML_CONSTS:  XML_STRUCT_DICT[var] = var
+		for var in self.PROPERTIES:
+			if var not in self.XML_CONSTS:  self.XML_STRUCT_DICT[var] = var
 
 
 
@@ -1156,6 +1157,7 @@ class baseplate(fsobj_part):
 		# NEW:  Data to be read from base XML file
 		# Will be given straight to the upload file, or held onto
 		"id_number",
+		"parent_ID",
 		"kind_of_part_id",
 		"kind_of_part",
 		#"location_id",
@@ -1170,7 +1172,7 @@ class baseplate(fsobj_part):
 
 	XML_STRUCT_DICT = { "data":{"row":{
 		"ID":"id_number",
-		"PART_PARENT_ID":  #Don't care about this (not needed for upload)
+		"PART_PARENT_ID":'parent_id',  #Don't care about this (not needed for upload)
 		"KIND_OF_PART_ID":"kind_of_part_id",
 		"KIND_OF_PART":"kind_of_part",
 		"LOCATION_ID":"location_id",
@@ -1207,6 +1209,9 @@ class baseplate(fsobj_part):
 	@kind_of_part.setter
 	def kind_of_part(self, value):
 		# Parse and read in the baseplate size
+		if value is None:
+			self.size = None
+			return
 		size_str = value.split()[1]
 		if size_str == "Six":
 			self.size = 6
@@ -1217,8 +1222,13 @@ class baseplate(fsobj_part):
 
 	@property
 	def location_id(self):
-		return LOCATION_DICT[]
-	@location_id.setter(self, value):
+		# LOCATION_DICT maps ID -> name#
+		for locID, locname in LOCATION_DICT.items():
+			if self.name == locname:  return locID
+		print("ERROR:  location not found in LOCATION_DICT")
+		return None
+	@location_id.setter
+	def location_id(self, value):
 		if not value in LOCATION_DICT.keys():
 			print("Warning:  Found invalid location ID {}".format(value))
 		else:
@@ -1392,7 +1402,8 @@ class sensor(fsobj_part):
 		'size',
 	]
 
-
+	
+	"""
 	@property
 	def kind_of_part(self): # Determined entirely by size
 		if self.size == 6:
@@ -1406,6 +1417,9 @@ class sensor(fsobj_part):
 	@kind_of_part.setter
 	def kind_of_part(self, value):
 		# Parse and read in the baseplate size
+		if value is None:
+			self.channels = None
+			return
 		parsestr = value.split() # ex. "HPK Six Inch 256 Cell Silicon Sensor"
 		size_str = parsestr[1]
 		self.channels = parsestr[3]
@@ -1415,11 +1429,18 @@ class sensor(fsobj_part):
 			self.size = 8
 		else:
 			print("ERROR:  Unexpected sensor size {} loaded".format(size_str))
+	"""
+
 
 	@property
 	def location_id(self):
-		return LOCATION_DICT[]
-	@location_id.setter(self, value):
+		# LOCATION_DICT maps ID -> name#
+		for locID, locname in LOCATION_DICT.items():
+			if self.name == locname:  return locID
+		print("ERROR:  location not found in LOCATION_DICT")
+		return None
+	@location_id.setter
+	def location_id(self, value):
 		if not value in LOCATION_DICT.keys():
 			print("Warning:  Found invalid location ID {}".format(value))
 		else:
@@ -1620,6 +1641,8 @@ class pcb(fsobj_part):
 	]
 
 
+	# WIP, go back and fix!
+	"""
 	@property
 	def kind_of_part(self): # Determined entirely by size
 		return "HGC {} Hex PCB".format(self.resolution_type)
@@ -1630,16 +1653,22 @@ class pcb(fsobj_part):
 		if not res_str in ['HD', 'LD']:
 			print("ERROR:  Unexpected resolution type {}".format(res_str))
 		self.resolution_type = res_str  # HD or LD
-		
-
+	"""
+	
 	@property
 	def location_id(self):
-		return LOCATION_DICT[]
-	@location_id.setter(self, value):
+		# LOCATION_DICT maps ID -> name#
+		for locID, locname in LOCATION_DICT.items():
+			if self.name == locname:  return locID
+		print("ERROR:  location not found in LOCATION_DICT")
+		return None
+	@location_id.setter
+	def location_id(self, value):
 		if not value in LOCATION_DICT.keys():
 			print("Warning:  Found invalid location ID {}".format(value))
 		else:
 			self.location = LOCATION_DICT[value]
+
 
 	def fetch_datasets(self):
 		if self.ID is None:
@@ -1812,6 +1841,8 @@ class protomodule(fsobj_part):
 	]
 
 
+	# WIP, go back and fix
+	"""
 	@property
 	def kind_of_part(self): # Determined entirely by size
 		if self.size == 6:
@@ -1832,6 +1863,7 @@ class protomodule(fsobj_part):
 			self.size = 8
 		else:
 			print("Read unrecognized protomodule size {}".format(res_str))
+	"""
 
 	@property
 	def assm_tray_pos(self):
@@ -2057,6 +2089,8 @@ class module(fsobj_part):
 	]
 
 
+	# GO BACK and fix
+	"""
 	@property
 	def kind_of_part(self): # Determined entirely by size
 		if self.size == 6:
@@ -2074,6 +2108,7 @@ class module(fsobj_part):
 		if not res_str in ['HD', 'LD']:
 			print("ERROR:  Unexpected resolution type {}".format(res_str))
 		self.resolution_type = res_str  # HD or LD
+	"""
 
 
 	# TEMPORARY:  May want to fix this...
