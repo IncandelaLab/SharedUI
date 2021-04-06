@@ -7,6 +7,8 @@ INDEX_INSTITUTION = {
 	'FNAL':1,
 	'UCSB':2,
 	'UMN':3,
+	'HEPHY':4,
+	'HPK':5,
 }
 
 INSTITUTION_INDEX = {  # Can probably be replaced w/ list
@@ -14,6 +16,8 @@ INSTITUTION_INDEX = {  # Can probably be replaced w/ list
 	1:'FNAL',
 	2:'UCSB',
 	3:'UMN',
+	4:'HEPHY',
+	5:'HPK',
 }
 
 class simple_fsobj_vc(object):

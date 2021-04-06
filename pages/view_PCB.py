@@ -56,6 +56,13 @@ INDEX_INSTITUTION = {
 	'FNAL':1,
 	'UCSB':2,
 	'UMN':3,
+	'HEPHY':4,
+	'HPK':5,
+}
+
+INDEX_RESOLUTION_TYPE = {
+	'HD':0,
+	'LD':1,
 }
 
 class func(object):

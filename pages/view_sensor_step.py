@@ -15,7 +15,8 @@ INDEX_INSTITUTION = {
 	'FNAL':1,
 	'UCSB':2,
 	'UMN':3,
-	'NTU':4,
+	'HEPHY':4,
+	'HPK':5,
 }
 
 STATUS_NO_ISSUES = "valid (no issues)"

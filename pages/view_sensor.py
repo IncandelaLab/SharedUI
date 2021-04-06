@@ -1,4 +1,8 @@
 from filemanager import fm
+import os
+import shutil
+
+from PyQt5.QtWidgets import QFileDialog, QWidget
 
 PAGE_NAME = "view_sensor"
 OBJECTTYPE = "sensor"
@@ -40,12 +44,31 @@ INDEX_INSPECTION = {
 	False:1,
 }
 
+INDEX_CHECK = {
+	'pass':0,
+	True:0,
+	'fail':1,
+	False:1,
+}
+
 INDEX_INSTITUTION = {
 	'CERN':0,
 	'FNAL':1,
 	'UCSB':2,
 	'UMN':3,
+	'HEPHY':4,
+	'HPK':5,
 }
+
+
+class Filewindow(QWidget):
+	def __init__(self):
+		super(Filewindow, self).__init__()
+
+	def getfile(self,*args,**kwargs):
+		fname, fmt = QFileDialog.getOpenFileName(self, 'Open file', '~',"(*.jpg *.png *.xml)")
+		print("File dialog:  got file", fname)
+		return fname
 
 
 class func(object):
@@ -136,6 +159,10 @@ class func(object):
 		#	self.page.dsbC5
 		#]
 
+		self.fwnd = Filewindow()
+		self.page.pbAddFiles.clicked.connect(self.getFile)
+		self.page.pbDeleteFile.clicked.connect(self.deleteFile)
+
 
 	@enforce_mode(['view', 'editing', 'creating'])
 	def update_info(self,ID=None,*args,**kwargs):
@@ -178,9 +205,9 @@ class func(object):
 		#		corner.setValue(-1 if self.sensor.corner_heights[i] is None else self.sensor.corner_heights[i]) 
 		#		if corner.value() == -1: corner.clear() 
  
-		self.page.leFlatness.setText("" if self.sensor.flatness is None else str(round(self.sensor.flatness,DISPLAY_PRECISION)))
-		self.page.dsbThickness.setValue(-1 if self.sensor.thickness is None else self.sensor.thickness) 
-		if self.page.dsbThickness.value() == -1: self.page.dsbThickness.clear() 
+		#self.page.leFlatness.setText("" if self.sensor.flatness is None else str(round(self.sensor.flatness,DISPLAY_PRECISION)))
+		#self.page.dsbThickness.setValue(-1 if self.sensor.thickness is None else self.sensor.thickness) 
+		#if self.page.dsbThickness.value() == -1: self.page.dsbThickness.clear() 
  
 		self.page.sbStepKapton.setValue(-1 if self.sensor.step_kapton is None else self.sensor.step_kapton) 
 		if self.page.sbStepKapton.value() == -1: self.page.sbStepKapton.clear() 
@@ -201,6 +228,11 @@ class func(object):
 		if self.page.sbStepSensor.value()  == -1: self.page.sbStepSensor.clear()
 		#if self.page.sbProtomodule.value() == -1: self.page.sbProtomodule.clear()
 		#if self.page.sbModule.value()      == -1: self.page.sbModule.clear()
+
+		self.page.listFiles.clear()
+		for f in self.sensor.test_files:
+			name = os.path.split(f)[1]
+			self.page.listFiles.addItem(name)
 
 		self.updateElements()
 
@@ -250,17 +282,20 @@ class func(object):
 
 		#for corner in self.corners:
 		#	corner.setReadOnly(not (mode_creating or mode_editing))
-		self.page.dsbThickness.setReadOnly(not (mode_creating or mode_editing))
+		#self.page.dsbThickness.setReadOnly(not (mode_creating or mode_editing))
 
 		self.page.pbGoStepKapton.setEnabled(mode_view and step_kapton_exists)
-		self.page.cbCheckEdgesFirm.setEnabled(mode_creating or mode_editing)
+		#self.page.cbCheckEdgesFirm.setEnabled(mode_creating or mode_editing)
 		self.page.cbCheckGlueSpill.setEnabled(mode_creating or mode_editing)
-		self.page.dsbKaptonFlatness.setReadOnly(not (mode_creating or mode_editing))
+		#self.page.dsbKaptonFlatness.setReadOnly(not (mode_creating or mode_editing))
 
 		self.page.cbInspection.setEnabled(   mode_creating or mode_editing   )
 		self.page.pbGoStepSensor.setEnabled( mode_view and step_sensor_exists)
 		self.page.pbGoProtomodule.setEnabled(mode_view and protomodule_exists)
 		self.page.pbGoModule.setEnabled(     mode_view and module_exists     )
+
+		self.page.pbAddFiles.setEnabled(mode_creating or mode_editing)
+		self.page.pbDeleteFile.setEnabled(mode_creating or mode_editing)
 
 
 	# NEW:
@@ -406,7 +441,35 @@ class func(object):
 		if ID != "":
 			self.setUIPage('modules',ID=ID)
 
+	@enforce_mode(['editing', 'creating'])
+	def getFile(self,*args,**kwargs):
+		f = self.fwnd.getfile()
+		if f:
+			# Need to call this to ensure that necessary dirs for storing item are created
+			self.sensor.save()
 
+			fname = os.path.split(f)[1]  # Name of file
+			fdir, fname_ = self.sensor.get_filedir_filename()
+			new_filepath = fdir + '/' + fname
+			print("GETFILE:  Copying file", f, "to", new_filepath)
+			shutil.copyfile(f, new_filepath)
+			self.page.listComments.addItem(new_filepath)
+			self.sensor.test_files.append(new_filepath)
+			self.update_info()
+
+	@enforce_mode(['editing', 'creating'])
+	def deleteFile(self,*args,**kwargs):
+		row = self.page.listFiles.currentRow()
+		if row >= 0:
+			fname = self.page.listFiles.item(row).text()
+			self.page.listFiles.takeItem(row)
+			# Now need to remove the file...
+			fdir, fname_ = self.sensor.get_filedir_filename()
+			new_filepath = fdir + '/' + fname
+			print("REMOVING FILE", new_filepath)
+			os.remove(new_filepath)
+			self.sensor.test_files.remove(new_filepath)
+			self.update_info()
 
 	@enforce_mode('view')
 	def load_kwargs(self,kwargs):

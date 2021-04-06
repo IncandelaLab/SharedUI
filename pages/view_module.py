@@ -2,6 +2,10 @@ from filemanager import fm
 from PyQt5 import QtCore
 import time
 
+# NEW, experimental
+from PyQt5.QtWidgets import QFileDialog, QWidget
+
+
 PAGE_NAME = "view_module"
 DEBUG = False
 SITE_SEP = ', '
@@ -44,6 +48,8 @@ INDEX_INSTITUTION = {
 	'FNAL':1,
 	'UCSB':2,
 	'UMN':3,
+	'HEPHY':4,
+	'HPK':5,
 }
 
 
@@ -53,6 +59,19 @@ def separate_sites(sites_string):
 		s=s.replace(char, '\n')
 	sites = [_ for _ in s.splitlines() if _]
 	return sites
+
+
+# EXPERIMENTAL
+
+#class Filewindow(QWidget):
+#	def __init__(self):
+#		super(Filewindow, self).__init__()
+#		print("init")
+#
+#	def getfile(self,*args,**kwargs):
+#		fname = QFileDialog.getOpenFileName(self, 'Open file', '/home/phillip',"Image files (*.jpg *.gif)")
+
+
 
 class func(object):
 	def __init__(self,fm,page,setUIPage,setSwitchingEnabled):
@@ -139,6 +158,10 @@ class func(object):
 		self.page.pbIvGoPlotter.clicked.connect(    self.ivGoPlotter    )
 		self.page.pbDaqAddToPlotter.clicked.connect(self.daqAddToPlotter)
 		self.page.pbDaqGoPlotter.clicked.connect(   self.daqGoPlotter   )
+
+		# NEW, experimental
+		#self.fwnd = Filewindow()
+		#self.page.pbAddFiles.clicked.connect(self.fwnd.getfile)
 
 
 
@@ -294,6 +317,16 @@ class func(object):
 		# daq datasets
 		self.page.pbDaqAddToPlotter.setEnabled(mode_view and daq_data_exists)
 		self.page.pbDaqGoPlotter.setEnabled(   mode_view and daq_data_exists)
+
+		# NEW, experimental
+		self.page.pbAddFiles.setEnabled(mode_creating or mode_editing)
+
+
+#	# NEW, experimental
+#	@enforce_mode(['creating', 'editing'])
+#	def addFiles(self,*args,**kwargs):
+#		# Open up dialogue box, take note of selected file name
+#		getfile()  # VERY experimental...
 
 
 	# NEW:

@@ -32,6 +32,25 @@ MAC_ID_RANGES = {
 
 }
 
+# NEW
+LOCATION_DICT = {  # For loading from LOCATION_ID XML tag
+	1780: "FNAL",
+	1781: "UMN",
+	1782: "UCSB",
+	1783: "CERN",
+	1481: "UCSB",  # Technically "UCSB HEP", but prob no significant difference
+	1482: "UMN",
+	1483: "CERN",
+	1484: "HEPHY",
+	3800: "HPK",
+	2180: "FNAL",
+	1400: "UCSB",
+	1420: "CERN",
+	1440: "HEPHY",
+	1460 "UMN",
+}
+
+
 CENTURY = '{:0>3}__'
 
 CFG_FILE = 'cfg.json'
@@ -276,7 +295,17 @@ class fsobj(object):
 		DEFAULTS = {**self.DEFAULTS_COMMON, **getattr(self, 'DEFAULTS', {})}
 		for prop in PROPERTIES:
 			setattr(self, prop, DEFAULTS[prop] if prop in DEFAULTS.keys() else None)
-	
+
+		# INSERTED, may be buggy...
+		part_name = self.__class__.__name__
+		self.partlistfile = os.sep.join([ DATADIR, 'partlist', part_name+'s.json' ])
+		with open(self.partlistfile, 'r') as opfl:
+			data = json.load(opfl)
+			if not self.ID in data.keys():
+				# Object does not exist, so can't get filedir from get_filedir_filename()
+				# ...until the date has been set via add_part_to_list.  Do that now.
+				self.add_part_to_list()
+
 
 	def clear(self):
 		self.ID = None
@@ -529,6 +558,15 @@ class fsobj_part(fsobj):
 
 	# Must customize XML_UPLOAD_DICT slightly for each part type
 	XML_UPLOAD_DICT = None
+	XML_CONSTS = None
+
+	# NEW:  Want to ....
+	def __init__(self):  # Maybe this could be done OUTSIDE of init...but not sure I want to risk it.
+		# Add all other vars to XML_STRUCT_DICT
+		# (so they will be saved accordingly)
+		for var in PROPERTIES:
+			if var not in XML_CONSTS:  XML_STRUCT_DICT[var] = var
+
 
 
 	# save() must also create and save the XML file for uploading...
@@ -824,7 +862,7 @@ class fsobj_assembly(fsobj):
 			print(e)
 			return False
 
-		xml_string = minidom.parseString(data).toprettyxml(indent="    ")
+		xml_str = minidom.parseString(data).toprettyxml(indent="    ")
 		# Output is an empty XML file, header len 61
 		# NOTE:  Should be a SINGLE XML result!
 		if len(xml_str) < 62:
@@ -1120,7 +1158,7 @@ class baseplate(fsobj_part):
 		"id_number",
 		"kind_of_part_id",
 		"kind_of_part",
-		"location_id",
+		#"location_id",
 		"description",
 	]
 
@@ -1129,22 +1167,15 @@ class baseplate(fsobj_part):
 		"size":     '8', # This should not be changed!
 	}
 
-	#NEW:  List of vars that are manually given to the XML file via Akshay's script and 
-	#      should not be saved automatically by the loop over PROPERTIES
-	"""PROPERTIES_SAVED_MANUALLY = [
-		"identifier",
-		"comments",
-		"insertion_user",
-	]"""
 
 	XML_STRUCT_DICT = { "data":{"row":{
 		"ID":"id_number",
-		# PART_PARENT_ID:  Don't care about this (not needed for upload)
+		"PART_PARENT_ID":  #Don't care about this (not needed for upload)
 		"KIND_OF_PART_ID":"kind_of_part_id",
-		"KIND_OF_PART":"kind_of_part", #TBD:  Property
-		"LOCATION_ID":"location_id", # same...
+		"KIND_OF_PART":"kind_of_part",
+		"LOCATION_ID":"location_id",
 		"SERIAL_NUMBER":"ID",
-		"DESCRIPTION":"description",  # Can probably leave this blank...
+		"DESCRIPTION":"description",
 	}}}
 
 	XML_UPLOAD_DICT = {"PARTS":{"PART":{
@@ -1154,6 +1185,44 @@ class baseplate(fsobj_part):
 		"COMMENT_DESCRIPTION":"description",
 		"LOCATION":"institution",
 	}}}
+
+	# List of vars that should NOT be edited in the GUI and are only loaded from DB
+	# (And some info would be redundant w/ other constants, eg KIND_OF_PART and self.size)
+	XML_CONSTS = [
+		#'ID',  # does NOT count
+		'size',
+	]
+
+
+	@property
+	def kind_of_part(self): # Determined entirely by size
+		if self.size == 6:
+			size_str = "Six"
+		elif self.size == 8:
+			size_str = "Eight"
+		else:
+			print("ERROR:  size {} does not exist".format(self.size))
+			return None
+		return "HGC {} Inch Plate".format(size_str)
+	@kind_of_part.setter
+	def kind_of_part(self, value):
+		# Parse and read in the baseplate size
+		size_str = value.split()[1]
+		if size_str == "Six":
+			self.size = 6
+		elif size_str == "Eight":
+			self.size = 8
+		else:
+			print("ERROR:  Unexpected baseplate size {} loaded".format(size_str))
+
+	@property
+	def location_id(self):
+		return LOCATION_DICT[]
+	@location_id.setter(self, value):
+		if not value in LOCATION_DICT.keys():
+			print("Warning:  Found invalid location ID {}".format(value))
+		else:
+			self.location = LOCATION_DICT[value]
 
 
 
@@ -1283,11 +1352,14 @@ class sensor(fsobj_part):
 		"kind_of_part",
 		"location_id",
 		"description",
+
+		"test_files",
 	]
 
 	DEFAULTS = {
 		"shipments":[],
 		"size":    '8',  # DO NOT MODIFY
+		"test_files":[],
 	}
 
 	XML_STRUCT_DICT = { "data":{"row":{
@@ -1315,7 +1387,44 @@ class sensor(fsobj_part):
 		#}
 	}}}
 
-		
+	XML_CONSTS = [
+		#'ID',  # does NOT count
+		'size',
+	]
+
+
+	@property
+	def kind_of_part(self): # Determined entirely by size
+		if self.size == 6:
+			size_str = "Six"
+		elif self.size == 8:
+			size_str = "Eight"
+		else:
+			print("ERROR:  size {} does not exist".format(self.size))
+			return None
+		return "HPK {} Inch {} Cell Silicon Sensor".format(size_str, self.channels)
+	@kind_of_part.setter
+	def kind_of_part(self, value):
+		# Parse and read in the baseplate size
+		parsestr = value.split() # ex. "HPK Six Inch 256 Cell Silicon Sensor"
+		size_str = parsestr[1]
+		self.channels = parsestr[3]
+		if size_str == "Six":
+			self.size = 6
+		elif size_str == "Eight":
+			self.size = 8
+		else:
+			print("ERROR:  Unexpected sensor size {} loaded".format(size_str))
+
+	@property
+	def location_id(self):
+		return LOCATION_DICT[]
+	@location_id.setter(self, value):
+		if not value in LOCATION_DICT.keys():
+			print("Warning:  Found invalid location ID {}".format(value))
+		else:
+			self.location = LOCATION_DICT[value]
+
 
 	@property
 	def flatness(self):
@@ -1505,7 +1614,32 @@ class pcb(fsobj_part):
 
 	DAQ_DATADIR = 'daq'
 
+	XML_CONSTS = [
+		#'ID',  # does NOT count
+		'resolution_type',
+	]
 
+
+	@property
+	def kind_of_part(self): # Determined entirely by size
+		return "HGC {} Hex PCB".format(self.resolution_type)
+	@kind_of_part.setter
+	def kind_of_part(self, value):
+		# Parse and read in the baseplate size
+		res_str = value.split()[1]
+		if not res_str in ['HD', 'LD']:
+			print("ERROR:  Unexpected resolution type {}".format(res_str))
+		self.resolution_type = res_str  # HD or LD
+		
+
+	@property
+	def location_id(self):
+		return LOCATION_DICT[]
+	@location_id.setter(self, value):
+		if not value in LOCATION_DICT.keys():
+			print("Warning:  Found invalid location ID {}".format(value))
+		else:
+			self.location = LOCATION_DICT[value]
 
 	def fetch_datasets(self):
 		if self.ID is None:
@@ -1672,6 +1806,32 @@ class protomodule(fsobj_part):
 		}
 	}}}
 
+	XML_CONSTS = [
+		#'ID',  # does NOT count
+		'resolution_type',
+	]
+
+
+	@property
+	def kind_of_part(self): # Determined entirely by size
+		if self.size == 6:
+			size_str = "Six"
+		elif self.size == 8:
+			size_str = "Eight"
+		else:
+			print("ERROR:  size {} does not exist".format(self.size))
+			return Nonei
+		return "HGC {} Inch Silicon Protomodule".format(size_str)
+	@kind_of_part.setter
+	def kind_of_part(self, value):
+		# Parse and read in the baseplate size
+		res_str = value.split()[1]
+		if res_str == "Six":
+			self.size = 6
+		elif res_str == "Eight":
+			self.size = 8
+		else:
+			print("Read unrecognized protomodule size {}".format(res_str))
 
 	@property
 	def assm_tray_pos(self):
@@ -1890,6 +2050,30 @@ class module(fsobj_part):
 
 	BA_FILENAME = 'ba {which}'
 	BD_FILENAME = 'bd {which}'
+
+	XML_CONSTS = [
+		#'ID',  # does NOT count
+		'resolution_type',
+	]
+
+
+	@property
+	def kind_of_part(self): # Determined entirely by size
+		if self.size == 6:
+			size_str = "Six"
+		elif self.size == 8:
+			size_str = "Eight"
+		else:
+			print("ERROR:  size {} does not exist".format(self.size))
+			return None
+		return "HGC {} Inch Plate".format(size_str)
+	@kind_of_part.setter
+	def kind_of_part(self, value):
+		# Parse and read in the baseplate size
+		res_str = value.split()[1]
+		if not res_str in ['HD', 'LD']:
+			print("ERROR:  Unexpected resolution type {}".format(res_str))
+		self.resolution_type = res_str  # HD or LD
 
 
 	# TEMPORARY:  May want to fix this...

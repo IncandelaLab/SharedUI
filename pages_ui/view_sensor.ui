@@ -301,44 +301,6 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QComboBox" name="cbInstitution">
-    <property name="geometry">
-     <rect>
-      <x>120</x>
-      <y>21</y>
-      <width>141</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="currentIndex">
-     <number>-1</number>
-    </property>
-    <item>
-     <property name="text">
-      <string>CERN</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>FNAL</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>UCSB</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>UMN</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>NTU</string>
-     </property>
-    </item>
-   </widget>
    <widget class="QLineEdit" name="leInsertUser">
     <property name="geometry">
      <rect>
@@ -436,6 +398,49 @@
      <bool>true</bool>
     </property>
    </widget>
+   <widget class="QComboBox" name="cbInstitution">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>20</y>
+      <width>141</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>-1</number>
+    </property>
+    <item>
+     <property name="text">
+      <string>CERN</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>FNAL</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>UCSB</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>UMN</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>HEPHY</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>HPK</string>
+     </property>
+    </item>
+   </widget>
    <zorder>lineEdit_9</zorder>
    <zorder>lineEdit_3</zorder>
    <zorder>leLocation</zorder>
@@ -452,12 +457,12 @@
    <zorder>cbShape</zorder>
    <zorder>sbChannels</zorder>
    <zorder>lineEdit_17</zorder>
-   <zorder>cbInstitution</zorder>
    <zorder>leInsertUser</zorder>
    <zorder>lineEdit_18</zorder>
    <zorder>cbType</zorder>
    <zorder>leBarcode</zorder>
    <zorder>lineEdit_23</zorder>
+   <zorder>cbInstitution</zorder>
   </widget>
   <widget class="QFrame" name="frame_3">
    <property name="geometry">
@@ -592,7 +597,7 @@
    <property name="geometry">
     <rect>
      <x>510</x>
-     <y>446</y>
+     <y>303</y>
      <width>51</width>
      <height>21</height>
     </rect>
@@ -605,7 +610,7 @@
    <property name="geometry">
     <rect>
      <x>510</x>
-     <y>536</y>
+     <y>393</y>
      <width>51</width>
      <height>21</height>
     </rect>
@@ -618,7 +623,7 @@
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>466</y>
+     <y>323</y>
      <width>121</width>
      <height>21</height>
     </rect>
@@ -634,7 +639,7 @@
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>536</y>
+     <y>393</y>
      <width>121</width>
      <height>21</height>
     </rect>
@@ -650,7 +655,7 @@
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>446</y>
+     <y>303</y>
      <width>121</width>
      <height>21</height>
     </rect>
@@ -666,7 +671,7 @@
    <property name="geometry">
     <rect>
      <x>510</x>
-     <y>466</y>
+     <y>323</y>
      <width>51</width>
      <height>21</height>
     </rect>
@@ -679,7 +684,7 @@
    <property name="geometry">
     <rect>
      <x>430</x>
-     <y>446</y>
+     <y>303</y>
      <width>81</width>
      <height>21</height>
     </rect>
@@ -698,7 +703,7 @@
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>516</y>
+     <y>373</y>
      <width>61</width>
      <height>16</height>
     </rect>
@@ -711,7 +716,7 @@
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>426</y>
+     <y>283</y>
      <width>131</width>
      <height>16</height>
     </rect>
@@ -724,7 +729,7 @@
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>366</y>
+     <y>223</y>
      <width>141</width>
      <height>16</height>
     </rect>
@@ -737,7 +742,7 @@
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>386</y>
+     <y>243</y>
      <width>131</width>
      <height>21</height>
     </rect>
@@ -753,7 +758,7 @@
    <property name="geometry">
     <rect>
      <x>440</x>
-     <y>386</y>
+     <y>243</y>
      <width>121</width>
      <height>21</height>
     </rect>
@@ -776,7 +781,7 @@
    <property name="geometry">
     <rect>
      <x>430</x>
-     <y>466</y>
+     <y>323</y>
      <width>80</width>
      <height>20</height>
     </rect>
@@ -789,7 +794,7 @@
    <property name="geometry">
     <rect>
      <x>430</x>
-     <y>536</y>
+     <y>393</y>
      <width>80</width>
      <height>20</height>
     </rect>
@@ -802,7 +807,7 @@
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>173</y>
+     <y>30</y>
      <width>211</width>
      <height>16</height>
     </rect>
@@ -815,7 +820,7 @@
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>254</y>
+     <y>111</y>
      <width>241</width>
      <height>81</height>
     </rect>
@@ -826,7 +831,7 @@
    <property name="frameShadow">
     <enum>QFrame::Plain</enum>
    </property>
-   <widget class="QDoubleSpinBox" name="dsbKaptonFlatness_2">
+   <widget class="QDoubleSpinBox" name="dsbKaptonFlatness">
     <property name="enabled">
      <bool>false</bool>
     </property>
@@ -873,7 +878,7 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QComboBox" name="cbCheckEdgesFirm_2">
+   <widget class="QComboBox" name="cbCheckEdgesFirm">
     <property name="enabled">
      <bool>false</bool>
     </property>
@@ -921,7 +926,7 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QComboBox" name="cbCheckGlueSpill_2">
+   <widget class="QComboBox" name="cbCheckGlueSpill">
     <property name="geometry">
      <rect>
       <x>159</x>
@@ -988,7 +993,7 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QDoubleSpinBox" name="dsbThickness_2">
+   <widget class="QDoubleSpinBox" name="dsbThickness">
     <property name="enabled">
      <bool>false</bool>
     </property>
@@ -1021,7 +1026,7 @@
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>233</y>
+     <y>90</y>
      <width>241</width>
      <height>16</height>
     </rect>
@@ -1034,7 +1039,7 @@
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>193</y>
+     <y>50</y>
      <width>241</width>
      <height>21</height>
     </rect>
@@ -1045,7 +1050,7 @@
    <property name="frameShadow">
     <enum>QFrame::Plain</enum>
    </property>
-   <widget class="QPushButton" name="pbGoStepKapton_2">
+   <widget class="QPushButton" name="pbGoStepKapton">
     <property name="geometry">
      <rect>
       <x>190</x>
@@ -1058,7 +1063,7 @@
      <string>Go to</string>
     </property>
    </widget>
-   <widget class="QSpinBox" name="sbStepKapton_2">
+   <widget class="QSpinBox" name="sbStepKapton">
     <property name="geometry">
      <rect>
       <x>110</x>
@@ -1094,243 +1099,75 @@
     </property>
    </widget>
   </widget>
-  <widget class="QFrame" name="frame_8">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
+  <widget class="QPushButton" name="pbAddFiles">
    <property name="geometry">
     <rect>
-     <x>310</x>
-     <y>51</y>
-     <width>241</width>
-     <height>81</height>
+     <x>720</x>
+     <y>170</y>
+     <width>101</width>
+     <height>31</height>
     </rect>
    </property>
-   <property name="frameShape">
-    <enum>QFrame::StyledPanel</enum>
+   <property name="text">
+    <string>Add files</string>
    </property>
-   <property name="frameShadow">
-    <enum>QFrame::Plain</enum>
-   </property>
-   <widget class="QDoubleSpinBox" name="dsbKaptonFlatness">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>159</x>
-      <y>40</y>
-      <width>81</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-    <property name="decimals">
-     <number>3</number>
-    </property>
-    <property name="minimum">
-     <double>-1.000000000000000</double>
-    </property>
-    <property name="maximum">
-     <double>2147483647.000000000000000</double>
-    </property>
-    <property name="singleStep">
-     <double>0.050000000000000</double>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEdit_29">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>1</x>
-      <y>20</y>
-      <width>161</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>height difference between highest and lowers corners</string>
-    </property>
-    <property name="text">
-     <string>Check glue spillage</string>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="cbCheckEdgesFirm">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>159</x>
-      <y>0</y>
-      <width>81</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="currentIndex">
-     <number>-1</number>
-    </property>
-    <item>
-     <property name="text">
-      <string>pass</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>fail</string>
-     </property>
-    </item>
-   </widget>
-   <widget class="QLineEdit" name="lineEdit_30">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>1</x>
-      <y>0</y>
-      <width>161</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>height difference between highest and lowers corners</string>
-    </property>
-    <property name="text">
-     <string>Check edges firm</string>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="cbCheckGlueSpill">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>159</x>
-      <y>20</y>
-      <width>81</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="currentIndex">
-     <number>-1</number>
-    </property>
-    <item>
-     <property name="text">
-      <string>pass</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>fail</string>
-     </property>
-    </item>
-   </widget>
-   <widget class="QLineEdit" name="lineEdit_31">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>1</x>
-      <y>40</y>
-      <width>161</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>height difference between highest and lowers corners</string>
-    </property>
-    <property name="text">
-     <string>Kapton flatness (mm)</string>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEdit_26">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>1</x>
-      <y>60</y>
-      <width>161</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>height difference between highest and lowers corners</string>
-    </property>
-    <property name="text">
-     <string>Kapton thickness (mm)</string>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QDoubleSpinBox" name="dsbThickness">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>160</x>
-      <y>60</y>
-      <width>79</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-    <property name="decimals">
-     <number>3</number>
-    </property>
-    <property name="minimum">
-     <double>-1.000000000000000</double>
-    </property>
-    <property name="maximum">
-     <double>2147483647.000000000000000</double>
-    </property>
-    <property name="singleStep">
-     <double>0.050000000000000</double>
-    </property>
-   </widget>
-   <zorder>lineEdit_29</zorder>
-   <zorder>lineEdit_30</zorder>
-   <zorder>cbCheckGlueSpill</zorder>
-   <zorder>lineEdit_31</zorder>
-   <zorder>cbCheckEdgesFirm</zorder>
-   <zorder>dsbKaptonFlatness</zorder>
-   <zorder>lineEdit_26</zorder>
-   <zorder>dsbThickness</zorder>
   </widget>
-  <widget class="QLabel" name="label_5">
+  <widget class="QListWidget" name="listFiles">
+   <property name="geometry">
+    <rect>
+     <x>590</x>
+     <y>50</y>
+     <width>351</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>ID (date sent) (SENDER to RECEIVER)</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_16">
+   <property name="geometry">
+    <rect>
+     <x>591</x>
+     <y>140</y>
+     <width>221</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Testing data files</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pbDeleteFile">
+   <property name="geometry">
+    <rect>
+     <x>810</x>
+     <y>140</y>
+     <width>131</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Delete selected</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_7">
    <property name="enabled">
     <bool>true</bool>
    </property>
    <property name="geometry">
     <rect>
-     <x>310</x>
+     <x>590</x>
      <y>30</y>
      <width>241</width>
      <height>16</height>
     </rect>
    </property>
    <property name="text">
-    <string>kaptonized baseplate qualification</string>
+    <string>Testing data storage</string>
    </property>
   </widget>
  </widget>

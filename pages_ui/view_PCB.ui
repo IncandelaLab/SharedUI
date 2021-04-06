@@ -736,44 +736,6 @@
     </property>
    </item>
   </widget>
-  <widget class="QComboBox" name="cbInstitution">
-   <property name="geometry">
-    <rect>
-     <x>130</x>
-     <y>130</y>
-     <width>141</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="currentIndex">
-    <number>-1</number>
-   </property>
-   <item>
-    <property name="text">
-     <string>CERN</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>FNAL</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>UCSB</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>UMN</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>NTU</string>
-    </property>
-   </item>
-  </widget>
   <widget class="QLineEdit" name="lineEdit_20">
    <property name="geometry">
     <rect>
@@ -1061,6 +1023,49 @@
    <property name="text">
     <string>Load / check DB</string>
    </property>
+  </widget>
+  <widget class="QComboBox" name="cbInstitution">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>130</y>
+     <width>141</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="currentIndex">
+    <number>-1</number>
+   </property>
+   <item>
+    <property name="text">
+     <string>CERN</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>FNAL</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>UCSB</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>UMN</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>HEPHY</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>HPK</string>
+    </property>
+   </item>
   </widget>
  </widget>
  <resources/>

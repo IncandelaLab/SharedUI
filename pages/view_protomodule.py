@@ -39,6 +39,8 @@ INDEX_INSTITUTION = {
 	'FNAL':1,
 	'UCSB':2,
 	'UMN':3,
+	'HEPHY':4,
+	'HPK':5,
 }
 
 

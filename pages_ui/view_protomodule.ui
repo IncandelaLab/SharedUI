@@ -367,44 +367,6 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QComboBox" name="cbInstitution">
-    <property name="geometry">
-     <rect>
-      <x>120</x>
-      <y>19</y>
-      <width>141</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="currentIndex">
-     <number>-1</number>
-    </property>
-    <item>
-     <property name="text">
-      <string>CERN</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>FNAL</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>UCSB</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>UMN</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>NTU</string>
-     </property>
-    </item>
-   </widget>
    <widget class="QLineEdit" name="leInsertUser">
     <property name="geometry">
      <rect>
@@ -440,6 +402,49 @@
      <bool>true</bool>
     </property>
    </widget>
+   <widget class="QComboBox" name="cbInstitution">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>20</y>
+      <width>141</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>-1</number>
+    </property>
+    <item>
+     <property name="text">
+      <string>CERN</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>FNAL</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>UCSB</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>UMN</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>HEPHY</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>HPK</string>
+     </property>
+    </item>
+   </widget>
    <zorder>lineEdit_9</zorder>
    <zorder>lineEdit_3</zorder>
    <zorder>leLocation</zorder>
@@ -459,9 +464,9 @@
    <zorder>sbChannels</zorder>
    <zorder>pbGoShipment</zorder>
    <zorder>lineEdit_52</zorder>
-   <zorder>cbInstitution</zorder>
    <zorder>lineEdit_38</zorder>
    <zorder>leInsertUser</zorder>
+   <zorder>cbInstitution</zorder>
   </widget>
   <widget class="QFrame" name="frame_3">
    <property name="geometry">

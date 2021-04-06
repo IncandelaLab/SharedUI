@@ -793,6 +793,86 @@
     </rect>
    </property>
   </widget>
+  <widget class="QLineEdit" name="lineEdit_21">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>30</y>
+     <width>111</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Institution</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_22">
+   <property name="geometry">
+    <rect>
+     <x>310</x>
+     <y>30</y>
+     <width>151</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Institution</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_23">
+   <property name="geometry">
+    <rect>
+     <x>650</x>
+     <y>30</y>
+     <width>111</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Institution</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_24">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>370</y>
+     <width>111</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Institution</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_25">
+   <property name="geometry">
+    <rect>
+     <x>310</x>
+     <y>370</y>
+     <width>151</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Institution</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
   <widget class="QComboBox" name="cbSensorToolInstitution">
    <property name="geometry">
     <rect>
@@ -827,41 +907,14 @@
    </item>
    <item>
     <property name="text">
-     <string>NTU</string>
+     <string>HEPHY</string>
     </property>
    </item>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_21">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>30</y>
-     <width>111</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Institution</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_22">
-   <property name="geometry">
-    <rect>
-     <x>310</x>
-     <y>30</y>
-     <width>151</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Institution</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
+   <item>
+    <property name="text">
+     <string>HPK</string>
+    </property>
+   </item>
   </widget>
   <widget class="QComboBox" name="cbSensorTrayInstitution">
    <property name="geometry">
@@ -897,25 +950,14 @@
    </item>
    <item>
     <property name="text">
-     <string>NTU</string>
+     <string>HEPHY</string>
     </property>
    </item>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_23">
-   <property name="geometry">
-    <rect>
-     <x>650</x>
-     <y>30</y>
-     <width>111</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Institution</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
+   <item>
+    <property name="text">
+     <string>HPK</string>
+    </property>
+   </item>
   </widget>
   <widget class="QComboBox" name="cbAssemblyTrayInstitution">
    <property name="geometry">
@@ -936,11 +978,6 @@
    </item>
    <item>
     <property name="text">
-     <string>NTU</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
      <string>FNAL</string>
     </property>
    </item>
@@ -954,22 +991,16 @@
      <string>UMN</string>
     </property>
    </item>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_24">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>370</y>
-     <width>111</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Institution</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
+   <item>
+    <property name="text">
+     <string>HEPHY</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>HPK</string>
+    </property>
+   </item>
   </widget>
   <widget class="QComboBox" name="cbPcbToolInstitution">
    <property name="geometry">
@@ -1005,25 +1036,14 @@
    </item>
    <item>
     <property name="text">
-     <string>NTU</string>
+     <string>HEPHY</string>
     </property>
    </item>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_25">
-   <property name="geometry">
-    <rect>
-     <x>310</x>
-     <y>370</y>
-     <width>151</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Institution</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
+   <item>
+    <property name="text">
+     <string>HPK</string>
+    </property>
+   </item>
   </widget>
   <widget class="QComboBox" name="cbPcbTrayInstitution">
    <property name="geometry">
@@ -1059,7 +1079,12 @@
    </item>
    <item>
     <property name="text">
-     <string>NTU</string>
+     <string>HEPHY</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>HPK</string>
     </property>
    </item>
   </widget>
