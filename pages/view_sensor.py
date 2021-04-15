@@ -60,7 +60,7 @@ INDEX_INSTITUTION = {
 	'HPK':5,
 }
 
-
+"""
 class Filewindow(QWidget):
 	def __init__(self):
 		super(Filewindow, self).__init__()
@@ -69,7 +69,7 @@ class Filewindow(QWidget):
 		fname, fmt = QFileDialog.getOpenFileName(self, 'Open file', '~',"(*.jpg *.png *.xml)")
 		print("File dialog:  got file", fname)
 		return fname
-
+"""
 
 class func(object):
 	def __init__(self,fm,page,setUIPage,setSwitchingEnabled):
@@ -159,21 +159,23 @@ class func(object):
 		#	self.page.dsbC5
 		#]
 
-		self.fwnd = Filewindow()
-		self.page.pbAddFiles.clicked.connect(self.getFile)
-		self.page.pbDeleteFile.clicked.connect(self.deleteFile)
+		#self.fwnd = Filewindow()
+		#self.page.pbAddFiles.clicked.connect(self.getFile)
+		#self.page.pbDeleteFile.clicked.connect(self.deleteFile)
 
 
 	@enforce_mode(['view', 'editing', 'creating'])
-	def update_info(self,ID=None,*args,**kwargs):
+	def update_info(self,ID=None,do_load=True,*args,**kwargs):
 		if ID is None:
 			#ID = self.page.sbID.value()
 			ID = self.page.leID.text()
 		else:
 			#self.page.sbID.setValue(ID)
 			self.page.leID.setText(ID)
-		
-		self.sensor_exists = self.sensor.load(ID)
+		if do_load:
+			self.sensor_exists = self.sensor.load(ID)
+		else:
+			self.sensor_exists = False
 
 		#self.page.leID.setText(self.sensor.ID)
 
@@ -229,10 +231,10 @@ class func(object):
 		#if self.page.sbProtomodule.value() == -1: self.page.sbProtomodule.clear()
 		#if self.page.sbModule.value()      == -1: self.page.sbModule.clear()
 
-		self.page.listFiles.clear()
-		for f in self.sensor.test_files:
-			name = os.path.split(f)[1]
-			self.page.listFiles.addItem(name)
+		#self.page.listFiles.clear()
+		#for f in self.sensor.test_files:
+		#	name = os.path.split(f)[1]
+		#	self.page.listFiles.addItem(name)
 
 		self.updateElements()
 
@@ -294,8 +296,8 @@ class func(object):
 		self.page.pbGoProtomodule.setEnabled(mode_view and protomodule_exists)
 		self.page.pbGoModule.setEnabled(     mode_view and module_exists     )
 
-		self.page.pbAddFiles.setEnabled(mode_creating or mode_editing)
-		self.page.pbDeleteFile.setEnabled(mode_creating or mode_editing)
+		#self.page.pbAddFiles.setEnabled(mode_creating or mode_editing)
+		#self.page.pbDeleteFile.setEnabled(mode_creating or mode_editing)
 
 
 	# NEW:
@@ -313,7 +315,7 @@ class func(object):
 			#self.sensor.new(ID)
 			#self.mode = 'creating'  # update_info needs mode==view
 			self.page.leStatus.setText("sensor DNE")
-			self.update_info()
+			self.update_info(do_load=False)
 		else:
 			# pass
 			self.sensor = tmp_sensor
@@ -441,11 +443,14 @@ class func(object):
 		if ID != "":
 			self.setUIPage('modules',ID=ID)
 
+
+	"""
 	@enforce_mode(['editing', 'creating'])
 	def getFile(self,*args,**kwargs):
 		f = self.fwnd.getfile()
 		if f:
 			# Need to call this to ensure that necessary dirs for storing item are created
+			print("Got file.  Saving to ensure creation of filemanager location...")
 			self.sensor.save()
 
 			fname = os.path.split(f)[1]  # Name of file
@@ -470,6 +475,7 @@ class func(object):
 			os.remove(new_filepath)
 			self.sensor.test_files.remove(new_filepath)
 			self.update_info()
+	"""
 
 	@enforce_mode('view')
 	def load_kwargs(self,kwargs):

@@ -240,25 +240,54 @@ class fsobj(object):
 				self._load_from_dict(item, xml_tree)
 			# If item must be stored as a list in the class:
 			elif item in self.ITEMLIST_LIST:  #len(xml_tree.findall(item_name)) > 1:  # If multiple items found:
+				print("_load_from_dict:  list item {} found!".format(item))
 				itemdata = xml_tree.findall('.//'+item_name)  # List of all contents of matching tags
 				# NOTE:  Items could be text or ints!  Convert accordingly.
-				itemdata = [it.text for it in itemdata]
-				if itemdata != []:
-					if itemdata[0].isdigit():  itemdata = [int(it.text) for it in itemdata]
+				itemdata = [self._convert_str(it.text) for it in itemdata]
+				if itemdata == []:
+					setattr(self, item, None)
+				"""else:
+					# convert all strings to ints/nums where possible
+					for i in range(len(itemdata)):
+						if itemdata[i].isdigit():  # Int
+							itemdata[i] = int(itemdata[i])
+						elif itemdata[i].replace('.','',1).isdigit():  # float
+							itemdata[i] = float(itemmdata[i])
+						elif itemdata[i] == "None":  # None
+							itemdata[i] = None
+						else:  # string
+							itemdata[i] = itemdata[i]
+				"""
 				setattr(self, item, itemdata)  # Should be a list containing contents; just assign it to the var
 			else:
-				print("_load_from_dict: ordinary item {} found!".format(item_name))
+				print("_load_from_dict: ordinary XML item {} found!".format(item_name))
 				itemdata = xml_tree.find('.//'+item_name)  # NOTE:  itemdata is an Element, not text!
-				print("Item text is", itemdata.text, "; item is", item)
+				print("Loaded item text is", itemdata.text, "; item is", item)
 				if itemdata.text.isdigit():  # If int:
 					idt = int(itemdata.text)
 				elif itemdata.text.replace('.','',1).isdigit():  # If float:
 					idt = float(itemdata.text)
 				elif itemdata.text == 'True':  idt = True
 				elif itemdata.text == 'False': idt = False
+				elif itemdata.text == 'None':  idt = None
 				else:  # If string
 					idt = itemdata.text
 				setattr(self, item, idt)
+
+	# Utility:  Take a string from an XML element and return a var w/ the correct type
+	# "True" -> bool, 100 -> int, etc.
+	def _convert_str(self, string):
+		if string.isdigit():
+			return str(string)
+		elif string.replace('.','',1).isdigit():
+			return float(string)
+		elif string == "True" or string == "False":
+			return bool(string)
+		elif string == "None":
+			return None
+		else:
+			return string
+
 
 	def load(self, ID, on_property_missing = "warn"):
 		if ID == -1:
@@ -329,15 +358,20 @@ class fsobj(object):
 		root = Element('ROOT')
 		root.set('xmlns:xsi','http://www.w3.org/2001/XMLSchema-instance')
 		tree = ElementTree(root)
+		print("CALLING generate_xml().  Full dict is:")
+		print(input_dict)
 
 		for item_name, item in input_dict.items():
 			# Note:  Need to add a case if one of the items is a list.
 			# For files where multiple DATA_SETs w/ the same name are needed.
 			if type(item) == list:
+				print("  List found in generate_xml.  Calling dict to element...", item)
 				for item_ in item:
 					child = self.dict_to_element(item_, item_name)
 					root.append(child)
 			else:
+				print("  List not found in generate_xml.  Calling dict to element on...")
+				print(item, item_name)
 				child = self.dict_to_element(item, item_name)
 				root.append(child)
 		return tree
@@ -348,6 +382,8 @@ class fsobj(object):
 		# structured according to that dictionary.
 		# NOTE:  This must be able to work recursively.  I.e. if one of the objs in the input_dict is a dict,
 		#    it reads *that* dictionary and creates an element for it, +appends it to current element.  Etc.
+		print("dict_to_element: input dict is")
+		print(input_dict)
 
 		parent = Element(element_name)
 		
@@ -355,8 +391,9 @@ class fsobj(object):
 			# CHANGE FOR NEW XML SYSTEM:
 			# item is a list (comments), dict (another XML layer), or string (var)
 			# If string, use getattr()
-			print("dict_to_element:  SAVING: ", item_name, item)
+			print("    dict_to_element:  SAVING: ", item_name, item)
 			if type(item) == dict:
+				print("  **Dict found.  Calling recursive case...")
 				# Recursive case: Create an element from the child dictionary.
 				child = self.dict_to_element(item, item_name)
 				# Special case for PARTs:
@@ -364,7 +401,8 @@ class fsobj(object):
 					child.set('mode','auto')
 				parent.append(child)
 			elif type(item) == list:
-				# Second recursive case:  for multiple parts
+				# Second recursive case:  for multiple parts, comments, etc
+				print("    Found list of vals to store for", item_name, item)
 				# "PART":[{part_dict_1}, {part_dict_2}]; both have to be labeled w/ "PART"
 				for it in item:
 					# For each item, create elements recursively and append to parent
@@ -374,13 +412,13 @@ class fsobj(object):
 					parent.append(ch)
 			elif type(getattr(self, item, None)) == list:  #type(item) == list:
 				# Base case 1:  List of comments.  Create an element for each one.
-				print("Found comment list: ", getattr(self, item, None))
+				print("    Found list: ", getattr(self, item, None))
 				for comment in getattr(self, item, None):
 					child = Element(item_name)
-					child.text = comment
+					child.text = str(comment)
 					parent.append(child)
 			else:
-				print("INSERTING BASE ITEM", item_name, item)
+				print("    INSERTING BASE ITEM", item_name, item)
 				# Base case 2:
 				child = Element(item_name)
 				child.text = str(getattr(self, item, None))  # item should be the var name!
@@ -418,6 +456,9 @@ class fsobj(object):
 
 		# Generate XML tree:
 		struct_dict = self.XML_STRUCT_DICT
+		print("IN SAVE: XML_STRUCT_DICT is")
+		print(struct_dict)
+
 		xml_tree = self.generate_xml(struct_dict)  #self.XML_STRUCT_DICT)
 
 		# Save xml file:
@@ -555,7 +596,6 @@ class fsobj_part(fsobj):
 	# Are there additional attrs to request...?
 	XML_STRUCT_DICT = None
 
-
 	# Must customize XML_UPLOAD_DICT slightly for each part type
 	XML_UPLOAD_DICT = None
 	XML_CONSTS = None
@@ -565,8 +605,9 @@ class fsobj_part(fsobj):
 		super(fsobj_part, self).__init__()
 		# Add all other vars to XML_STRUCT_DICT
 		# (so they will be saved accordingly)
-		for var in self.PROPERTIES:
-			if var not in self.XML_CONSTS:  self.XML_STRUCT_DICT[var] = var
+		for var in self.PROPERTIES + self.PROPERTIES_COMMON:
+			# WARNING:  XML_STRUCT_DICT is {'data':{'row': and THEN the useful vars
+			if var not in self.XML_CONSTS:  self.XML_STRUCT_DICT['data']['row'][var] = var
 
 
 
@@ -606,7 +647,7 @@ class fsobj_part(fsobj):
 	# load() requires downloading ability, but is otherwise normal.
 
 	def load(self, ID, on_property_missing = "warn"):
-		print("LOADING PART")
+		print("LOADING PART {}".format(ID))
 		if ID == "":
 			self.clear()
 			return False
@@ -1195,6 +1236,10 @@ class baseplate(fsobj_part):
 		'size',
 	]
 
+	# List of vars that are stored as lists.
+	# Need to be treated separately @ loading from XML
+	ITEMLIST_LIST = ['comments', 'shipments', 'corner_heights']
+
 
 	@property
 	def kind_of_part(self): # Determined entirely by size
@@ -1202,6 +1247,8 @@ class baseplate(fsobj_part):
 			size_str = "Six"
 		elif self.size == 8:
 			size_str = "Eight"
+		elif self.size == None:
+			return None
 		else:
 			print("ERROR:  size {} does not exist".format(self.size))
 			return None
@@ -1209,7 +1256,7 @@ class baseplate(fsobj_part):
 	@kind_of_part.setter
 	def kind_of_part(self, value):
 		# Parse and read in the baseplate size
-		if value is None:
+		if value is None or value == "None":
 			self.size = None
 			return
 		size_str = value.split()[1]
@@ -1234,6 +1281,16 @@ class baseplate(fsobj_part):
 		else:
 			self.location = LOCATION_DICT[value]
 
+	@property
+	def flatness(self):
+		# BASEPLATE flatness, not kapton flatness!
+		if self.corner_heights is None:
+			return None
+		else:
+			if None in self.corner_heights:
+				return None
+			else:
+				return max(self.corner_heights) - min(self.corner_heights)
 
 
 	def ready_step_sensor(self, step_sensor = None, max_flatness = None):
@@ -1345,11 +1402,11 @@ class sensor(fsobj_part):
 
 		# NOTE:  kapton step has been moved to sensor!
 		"step_kapton",
-		"kapton_flatness",
-		"check_edges_firm",
+		#"kapton_flatness",
+		#"check_edges_firm",
 		"check_glue_spill",
-		"thickness",
-		"corner_heights",
+		#"thickness",
+		#"corner_heights",
 
 		# associations to other objects
 		"module", # which module this sensor is a part of
@@ -1363,13 +1420,11 @@ class sensor(fsobj_part):
 		"location_id",
 		"description",
 
-		"test_files",
 	]
 
 	DEFAULTS = {
 		"shipments":[],
 		"size":    '8',  # DO NOT MODIFY
-		"test_files":[],
 	}
 
 	XML_STRUCT_DICT = { "data":{"row":{
@@ -1402,7 +1457,9 @@ class sensor(fsobj_part):
 		'size',
 	]
 
-	
+	ITEMLIST_LIST = ['comments', 'shipments']
+
+
 	"""
 	@property
 	def kind_of_part(self): # Determined entirely by size
@@ -1447,16 +1504,7 @@ class sensor(fsobj_part):
 			self.location = LOCATION_DICT[value]
 
 
-	@property
-	def flatness(self):
-		# BASEPLATE flatness, not kapton flatness!
-		if self.corner_heights is None:
-			return None
-		else:
-			if None in self.corner_heights:
-				return None
-			else:
-				return max(self.corner_heights) - min(self.corner_heights)
+
 
 
 	# NEWLY MOVED FROM BASEPLATE!!!
@@ -1600,6 +1648,8 @@ class pcb(fsobj_part):
 		"manufacturer",  # for output XML
 		"version",
 		"batch_number",
+
+		"test_files",
 	]
 
 	PROPERTIES_DO_NOT_SAVE = [
@@ -1611,6 +1661,7 @@ class pcb(fsobj_part):
 		"daq_data":[],
 		"size":     '8',
 		"comment_description":  "TEST",
+		"test_files":[],
 	}
 
 	XML_STRUCT_DICT = { "data":{"row":{
@@ -2023,6 +2074,8 @@ class module(fsobj_part):
 		"kind_of_part",
 		"location_id",
 		"description",
+
+		"test_files",
 	]
 	
 	PROPERTIES_DO_NOT_SAVE = [
@@ -2036,6 +2089,7 @@ class module(fsobj_part):
 		'iv_data':[],
 		'daq_data':[],
 		"size":    '8',
+		"test_files":[],
 	}
 
 	XML_STRUCT_DICT = { "data":{"row":{

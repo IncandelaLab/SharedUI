@@ -1002,7 +1002,7 @@
    <property name="geometry">
     <rect>
      <x>680</x>
-     <y>290</y>
+     <y>470</y>
      <width>211</width>
      <height>21</height>
     </rect>
@@ -1018,7 +1018,7 @@
    <property name="geometry">
     <rect>
      <x>680</x>
-     <y>310</y>
+     <y>490</y>
      <width>211</width>
      <height>131</height>
     </rect>
@@ -1028,7 +1028,7 @@
    <property name="geometry">
     <rect>
      <x>680</x>
-     <y>440</y>
+     <y>620</y>
      <width>171</width>
      <height>21</height>
     </rect>
@@ -1041,7 +1041,7 @@
    <property name="geometry">
     <rect>
      <x>680</x>
-     <y>460</y>
+     <y>640</y>
      <width>101</width>
      <height>21</height>
     </rect>
@@ -1054,7 +1054,7 @@
    <property name="geometry">
     <rect>
      <x>680</x>
-     <y>250</y>
+     <y>430</y>
      <width>101</width>
      <height>21</height>
     </rect>
@@ -1067,7 +1067,7 @@
    <property name="geometry">
     <rect>
      <x>680</x>
-     <y>230</y>
+     <y>410</y>
      <width>171</width>
      <height>21</height>
     </rect>
@@ -1080,7 +1080,7 @@
    <property name="geometry">
     <rect>
      <x>680</x>
-     <y>80</y>
+     <y>260</y>
      <width>211</width>
      <height>21</height>
     </rect>
@@ -1096,7 +1096,7 @@
    <property name="geometry">
     <rect>
      <x>680</x>
-     <y>100</y>
+     <y>280</y>
      <width>211</width>
      <height>131</height>
     </rect>
@@ -1356,6 +1356,77 @@
      <string>HPK</string>
     </property>
    </item>
+  </widget>
+  <widget class="QPushButton" name="pbDeleteFile">
+   <property name="geometry">
+    <rect>
+     <x>900</x>
+     <y>170</y>
+     <width>131</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Delete selected</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_7">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>680</x>
+     <y>60</y>
+     <width>241</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Testing data storage</string>
+   </property>
+  </widget>
+  <widget class="QListWidget" name="listFiles">
+   <property name="geometry">
+    <rect>
+     <x>680</x>
+     <y>80</y>
+     <width>351</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>ID (date sent) (SENDER to RECEIVER)</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_17">
+   <property name="geometry">
+    <rect>
+     <x>681</x>
+     <y>170</y>
+     <width>221</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Testing data files</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pbAddFiles">
+   <property name="geometry">
+    <rect>
+     <x>810</x>
+     <y>200</y>
+     <width>101</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Add files</string>
+   </property>
   </widget>
  </widget>
  <resources/>

@@ -1,6 +1,8 @@
 from filemanager import fm
 from PyQt5 import QtCore
 import time
+import os
+import shutil
 
 # NEW, experimental
 from PyQt5.QtWidgets import QFileDialog, QWidget
@@ -63,14 +65,14 @@ def separate_sites(sites_string):
 
 # EXPERIMENTAL
 
-#class Filewindow(QWidget):
-#	def __init__(self):
-#		super(Filewindow, self).__init__()
-#		print("init")
-#
-#	def getfile(self,*args,**kwargs):
-#		fname = QFileDialog.getOpenFileName(self, 'Open file', '/home/phillip',"Image files (*.jpg *.gif)")
+class Filewindow(QWidget):
+	def __init__(self):
+		super(Filewindow, self).__init__()
 
+	def getfile(self,*args,**kwargs):
+		fname, fmt = QFileDialog.getOpenFileName(self, 'Open file', '~',"(*.jpg *.png *.xml)")
+		print("File dialog:  got file", fname)
+		return fname
 
 
 class func(object):
@@ -160,20 +162,24 @@ class func(object):
 		self.page.pbDaqGoPlotter.clicked.connect(   self.daqGoPlotter   )
 
 		# NEW, experimental
-		#self.fwnd = Filewindow()
-		#self.page.pbAddFiles.clicked.connect(self.fwnd.getfile)
-
+		self.fwnd = Filewindow()
+		self.page.pbAddFiles.clicked.connect(self.getFile)
+		self.page.pbDeleteFile.clicked.connect(self.deleteFile)
 
 
 
 	@enforce_mode(['view', 'editing', 'creating'])
-	def update_info(self,ID=None,*args,**kwargs):
+	def update_info(self,ID=None,do_load=True,*args,**kwargs):
 		if ID is None:
 			ID = self.page.leID.text()
 		else:
 			self.page.leID.setText(ID)
+		if do_load:
+			self.module_exists = self.module.load(ID)
+		else:
+			self.module_exists = False
 		
-		self.module_exists = self.module.load(ID)
+		#elf.module_exists = self.module.load(ID)
 		
 		# shipments and location
 		self.page.leInsertUser.setText("" if self.module.insertion_user is None else self.module.insertion_user)
@@ -236,6 +242,11 @@ class func(object):
 		self.page.listDaqData.clear()
 		for daq in self.module.daq_data:
 			self.page.listDaqData.addItem(daq)
+
+		self.page.listFiles.clear()
+		for f in self.module.test_files:
+			name = os.path.split(f)[1]
+			self.page.listFiles.addItem(name)
 
 		self.updateElements()
 
@@ -320,6 +331,7 @@ class func(object):
 
 		# NEW, experimental
 		self.page.pbAddFiles.setEnabled(mode_creating or mode_editing)
+		self.page.pbDeleteFile.setEnabled(mode_creating or mode_editing)
 
 
 #	# NEW, experimental
@@ -344,7 +356,7 @@ class func(object):
 			#self.sensor.new(ID)
 			#self.mode = 'creating'  # update_info needs mode==view
 			self.page.leStatus.setText("module DNE")
-			self.update_info()
+			self.update_info(do_load=False)
 		else:
 			self.module = tmp_module
 			self.page.leStatus.setText("module exists")
@@ -508,6 +520,37 @@ class func(object):
 	def daqGoPlotter(self,*args,**kwargs):
 		self.setUIPage('plotter',which='daq')
 
+
+	@enforce_mode(['editing', 'creating'])
+	def getFile(self,*args,**kwargs):
+		f = self.fwnd.getfile()
+		if f:
+			# Need to call this to ensure that necessary dirs for storing item are created
+			print("Got file.  Saving to ensure creation of filemanager location...")
+			self.module.save()
+
+			fname = os.path.split(f)[1]  # Name of file
+			fdir, fname_ = self.module.get_filedir_filename()
+			new_filepath = fdir + '/' + fname
+			print("GETFILE:  Copying file", f, "to", new_filepath)
+			shutil.copyfile(f, new_filepath)
+			self.page.listComments.addItem(new_filepath)
+			self.module.test_files.append(new_filepath)
+			self.update_info()
+
+	@enforce_mode(['editing', 'creating'])
+	def deleteFile(self,*args,**kwargs):
+		row = self.page.listFiles.currentRow()
+		if row >= 0:
+			fname = self.page.listFiles.item(row).text()
+			self.page.listFiles.takeItem(row)
+			# Now need to remove the file...
+			fdir, fname_ = self.module.get_filedir_filename()
+			new_filepath = fdir + '/' + fname
+			print("REMOVING FILE", new_filepath)
+			os.remove(new_filepath)
+			self.module.test_files.remove(new_filepath)
+			self.update_info()
 
 
 

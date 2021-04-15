@@ -1,4 +1,8 @@
 from filemanager import fm
+import os
+import shutil
+
+from PyQt5.QtWidgets import QFileDialog, QWidget
 
 PAGE_NAME = "view_pcb"
 PARTTYPE = "PCB"
@@ -64,6 +68,17 @@ INDEX_RESOLUTION_TYPE = {
 	'HD':0,
 	'LD':1,
 }
+
+class Filewindow(QWidget):
+	def __init__(self):
+		super(Filewindow, self).__init__()
+
+	def getfile(self,*args,**kwargs):
+		fname, fmt = QFileDialog.getOpenFileName(self, 'Open file', '~',"(*.jpg *.png *.xml)")
+		print("File dialog:  got file", fname)
+		return fname
+
+
 
 class func(object):
 	def __init__(self,fm,page,setUIPage,setSwitchingEnabled):
@@ -145,17 +160,25 @@ class func(object):
 		self.page.pbAddToPlotter.clicked.connect(self.addToPlotter)
 		self.page.pbGoPlotter.clicked.connect(self.goPlotter)
 
+		self.fwnd = Filewindow()
+		self.page.pbAddFiles.clicked.connect(self.getFile)
+		self.page.pbDeleteFile.clicked.connect(self.deleteFile)
+
 
 	@enforce_mode(['view', 'editing', 'creating'])
-	def update_info(self,ID=None,*args,**kwargs):
+	def update_info(self,ID=None,do_load=True,*args,**kwargs):
 		if ID is None:
 			#ID = self.page.sbID.value()
 			ID = self.page.leID.text()
 		else:
 			#self.page.sbID.setValue(ID)
 			self.page.leID.setText(ID)
+		if do_load:
+			self.pcb_exists = self.pcb.load(ID)
+		else:
+			self.pcb_exists = False
 		
-		self.pcb_exists = self.pcb.load(ID)
+		#self.pcb_exists = self.pcb.load(ID)
 
 		#self.page.leID.setText(self.pcb.ID)
 
@@ -198,6 +221,11 @@ class func(object):
 		self.page.listDaqData.clear()
 		for daq in self.pcb.daq_data:
 			self.page.listDaqData.addItem(daq)
+
+		self.page.listFiles.clear()
+		for f in self.pcb.test_files:
+			name = os.path.split(f)[1]
+			self.page.listFiles.addItem(name)
 
 		self.updateElements()
 
@@ -257,6 +285,9 @@ class func(object):
 		self.page.pbAddToPlotter.setEnabled(mode_view and daq_data_exists)
 		self.page.pbGoPlotter.setEnabled(   mode_view and daq_data_exists)
 
+		self.page.pbAddFiles.setEnabled(mode_creating or mode_editing)
+		self.page.pbDeleteFile.setEnabled(mode_creating or mode_editing)
+
 
 	# NEW:
 	@enforce_mode('view')
@@ -273,7 +304,7 @@ class func(object):
 			#self.sensor.new(ID)
 			#self.mode = 'creating'  # update_info needs mode==view
 			self.page.leStatus.setText("PCB DNE")
-			self.update_info()
+			self.update_info(do_load=False)
 		else:
 			self.pcb = tmp_pcb
 			self.page.leStatus.setText("PCB exists")
@@ -393,6 +424,38 @@ class func(object):
 	@enforce_mode('view')
 	def goPlotter(self,*args,**kwargs):
 		self.setUIPage('plotter',which='daq')
+
+
+	@enforce_mode(['editing', 'creating'])
+	def getFile(self,*args,**kwargs):
+		f = self.fwnd.getfile()
+		if f:
+			# Need to call this to ensure that necessary dirs for storing item are created
+			print("Got file.  Saving to ensure creation of filemanager location...")
+			self.pcb.save()
+
+			fname = os.path.split(f)[1]  # Name of file
+			fdir, fname_ = self.pcb.get_filedir_filename()
+			new_filepath = fdir + '/' + fname
+			print("GETFILE:  Copying file", f, "to", new_filepath)
+			shutil.copyfile(f, new_filepath)
+			self.page.listComments.addItem(new_filepath)
+			self.pcb.test_files.append(new_filepath)
+			self.update_info()
+
+	@enforce_mode(['editing', 'creating'])
+	def deleteFile(self,*args,**kwargs):
+		row = self.page.listFiles.currentRow()
+		if row >= 0:
+			fname = self.page.listFiles.item(row).text()
+			self.page.listFiles.takeItem(row)
+			# Now need to remove the file...
+			fdir, fname_ = self.pcb.get_filedir_filename()
+			new_filepath = fdir + '/' + fname
+			print("REMOVING FILE", new_filepath)
+			os.remove(new_filepath)
+			self.pcb.test_files.remove(new_filepath)
+			self.update_info()
 
 
 

@@ -191,7 +191,7 @@ class func(object):
 				corner.setValue(-1 if self.baseplate.corner_heights[i] is None else self.baseplate.corner_heights[i])
 				if corner.value() == -1: corner.clear()
 
-		#self.page.leFlatness.setText("" if self.baseplate.flatness is None else str(round(self.baseplate.flatness,DISPLAY_PRECISION)))
+		self.page.leFlatness.setText("" if self.baseplate.flatness is None else str(round(self.baseplate.flatness,DISPLAY_PRECISION)))
 		#self.page.dsbThickness.setValue(-1 if self.baseplate.thickness is None else self.baseplate.thickness)
 		#if self.page.dsbThickness.value() == -1: self.page.dsbThickness.clear()
 
@@ -360,7 +360,7 @@ class func(object):
 			self.baseplate.comments.append(str(self.page.listComments.item(i).text()))
 
 		self.baseplate.corner_heights = [_.value() if _.value()>=0 else None for _ in self.corners]
-		self.baseplate.thickness = self.page.dsbThickness.value() if self.page.dsbThickness.value()>=0 else None
+		#self.baseplate.thickness = self.page.dsbThickness.value() if self.page.dsbThickness.value()>=0 else None
 
 		#self.baseplate.check_edges_firm = str(self.page.cbCheckEdgesFirm.currentText()) if str(self.page.cbCheckEdgesFirm.currentText()) else None
 		#self.baseplate.check_glue_spill = str(self.page.cbCheckGlueSpill.currentText()) if str(self.page.cbCheckGlueSpill.currentText()) else None
