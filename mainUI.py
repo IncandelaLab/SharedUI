@@ -8,9 +8,11 @@ import os
 # FOR DATABASE UPLOADING:
 from cmsdbldr_client import LoaderClient
 import atexit  # Close ssh tunnel upon exiting the GUI
+import glob
 
 
 # Import page functionality classes
+from pages.view_users       import func as cls_func_view_users
 from pages.view_baseplate   import func as cls_func_view_baseplate
 from pages.view_sensor      import func as cls_func_view_sensor
 from pages.view_PCB         import func as cls_func_view_PCB
@@ -18,7 +20,7 @@ from pages.view_protomodule import func as cls_func_view_protomodule
 from pages.view_module      import func as cls_func_view_module
 from pages.search           import func as cls_func_search
 
-from pages.view_kapton_step import func as cls_func_view_kapton_step
+#from pages.view_kapton_step import func as cls_func_view_kapton_step
 from pages.view_sensor_step import func as cls_func_view_sensor_step
 from pages.view_pcb_step    import func as cls_func_view_pcb_step
 from pages.view_wirebonding import func as cls_func_view_wirebonding
@@ -33,6 +35,12 @@ from pages.view_shipment    import func as cls_func_shipment
 
 
 # Set up page widgets
+from pages_ui.view_users import Ui_Form as form_view_users
+class widget_view_users(wdgt.QWidget,form_view_users):
+	def __init__(self,parent):
+		super(widget_view_users,self).__init__(parent)
+		self.setupUi(self)
+
 from pages_ui.view_baseplate import Ui_Form as form_view_baseplate
 class widget_view_baseplate(wdgt.QWidget,form_view_baseplate):  #was gui.QWidget, etc
 	def __init__(self,parent):
@@ -73,13 +81,13 @@ class widget_search(wdgt.QWidget,form_search):
 		self.setupUi(self)
 
 
-
+"""
 from pages_ui.view_kapton_step import Ui_Form as form_view_kapton_step
 class widget_view_kapton_step(wdgt.QWidget,form_view_kapton_step):
 	def __init__(self,parent):
 		super(widget_view_kapton_step,self).__init__(parent)
 		self.setupUi(self)
-
+"""
 from pages_ui.view_sensor_step import Ui_Form as form_view_sensor_step
 class widget_view_sensor_step(wdgt.QWidget,form_view_sensor_step):
 	def __init__(self,parent):
@@ -129,23 +137,35 @@ class widget_shipment(wdgt.QWidget, form_shipment):
 
 # Dict of page IDs by name (as the name shows up in the page list widgets)
 PAGE_IDS = {
-	'search for parts'       : 0,
-	'baseplates'             : 1,
-	'sensors'                : 2,
-	'PCBs'                   : 3,
-	'protomodules'           : 4,
-	'modules'                : 5,
-	'tooling'                : 6,
-	'supplies'               : 7,
+	'users'                  : 0,
+	'search for parts'       : 1,
+	'baseplates'             : 2,
+	'sensors'                : 3,
+	'PCBs'                   : 4,
+	'protomodules'           : 5,
+	'modules'                : 6,
+	'tooling'                : 7,
+	'supplies'               : 8,
 
-	'kapton placement steps' : 8,
+	#'kapton placement steps' : 9,
 	'sensor placement steps' : 9,
 	'PCB placement steps'    : 10,
 	'wirebonding and encapsulating' : 11,
 
 	'shipments'               :12, #WARNING:  Order has been switched
-	# 'IV curve'               :11,
 }
+
+# List of all pages where DB expects info to upload
+UPLOAD_ENABLED_PAGES = [
+	'baseplates',  # All part pages
+	'sensors',
+	'PCBs',
+	'protomodules',
+	'modules',
+	#'kapton placement steps',  # ...and assembly steps
+	'sensor placement steps',
+	'PCB placement steps'
+]
 
 
 def id_generator():
@@ -176,8 +196,8 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		print("Finished rigging UI.")
 
 		# NOTE:  This has been temporarily changed!
-		#self.setUIPage('baseplates')
-		self.setUIPage('tooling')
+		self.setUIPage('baseplates')
+		#self.setUIPage('tooling')
 
 
 		#self.setUIPage('search for parts')
@@ -203,8 +223,9 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 
 
 	def setupPagesUI(self):
-		self.page_search           = widget_search(None)           ; self.swPages.addWidget(self.page_search)
+		self.page_view_users       = widget_view_users(None)       ; self.swPages.addWidget(self.page_view_users)
 
+		self.page_search           = widget_search(None)           ; self.swPages.addWidget(self.page_search)
 		self.page_view_baseplate   = widget_view_baseplate(None)   ; self.swPages.addWidget(self.page_view_baseplate)
 		self.page_view_sensor      = widget_view_sensor(None)      ; self.swPages.addWidget(self.page_view_sensor)
 		self.page_view_PCB         = widget_view_PCB(None)         ; self.swPages.addWidget(self.page_view_PCB)
@@ -213,17 +234,17 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		self.page_view_tooling     = widget_view_tooling(None)     ; self.swPages.addWidget(self.page_view_tooling)
 		self.page_view_supplies    = widget_view_supplies(None)    ; self.swPages.addWidget(self.page_view_supplies)	# NEW
 
-		self.page_view_kapton_step = widget_view_kapton_step(None) ; self.swPages.addWidget(self.page_view_kapton_step)
+		#self.page_view_kapton_step = widget_view_kapton_step(None) ; self.swPages.addWidget(self.page_view_kapton_step)
 		self.page_view_sensor_step = widget_view_sensor_step(None) ; self.swPages.addWidget(self.page_view_sensor_step)
 		self.page_view_pcb_step    = widget_view_pcb_step(None)    ; self.swPages.addWidget(self.page_view_pcb_step)
 		self.page_view_wirebonding = widget_view_wirebonding(None) ; self.swPages.addWidget(self.page_view_wirebonding)
 
-
-		# self.page_routine_iv       = widget_routine_iv(None)       ; self.swPages.addWidget(self.page_routine_iv)
 		self.page_shipment         = widget_shipment(None)         ; self.swPages.addWidget(self.page_shipment)
 
 
 	def initPages(self):
+		self.func_view_users       = cls_func_view_users(            fm, self.page_view_users      , self.setUIPage, self.setSwitchingEnabled)
+
 		self.func_search           = cls_func_search(                fm, self.page_search          , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_baseplate   = cls_func_view_baseplate(        fm, self.page_view_baseplate  , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_sensor      = cls_func_view_sensor(           fm, self.page_view_sensor     , self.setUIPage, self.setSwitchingEnabled)
@@ -231,7 +252,7 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		self.func_view_protomodule = cls_func_view_protomodule(      fm, self.page_view_protomodule, self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_module      = cls_func_view_module(           fm, self.page_view_module     , self.setUIPage, self.setSwitchingEnabled)
 
-		self.func_view_kapton_step = cls_func_view_kapton_step(      fm, self.page_view_kapton_step, self.setUIPage, self.setSwitchingEnabled)
+		#self.func_view_kapton_step = cls_func_view_kapton_step(      fm, self.page_view_kapton_step, self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_sensor_step = cls_func_view_sensor_step(      fm, self.page_view_sensor_step, self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_pcb_step    = cls_func_view_pcb_step(         fm, self.page_view_pcb_step   , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_wirebonding = cls_func_view_wirebonding(      fm, self.page_view_wirebonding, self.setUIPage, self.setSwitchingEnabled)
@@ -245,6 +266,8 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		# This list must be in the same order that the pages are in in the stackedWidget in the main UI file.
 		# This is the same order as in the dict PAGE_IDS
 		self.func_list = [
+			self.func_view_users,
+
 			self.func_search,
 			self.func_view_baseplate,
 			self.func_view_sensor,
@@ -254,7 +277,7 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 			self.func_view_tooling,
 			self.func_view_supplies,
 
-			self.func_view_kapton_step,
+			#self.func_view_kapton_step,
 			self.func_view_sensor_step,
 			self.func_view_pcb_step,
 			self.func_view_wirebonding,
@@ -265,13 +288,14 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 
 
 	def rig(self):
+		self.listUsers.itemActivated.connect(self.changeUIPage)
 		self.listInformation.itemActivated.connect(self.changeUIPage)
 		self.listAssembly.itemActivated.connect(self.changeUIPage)
 		self.listShippingAndReceiving.itemActivated.connect(self.changeUIPage)
 		self.swPages.currentChanged.connect(self.pageChanged)
 
-		# NEW, experimental
-		self.pbUpload.clicked.connect(self.goUpload)
+		self.pbUploadObject.clicked.connect(self.goUploadObject)
+		self.pbUploadDate.clicked.connect(self.goUploadDate)
 
 
 	def timer_setup(self):
@@ -358,17 +382,27 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 
 			if len(kwargs) > 0:
 				self.func_list[PAGE_IDS[which_page]].load_kwargs(kwargs)
+
+			# NEW:  Enable/disable uploading accordingly.
+			enableUploading = which_page in UPLOAD_ENABLED_PAGES
+			self.pbUploadObject.setEnabled(enableUploading)
+			self.pbUploadDate.setEnabled(  enableUploading)
+			self.dUpload.setEnabled(       enableUploading)
+			self.leStatus.setText("")
+			self.leStatus.setEnabled(      enableUploading)
+
 		else:
 			print("Page <{}> not supported yet. Tried to load with kwargs {}".format(which_page,kwargs))
 
 	def setSwitchingEnabled(self,enabled):
+		self.listUsers.setEnabled(enabled)
 		self.listInformation.setEnabled(enabled)
 		self.listAssembly.setEnabled(enabled)
 		self.listShippingAndReceiving.setEnabled(enabled)
 
 
 	# New, sort of experimental
-	def goUpload(self,*args,**kwargs):
+	def goUploadObject(self,*args,**kwargs):
 		# Create a popup box requesting username/password, plus a "cancel" button.
 		# If username+password given, submit.
 		# BUT:  How can username/password be fed to loader?
@@ -378,6 +412,7 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 
 		# OUTDATED:
 		# FIRST:  Check to see whether there's any modified XML files
+		"""
 		xmlStepList = [self.func_view_baseplate, self.func_view_sensor, self.func_view_PCB, self.func_view_sensor_step]
 		xmlFilesModified = 0
 		for step in xmlStepList:
@@ -387,8 +422,21 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		if xmlFilesModified == 0:
 			print("ALL CHANGES HAVE ALREADY BEEN SAVED")
 			return
-				
+		"""
+		currentPage = self.func_list[self.swPages.currentIndex()]
+		upload_files = currentPage.filesToUpload()
+		print("Preparing to upload files for single object:", upload_files)
+		lc = LoaderClient()
+		success = True
+		for f in upload_files:
+			upload_status = lc.run(iargs=["--login", "--url", "https://cmsdca.cern.ch/hgc_loader/hgc/int2r", f, "--verbose"])
+			success = (upload_status == 200) and success
+		if success:
+			leStatus.setText("Success!")
+		else:
+			leStatus.setText("Error during upload!")
 
+		"""
 		print("DISPLAYING POP-UP")
 		ldlg = LoginDialog(self)
 		loginResult = ldlg.exec_()
@@ -404,6 +452,28 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 
 		else:
 			print("Upload unsuccessful!")
+		"""
+
+
+	def goUploadDate(self):
+		lDate = self.dUpload.date()
+		dateStr = "{}-{}-{}".format(lDate.year(), lDate.month(), lDate.day())
+		filemanager_dir = os.sep.join([os.getcwd(), 'filemanager_data'])
+		part_files = glob.glob(filemanager_dir + "/*/{}/*upload*".format(dateStr))
+		step_files = glob.glob(filemanager_dir + "/steps/*/*upload*".format(dateStr))
+		print("Preparing to upload multiple object files:", part_files + step_files)
+		lc = LoaderClient()
+		success = True
+		# NOTE:  Writing all errors to upload_errors.log
+		sys.stdout = open('upload_errors.log', 'w+')
+		for f in part_files + step_files:
+			upload_status = lc.run(iargs=["--login", "--url", "https://cmsdca.cern.ch/hgc_loader/hgc/int2r", f, "--verbose"])
+			success = (upload_status == 200) and success
+		sys.stdout.close()
+		if success:
+			leStatus.setText("Success!")
+		else:
+			leStatus.setText("Error during upload!")
 
 
 # Class for requesting GUI username at start (for ssh tunnel)

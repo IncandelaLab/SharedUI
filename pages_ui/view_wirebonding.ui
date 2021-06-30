@@ -68,43 +68,11 @@
     <string>Save</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="leLocation">
-   <property name="geometry">
-    <rect>
-     <x>150</x>
-     <y>119</y>
-     <width>141</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_14">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>119</y>
-     <width>141</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>location</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
   <widget class="QPlainTextEdit" name="pteWriteComment">
    <property name="geometry">
     <rect>
-     <x>650</x>
-     <y>510</y>
+     <x>670</x>
+     <y>310</y>
      <width>281</width>
      <height>61</height>
     </rect>
@@ -116,8 +84,8 @@
   <widget class="QLineEdit" name="lineEdit_16">
    <property name="geometry">
     <rect>
-     <x>650</x>
-     <y>390</y>
+     <x>670</x>
+     <y>190</y>
      <width>161</width>
      <height>21</height>
     </rect>
@@ -132,8 +100,8 @@
   <widget class="QPushButton" name="pbDeleteComment">
    <property name="geometry">
     <rect>
-     <x>810</x>
-     <y>390</y>
+     <x>830</x>
+     <y>190</y>
      <width>121</width>
      <height>21</height>
     </rect>
@@ -145,8 +113,8 @@
   <widget class="QListWidget" name="listComments">
    <property name="geometry">
     <rect>
-     <x>650</x>
-     <y>410</y>
+     <x>670</x>
+     <y>210</y>
      <width>281</width>
      <height>91</height>
     </rect>
@@ -155,8 +123,8 @@
   <widget class="QPushButton" name="pbAddComment">
    <property name="geometry">
     <rect>
-     <x>650</x>
-     <y>570</y>
+     <x>670</x>
+     <y>370</y>
      <width>111</width>
      <height>21</height>
     </rect>
@@ -169,7 +137,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>150</y>
+     <y>120</y>
      <width>211</width>
      <height>21</height>
     </rect>
@@ -182,7 +150,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>200</y>
+     <y>280</y>
      <width>171</width>
      <height>21</height>
     </rect>
@@ -195,9 +163,9 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>220</y>
+     <y>300</y>
      <width>281</width>
-     <height>331</height>
+     <height>191</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -206,32 +174,6 @@
    <property name="frameShadow">
     <enum>QFrame::Plain</enum>
    </property>
-   <widget class="QPlainTextEdit" name="pteWirebondsDamagedBack">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>180</y>
-      <width>281</width>
-      <height>51</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="leWirebondsRepairedUserBack">
-    <property name="geometry">
-     <rect>
-      <x>180</x>
-      <y>310</y>
-      <width>101</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
    <widget class="QCheckBox" name="ckWirebondsInspectedBack">
     <property name="geometry">
      <rect>
@@ -245,41 +187,12 @@
      <string>Wirebonds inspected</string>
     </property>
    </widget>
-   <widget class="QCheckBox" name="ckWirebondsRepairedBack">
-    <property name="geometry">
-     <rect>
-      <x>1</x>
-      <y>240</y>
-      <width>241</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Wirebonds repaired (list below)</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="leWirebondingUserBack">
-    <property name="geometry">
-     <rect>
-      <x>190</x>
-      <y>20</y>
-      <width>91</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
    <widget class="QLineEdit" name="lineEdit_31">
     <property name="geometry">
      <rect>
       <x>1</x>
       <y>20</y>
-      <width>191</width>
+      <width>171</width>
       <height>21</height>
      </rect>
     </property>
@@ -300,7 +213,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Unbonded channels</string>
+     <string>Unbonded areas</string>
     </property>
    </widget>
    <widget class="QCheckBox" name="ckWirebondingBack">
@@ -320,7 +233,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>310</y>
+      <y>170</y>
       <width>181</width>
       <height>20</height>
      </rect>
@@ -342,27 +255,30 @@
      </rect>
     </property>
    </widget>
-   <widget class="QPlainTextEdit" name="pteWirebondsRepairedListBack">
+   <widget class="QComboBox" name="cbWirebondingUserBack">
     <property name="geometry">
      <rect>
-      <x>0</x>
-      <y>260</y>
-      <width>281</width>
-      <height>51</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_7">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>160</y>
-      <width>211</width>
+      <x>170</x>
+      <y>20</y>
+      <width>111</width>
       <height>21</height>
      </rect>
     </property>
-    <property name="text">
-     <string>(list damaged below)</string>
+    <property name="currentIndex">
+     <number>-1</number>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="cbWirebondsRepairedUserBack">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>170</y>
+      <width>101</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>-1</number>
     </property>
    </widget>
   </widget>
@@ -370,7 +286,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>170</y>
+     <y>140</y>
      <width>282</width>
      <height>21</height>
     </rect>
@@ -394,13 +310,13 @@
      <string>height difference between highest and lowers corners</string>
     </property>
     <property name="text">
-     <string>Check glue spillage</string>
+     <string>Visual inspection</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QComboBox" name="cbCheckGlueSpill">
+   <widget class="QComboBox" name="cbPreinspection">
     <property name="geometry">
      <rect>
       <x>190</x>
@@ -427,8 +343,8 @@
   <widget class="QLabel" name="label_4">
    <property name="geometry">
     <rect>
-     <x>650</x>
-     <y>270</y>
+     <x>670</x>
+     <y>110</y>
      <width>181</width>
      <height>21</height>
     </rect>
@@ -441,7 +357,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>570</y>
+     <y>510</y>
      <width>171</width>
      <height>16</height>
     </rect>
@@ -453,10 +369,10 @@
   <widget class="QFrame" name="frame_3">
    <property name="geometry">
     <rect>
-     <x>650</x>
-     <y>290</y>
+     <x>670</x>
+     <y>130</y>
      <width>241</width>
-     <height>61</height>
+     <height>41</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -469,7 +385,7 @@
     <property name="geometry">
      <rect>
       <x>150</x>
-      <y>40</y>
+      <y>20</y>
       <width>91</width>
       <height>21</height>
      </rect>
@@ -492,7 +408,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>40</y>
+      <y>20</y>
       <width>151</width>
       <height>20</height>
      </rect>
@@ -504,24 +420,11 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QCheckBox" name="ckWirebondingFinalInspection">
-    <property name="geometry">
-     <rect>
-      <x>1</x>
-      <y>0</y>
-      <width>171</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Final inspection done</string>
-    </property>
-   </widget>
    <widget class="QLineEdit" name="lineEdit_40">
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>20</y>
+      <y>0</y>
       <width>151</width>
       <height>21</height>
      </rect>
@@ -533,35 +436,31 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QLineEdit" name="leWirebondingFinalInspectionUser">
+   <widget class="QComboBox" name="cbWirebondingFinalInspectionUser">
     <property name="geometry">
      <rect>
       <x>150</x>
-      <y>20</y>
+      <y>0</y>
       <width>91</width>
-      <height>20</height>
+      <height>21</height>
      </rect>
     </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
+    <property name="currentIndex">
+     <number>-1</number>
     </property>
    </widget>
    <zorder>lineEdit_37</zorder>
-   <zorder>ckWirebondingFinalInspection</zorder>
    <zorder>lineEdit_40</zorder>
-   <zorder>leWirebondingFinalInspectionUser</zorder>
    <zorder>cbWirebondingFinalInspectionOK</zorder>
+   <zorder>cbWirebondingFinalInspectionUser</zorder>
   </widget>
   <widget class="QFrame" name="frame_4">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>590</y>
+     <y>530</y>
      <width>291</width>
-     <height>101</height>
+     <height>141</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -583,22 +482,6 @@
      <string>Back encapsulation done</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="leEncapsulationUserBack">
-    <property name="geometry">
-     <rect>
-      <x>140</x>
-      <y>20</y>
-      <width>151</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
    <widget class="QLineEdit" name="lineEdit_38">
     <property name="geometry">
      <rect>
@@ -618,15 +501,15 @@
    <widget class="QDateTimeEdit" name="dtCureStartBack">
     <property name="geometry">
      <rect>
-      <x>80</x>
-      <y>40</y>
-      <width>131</width>
+      <x>140</x>
+      <y>60</y>
+      <width>151</width>
       <height>21</height>
      </rect>
     </property>
     <property name="date">
      <date>
-      <year>2020</year>
+      <year>2021</year>
       <month>1</month>
       <day>1</day>
      </date>
@@ -653,13 +536,13 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>60</y>
-      <width>81</width>
+      <y>80</y>
+      <width>141</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>cure stop</string>
+     <string>oven cure stop</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -668,9 +551,9 @@
    <widget class="QPushButton" name="pbCureStopNowBack">
     <property name="geometry">
      <rect>
-      <x>210</x>
-      <y>60</y>
-      <width>81</width>
+      <x>140</x>
+      <y>80</y>
+      <width>151</width>
       <height>21</height>
      </rect>
     </property>
@@ -681,9 +564,9 @@
    <widget class="QPushButton" name="pbCureStartNowBack">
     <property name="geometry">
      <rect>
-      <x>210</x>
+      <x>140</x>
       <y>40</y>
-      <width>81</width>
+      <width>151</width>
       <height>21</height>
      </rect>
     </property>
@@ -696,12 +579,12 @@
      <rect>
       <x>1</x>
       <y>40</y>
-      <width>81</width>
+      <width>141</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>cure start</string>
+     <string>oven cure start</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -711,7 +594,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>80</y>
+      <y>120</y>
       <width>161</width>
       <height>20</height>
      </rect>
@@ -727,7 +610,7 @@
     <property name="geometry">
      <rect>
       <x>160</x>
-      <y>80</y>
+      <y>120</y>
       <width>131</width>
       <height>20</height>
      </rect>
@@ -749,15 +632,15 @@
    <widget class="QDateTimeEdit" name="dtCureStopBack">
     <property name="geometry">
      <rect>
-      <x>80</x>
-      <y>60</y>
-      <width>131</width>
+      <x>140</x>
+      <y>100</y>
+      <width>151</width>
       <height>21</height>
      </rect>
     </property>
     <property name="date">
      <date>
-      <year>2020</year>
+      <year>2021</year>
       <month>1</month>
       <day>1</day>
      </date>
@@ -780,68 +663,19 @@
      <bool>true</bool>
     </property>
    </widget>
-   <zorder>ckEncapsulationBack</zorder>
-   <zorder>lineEdit_38</zorder>
-   <zorder>dtCureStartBack</zorder>
-   <zorder>lineEdit_6</zorder>
-   <zorder>pbCureStopNowBack</zorder>
-   <zorder>pbCureStartNowBack</zorder>
-   <zorder>lineEdit_7</zorder>
-   <zorder>lineEdit_39</zorder>
-   <zorder>cbEncapsulationInspectionBack</zorder>
-   <zorder>leEncapsulationUserBack</zorder>
-   <zorder>dtCureStopBack</zorder>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_52">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>99</y>
-     <width>141</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>institution</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_53">
-   <property name="geometry">
-    <rect>
-     <x>11</x>
-     <y>80</y>
-     <width>141</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="toolTip">
-    <string>height difference between highest and lowers corners</string>
-   </property>
-   <property name="text">
-    <string>User name</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="leInsertUser">
-   <property name="geometry">
-    <rect>
-     <x>150</x>
-     <y>80</y>
-     <width>141</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
+   <widget class="QComboBox" name="cbEncapsulationUserBack">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>20</y>
+      <width>151</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>-1</number>
+    </property>
+   </widget>
   </widget>
   <widget class="QLineEdit" name="leID">
    <property name="geometry">
@@ -878,8 +712,8 @@
   <widget class="QFrame" name="frame_5">
    <property name="geometry">
     <rect>
-     <x>330</x>
-     <y>80</y>
+     <x>340</x>
+     <y>90</y>
      <width>282</width>
      <height>81</height>
     </rect>
@@ -890,43 +724,11 @@
    <property name="frameShadow">
     <enum>QFrame::Plain</enum>
    </property>
-   <widget class="QLineEdit" name="leTestBondsPulledUser">
-    <property name="geometry">
-     <rect>
-      <x>190</x>
-      <y>40</y>
-      <width>91</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEdit_35">
-    <property name="geometry">
-     <rect>
-      <x>1</x>
-      <y>60</y>
-      <width>191</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Test bonds pulled OK?</string>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
    <widget class="QLineEdit" name="lineEdit_32">
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>40</y>
+      <y>20</y>
       <width>191</width>
       <height>21</height>
      </rect>
@@ -937,42 +739,6 @@
     <property name="readOnly">
      <bool>true</bool>
     </property>
-   </widget>
-   <widget class="QCheckBox" name="ckTestBondsPulled">
-    <property name="geometry">
-     <rect>
-      <x>1</x>
-      <y>20</y>
-      <width>161</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Test bonds pulled</string>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="cbTestBondsPulledOK">
-    <property name="geometry">
-     <rect>
-      <x>190</x>
-      <y>60</y>
-      <width>91</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="currentIndex">
-     <number>-1</number>
-    </property>
-    <item>
-     <property name="text">
-      <string>yes</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>no</string>
-     </property>
-    </item>
    </widget>
    <widget class="QCheckBox" name="ckTestBonds">
     <property name="geometry">
@@ -987,12 +753,77 @@
      <string>Is test bond module</string>
     </property>
    </widget>
+   <widget class="QLineEdit" name="lineEdit_43">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>40</y>
+      <width>191</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Pull strength average (g)</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_44">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>60</y>
+      <width>191</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Pull strength stddev (g)</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="dsbBondPullAvg">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>40</y>
+      <width>91</width>
+      <height>21</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="dsbBondPullStd">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>60</y>
+      <width>91</width>
+      <height>21</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="cbTestBondsPulledUser">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>20</y>
+      <width>91</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>-1</number>
+    </property>
+   </widget>
   </widget>
   <widget class="QLabel" name="label_8">
    <property name="geometry">
     <rect>
-     <x>330</x>
-     <y>60</y>
+     <x>340</x>
+     <y>70</y>
      <width>211</width>
      <height>21</height>
     </rect>
@@ -1004,7 +835,7 @@
   <widget class="QLabel" name="label_12">
    <property name="geometry">
     <rect>
-     <x>330</x>
+     <x>340</x>
      <y>190</y>
      <width>171</width>
      <height>21</height>
@@ -1017,10 +848,10 @@
   <widget class="QFrame" name="frame_6">
    <property name="geometry">
     <rect>
-     <x>330</x>
+     <x>340</x>
      <y>210</y>
      <width>281</width>
-     <height>471</height>
+     <height>271</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -1029,32 +860,6 @@
    <property name="frameShadow">
     <enum>QFrame::Plain</enum>
    </property>
-   <widget class="QPlainTextEdit" name="pteWirebondsDamagedFront">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>260</y>
-      <width>281</width>
-      <height>51</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="leWirebondsRepairedUserFront">
-    <property name="geometry">
-     <rect>
-      <x>180</x>
-      <y>390</y>
-      <width>101</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
    <widget class="QCheckBox" name="ckWirebondsInspectedFront">
     <property name="geometry">
      <rect>
@@ -1068,41 +873,12 @@
      <string>Wirebonds inspected</string>
     </property>
    </widget>
-   <widget class="QCheckBox" name="ckWirebondsRepairedFront">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>320</y>
-      <width>241</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Wirebonds repaired (list below)</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="leWirebondingUserFront">
-    <property name="geometry">
-     <rect>
-      <x>190</x>
-      <y>20</y>
-      <width>91</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
    <widget class="QLineEdit" name="lineEdit_41">
     <property name="geometry">
      <rect>
       <x>1</x>
       <y>20</y>
-      <width>191</width>
+      <width>181</width>
       <height>21</height>
      </rect>
     </property>
@@ -1143,7 +919,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>390</y>
+      <y>250</y>
       <width>181</width>
       <height>20</height>
      </rect>
@@ -1163,29 +939,6 @@
       <width>281</width>
       <height>51</height>
      </rect>
-    </property>
-   </widget>
-   <widget class="QPlainTextEdit" name="pteWirebondsRepairedListFront">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>340</y>
-      <width>281</width>
-      <height>51</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_10">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>240</y>
-      <width>211</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>(list damaged below)</string>
     </property>
    </widget>
    <widget class="QPlainTextEdit" name="pteWirebondingChannelsSkipFront">
@@ -1214,40 +967,40 @@
      <string>Channels to skip (currently disabled)</string>
     </property>
    </widget>
-   <widget class="QCheckBox" name="ckGuardLayerBonds">
+   <widget class="QComboBox" name="cbWirebondingUserFront">
     <property name="geometry">
      <rect>
-      <x>0</x>
-      <y>450</y>
-      <width>241</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Guard layer bonds performed</string>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="ckShieldLayerBonds">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>420</y>
-      <width>241</width>
+      <x>180</x>
+      <y>20</y>
+      <width>101</width>
       <height>21</height>
      </rect>
     </property>
-    <property name="text">
-     <string>Shield layer bonds performed</string>
+    <property name="currentIndex">
+     <number>-1</number>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="cbWirebondsRepairedUserFront">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>250</y>
+      <width>101</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>-1</number>
     </property>
    </widget>
   </widget>
   <widget class="QFrame" name="frame_7">
    <property name="geometry">
     <rect>
-     <x>650</x>
-     <y>140</y>
-     <width>291</width>
-     <height>101</height>
+     <x>340</x>
+     <y>520</y>
+     <width>281</width>
+     <height>141</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -1269,22 +1022,6 @@
      <string>Front encapsulation done</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="leEncapsulationUserFront">
-    <property name="geometry">
-     <rect>
-      <x>140</x>
-      <y>20</y>
-      <width>151</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
    <widget class="QLineEdit" name="lineEdit_45">
     <property name="geometry">
      <rect>
@@ -1304,15 +1041,15 @@
    <widget class="QDateTimeEdit" name="dtCureStartFront">
     <property name="geometry">
      <rect>
-      <x>80</x>
-      <y>40</y>
-      <width>131</width>
+      <x>140</x>
+      <y>60</y>
+      <width>141</width>
       <height>21</height>
      </rect>
     </property>
     <property name="date">
      <date>
-      <year>2020</year>
+      <year>2021</year>
       <month>1</month>
       <day>1</day>
      </date>
@@ -1339,13 +1076,13 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>60</y>
-      <width>81</width>
+      <y>80</y>
+      <width>141</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>cure stop</string>
+     <string>oven cure stop</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -1354,9 +1091,9 @@
    <widget class="QPushButton" name="pbCureStopNowFront">
     <property name="geometry">
      <rect>
-      <x>210</x>
-      <y>60</y>
-      <width>81</width>
+      <x>140</x>
+      <y>80</y>
+      <width>141</width>
       <height>21</height>
      </rect>
     </property>
@@ -1367,9 +1104,9 @@
    <widget class="QPushButton" name="pbCureStartNowFront">
     <property name="geometry">
      <rect>
-      <x>210</x>
+      <x>140</x>
       <y>40</y>
-      <width>81</width>
+      <width>141</width>
       <height>21</height>
      </rect>
     </property>
@@ -1382,12 +1119,12 @@
      <rect>
       <x>1</x>
       <y>40</y>
-      <width>81</width>
+      <width>141</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>cure start</string>
+     <string>oven cure start</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -1397,7 +1134,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>80</y>
+      <y>120</y>
       <width>161</width>
       <height>20</height>
      </rect>
@@ -1413,8 +1150,8 @@
     <property name="geometry">
      <rect>
       <x>160</x>
-      <y>80</y>
-      <width>131</width>
+      <y>120</y>
+      <width>121</width>
       <height>20</height>
      </rect>
     </property>
@@ -1435,15 +1172,15 @@
    <widget class="QDateTimeEdit" name="dtCureStopFront">
     <property name="geometry">
      <rect>
-      <x>80</x>
-      <y>60</y>
-      <width>131</width>
+      <x>140</x>
+      <y>100</y>
+      <width>141</width>
       <height>21</height>
      </rect>
     </property>
     <property name="date">
      <date>
-      <year>2020</year>
+      <year>2021</year>
       <month>1</month>
       <day>1</day>
      </date>
@@ -1466,12 +1203,25 @@
      <bool>true</bool>
     </property>
    </widget>
+   <widget class="QComboBox" name="cbEncapsulationUserFront">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>20</y>
+      <width>141</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>-1</number>
+    </property>
+   </widget>
   </widget>
   <widget class="QLabel" name="label_14">
    <property name="geometry">
     <rect>
-     <x>650</x>
-     <y>120</y>
+     <x>340</x>
+     <y>500</y>
      <width>181</width>
      <height>16</height>
     </rect>
@@ -1483,9 +1233,9 @@
   <widget class="QLineEdit" name="leErrors">
    <property name="geometry">
     <rect>
-     <x>650</x>
+     <x>330</x>
      <y>30</y>
-     <width>301</width>
+     <width>631</width>
      <height>21</height>
     </rect>
    </property>
@@ -1499,7 +1249,7 @@
   <widget class="QLabel" name="label_6">
    <property name="geometry">
     <rect>
-     <x>650</x>
+     <x>660</x>
      <y>50</y>
      <width>321</width>
      <height>51</height>
@@ -1515,58 +1265,241 @@
   <widget class="QLabel" name="label_15">
    <property name="geometry">
     <rect>
-     <x>650</x>
+     <x>330</x>
      <y>10</y>
      <width>181</width>
      <height>16</height>
     </rect>
    </property>
    <property name="text">
-    <string>Text formatting errors:</string>
+    <string>Errors:</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="cbInstitution">
+  <widget class="QLineEdit" name="lineEdit_15">
    <property name="geometry">
     <rect>
-     <x>150</x>
-     <y>100</y>
+     <x>10</x>
+     <y>90</y>
      <width>141</width>
      <height>21</height>
     </rect>
    </property>
-   <property name="currentIndex">
-    <number>-1</number>
+   <property name="text">
+    <string>wirebonding date</string>
    </property>
-   <item>
-    <property name="text">
-     <string>CERN</string>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QDateEdit" name="dWirebonding">
+   <property name="geometry">
+    <rect>
+     <x>150</x>
+     <y>90</y>
+     <width>141</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="calendarPopup">
+    <bool>true</bool>
+   </property>
+   <property name="date">
+    <date>
+     <year>2021</year>
+     <month>1</month>
+     <day>1</day>
+    </date>
+   </property>
+  </widget>
+  <widget class="QPlainTextEdit" name="pteWriteCommentEncap">
+   <property name="geometry">
+    <rect>
+     <x>670</x>
+     <y>550</y>
+     <width>281</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="plainText">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pbAddCommentEncap">
+   <property name="geometry">
+    <rect>
+     <x>670</x>
+     <y>610</y>
+     <width>111</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Add comment</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_17">
+   <property name="geometry">
+    <rect>
+     <x>670</x>
+     <y>430</y>
+     <width>161</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>encapsulation notes</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QListWidget" name="listCommentsEncap">
+   <property name="geometry">
+    <rect>
+     <x>670</x>
+     <y>450</y>
+     <width>281</width>
+     <height>91</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pbDeleteCommentEncap">
+   <property name="geometry">
+    <rect>
+     <x>830</x>
+     <y>430</y>
+     <width>121</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Delete selected</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_7">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>180</y>
+     <width>171</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Supply batches</string>
+   </property>
+  </widget>
+  <widget class="QFrame" name="frame_8">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>200</y>
+     <width>281</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Plain</enum>
+   </property>
+   <widget class="QLineEdit" name="lineEdit_33">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>181</width>
+      <height>21</height>
+     </rect>
     </property>
-   </item>
-   <item>
     <property name="text">
-     <string>FNAL</string>
+     <string>Sylgard batch ID</string>
     </property>
-   </item>
-   <item>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_34">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>20</y>
+      <width>181</width>
+      <height>21</height>
+     </rect>
+    </property>
     <property name="text">
-     <string>UCSB</string>
+     <string>Bond wire batch ID</string>
     </property>
-   </item>
-   <item>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_35">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>40</y>
+      <width>181</width>
+      <height>21</height>
+     </rect>
+    </property>
     <property name="text">
-     <string>UMN</string>
+     <string>Wedge batch ID</string>
     </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>HEPHY</string>
+    <property name="readOnly">
+     <bool>true</bool>
     </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>HPK</string>
+   </widget>
+   <widget class="QSpinBox" name="sbBatchSylgard">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>0</y>
+      <width>101</width>
+      <height>21</height>
+     </rect>
     </property>
-   </item>
+    <property name="minimum">
+     <number>-1</number>
+    </property>
+    <property name="maximum">
+     <number>999999</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="sbBatchBondWire">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>20</y>
+      <width>101</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="minimum">
+     <number>-1</number>
+    </property>
+    <property name="maximum">
+     <number>999999</number>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="sbBatchWedge">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>40</y>
+      <width>101</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="minimum">
+     <number>-1</number>
+    </property>
+    <property name="maximum">
+     <number>999999</number>
+    </property>
+   </widget>
   </widget>
  </widget>
  <resources/>

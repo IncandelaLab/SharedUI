@@ -30,6 +30,12 @@ INDEX_SHAPE = {
 	'choptwo':6,
 }
 
+INDEX_GRADE = {
+	'A':0,
+	'B':1,
+	'C':2,
+}
+
 INDEX_CHIRALITY = {
 	'achiral':0,
 	'left':1,
@@ -156,16 +162,20 @@ class func(object):
 		self.page.pbDeleteComment.clicked.connect(self.deleteComment)
 		self.page.pbAddComment.clicked.connect(self.addComment)
 
-		self.page.pbIvAddToPlotter.clicked.connect( self.ivAddToPlotter )
-		self.page.pbIvGoPlotter.clicked.connect(    self.ivGoPlotter    )
-		self.page.pbDaqAddToPlotter.clicked.connect(self.daqAddToPlotter)
-		self.page.pbDaqGoPlotter.clicked.connect(   self.daqGoPlotter   )
+		#self.page.pbIvAddToPlotter.clicked.connect( self.ivAddToPlotter )
+		#self.page.pbIvGoPlotter.clicked.connect(    self.ivGoPlotter    )
+		#self.page.pbDaqAddToPlotter.clicked.connect(self.daqAddToPlotter)
+		#self.page.pbDaqGoPlotter.clicked.connect(   self.daqGoPlotter   )
 
 		# NEW, experimental
 		self.fwnd = Filewindow()
 		self.page.pbAddFiles.clicked.connect(self.getFile)
 		self.page.pbDeleteFile.clicked.connect(self.deleteFile)
 
+		auth_users = fm.userManager.getAuthorizedUsers(PAGE_NAME)
+		self.index_users = {auth_users[i]:i for i in range(len(auth_users))}
+		for user in self.index_users.keys():
+			self.page.cbInsertUser.addItem(user)
 
 
 	@enforce_mode(['view', 'editing', 'creating'])
@@ -182,7 +192,7 @@ class func(object):
 		#elf.module_exists = self.module.load(ID)
 		
 		# shipments and location
-		self.page.leInsertUser.setText("" if self.module.insertion_user is None else self.module.insertion_user)
+		#self.page.leInsertUser.setText("" if self.module.insertion_user is None else self.module.insertion_user)
 		self.page.leLocation.setText("" if self.module.location is None else self.module.location)
 		self.page.listShipments.clear()
 		for shipment in self.module.shipments:
@@ -192,8 +202,14 @@ class func(object):
 		self.page.sbChannels.setValue(  -1 if self.module.channels    is None else self.module.channels   )
 		self.page.dsbThickness.setValue(-1 if self.module.thickness   is None else self.module.thickness  )
 		self.page.cbShape.setCurrentIndex(      INDEX_SHAPE.get(      self.module.shape    , -1)  )
-		self.page.cbChirality.setCurrentIndex(  INDEX_CHIRALITY.get(  self.module.chirality, -1)  )
+		self.page.cbGrade.setCurrentIndex(      INDEX_GRADE.get(      self.module.grade    , -1)  )
+		#self.page.cbChirality.setCurrentIndex(  INDEX_CHIRALITY.get(  self.module.chirality, -1)  )
 		self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.module.institution, -1))
+		if not self.module.insertion_user in self.index_users.keys() and not self.module.insertion_user is None:
+			# Insertion user was deleted from user page...just add user to the dropdown
+			self.index_users[self.module.insertion_user] = max(self.index_users.values()) + 1
+			self.page.cbInsertUser.addItem(self.module.insertion_user)
+		self.page.cbInsertUser.setCurrentIndex(self.index_users.get(self.module.insertion_user, -1))
 		if self.page.sbChannels.value()   == -1: self.page.sbChannels.clear()
 		if self.page.dsbThickness.value() == -1: self.page.dsbThickness.clear()
 
@@ -213,6 +229,8 @@ class func(object):
 		if self.page.lePcb.text()          == -1:  self.page.lePcb.clear()
 		if self.page.leProtomodule.text()  == -1:  self.page.leProtomodule.clear()
 
+		self.page.ckWirebondingCompleted.setChecked(False if self.module.wirebonding_completed is None else self.module.wirebonding_completed)
+
 
 		# comments
 		self.page.listComments.clear()
@@ -221,27 +239,27 @@ class func(object):
 		self.page.pteWriteComment.clear()
 
 		# finished module qualification
-		self.page.ckHvCablesAttached.setChecked(False if self.module.hv_cables_attached is None else self.module.hv_cables_attached)
-		self.page.leHvCablesAttachedUser.setText("" if self.module.hv_cables_attached_user is None else self.module.hv_cables_attached_user )
-		self.page.leUnbiasedDaq.setText(         "" if self.module.unbiased_daq            is None else self.module.unbiased_daq            )
-		self.page.leUnbiasedDaqUser.setText(     "" if self.module.unbiased_daq_user       is None else self.module.unbiased_daq_user       )
-		self.page.leIv.setText(                  "" if self.module.iv                      is None else self.module.iv                      )
-		self.page.leIvUser.setText(              "" if self.module.iv_user                 is None else self.module.iv_user                 )
-		self.page.leBiasedDaq.setText(           "" if self.module.biased_daq              is None else self.module.biased_daq              )
-		self.page.leBiasedDaqVoltage.setText(    "" if self.module.biased_daq_voltage      is None else self.module.biased_daq_voltage      )
-		self.page.cbUnbiasedDaqOK.setCurrentIndex(INDEX_INSPECTION.get(self.module.unbiased_daq_ok, -1))
-		self.page.cbIvOK.setCurrentIndex(         INDEX_INSPECTION.get(self.module.iv_ok          , -1))
-		self.page.cbBiasedDaqOK.setCurrentIndex(  INDEX_INSPECTION.get(self.module.biased_daq_ok  , -1))
+		#self.page.ckHvCablesAttached.setChecked(False if self.module.hv_cables_attached is None else self.module.hv_cables_attached)
+		#self.page.leHvCablesAttachedUser.setText("" if self.module.hv_cables_attached_user is None else self.module.hv_cables_attached_user )
+		#self.page.leUnbiasedDaq.setText(         "" if self.module.unbiased_daq            is None else self.module.unbiased_daq            )
+		#self.page.leUnbiasedDaqUser.setText(     "" if self.module.unbiased_daq_user       is None else self.module.unbiased_daq_user       )
+		#self.page.leIv.setText(                  "" if self.module.iv                      is None else self.module.iv                      )
+		#self.page.leIvUser.setText(              "" if self.module.iv_user                 is None else self.module.iv_user                 )
+		#self.page.leBiasedDaq.setText(           "" if self.module.biased_daq              is None else self.module.biased_daq              )
+		#self.page.leBiasedDaqVoltage.setText(    "" if self.module.biased_daq_voltage      is None else self.module.biased_daq_voltage      )
+		#self.page.cbUnbiasedDaqOK.setCurrentIndex(INDEX_INSPECTION.get(self.module.unbiased_daq_ok, -1))
+		#self.page.cbIvOK.setCurrentIndex(         INDEX_INSPECTION.get(self.module.iv_ok          , -1))
+		#self.page.cbBiasedDaqOK.setCurrentIndex(  INDEX_INSPECTION.get(self.module.biased_daq_ok  , -1))
 
 		# iv datasets
-		self.page.listIvData.clear()
-		for iv in self.module.iv_data:
-			self.page.listIvData.addItem(iv)
+		#self.page.listIvData.clear()
+		#for iv in self.module.iv_data:
+		#	self.page.listIvData.addItem(iv)
 
 		# daq datasets
-		self.page.listDaqData.clear()
-		for daq in self.module.daq_data:
-			self.page.listDaqData.addItem(daq)
+		#self.page.listDaqData.clear()
+		#for daq in self.module.daq_data:
+		#	self.page.listDaqData.addItem(daq)
 
 		self.page.listFiles.clear()
 		for f in self.module.test_files:
@@ -257,8 +275,8 @@ class func(object):
 
 		module_exists   = self.module_exists
 		shipments_exist = self.page.listShipments.count() > 0
-		daq_data_exists = self.page.listDaqData.count()   > 0
-		iv_data_exists  = self.page.listIvData.count()    > 0
+		#daq_data_exists = self.page.listDaqData.count()   > 0
+		#iv_data_exists  = self.page.listIvData.count()    > 0
 
 		step_kapton_exists   = self.page.sbStepKapton.value()    >= 0
 		step_sensor_exists   = self.page.sbStepSensor.value()    >= 0
@@ -286,13 +304,15 @@ class func(object):
 		self.page.pbGoShipment.setEnabled(mode_view and shipments_exist)
 
 		# characteristics
-		self.page.leInsertUser.setReadOnly( not (mode_creating or mode_editing) )
+		#self.page.leInsertUser.setReadOnly( not (mode_creating or mode_editing) )
 		self.page.leLocation.setReadOnly(   not (mode_creating or mode_editing) )
 		self.page.sbChannels.setReadOnly(   not (mode_creating or mode_editing) )
 		self.page.dsbThickness.setReadOnly( not (mode_creating or mode_editing) )
-		self.page.cbShape.setEnabled(            mode_creating or mode_editing  )
-		self.page.cbChirality.setEnabled(        mode_creating or mode_editing  )
+		#self.page.cbShape.setEnabled(            mode_creating or mode_editing  )
+		#self.page.cbChirality.setEnabled(        mode_creating or mode_editing  )
+		self.page.cbGrade.setEnabled(            mode_creating or mode_editing  )
 		self.page.cbInstitution.setEnabled(      mode_creating or mode_editing  )
+		self.page.cbInsertUser.setEnabled(       mode_creating or mode_editing  )
 
 		# parts and steps
 		self.page.pbGoStepKapton.setEnabled(   mode_view and step_kapton_exists   )
@@ -309,25 +329,25 @@ class func(object):
 		self.page.pteWriteComment.setEnabled(mode_creating or mode_editing)
 
 		# finished module qualification
-		self.page.ckHvCablesAttached.setEnabled( mode_creating or mode_editing )
-		self.page.leHvCablesAttachedUser.setReadOnly( not (mode_creating or mode_editing) )
-		self.page.leUnbiasedDaq.setReadOnly(          not (mode_creating or mode_editing) )
-		self.page.leUnbiasedDaqUser.setReadOnly(      not (mode_creating or mode_editing) )
-		self.page.leIv.setReadOnly(                   not (mode_creating or mode_editing) )
-		self.page.leIvUser.setReadOnly(               not (mode_creating or mode_editing) )
-		self.page.leBiasedDaq.setReadOnly(            not (mode_creating or mode_editing) )
-		self.page.leBiasedDaqVoltage.setReadOnly(     not (mode_creating or mode_editing) )
-		self.page.cbUnbiasedDaqOK.setEnabled( mode_creating or mode_editing )
-		self.page.cbIvOK.setEnabled(          mode_creating or mode_editing )
-		self.page.cbBiasedDaqOK.setEnabled(   mode_creating or mode_editing )
+		#self.page.ckHvCablesAttached.setEnabled( mode_creating or mode_editing )
+		#self.page.leHvCablesAttachedUser.setReadOnly( not (mode_creating or mode_editing) )
+		#self.page.leUnbiasedDaq.setReadOnly(          not (mode_creating or mode_editing) )
+		#self.page.leUnbiasedDaqUser.setReadOnly(      not (mode_creating or mode_editing) )
+		#self.page.leIv.setReadOnly(                   not (mode_creating or mode_editing) )
+		#self.page.leIvUser.setReadOnly(               not (mode_creating or mode_editing) )
+		#self.page.leBiasedDaq.setReadOnly(            not (mode_creating or mode_editing) )
+		#self.page.leBiasedDaqVoltage.setReadOnly(     not (mode_creating or mode_editing) )
+		#self.page.cbUnbiasedDaqOK.setEnabled( mode_creating or mode_editing )
+		#self.page.cbIvOK.setEnabled(          mode_creating or mode_editing )
+		#self.page.cbBiasedDaqOK.setEnabled(   mode_creating or mode_editing )
 
 		# iv datasets
-		self.page.pbIvAddToPlotter.setEnabled(mode_view and iv_data_exists)
-		self.page.pbIvGoPlotter.setEnabled(   mode_view and iv_data_exists)
+		#self.page.pbIvAddToPlotter.setEnabled(mode_view and iv_data_exists)
+		#self.page.pbIvGoPlotter.setEnabled(   mode_view and iv_data_exists)
 
 		# daq datasets
-		self.page.pbDaqAddToPlotter.setEnabled(mode_view and daq_data_exists)
-		self.page.pbDaqGoPlotter.setEnabled(   mode_view and daq_data_exists)
+		#self.page.pbDaqAddToPlotter.setEnabled(mode_view and daq_data_exists)
+		#self.page.pbDaqGoPlotter.setEnabled(   mode_view and daq_data_exists)
 
 		# NEW, experimental
 		self.page.pbAddFiles.setEnabled(mode_creating or mode_editing)
@@ -393,13 +413,15 @@ class func(object):
 	@enforce_mode(['editing','creating'])
 	def saveEditing(self,*args,**kwargs):
 		# characteristics
-		self.module.insertion_user = str(self.page.leInsertUser.text()   ) if str(self.page.leInsertUser.text())         else None
-		self.module.location    = str(self.page.leLocation.text()        ) if str(self.page.leLocation.text())           else None
-		self.module.channels    =     self.page.sbChannels.value()         if self.page.sbChannels.value()   >= 0          else None
-		self.module.thickness   =     self.page.dsbThickness.value()       if self.page.dsbThickness.value() >= 0          else None
-		self.module.shape       = str(self.page.cbShape.currentText()    ) if str(self.page.cbShape.currentText()        ) else None
-		self.module.chirality   = str(self.page.cbChirality.currentText()) if str(self.page.cbChirality.currentText()    ) else None
-		self.module.institution = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
+		#self.module.insertion_user = str(self.page.leInsertUser.text()   ) if str(self.page.leInsertUser.text())         else None
+		self.module.location        = str(self.page.leLocation.text()        ) if str(self.page.leLocation.text())             else None
+		self.module.channels        =     self.page.sbChannels.value()         if self.page.sbChannels.value()   >= 0          else None
+		self.module.thickness       =     self.page.dsbThickness.value()       if self.page.dsbThickness.value() >= 0          else None
+		#self.module.shape           = str(self.page.cbShape.currentText()    ) if str(self.page.cbShape.currentText()        ) else None
+		#self.module.chirality       = str(self.page.cbChirality.currentText()) if str(self.page.cbChirality.currentText()    ) else None
+		self.module.institution     = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
+		self.module.insertion_user  = str(self.page.cbInsertUser.currentText())  if str(self.page.cbInsertUser.currentText())  else None
+		self.module.grade           = str(self.page.cbGrade.currentText())       if str(self.page.cbGrade.currentText())       else None
 
 		# comments
 		num_comments = self.page.listComments.count()
@@ -408,17 +430,17 @@ class func(object):
 			self.module.comments.append(str(self.page.listComments.item(i).text()))
 
 		# finished module qualification
-		self.module.hv_cables_attached  = self.page.ckHvCablesAttached.isChecked()
-		self.module.hv_cables_attached_user = str(self.page.leHvCablesAttachedUser.text()) if str(self.page.leHvCablesAttachedUser.text()) else None
-		self.module.unbiased_daq            = str(self.page.leUnbiasedDaq.text()         ) if str(self.page.leUnbiasedDaq.text()         ) else None
-		self.module.unbiased_daq_user       = str(self.page.leUnbiasedDaqUser.text()     ) if str(self.page.leUnbiasedDaqUser.text()     ) else None
-		self.module.iv                      = str(self.page.leIv.text()                  ) if str(self.page.leIv.text()                  ) else None
-		self.module.iv_user                 = str(self.page.leIvUser.text()              ) if str(self.page.leIvUser.text()              ) else None
-		self.module.biased_daq              = str(self.page.leBiasedDaq.text()           ) if str(self.page.leBiasedDaq.text()           ) else None
-		self.module.biased_daq_voltage      = str(self.page.leBiasedDaqVoltage.text()    ) if str(self.page.leBiasedDaqVoltage.text()    ) else None
-		self.module.unbiased_daq_ok = str(self.page.cbUnbiasedDaqOK.currentText()) if str(self.page.cbUnbiasedDaqOK.currentText()) else None
-		self.module.iv_ok           = str(self.page.cbIvOK.currentText()         ) if str(self.page.cbIvOK.currentText()         ) else None
-		self.module.biased_daq_ok   = str(self.page.cbBiasedDaqOK.currentText()  ) if str(self.page.cbBiasedDaqOK.currentText()  ) else None
+		#self.module.hv_cables_attached  = self.page.ckHvCablesAttached.isChecked()
+		#self.module.hv_cables_attached_user = str(self.page.leHvCablesAttachedUser.text()) if str(self.page.leHvCablesAttachedUser.text()) else None
+		#self.module.unbiased_daq            = str(self.page.leUnbiasedDaq.text()         ) if str(self.page.leUnbiasedDaq.text()         ) else None
+		#self.module.unbiased_daq_user       = str(self.page.leUnbiasedDaqUser.text()     ) if str(self.page.leUnbiasedDaqUser.text()     ) else None
+		#self.module.iv                      = str(self.page.leIv.text()                  ) if str(self.page.leIv.text()                  ) else None
+		#self.module.iv_user                 = str(self.page.leIvUser.text()              ) if str(self.page.leIvUser.text()              ) else None
+		#self.module.biased_daq              = str(self.page.leBiasedDaq.text()           ) if str(self.page.leBiasedDaq.text()           ) else None
+		#self.module.biased_daq_voltage      = str(self.page.leBiasedDaqVoltage.text()    ) if str(self.page.leBiasedDaqVoltage.text()    ) else None
+		#self.module.unbiased_daq_ok = str(self.page.cbUnbiasedDaqOK.currentText()) if str(self.page.cbUnbiasedDaqOK.currentText()) else None
+		#self.module.iv_ok           = str(self.page.cbIvOK.currentText()         ) if str(self.page.cbIvOK.currentText()         ) else None
+		#self.module.biased_daq_ok   = str(self.page.cbBiasedDaqOK.currentText()  ) if str(self.page.cbBiasedDaqOK.currentText()  ) else None
 
 		self.module.save()
 		self.mode = 'view'
@@ -531,7 +553,9 @@ class func(object):
 
 			fname = os.path.split(f)[1]  # Name of file
 			fdir, fname_ = self.module.get_filedir_filename()
-			new_filepath = fdir + '/' + fname
+			#new_filepath = fdir + '/' + fname
+			tmp_filepath = (fdir + '/' + fname).rsplit('.', 1)  # Only want the last . to get replaced...
+			new_filepath = "_upload.".join(tmp_filepath)
 			print("GETFILE:  Copying file", f, "to", new_filepath)
 			shutil.copyfile(f, new_filepath)
 			self.page.listComments.addItem(new_filepath)
@@ -552,6 +576,12 @@ class func(object):
 			self.module.test_files.remove(new_filepath)
 			self.update_info()
 
+	def filesToUpload(self):
+		# Return a list of all files to upload to DB
+		if self.module is None:
+			return []
+		else:
+			return self.module.filesToUpload()
 
 
 	@enforce_mode('view')

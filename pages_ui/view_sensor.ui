@@ -19,7 +19,7 @@
      <x>10</x>
      <y>110</y>
      <width>261</width>
-     <height>521</height>
+     <height>541</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -166,29 +166,10 @@
      </rect>
     </property>
     <property name="text">
-     <string>Shape</string>
+     <string>Geometry</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="sbChannels">
-    <property name="geometry">
-     <rect>
-      <x>180</x>
-      <y>240</y>
-      <width>80</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-    <property name="minimum">
-     <number>-1</number>
-    </property>
-    <property name="maximum">
-     <number>2147483647</number>
     </property>
    </widget>
    <widget class="QLineEdit" name="lineEdit_6">
@@ -201,7 +182,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Channels</string>
+     <string>Sensor type</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -227,7 +208,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>500</y>
+      <y>520</y>
       <width>111</width>
       <height>21</height>
      </rect>
@@ -240,7 +221,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>280</y>
+      <y>300</y>
       <width>141</width>
       <height>21</height>
      </rect>
@@ -256,7 +237,7 @@
     <property name="geometry">
      <rect>
       <x>140</x>
-      <y>280</y>
+      <y>300</y>
       <width>121</width>
       <height>21</height>
      </rect>
@@ -269,7 +250,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>430</y>
+      <y>450</y>
       <width>261</width>
       <height>71</height>
      </rect>
@@ -279,7 +260,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>300</y>
+      <y>320</y>
       <width>261</width>
       <height>121</height>
      </rect>
@@ -296,22 +277,6 @@
     </property>
     <property name="text">
      <string>Institution</string>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="leInsertUser">
-    <property name="geometry">
-     <rect>
-      <x>120</x>
-      <y>1</y>
-      <width>141</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -343,7 +308,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>-1</number>
     </property>
     <item>
      <property name="text">
@@ -441,6 +406,86 @@
      </property>
     </item>
    </widget>
+   <widget class="QComboBox" name="cbInsertUser">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>0</y>
+      <width>141</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>-1</number>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="cbChannelDensity">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>240</y>
+      <width>81</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>-1</number>
+    </property>
+    <item>
+     <property name="text">
+      <string>HD</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>LD</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_7">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>260</y>
+      <width>181</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Sensor grade</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="cbGrade">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>260</y>
+      <width>81</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>-1</number>
+    </property>
+    <item>
+     <property name="text">
+      <string>A</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>B</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>C</string>
+     </property>
+    </item>
+   </widget>
    <zorder>lineEdit_9</zorder>
    <zorder>lineEdit_3</zorder>
    <zorder>leLocation</zorder>
@@ -455,14 +500,16 @@
    <zorder>listComments</zorder>
    <zorder>pbGoShipment</zorder>
    <zorder>cbShape</zorder>
-   <zorder>sbChannels</zorder>
    <zorder>lineEdit_17</zorder>
-   <zorder>leInsertUser</zorder>
    <zorder>lineEdit_18</zorder>
    <zorder>cbType</zorder>
    <zorder>leBarcode</zorder>
    <zorder>lineEdit_23</zorder>
    <zorder>cbInstitution</zorder>
+   <zorder>cbInsertUser</zorder>
+   <zorder>cbChannelDensity</zorder>
+   <zorder>lineEdit_7</zorder>
+   <zorder>cbGrade</zorder>
   </widget>
   <widget class="QFrame" name="frame_3">
    <property name="geometry">
@@ -860,6 +907,9 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="lineEdit_32">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>1</x>
@@ -927,6 +977,9 @@
     </property>
    </widget>
    <widget class="QComboBox" name="cbCheckGlueSpill">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>159</x>
@@ -1036,6 +1089,9 @@
    </property>
   </widget>
   <widget class="QFrame" name="frame_7">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>310</x>
@@ -1051,6 +1107,9 @@
     <enum>QFrame::Plain</enum>
    </property>
    <widget class="QPushButton" name="pbGoStepKapton">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>190</x>
@@ -1064,6 +1123,9 @@
     </property>
    </widget>
    <widget class="QSpinBox" name="sbStepKapton">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>110</x>
@@ -1083,6 +1145,9 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="lineEdit_35">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>1</x>

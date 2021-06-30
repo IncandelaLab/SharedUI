@@ -21,12 +21,19 @@ INDEX_SHAPE = {
 	'choptwo':6,
 }
 
+INDEX_GRADE = {
+    'A':0,
+    'B':1,
+    'C':2,
+}
+
+"""
 INDEX_CHIRALITY = {
 	'achiral':0,
 	'left':1,
 	'right':2,
 }
-
+"""
 INDEX_INSPECTION = {
 	'pass':0,
 	True:0,
@@ -122,6 +129,10 @@ class func(object):
 		self.page.pbGoStepPcb.clicked.connect(self.goStepPcb)
 		self.page.pbGoModule.clicked.connect(self.goModule)
 
+		auth_users = fm.userManager.getAuthorizedUsers(PAGE_NAME)
+		self.index_users = {auth_users[i]:i for i in range(len(auth_users))}
+		for user in self.index_users.keys():
+			self.page.cbInsertUser.addItem(user)
 
 
 	@enforce_mode(['view', 'editing', 'creating'])
@@ -141,10 +152,11 @@ class func(object):
 		for shipment in self.protomodule.shipments:
 			self.page.listShipments.addItem(str(shipment))
 
-		self.page.leInsertUser.setText(  "" if self.protomodule.insertion_user is None else   self.protomodule.insertion_user)
+		#self.page.leInsertUser.setText(  "" if self.protomodule.insertion_user is None else   self.protomodule.insertion_user)
 		self.page.leLocation.setText(    "" if self.protomodule.location     is None else     self.protomodule.location    )
 		self.page.cbShape.setCurrentIndex(    INDEX_SHAPE.get(    self.protomodule.shape    ,-1))
-		self.page.cbChirality.setCurrentIndex(INDEX_CHIRALITY.get(self.protomodule.chirality,-1))
+		self.page.cbGrade.setCurrentIndex(    INDEX_GRADE.get(    self.protomodule.grade    ,-1))
+		#self.page.cbChirality.setCurrentIndex(INDEX_CHIRALITY.get(self.protomodule.chirality,-1))
 		self.page.dsbThickness.setValue( -1 if self.protomodule.thickness is None else self.protomodule.thickness )
 		self.page.sbChannels.setValue(   -1 if self.protomodule.channels  is None else self.protomodule.channels  )
 		if self.page.dsbThickness.value() == -1: self.page.dsbThickness.clear()
@@ -164,9 +176,14 @@ class func(object):
 		#if self.page.sbSensor.value()     == -1: self.page.sbSensor.clear()
 		#if self.page.sbBaseplate.value()  == -1: self.page.sbBaseplate.clear()
 
-		self.page.cbCheckCracks.setCurrentIndex(   INDEX_INSPECTION.get(self.protomodule.check_cracks    , -1))
-		self.page.cbCheckGlueSpill.setCurrentIndex(INDEX_INSPECTION.get(self.protomodule.check_glue_spill, -1))
+		#self.page.cbCheckCracks.setCurrentIndex(   INDEX_INSPECTION.get(self.protomodule.check_cracks    , -1))
+		#self.page.cbCheckGlueSpill.setCurrentIndex(INDEX_INSPECTION.get(self.protomodule.check_glue_spill, -1))
 		self.page.cbInstitution.setCurrentIndex(   INDEX_INSTITUTION.get(self.protomodule.institution, -1)    )
+		if not self.protomodule.insertion_user in self.index_users.keys() and not self.protomodule.insertion_user is None:
+			# Insertion user was deleted from user page...just add user to the dropdown
+			self.index_users[self.protomodule.insertion_user] = max(self.index_users.values()) + 1
+			self.page.cbInsertUser.addItem(self.protomodule.insertion_user)
+		self.page.cbInsertUser.setCurrentIndex(self.index_users.get(self.protomodule.insertion_user, -1))
 		self.page.dsbOffsetTranslationX.setValue( -1 if self.protomodule.offset_translation_x is None else self.protomodule.offset_translation_x )
 		self.page.dsbOffsetTranslationY.setValue( -1 if self.protomodule.offset_translation_y is None else self.protomodule.offset_translation_y )
 		self.page.dsbOffsetRotation.setValue(    -1 if self.protomodule.offset_rotation    is None else self.protomodule.offset_rotation    )
@@ -209,7 +226,7 @@ class func(object):
 		#self.page.sbID.setEnabled(mode_view)
 		self.page.leID.setReadOnly(not mode_view)
 
-		self.page.pbLoad.setEnacled(mode_view)
+		self.page.pbLoad.setEnabled(mode_view)
 
 		#self.page.pbNew.setEnabled(     mode_view and not protomodule_exists )
 		self.page.pbEdit.setEnabled(    mode_view and     protomodule_exists )
@@ -218,11 +235,13 @@ class func(object):
 
 		self.page.pbGoShipment.setEnabled(mode_view and shipments_exist)
 
-		self.page.leInsertUser.setReadOnly(not (mode_creating or mode_editing) )
+		#self.page.leInsertUser.setReadOnly(not (mode_creating or mode_editing) )
 		self.page.leLocation.setReadOnly(  not (mode_creating or mode_editing) )
 		self.page.cbShape.setEnabled(           mode_creating or mode_editing  )
-		self.page.cbChirality.setEnabled(       mode_creating or mode_editing  )
+		self.page.cbGrade.setEnabled(           mode_creating or mode_editing  )
+		#self.page.cbChirality.setEnabled(       mode_creating or mode_editing  )
 		self.page.cbInstitution.setEnabled(     mode_creating or mode_editing  )
+		self.page.cbInsertUser.setEnabled(      mode_creating or mode_editing  )
 		self.page.dsbThickness.setReadOnly(not (mode_creating or mode_editing) )
 		self.page.sbChannels.setReadOnly(  not (mode_creating or mode_editing) )
 
@@ -240,8 +259,8 @@ class func(object):
 		self.page.dsbOffsetTranslationY.setReadOnly( not (mode_creating or mode_editing) )
 		self.page.dsbOffsetRotation.setReadOnly(    not (mode_creating or mode_editing) )
 		self.page.dsbFlatness.setReadOnly(          not (mode_creating or mode_editing) )
-		self.page.cbCheckCracks.setEnabled(              mode_creating or mode_editing  )
-		self.page.cbCheckGlueSpill.setEnabled(           mode_creating or mode_editing  )
+		#self.page.cbCheckCracks.setEnabled(              mode_creating or mode_editing  )
+		#self.page.cbCheckGlueSpill.setEnabled(           mode_creating or mode_editing  )
 
 
 
@@ -298,24 +317,27 @@ class func(object):
 	@enforce_mode(['editing','creating'])
 	def saveEditing(self,*args,**kwargs):
 
-		self.protomodule.insertion_user = str(self.page.leInsertUser.text()      ) if str(self.page.leInsertUser.text()      ) else None
-		self.protomodule.location     = str(self.page.leLocation.text()          ) if str(self.page.leLocation.text()        ) else None
-		self.protomodule.shape        = str(self.page.cbShape.currentText()      ) if str(self.page.cbShape.currentText()    ) else None
-		self.protomodule.chirality    = str(self.page.cbChirality.currentText()  ) if str(self.page.cbChirality.currentText()) else None
-		self.protomodule.institution  = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
-		self.protomodule.thickness    =     self.page.dsbThickness.value()         if self.page.dsbThickness.value() >=0 else None
-		self.protomodule.channels     =     self.page.sbChannels.value()           if self.page.sbChannels.value()   >=0 else None
+		#self.protomodule.insertion_user = str(self.page.leInsertUser.text()      ) if str(self.page.leInsertUser.text()      ) else None
+		self.protomodule.location       = str(self.page.leLocation.text()          ) if str(self.page.leLocation.text()        ) else None
+		self.protomodule.shape          = str(self.page.cbShape.currentText()      ) if str(self.page.cbShape.currentText()    ) else None
+		self.protomodule.grade          = str(self.page.cbGrade.currentText()      ) if str(self.page.cbGrade.currentText()    ) else None
+		#self.protomodule.chirality      = str(self.page.cbChirality.currentText()  ) if str(self.page.cbChirality.currentText()) else None
+		self.protomodule.institution    = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
+		self.protomodule.insertion_user = str(self.page.cbInsertUser.currentText())  if str(self.page.cbInsertUser.currentText())  else None
+		self.protomodule.thickness      =     self.page.dsbThickness.value()         if self.page.dsbThickness.value() >=0 else None
+		self.protomodule.channels       =     self.page.sbChannels.value()           if self.page.sbChannels.value()   >=0 else None
 
 		num_comments = self.page.listComments.count()
 		self.protomodule.comments = []
 		for i in range(num_comments):
 			self.protomodule.comments.append(str(self.page.listComments.item(i).text()))
 
-		self.protomodule.offset_translation	= self.page.dsbOffsetTranslation.value() if self.page.dsbOffsetTranslation.value() >=0 else None
-		self.protomodule.offset_rotation	= self.page.dsbOffsetRotation.value()    if self.page.dsbOffsetRotation.value()    >=0 else None
-		self.protomodule.flatness	        = self.page.dsbFlatness.value()          if self.page.dsbFlatness.value()          >=0 else None
-		self.protomodule.check_cracks	    = str(self.page.cbCheckCracks.currentText()   ) if str(self.page.cbCheckCracks.currentText()   ) else None
-		self.protomodule.check_glue_spill	= str(self.page.cbCheckGlueSpill.currentText()) if str(self.page.cbCheckGlueSpill.currentText()) else None
+		self.protomodule.offset_translation_x = self.page.dsbOffsetTranslationX.value() if self.page.dsbOffsetTranslationX.value() >=0 else None
+		self.protomodule.offset_translation_y = self.page.dsbOffsetTranslationY.value() if self.page.dsbOffsetTranslationY.value() >=0 else None
+		self.protomodule.offset_rotation	  = self.page.dsbOffsetRotation.value()    if self.page.dsbOffsetRotation.value()    >=0 else None
+		self.protomodule.flatness	          = self.page.dsbFlatness.value()          if self.page.dsbFlatness.value()          >=0 else None
+		#self.protomodule.check_cracks	    = str(self.page.cbCheckCracks.currentText()   ) if str(self.page.cbCheckCracks.currentText()   ) else None
+		#self.protomodule.check_glue_spill	= str(self.page.cbCheckGlueSpill.currentText()) if str(self.page.cbCheckGlueSpill.currentText()) else None
 
 		self.protomodule.save()
 		self.mode = 'view'
@@ -379,6 +401,13 @@ class func(object):
 		else:
 			return
 
+
+	def filesToUpload(self):
+		# Return a list of all files to upload to DB
+		if self.protomodule is None:
+			return []
+		else:
+			return self.protomodule.filesToUpload()
 
 
 	@enforce_mode('view')

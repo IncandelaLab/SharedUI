@@ -165,16 +165,6 @@
     <string>go to</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="leUserPerformed">
-   <property name="geometry">
-    <rect>
-     <x>650</x>
-     <y>140</y>
-     <width>121</width>
-     <height>20</height>
-    </rect>
-   </property>
-  </widget>
   <widget class="QLineEdit" name="leCureTemperature">
    <property name="geometry">
     <rect>
@@ -1039,6 +1029,19 @@
      <string>HPK</string>
     </property>
    </item>
+  </widget>
+  <widget class="QComboBox" name="cbUserPerformed">
+   <property name="geometry">
+    <rect>
+     <x>650</x>
+     <y>140</y>
+     <width>121</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="currentIndex">
+    <number>-1</number>
+   </property>
   </widget>
  </widget>
  <resources/>

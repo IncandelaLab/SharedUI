@@ -60,16 +60,17 @@ INDEX_INSTITUTION = {
 	'HPK':5,
 }
 
-"""
-class Filewindow(QWidget):
-	def __init__(self):
-		super(Filewindow, self).__init__()
+INDEX_CHANNEL = {
+ 	'HD':0,
+	'LD':1,
+}
 
-	def getfile(self,*args,**kwargs):
-		fname, fmt = QFileDialog.getOpenFileName(self, 'Open file', '~',"(*.jpg *.png *.xml)")
-		print("File dialog:  got file", fname)
-		return fname
-"""
+INDEX_GRADE = {
+	'A':0,
+	'B':1,
+	'C':2,
+}
+
 
 class func(object):
 	def __init__(self,fm,page,setUIPage,setSwitchingEnabled):
@@ -78,7 +79,7 @@ class func(object):
 		self.setMainSwitchingEnabled = setSwitchingEnabled
 
 		self.sensor = fm.sensor()
-		self.sensor_exists = None
+		self.sensor_exists = False
 
 		self.mode = 'setup'
 
@@ -144,7 +145,7 @@ class func(object):
 		self.page.pbDeleteComment.clicked.connect(self.deleteComment)
 		self.page.pbAddComment.clicked.connect(self.addComment)
 
-		self.page.pbGoStepKapton.clicked.connect(self.goStepKapton)
+		#self.page.pbGoStepKapton.clicked.connect(self.goStepKapton)
 
 		self.page.pbGoStepSensor.clicked.connect(self.goStepSensor)
 		self.page.pbGoProtomodule.clicked.connect(self.goProtomodule)
@@ -163,6 +164,10 @@ class func(object):
 		#self.page.pbAddFiles.clicked.connect(self.getFile)
 		#self.page.pbDeleteFile.clicked.connect(self.deleteFile)
 
+		auth_users = fm.userManager.getAuthorizedUsers(PAGE_NAME)
+		self.index_users = {auth_users[i]:i for i in range(len(auth_users))}
+		for user in self.index_users.keys():
+			self.page.cbInsertUser.addItem(user)
 
 	@enforce_mode(['view', 'editing', 'creating'])
 	def update_info(self,ID=None,do_load=True,*args,**kwargs):
@@ -172,12 +177,13 @@ class func(object):
 		else:
 			#self.page.sbID.setValue(ID)
 			self.page.leID.setText(ID)
-		if do_load:
-			self.sensor_exists = self.sensor.load(ID)
-		else:
-			self.sensor_exists = False
+		#if do_load:
+		#	self.sensor_exists = self.sensor.load(ID)
+		#else:
+		#	self.sensor_exists = False
 
 		#self.page.leID.setText(self.sensor.ID)
+		self.sensor_exists = self.sensor.load(ID)
 
 		self.page.listShipments.clear()
 		for shipment in self.sensor.shipments:
@@ -187,11 +193,19 @@ class func(object):
 		self.page.leBarcode.setText( "" if self.sensor.barcode          is None else self.sensor.barcode     )
 		self.page.cbType.setCurrentIndex(       INDEX_TYPE.get(       self.sensor.type,  -1)      )
 		self.page.cbShape.setCurrentIndex(      INDEX_SHAPE.get(      self.sensor.shape, -1)      )
-		self.page.leInsertUser.setText("" if self.sensor.insertion_user is None else self.sensor.insertion_user)
+		#self.page.leInsertUser.setText("" if self.sensor.insertion_user is None else self.sensor.insertion_user)
 		self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.sensor.institution, -1))
-		self.page.sbChannels.setValue(-1 if self.sensor.channels        is None else self.sensor.channels)
+		if not self.sensor.insertion_user in self.index_users.keys() and not self.sensor.insertion_user is None:
+			# Insertion user was deleted from user page...just add user to the dropdown
+			self.index_users[self.sensor.insertion_user] = max(self.index_users.values()) + 1
+			# WIP...
+			self.page.cbInsertUser.addItem(self.sensor.insertion_user)
+		self.page.cbInsertUser.setCurrentIndex(self.index_users.get(self.sensor.insertion_user, -1))
+		#self.page.sbChannels.setValue(-1 if self.sensor.channels        is None else self.sensor.channels)
+		#if self.page.sbChannels.value() == -1:  self.page.sbChannels.clear()
+		self.page.cbChannelDensity.setCurrentIndex(INDEX_CHANNEL.get(self.sensor.channel_density, -1))
+		self.page.cbGrade.setCurrentIndex(INDEX_GRADE.get(self.sensor.grade, -1))
 
-		if self.page.sbChannels.value() == -1:  self.page.sbChannels.clear()
 
 		self.page.listComments.clear()
 		for comment in self.sensor.comments:
@@ -211,11 +225,11 @@ class func(object):
 		#self.page.dsbThickness.setValue(-1 if self.sensor.thickness is None else self.sensor.thickness) 
 		#if self.page.dsbThickness.value() == -1: self.page.dsbThickness.clear() 
  
-		self.page.sbStepKapton.setValue(-1 if self.sensor.step_kapton is None else self.sensor.step_kapton) 
-		if self.page.sbStepKapton.value() == -1: self.page.sbStepKapton.clear() 
+		#self.page.sbStepKapton.setValue(-1 if self.sensor.step_kapton is None else self.sensor.step_kapton) 
+		#if self.page.sbStepKapton.value() == -1: self.page.sbStepKapton.clear() 
  
 		#self.page.cbCheckEdgesFirm.setCurrentIndex(INDEX_CHECK.get(self.sensor.check_edges_firm, -1)) 
-		self.page.cbCheckGlueSpill.setCurrentIndex(INDEX_CHECK.get(self.sensor.check_glue_spill, -1)) 
+		#self.page.cbCheckGlueSpill.setCurrentIndex(INDEX_CHECK.get(self.sensor.check_glue_spill, -1)) 
 		#self.page.dsbKaptonFlatness.setValue(-1 if self.sensor.kapton_flatness is None else self.sensor.kapton_flatness) 
 		#if self.page.dsbKaptonFlatness.value() == -1: self.page.dsbKaptonFlatness.clear()
 
@@ -248,7 +262,7 @@ class func(object):
 		mode_editing  = self.mode == 'editing'
 		mode_creating = self.mode == 'creating'
 		
-		step_kapton_exists = self.page.sbStepKapton.value()  >=0
+		#step_kapton_exists = self.page.sbStepKapton.value()  >=0
 		sensor_exists      = self.sensor_exists
 		shipments_exist    = self.page.listShipments.count() > 0
 		step_sensor_exists = self.page.sbStepSensor.value()  >= 0
@@ -270,13 +284,16 @@ class func(object):
 
 		self.page.pbGoShipment.setEnabled(mode_view and shipments_exist)
 
-		self.page.leInsertUser.setReadOnly(   not (mode_creating or mode_editing) )
+		#self.page.leInsertUser.setReadOnly(   not (mode_creating or mode_editing) )
 		self.page.leLocation.setReadOnly(     not (mode_creating or mode_editing) )
 		self.page.leBarcode.setReadOnly(      not (mode_creating or mode_editing) )
 		self.page.cbType.setEnabled(               mode_creating or mode_editing  )
 		self.page.cbShape.setEnabled(              mode_creating or mode_editing  )
 		self.page.cbInstitution.setEnabled(        mode_creating or mode_editing  )
-		self.page.sbChannels.setReadOnly(     not (mode_creating or mode_editing) )
+		self.page.cbInsertUser.setEnabled(         mode_creating or mode_editing  )
+		#self.page.sbChannels.setReadOnly(     not (mode_creating or mode_editing) )
+		self.page.cbChannelDensity.setEnabled(     mode_creating or mode_editing  )
+		self.page.cbGrade.setEnabled(              mode_creating or mode_editing  )
 
 		self.page.pbDeleteComment.setEnabled(mode_creating or mode_editing)
 		self.page.pbAddComment.setEnabled(   mode_creating or mode_editing)
@@ -286,9 +303,9 @@ class func(object):
 		#	corner.setReadOnly(not (mode_creating or mode_editing))
 		#self.page.dsbThickness.setReadOnly(not (mode_creating or mode_editing))
 
-		self.page.pbGoStepKapton.setEnabled(mode_view and step_kapton_exists)
+		#self.page.pbGoStepKapton.setEnabled(mode_view and step_kapton_exists)
 		#self.page.cbCheckEdgesFirm.setEnabled(mode_creating or mode_editing)
-		self.page.cbCheckGlueSpill.setEnabled(mode_creating or mode_editing)
+		#self.page.cbCheckGlueSpill.setEnabled(mode_creating or mode_editing)
 		#self.page.dsbKaptonFlatness.setReadOnly(not (mode_creating or mode_editing))
 
 		self.page.cbInspection.setEnabled(   mode_creating or mode_editing   )
@@ -315,7 +332,7 @@ class func(object):
 			#self.sensor.new(ID)
 			#self.mode = 'creating'  # update_info needs mode==view
 			self.page.leStatus.setText("sensor DNE")
-			self.update_info(do_load=False)
+			self.update_info()
 		else:
 			# pass
 			self.sensor = tmp_sensor
@@ -360,13 +377,18 @@ class func(object):
 	@enforce_mode(['editing','creating'])
 	def saveEditing(self,*args,**kwargs):
 
-		self.sensor.insertion_user = str(self.page.leInsertUser.text()      ) if str(self.page.leInsertUser.text()  )       else None
+		#self.sensor.insertion_user = str(self.page.leInsertUser.text()      ) if str(self.page.leInsertUser.text()  )       else None
 		self.sensor.location     = str(self.page.leLocation.text()          ) if str(self.page.leLocation.text()    )       else None
 		self.sensor.barcode      = str(self.page.leBarcode.text()           ) if str(self.page.leBarcode.text()     )       else None
 		self.sensor.type         = str(self.page.cbType.currentText()       ) if str(self.page.cbType.currentText() )       else None
 		self.sensor.shape        = str(self.page.cbShape.currentText()      ) if str(self.page.cbShape.currentText())       else None
 		self.sensor.institution  = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
-		self.sensor.channels     =     self.page.sbChannels.value()           if     self.page.sbChannels.value() >=0       else None
+		self.sensor.insertion_user = str(self.page.cbInsertUser.currentText())  if str(self.page.cbInsertUser.currentText())  else None
+		#self.sensor.channels     =     self.page.sbChannels.value()           if     self.page.sbChannels.value() >=0       else None
+		self.sensor.channel_density = str(self.page.cbChannelDensity.currentText())  if str(self.page.cbChannelDensity.currentText())  else None
+		self.sensor.grade        = str(self.page.cbGrade.currentText())  if str(self.page.cbGrade.currentText())  else None
+
+		self.sensor.thickness = float(self.sensor.type.split()[0])/1000 # Strip out the thickness
 
 		num_comments = self.page.listComments.count()
 		self.sensor.comments = []
@@ -376,9 +398,9 @@ class func(object):
 		#self.sensor.corner_heights = [_.value() if _.value()>=0 else None for _ in self.corners]
 		#self.sensor.thickness = self.page.dsbThickness.value() if self.page.dsbThickness.value()>=0 else None
 
-		self.sensor.check_edges_firm = str(self.page.cbCheckEdgesFirm.currentText()) if str(self.page.cbCheckEdgesFirm.currentText()) else None
-		self.sensor.check_glue_spill = str(self.page.cbCheckGlueSpill.currentText()) if str(self.page.cbCheckGlueSpill.currentText()) else None
-		self.sensor.kapton_flatness  =     self.page.dsbKaptonFlatness.value()       if self.page.dsbKaptonFlatness.value() >=0       else None
+		#self.sensor.check_edges_firm = str(self.page.cbCheckEdgesFirm.currentText()) if str(self.page.cbCheckEdgesFirm.currentText()) else None
+		#self.sensor.check_glue_spill = str(self.page.cbCheckGlueSpill.currentText()) if str(self.page.cbCheckGlueSpill.currentText()) else None
+		#self.sensor.kapton_flatness  =     self.page.dsbKaptonFlatness.value()       if self.page.dsbKaptonFlatness.value() >=0       else None
 
 		self.sensor.inspection = str(self.page.cbInspection.currentText()) if str(self.page.cbInspection.currentText()) else None
 
@@ -442,6 +464,14 @@ class func(object):
 		ID = self.page.leModule.text()
 		if ID != "":
 			self.setUIPage('modules',ID=ID)
+
+
+	def filesToUpload(self):
+		# Return a list of all files to upload to DB
+		if self.sensor is None:
+			return []
+		else:
+			return self.sensor.filesToUpload()
 
 
 	"""

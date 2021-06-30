@@ -108,7 +108,8 @@ class simple_fsobj_vc(object):
 		#if size == 0.0:
 		#	size = None
 		#self.fsobj_tool.size = size
-		self.fsobj_tool.location = self.leLocation.text()  # New
+		self.fsobj_tool.location = self.leLocation.text() if self.leLocation.text() != '' else 'n/a'  # New
+		print("Saving tool:  LOCATION IS", self.fsobj_tool.location)
 		self.fsobj_tool.save()
 		self.update_info()
 

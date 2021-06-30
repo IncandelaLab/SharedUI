@@ -50,6 +50,9 @@ I_SIZE_MISMATCH_8 = "* list of 8-inch objects selected: {}"
 I_INSTITUTION = "some selected objects are not at this institution: {}"
 I_INSTITUTION_NOT_SELECTED = "no institution selected"
 
+# Missing user
+I_USER_DNE = "no kapton step user selected"
+
 # batch empty
 I_BATCH_ARALDITE_EMPTY = "araldite batch is empty"
 
@@ -184,6 +187,12 @@ class func(object):
 
 		self.page.pbRunStartNow.clicked.connect(      self.setRunStartNow      )
 
+		auth_users = fm.userManager.getAuthorizedUsers(PAGE_NAME)
+		self.index_users = {auth_users[i]:i for i in range(len(auth_users))}
+		for user in self.index_users.keys():
+			self.page.cbInsertUser.addItem(user)
+
+
 	@enforce_mode('view')
 	def update_info(self,ID=None,*args,**kwargs):
 		if ID is None:
@@ -199,7 +208,12 @@ class func(object):
 		if self.step_kapton_exists:
 			self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.step_kapton.institution, -1))
 
-			self.page.leUserPerformed.setText(self.step_kapton.user_performed)
+			#self.page.leUserPerformed.setText(self.step_kapton.user_performed)
+			if not self.step_kapton.user_performed in self.index_users.keys() and not self.step_kapton.user_performed is None:
+				# Insertion user was deleted from user page...just add user to the dropdown
+				self.index_users[self.step_kapton.user_performed] = max(self.index_users.values()) + 1
+				self.page.cbUserPerformed.addItem(self.step_kapton.user_performed)
+			self.page.cbUserPerformed.setCurrentIndex(self.index_users.get(self.step_kapton.user_performed, -1))
 			self.page.leLocation.setText(self.step_kapton.location)
 
 			run_start = self.step_kapton.run_start
@@ -281,7 +295,8 @@ class func(object):
 
 		self.page.pbRunStartNow     .setEnabled(mode_creating or mode_editing)
 
-		self.page.leUserPerformed  .setReadOnly(mode_view)
+		#self.page.leUserPerformed  .setReadOnly(mode_view)
+		self.page.cbUserPerformed  .setEnabled( mode_creating or mode_editing)
 		self.page.leLocation       .setReadOnly(mode_view)
 		self.page.dtRunStart       .setReadOnly(mode_view)
 		self.page.leCureTemperature.setReadOnly(mode_view)
@@ -370,8 +385,11 @@ class func(object):
 		issues = []
 		objects = []
 
-		if self.step_kapton.institution == None:
+		if self.step_kapton.institution is None:
 			issues.append(I_INSTITUTION_NOT_SELECTED)
+
+		if self.step_kapton.user_performed is None:
+			issues.append(I_USER_DNE)
 
 		# tooling and supplies
 		
@@ -539,7 +557,8 @@ class func(object):
 	def saveEditing(self,*args,**kwargs):
 		self.step_kapton.institution = self.page.cbInstitution.currentText()
 
-		self.step_kapton.user_performed = str( self.page.leUserPerformed.text() )
+		#self.step_kapton.user_performed = str( self.page.leUserPerformed.text() )
+		self.step_kapton.user_performed = str(self.page.cbUserPerformed.currentText()) if str(self.page.cbUserPerformed.currentText()) else None
 		self.step_kapton.location       = str( self.page.leLocation.text() )
 
 		#if self.page.dtRunStart.date().year() == NO_DATE[0]:
@@ -606,6 +625,14 @@ class func(object):
 		localtime = time.localtime()
 		self.page.dtRunStart.setDate(QtCore.QDate(*localtime[0:3]))
 		self.page.dtRunStart.setTime(QtCore.QTime(*localtime[3:6]))
+
+	def filesToUpload(self):
+		# Return a list of all files to upload to DB
+		if self.step_kapton is None:
+			return []
+		else:
+			return self.step_kapton.filesToUpload()
+
 
 	@enforce_mode('view')
 	def load_kwargs(self,kwargs):

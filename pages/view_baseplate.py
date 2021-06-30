@@ -14,9 +14,8 @@ INDEX_SIZE = {
 }
 
 INDEX_MATERIAL = {
-	'Cu':0,
-	'CuW':1,
-	'PCB':2,
+	'CuW':0,
+	'PCB':1,
 }
 
 INDEX_SHAPE = {
@@ -29,10 +28,16 @@ INDEX_SHAPE = {
 	'choptwo':6,
 }
 
-INDEX_CHIRALITY = {
-	'achiral':0,
-	'left':1,
-	'right':2,
+#INDEX_CHIRALITY = {
+#	'achiral':0,
+#	'left':1,
+#	'right':2,
+#}
+
+INDEX_GRADE = {
+	'A':0,
+	'B':1,
+	'C':2,
 }
 
 INDEX_CHECK = {
@@ -59,7 +64,7 @@ class func(object):
 		self.setUIPage = setUIPage
 		self.setMainSwitchingEnabled = setSwitchingEnabled
 
-		self.baseplate_exists = None
+		self.baseplate_exists = False
 		self.baseplate = fm.baseplate()
 
 		self.mode = 'setup'
@@ -137,43 +142,56 @@ class func(object):
 
 		self.page.pbGoModule.clicked.connect(self.goModule)
 
-		self.corners = [
-			self.page.dsbC0,
-			self.page.dsbC1,
-			self.page.dsbC2,
-			self.page.dsbC3,
-			self.page.dsbC4,
-			self.page.dsbC5
-			]
+		#self.corners = [
+		#	self.page.dsbC0,
+		#	self.page.dsbC1,
+		#	self.page.dsbC2,
+		#	self.page.dsbC3,
+		#	self.page.dsbC4,
+		#	self.page.dsbC5
+		#	]
+
+		# NEW:
+		auth_users = fm.userManager.getAuthorizedUsers(PAGE_NAME)
+		self.index_users = {auth_users[i]:i for i in range(len(auth_users))}
+		for user in self.index_users.keys():
+			self.page.cbInsertUser.addItem(user)
 
 
 	@enforce_mode(['view', 'editing', 'creating']) # NEW:  Now allowed in editing, creating mode
-	def update_info(self,ID=None):
+	def update_info(self,do_load=True,ID=None):
 		"""Loads info on the selected baseplate ID and updates UI elements accordingly"""
 		# IMPORTANT CHANGE:  Baseplate load and existence check have been moved to startCreating/Editing()!
-		# Uncommenting this to see what happens...
+		# Probably can't remove the following
 		if ID is None:
 			ID = self.page.leID.text()
 		else:
 			#self.page.sbID.setValue(ID)
 			self.page.leID.setText(ID)
 
-		self.baseplate_exists = self.baseplate.load(ID)
+		#self.baseplate_exists = self.baseplate.load(ID)
 
 		#self.page.leID.setText(self.baseplate.ID)
+		self.baseplate_exists = self.baseplate.load(ID)
 
 		self.page.listShipments.clear()
 		for shipment in self.baseplate.shipments:
 			self.page.listShipments.addItem(str(shipment))
 
-		self.page.cbShape      .setCurrentIndex(INDEX_SHAPE.get(      self.baseplate.shape      , -1))
-		self.page.cbChirality  .setCurrentIndex(INDEX_CHIRALITY.get(  self.baseplate.chirality  , -1))
-		self.page.cbMaterial   .setCurrentIndex(INDEX_MATERIAL.get(   self.baseplate.material   , -1))
-		self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.baseplate.institution, -1))
-		self.page.leInsertUser   .setText("" if self.baseplate.insertion_user  is None else self.baseplate.insertion_user  )
+		self.page.cbShape      .setCurrentIndex(INDEX_SHAPE.get(      self.baseplate.shape         , -1))
+		#self.page.cbChirality  .setCurrentIndex(INDEX_CHIRALITY.get(  self.baseplate.chirality     , -1))
+		self.page.cbMaterial   .setCurrentIndex(INDEX_MATERIAL.get(   self.baseplate.material      , -1))
+		self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.baseplate.institution   , -1))
+		self.page.cbGrade      .setCurrentIndex(INDEX_GRADE.get(      self.baseplate.grade         , -1))
+		#self.page.leInsertUser   .setText("" if self.baseplate.insertion_user  is None else self.baseplate.insertion_user  )
+		if not self.baseplate.insertion_user in self.index_users.keys() and not self.baseplate.insertion_user is None:
+			# Insertion user was deleted from user page...just add user to the dropdown
+			self.index_users[self.baseplate.insertion_user] = max(self.index_users.values()) + 1
+			self.page.cbInsertUser.addItem(self.baseplate.insertion_user)
+		self.page.cbInsertUser.setCurrentIndex(self.index_users.get(self.baseplate.insertion_user, -1))
 		self.page.leBarcode      .setText("" if self.baseplate.barcode         is None else self.baseplate.barcode         )
 		self.page.leLocation     .setText("" if self.baseplate.location        is None else self.baseplate.location        )
-		self.page.leManufacturer .setText("" if self.baseplate.manufacturer    is None else self.baseplate.manufacturer    )
+		#self.page.leManufacturer .setText("" if self.baseplate.manufacturer    is None else self.baseplate.manufacturer    )
 		self.page.dsbNomThickness.setValue(-1 if self.baseplate.nomthickness   is None else self.baseplate.nomthickness    )
 		if self.page.dsbNomThickness.value() == -1: self.page.dsbNomThickness.clear()
 
@@ -182,16 +200,18 @@ class func(object):
 			self.page.listComments.addItem(comment)
 		self.page.pteWriteComment.clear()
 
-		if self.baseplate.corner_heights is None:
-			for corner in self.corners:
-				corner.setValue(-1)
-				corner.clear()
-		else:
-			for i,corner in enumerate(self.corners):
-				corner.setValue(-1 if self.baseplate.corner_heights[i] is None else self.baseplate.corner_heights[i])
-				if corner.value() == -1: corner.clear()
+		#if self.baseplate.corner_heights is None:
+		#	for corner in self.corners:
+		#		corner.setValue(-1)
+		#		corner.clear()
+		#else:
+		#	for i,corner in enumerate(self.corners):
+		#		corner.setValue(-1 if self.baseplate.corner_heights[i] is None else self.baseplate.corner_heights[i])
+		#		if corner.value() == -1: corner.clear()
 
-		self.page.leFlatness.setText("" if self.baseplate.flatness is None else str(round(self.baseplate.flatness,DISPLAY_PRECISION)))
+		#self.page.leFlatness.setText("" if self.baseplate.flatness is None else str(round(self.baseplate.flatness,DISPLAY_PRECISION)))
+		self.page.dsbFlatness.setValue(-1 if self.baseplate.flatness is None else self.baseplate.flatness )
+		if self.page.dsbNomThickness.value() == -1: self.page.dsbNomThickness.clear()
 		#self.page.dsbThickness.setValue(-1 if self.baseplate.thickness is None else self.baseplate.thickness)
 		#if self.page.dsbThickness.value() == -1: self.page.dsbThickness.clear()
 
@@ -215,13 +235,14 @@ class func(object):
 		self.updateElements()
 
 
-	@enforce_mode(['view','editing_corners','editing','creating'])
+	@enforce_mode(['view','editing','creating'])
 	def updateElements(self):
 		# NEW:
 		if not self.mode == "view":
 			self.page.leStatus.setText(self.mode)
 
 		exists = self.baseplate_exists
+		print("UPDATE ELEMENTS:  baseplate exists:", exists)
 		shipments_exist = self.page.listShipments.count() > 0
 
 		#step_kapton_exists   = self.page.sbStepKapton.value()   >=0
@@ -250,21 +271,23 @@ class func(object):
 		self.page.pbGoShipment.setEnabled(mode_view and shipments_exist)
 
 		self.page.cbShape.setEnabled(               mode_creating or mode_editing  )
-		self.page.cbChirality.setEnabled(           mode_creating or mode_editing  )
+		#self.page.cbChirality.setEnabled(           mode_creating or mode_editing  )
 		self.page.cbInstitution.setEnabled(         mode_creating or mode_editing  )
-		self.page.leInsertUser.setReadOnly(    not (mode_creating or mode_editing) )
+		self.page.cbInsertUser.setEnabled(          mode_creating or mode_editing  )
 		self.page.leBarcode.setReadOnly(       not (mode_creating or mode_editing) )
-		self.page.leManufacturer.setReadOnly(  not (mode_creating or mode_editing) )
+		#self.page.leManufacturer.setReadOnly(  not (mode_creating or mode_editing) )
 		self.page.cbMaterial.setEnabled(            mode_creating or mode_editing  )
 		self.page.leLocation.setReadOnly(      not (mode_creating or mode_editing) )
 		self.page.dsbNomThickness.setReadOnly( not (mode_creating or mode_editing) )
+		self.page.cbGrade.setEnabled(               mode_creating or mode_editing  )
+		self.page.dsbFlatness.setEnabled(           mode_creating or mode_editing  )
 
 		self.page.pbDeleteComment.setEnabled(mode_creating or mode_editing)
 		self.page.pbAddComment.setEnabled(   mode_creating or mode_editing)
 		self.page.pteWriteComment.setEnabled(mode_creating or mode_editing)
 
-		for corner in self.corners:
-			corner.setReadOnly(not (mode_creating or mode_editing))
+		#for corner in self.corners:
+		#	corner.setReadOnly(not (mode_creating or mode_editing))
 		#self.page.dsbThickness.setReadOnly(not (mode_creating or mode_editing))
 
 		#self.page.pbGoStepKapton.setEnabled(mode_view and step_kapton_exists)
@@ -281,6 +304,7 @@ class func(object):
 	# NEW:
 	@enforce_mode('view')
 	def loadPart(self,*args,**kwargs):
+		print("Baseplate:  loadPart()")
 		if self.page.leID.text == "":
 			self.page.leStatus.setText("input an ID")
 			return
@@ -288,6 +312,7 @@ class func(object):
 		tmp_baseplate = fm.baseplate()
 		tmp_ID = self.page.leID.text()
 		tmp_exists = tmp_baseplate.load(tmp_ID)
+		print("tmp_exists:", tmp_exists)
 		#if not self.baseplate_exists:
 		if not tmp_exists:  # DNE; good to create
 			#ID = self.page.leID.text()
@@ -345,21 +370,24 @@ class func(object):
 		print("SAVING, ID=", self.baseplate.ID)
 
 		self.baseplate.shape          = str(self.page.cbShape.currentText())       if str(self.page.cbShape.currentText())       else None
-		self.baseplate.chirality      = str(self.page.cbChirality.currentText())   if str(self.page.cbChirality.currentText())   else None
+		#self.baseplate.chirality      = str(self.page.cbChirality.currentText())   if str(self.page.cbChirality.currentText())   else None
 		self.baseplate.material       = str(self.page.cbMaterial.currentText())    if str(self.page.cbMaterial.currentText())    else None
 		self.baseplate.institution    = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
-		self.baseplate.insertion_user = str(self.page.leInsertUser.text())         if str(self.page.leInsertUser.text())         else None
-		self.baseplate.manufacturer   = str(self.page.leManufacturer.text())       if str(self.page.leManufacturer.text())       else None
+		#self.baseplate.insertion_user = str(self.page.leInsertUser.text())         if str(self.page.leInsertUser.text())         else None
+		self.baseplate.insertion_user = str(self.page.cbInsertUser.currentText())  if str(self.page.cbInsertUser.currentText())  else None
+		#self.baseplate.manufacturer   = str(self.page.leManufacturer.text())       if str(self.page.leManufacturer.text())       else None
 		self.baseplate.location       = str(self.page.leLocation.text())           if str(self.page.leLocation.text())           else None
 		self.baseplate.barcode        = str(self.page.leBarcode.text())            if str(self.page.leBarcode.text())            else None
 		self.baseplate.nomthickness   =     self.page.dsbNomThickness.value()      if self.page.dsbNomThickness.value() >=0      else None
+		self.baseplate.flatness       =     self.page.dsbFlatness.value()          if self.page.dsbFlatness.value() >= 0         else None
+		self.baseplate.grade          = str(self.page.cbGrade.currentText())       if str(self.page.cbGrade.currentText())       else None
 
 		num_comments = self.page.listComments.count()
 		self.baseplate.comments = []
 		for i in range(num_comments):
 			self.baseplate.comments.append(str(self.page.listComments.item(i).text()))
 
-		self.baseplate.corner_heights = [_.value() if _.value()>=0 else None for _ in self.corners]
+		#self.baseplate.corner_heights = [_.value() if _.value()>=0 else None for _ in self.corners]
 		#self.baseplate.thickness = self.page.dsbThickness.value() if self.page.dsbThickness.value()>=0 else None
 
 		#self.baseplate.check_edges_firm = str(self.page.cbCheckEdgesFirm.currentText()) if str(self.page.cbCheckEdgesFirm.currentText()) else None
@@ -429,6 +457,13 @@ class func(object):
 		if ID != "":
 			self.setUIPage('modules',ID=ID)
 
+
+	def filesToUpload(self):
+		# Return a list of all files to upload to DB
+		if self.baseplate is None:
+			return []
+		else:
+			return self.baseplate.filesToUpload()
 
 
 	@enforce_mode('view')

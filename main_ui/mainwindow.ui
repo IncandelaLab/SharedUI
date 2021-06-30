@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1366</width>
+    <width>1417</width>
     <height>858</height>
    </rect>
   </property>
@@ -21,13 +21,57 @@
        <number>0</number>
       </property>
       <item>
-       <layout class="QVBoxLayout" name="vlUISelect" stretch="1,6,1,1,5,1,1,2,0,0,12">
+       <layout class="QVBoxLayout" name="vlUISelect" stretch="0,0,0,1,6,0,1,5,0,1,2,0,0,0">
         <property name="spacing">
          <number>0</number>
         </property>
         <property name="sizeConstraint">
          <enum>QLayout::SetDefaultConstraint</enum>
         </property>
+        <item>
+         <widget class="QLineEdit" name="lineEdit_4">
+          <property name="text">
+           <string>User management</string>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QListWidget" name="listUsers">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>40</height>
+           </size>
+          </property>
+          <item>
+           <property name="text">
+            <string>users</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
         <item>
          <widget class="QLineEdit" name="leInformation">
           <property name="text">
@@ -40,10 +84,16 @@
         </item>
         <item>
          <widget class="QListWidget" name="listInformation">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="minimumSize">
            <size>
             <width>0</width>
-            <height>155</height>
+            <height>150</height>
            </size>
           </property>
           <property name="currentRow">
@@ -99,7 +149,7 @@
           <property name="sizeHint" stdset="0">
            <size>
             <width>20</width>
-            <height>20</height>
+            <height>40</height>
            </size>
           </property>
          </spacer>
@@ -113,11 +163,27 @@
         </item>
         <item>
          <widget class="QListWidget" name="listAssembly">
-          <item>
-           <property name="text">
-            <string>kapton placement steps</string>
-           </property>
-          </item>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>65</height>
+           </size>
+          </property>
+          <property name="verticalScrollBarPolicy">
+           <enum>Qt::ScrollBarAlwaysOff</enum>
+          </property>
+          <property name="horizontalScrollBarPolicy">
+           <enum>Qt::ScrollBarAlwaysOff</enum>
+          </property>
+          <property name="autoScroll">
+           <bool>true</bool>
+          </property>
           <item>
            <property name="text">
             <string>sensor placement steps</string>
@@ -131,16 +197,6 @@
           <item>
            <property name="text">
             <string>wirebonding and encapsulating</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>unbiased DAQ</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>IV curve</string>
            </property>
           </item>
          </widget>
@@ -167,6 +223,18 @@
         </item>
         <item>
          <widget class="QListWidget" name="listShippingAndReceiving">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>40</height>
+           </size>
+          </property>
           <item>
            <property name="text">
             <string>shipments</string>
@@ -175,26 +243,157 @@
          </widget>
         </item>
         <item>
-         <spacer name="verticalSpacer_4">
+         <spacer name="verticalSpacer_5">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
             <width>20</width>
-            <height>25</height>
+            <height>70</height>
            </size>
           </property>
          </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="pbUpload">
-          <property name="enabled">
-           <bool>true</bool>
+         <widget class="QGroupBox" name="groupBox">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>200</height>
+           </size>
           </property>
-          <property name="text">
-           <string>Upload changes to database (WIP)</string>
+          <property name="title">
+           <string>GroupBox</string>
           </property>
+          <widget class="QLineEdit" name="lineEdit_3">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>226</width>
+             <height>25</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Uploading to the HGCAL DB</string>
+           </property>
+          </widget>
+          <widget class="QPushButton" name="pbUploadObject">
+           <property name="geometry">
+            <rect>
+             <x>29</x>
+             <y>30</y>
+             <width>171</width>
+             <height>25</height>
+            </rect>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>150</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>220</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Upload current object</string>
+           </property>
+          </widget>
+          <widget class="QLabel" name="label">
+           <property name="geometry">
+            <rect>
+             <x>5</x>
+             <y>70</y>
+             <width>221</width>
+             <height>17</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Upload objects created on date:</string>
+           </property>
+          </widget>
+          <widget class="QPushButton" name="pbUploadDate">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="geometry">
+            <rect>
+             <x>30</x>
+             <y>115</y>
+             <width>161</width>
+             <height>25</height>
+            </rect>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>150</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Upload objects</string>
+           </property>
+          </widget>
+          <widget class="QDateEdit" name="dUpload">
+           <property name="geometry">
+            <rect>
+             <x>35</x>
+             <y>90</y>
+             <width>151</width>
+             <height>26</height>
+            </rect>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>150</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="calendarPopup">
+            <bool>true</bool>
+           </property>
+           <property name="date">
+            <date>
+             <year>2021</year>
+             <month>1</month>
+             <day>1</day>
+            </date>
+           </property>
+          </widget>
+          <widget class="QLineEdit" name="leStatus">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>170</y>
+             <width>211</width>
+             <height>25</height>
+            </rect>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+          <widget class="QLabel" name="label_2">
+           <property name="geometry">
+            <rect>
+             <x>5</x>
+             <y>150</y>
+             <width>211</width>
+             <height>17</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Upload status</string>
+           </property>
+          </widget>
          </widget>
         </item>
         <item>
@@ -205,7 +404,7 @@
           <property name="sizeHint" stdset="0">
            <size>
             <width>20</width>
-            <height>20</height>
+            <height>30</height>
            </size>
           </property>
          </spacer>
@@ -248,7 +447,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1366</width>
+     <width>1417</width>
      <height>22</height>
     </rect>
    </property>

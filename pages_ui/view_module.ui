@@ -470,34 +470,6 @@
     <string>Add comment</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="cbChirality">
-   <property name="geometry">
-    <rect>
-     <x>190</x>
-     <y>309</y>
-     <width>101</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="currentIndex">
-    <number>-1</number>
-   </property>
-   <item>
-    <property name="text">
-     <string>achiral</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>left</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>right</string>
-    </property>
-   </item>
-  </widget>
   <widget class="QLineEdit" name="lineEdit_20">
    <property name="geometry">
     <rect>
@@ -509,22 +481,6 @@
    </property>
    <property name="text">
     <string>Shape</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_21">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>309</y>
-     <width>181</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Chirality</string>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -608,6 +564,9 @@
    </property>
   </widget>
   <widget class="QFrame" name="frame_5">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>340</x>
@@ -623,6 +582,9 @@
     <enum>QFrame::Plain</enum>
    </property>
    <widget class="QCheckBox" name="ckHvCablesAttached">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -636,6 +598,9 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="lineEdit_42">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>1</x>
@@ -652,6 +617,9 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="leHvCablesAttachedUser">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>180</x>
@@ -668,6 +636,9 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="lineEdit_43">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>1</x>
@@ -684,6 +655,9 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="lineEdit_44">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>1</x>
@@ -700,6 +674,9 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="lineEdit_45">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>1</x>
@@ -716,6 +693,9 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="leUnbiasedDaq">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>180</x>
@@ -732,6 +712,9 @@
     </property>
    </widget>
    <widget class="QComboBox" name="cbUnbiasedDaqOK">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>180</x>
@@ -755,6 +738,9 @@
     </item>
    </widget>
    <widget class="QLineEdit" name="leUnbiasedDaqUser">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>180</x>
@@ -771,6 +757,9 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="lineEdit_46">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>1</x>
@@ -787,6 +776,9 @@
     </property>
    </widget>
    <widget class="QComboBox" name="cbIvOK">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>170</x>
@@ -810,6 +802,9 @@
     </item>
    </widget>
    <widget class="QLineEdit" name="leIvUser">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>170</x>
@@ -826,6 +821,9 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="leIv">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>170</x>
@@ -842,6 +840,9 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="lineEdit_47">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>1</x>
@@ -858,6 +859,9 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="lineEdit_48">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>1</x>
@@ -874,6 +878,9 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="lineEdit_49">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>1</x>
@@ -890,6 +897,9 @@
     </property>
    </widget>
    <widget class="QComboBox" name="cbBiasedDaqOK">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>170</x>
@@ -913,6 +923,9 @@
     </item>
    </widget>
    <widget class="QLineEdit" name="leBiasedDaqVoltage">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>170</x>
@@ -929,6 +942,9 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="leBiasedDaq">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>170</x>
@@ -945,6 +961,9 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="lineEdit_50">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>1</x>
@@ -961,6 +980,9 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="lineEdit_51">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>1</x>
@@ -998,111 +1020,10 @@
    <zorder>leBiasedDaqVoltage</zorder>
    <zorder>cbBiasedDaqOK</zorder>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_28">
-   <property name="geometry">
-    <rect>
-     <x>680</x>
-     <y>470</y>
-     <width>211</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>DAQ datasets</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QListWidget" name="listDaqData">
-   <property name="geometry">
-    <rect>
-     <x>680</x>
-     <y>490</y>
-     <width>211</width>
-     <height>131</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbDaqAddToPlotter">
-   <property name="geometry">
-    <rect>
-     <x>680</x>
-     <y>620</y>
-     <width>171</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Add selected to plotter</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbDaqGoPlotter">
-   <property name="geometry">
-    <rect>
-     <x>680</x>
-     <y>640</y>
-     <width>101</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Go to plotter</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbIvGoPlotter">
-   <property name="geometry">
-    <rect>
-     <x>680</x>
-     <y>430</y>
-     <width>101</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Go to plotter</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbIvAddToPlotter">
-   <property name="geometry">
-    <rect>
-     <x>680</x>
-     <y>410</y>
-     <width>171</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Add selected to plotter</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_41">
-   <property name="geometry">
-    <rect>
-     <x>680</x>
-     <y>260</y>
-     <width>211</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>IV datasets</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QListWidget" name="listIvData">
-   <property name="geometry">
-    <rect>
-     <x>680</x>
-     <y>280</y>
-     <width>211</width>
-     <height>131</height>
-    </rect>
-   </property>
-  </widget>
   <widget class="QComboBox" name="cbShape">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>190</x>
@@ -1180,22 +1101,6 @@
    </property>
    <property name="text">
     <string>User name</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="leInsertUser">
-   <property name="geometry">
-    <rect>
-     <x>150</x>
-     <y>100</y>
-     <width>141</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string/>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -1426,6 +1331,82 @@
    </property>
    <property name="text">
     <string>Add files</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="cbInsertUser">
+   <property name="geometry">
+    <rect>
+     <x>150</x>
+     <y>100</y>
+     <width>141</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="currentIndex">
+    <number>-1</number>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_21">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>309</y>
+     <width>181</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Grade</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="cbGrade">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>190</x>
+     <y>310</y>
+     <width>101</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="currentIndex">
+    <number>-1</number>
+   </property>
+   <item>
+    <property name="text">
+     <string>A</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>B</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>C</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QCheckBox" name="ckWirebondingCompleted">
+   <property name="geometry">
+    <rect>
+     <x>340</x>
+     <y>350</y>
+     <width>201</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Wirebonding completed</string>
+   </property>
+   <property name="checkable">
+    <bool>false</bool>
    </property>
   </widget>
  </widget>

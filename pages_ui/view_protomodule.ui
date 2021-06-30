@@ -221,50 +221,6 @@
      </rect>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit_15">
-    <property name="geometry">
-     <rect>
-      <x>1</x>
-      <y>249</y>
-      <width>181</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Chirality</string>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="cbChirality">
-    <property name="geometry">
-     <rect>
-      <x>180</x>
-      <y>249</y>
-      <width>81</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="currentIndex">
-     <number>-1</number>
-    </property>
-    <item>
-     <property name="text">
-      <string>achiral</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>left</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>right</string>
-     </property>
-    </item>
-   </widget>
    <widget class="QLineEdit" name="lineEdit_4">
     <property name="geometry">
      <rect>
@@ -367,22 +323,6 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QLineEdit" name="leInsertUser">
-    <property name="geometry">
-     <rect>
-      <x>120</x>
-      <y>1</y>
-      <width>141</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
    <widget class="QLineEdit" name="lineEdit_38">
     <property name="geometry">
      <rect>
@@ -445,6 +385,66 @@
      </property>
     </item>
    </widget>
+   <widget class="QComboBox" name="cbInsertUser">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>0</y>
+      <width>141</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>-1</number>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="cbGrade">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>250</y>
+      <width>81</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>-1</number>
+    </property>
+    <item>
+     <property name="text">
+      <string>A</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>B</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>C</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_22">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>250</y>
+      <width>181</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Grade</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
    <zorder>lineEdit_9</zorder>
    <zorder>lineEdit_3</zorder>
    <zorder>leLocation</zorder>
@@ -456,8 +456,6 @@
    <zorder>pbDeleteComment</zorder>
    <zorder>pteWriteComment</zorder>
    <zorder>listComments</zorder>
-   <zorder>lineEdit_15</zorder>
-   <zorder>cbChirality</zorder>
    <zorder>lineEdit_4</zorder>
    <zorder>dsbThickness</zorder>
    <zorder>cbShape</zorder>
@@ -465,8 +463,10 @@
    <zorder>pbGoShipment</zorder>
    <zorder>lineEdit_52</zorder>
    <zorder>lineEdit_38</zorder>
-   <zorder>leInsertUser</zorder>
    <zorder>cbInstitution</zorder>
+   <zorder>cbInsertUser</zorder>
+   <zorder>cbGrade</zorder>
+   <zorder>lineEdit_22</zorder>
   </widget>
   <widget class="QFrame" name="frame_3">
    <property name="geometry">
@@ -601,7 +601,7 @@
    <property name="geometry">
     <rect>
      <x>500</x>
-     <y>400</y>
+     <y>360</y>
      <width>51</width>
      <height>21</height>
     </rect>
@@ -630,7 +630,7 @@
    <property name="geometry">
     <rect>
      <x>330</x>
-     <y>400</y>
+     <y>360</y>
      <width>91</width>
      <height>21</height>
     </rect>
@@ -694,7 +694,7 @@
    <property name="geometry">
     <rect>
      <x>330</x>
-     <y>360</y>
+     <y>320</y>
      <width>111</width>
      <height>16</height>
     </rect>
@@ -749,7 +749,7 @@
    <property name="geometry">
     <rect>
      <x>420</x>
-     <y>380</y>
+     <y>340</y>
      <width>81</width>
      <height>21</height>
     </rect>
@@ -768,7 +768,7 @@
    <property name="geometry">
     <rect>
      <x>330</x>
-     <y>380</y>
+     <y>340</y>
      <width>91</width>
      <height>21</height>
     </rect>
@@ -784,7 +784,7 @@
    <property name="geometry">
     <rect>
      <x>500</x>
-     <y>380</y>
+     <y>340</y>
      <width>51</width>
      <height>21</height>
     </rect>
@@ -836,38 +836,6 @@
    </property>
    <property name="text">
     <string>Flatness (mm)</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_22">
-   <property name="geometry">
-    <rect>
-     <x>330</x>
-     <y>290</y>
-     <width>191</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Check for cracks</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_23">
-   <property name="geometry">
-    <rect>
-     <x>330</x>
-     <y>310</y>
-     <width>191</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Check glue spillage</string>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -952,52 +920,6 @@
     <double>0.100000000000000</double>
    </property>
   </widget>
-  <widget class="QComboBox" name="cbCheckCracks">
-   <property name="geometry">
-    <rect>
-     <x>520</x>
-     <y>290</y>
-     <width>81</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="currentIndex">
-    <number>-1</number>
-   </property>
-   <item>
-    <property name="text">
-     <string>pass</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>fail</string>
-    </property>
-   </item>
-  </widget>
-  <widget class="QComboBox" name="cbCheckGlueSpill">
-   <property name="geometry">
-    <rect>
-     <x>520</x>
-     <y>310</y>
-     <width>81</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="currentIndex">
-    <number>-1</number>
-   </property>
-   <item>
-    <property name="text">
-     <string>pass</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>fail</string>
-    </property>
-   </item>
-  </widget>
   <widget class="QLabel" name="label_4">
    <property name="geometry">
     <rect>
@@ -1050,7 +972,7 @@
    <property name="geometry">
     <rect>
      <x>420</x>
-     <y>400</y>
+     <y>360</y>
      <width>81</width>
      <height>20</height>
     </rect>

@@ -16,6 +16,8 @@ Additionally, the [CMS DB loader](https://github.com/valdasraps/cmsdbldr) is now
 
 It's recommended to use Qt Creator for editing the .ui files.  If it's not already installed, you can download it from the Qt Creator tab of [this page.](https://www.qt.io/offline-installers)  After making changes to the .ui files, run the script `compile.sh` (or `compile.bat`) in the .ui files' directory to carry all of the changes over to the corresponding .py files.  (Note:  Adding new .ui files will require you to modify compile.sh and compile.bat accordingly.)
 
+In addition to the above requirements, all users will need a lxplus account.  Furthermore, you will need to add yourself to the cms-hgcal-assemblyOperators [E-group](https://e-groups.cern.ch/e-groups/EgroupsSearchForm.do) in order to get permission to upload to the DB.
+
 ## Running and using the GUI
 
 Running the GUI is straightforward:  Run `python mainUI.py` in a terminal to launch it.  On Windows, you can run the batch file `run.bat` instead through either the terminal or the file manager.  All data will automatically be stored as .json files in the directory `/path/to/SharedUI/filemanager_data`.  (Some pages will also produce one or more XML files, but this is still preliminary.)

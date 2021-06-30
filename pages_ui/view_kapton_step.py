@@ -49,9 +49,6 @@ class Ui_Form(object):
         self.pbGoSensor5 = QtWidgets.QPushButton(Form)
         self.pbGoSensor5.setGeometry(QtCore.QRect(300, 240, 51, 21))
         self.pbGoSensor5.setObjectName("pbGoSensor5")
-        self.leUserPerformed = QtWidgets.QLineEdit(Form)
-        self.leUserPerformed.setGeometry(QtCore.QRect(650, 140, 121, 20))
-        self.leUserPerformed.setObjectName("leUserPerformed")
         self.leCureTemperature = QtWidgets.QLineEdit(Form)
         self.leCureTemperature.setGeometry(QtCore.QRect(630, 240, 151, 20))
         self.leCureTemperature.setObjectName("leCureTemperature")
@@ -275,9 +272,13 @@ class Ui_Form(object):
         self.cbInstitution.addItem("")
         self.cbInstitution.addItem("")
         self.cbInstitution.addItem("")
+        self.cbUserPerformed = QtWidgets.QComboBox(Form)
+        self.cbUserPerformed.setGeometry(QtCore.QRect(650, 140, 121, 21))
+        self.cbUserPerformed.setObjectName("cbUserPerformed")
 
         self.retranslateUi(Form)
         self.cbInstitution.setCurrentIndex(-1)
+        self.cbUserPerformed.setCurrentIndex(-1)
         QtCore.QMetaObject.connectSlotsByName(Form)
 
     def retranslateUi(self, Form):

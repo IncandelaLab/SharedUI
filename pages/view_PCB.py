@@ -1,6 +1,7 @@
 from filemanager import fm
 import os
 import shutil
+import glob
 
 from PyQt5.QtWidgets import QFileDialog, QWidget
 
@@ -69,14 +70,21 @@ INDEX_RESOLUTION_TYPE = {
 	'LD':1,
 }
 
+INDEX_GRADE = {
+	'A':0,
+	'B':1,
+	'C':2,
+}
+
 class Filewindow(QWidget):
 	def __init__(self):
 		super(Filewindow, self).__init__()
 
-	def getfile(self,*args,**kwargs):
-		fname, fmt = QFileDialog.getOpenFileName(self, 'Open file', '~',"(*.jpg *.png *.xml)")
-		print("File dialog:  got file", fname)
-		return fname
+	def getdir(self,*args,**kwargs):
+		#fname, fmt = QFileDialog.getOpenFileName(self, 'Open file', '~',"(*.root)")
+		dname = str(QFileDialog.getExistingDirectory(self, "Select directory"))
+		print("File dialog:  got directory", fname)
+		return dname
 
 
 
@@ -87,7 +95,7 @@ class func(object):
 		self.setMainSwitchingEnabled = setSwitchingEnabled
 
 		self.pcb = fm.pcb()
-		self.pcb_exists = None
+		self.pcb_exists = False
 
 		self.mode = 'setup'
 
@@ -157,12 +165,17 @@ class func(object):
 		self.page.pbGoStepPcb.clicked.connect(self.goStepPcb)
 		self.page.pbGoModule.clicked.connect(self.goModule)
 
-		self.page.pbAddToPlotter.clicked.connect(self.addToPlotter)
-		self.page.pbGoPlotter.clicked.connect(self.goPlotter)
+		#self.page.pbAddToPlotter.clicked.connect(self.addToPlotter)
+		#self.page.pbGoPlotter.clicked.connect(self.goPlotter)
 
 		self.fwnd = Filewindow()
 		self.page.pbAddFiles.clicked.connect(self.getFile)
 		self.page.pbDeleteFile.clicked.connect(self.deleteFile)
+
+		auth_users = fm.userManager.getAuthorizedUsers(PAGE_NAME)
+		self.index_users = {auth_users[i]:i for i in range(len(auth_users))}
+		for user in self.index_users.keys():
+			self.page.cbInsertUser.addItem(user)
 
 
 	@enforce_mode(['view', 'editing', 'creating'])
@@ -173,28 +186,32 @@ class func(object):
 		else:
 			#self.page.sbID.setValue(ID)
 			self.page.leID.setText(ID)
-		if do_load:
-			self.pcb_exists = self.pcb.load(ID)
-		else:
-			self.pcb_exists = False
+		#if do_load:
+		#	self.pcb_exists = self.pcb.load(ID)
+		#else:
+		#	self.pcb_exists = False
 		
-		#self.pcb_exists = self.pcb.load(ID)
-
 		#self.page.leID.setText(self.pcb.ID)
 
 		self.page.listShipments.clear()
 		for shipment in self.pcb.shipments:
 			self.page.listShipments.addItem(str(shipment))
 
-		self.page.leInsertUser.setText(  "" if self.pcb.insertion_user is None else self.pcb.insertion_user)
+		#self.page.leInsertUser.setText(  "" if self.pcb.insertion_user is None else self.pcb.insertion_user)
 		self.page.leLocation.setText(    "" if self.pcb.location       is None else self.pcb.location    )
 		self.page.leBarcode.setText(     "" if self.pcb.barcode        is None else self.pcb.barcode     )
 		self.page.leManufacturer.setText("" if self.pcb.manufacturer   is None else self.pcb.manufacturer)
 		self.page.cbType.setCurrentIndex(          INDEX_TYPE.get(           self.pcb.type,-1)           )
 		self.page.cbResolutionType.setCurrentIndex(INDEX_RESOLUTION_TYPE.get(self.pcb.resolution_type,-1))
 		self.page.cbShape.setCurrentIndex(         INDEX_SHAPE.get(          self.pcb.shape,-1)          )
-		self.page.cbChirality.setCurrentIndex(     INDEX_CHIRALITY.get(      self.pcb.chirality,-1)      )
+		#self.page.cbChirality.setCurrentIndex(     INDEX_CHIRALITY.get(      self.pcb.chirality,-1)      )
+		self.page.cbGrade.setCurrentIndex(         INDEX_GRADE.get(          self.pcb.grade, -1)         )
 		self.page.cbInstitution.setCurrentIndex(   INDEX_INSTITUTION.get(    self.pcb.institution, -1)   )
+		if not self.pcb.insertion_user in self.index_users.keys() and not self.pcb.insertion_user is None:
+			# Insertion user was deleted from user page...just add user to the dropdown
+			self.index_users[self.pcb.insertion_user] = max(self.index_users.values()) + 1
+			self.page.cbInsertUser.addItem(self.pcb.insertion_user)
+		self.page.cbInsertUser.setCurrentIndex(self.index_users.get(self.pcb.insertion_user, -1))
 		self.page.sbChannels.setValue(-1 if self.pcb.channels is None else self.pcb.channels)
 		self.page.sbNumRocs.setValue( -1 if self.pcb.num_rocs is None else self.pcb.num_rocs)
 		if self.page.sbChannels.value() == -1: self.page.sbChannels.clear()
@@ -204,9 +221,9 @@ class func(object):
 			self.page.listComments.addItem(comment)
 		self.page.pteWriteComment.clear()
 
-		self.page.leDaq.setText("" if self.pcb.daq is None else self.pcb.daq)
-		self.page.cbInspection.setCurrentIndex(INDEX_CHECK.get(self.pcb.inspection, -1))
-		self.page.cbDaqOK.setCurrentIndex(     INDEX_CHECK.get(self.pcb.daq_ok    , -1))
+		#self.page.leDaq.setText("" if self.pcb.daq is None else self.pcb.daq)
+		self.page.cbGrade.setCurrentIndex(INDEX_GRADE.get(self.pcb.grade, -1))
+		#self.page.cbDaqOK.setCurrentIndex(     INDEX_CHECK.get(self.pcb.daq_ok    , -1))
 		self.page.dsbFlatness.setValue( -1 if self.pcb.flatness  is None else self.pcb.flatness )
 		self.page.dsbThickness.setValue(-1 if self.pcb.thickness is None else self.pcb.thickness)
 		if self.page.dsbFlatness.value()  == -1: self.page.dsbFlatness.clear()
@@ -218,9 +235,9 @@ class func(object):
 		if self.page.sbStepPcb.value() == -1: self.page.sbStepPcb.clear()
 		#if self.page.sbModule.value()  == -1: self.page.sbModule.clear()
 
-		self.page.listDaqData.clear()
-		for daq in self.pcb.daq_data:
-			self.page.listDaqData.addItem(daq)
+		#self.page.listDaqData.clear()
+		#for daq in self.pcb.daq_data:
+		#	self.page.listDaqData.addItem(daq)
 
 		self.page.listFiles.clear()
 		for f in self.pcb.test_files:
@@ -237,7 +254,7 @@ class func(object):
 
 		pcb_exists      = self.pcb_exists
 		shipments_exist = self.page.listShipments.count() > 0
-		daq_data_exists = self.page.listDaqData.count()   > 0
+		#daq_data_exists = self.page.listDaqData.count()   > 0
 
 		step_pcb_exists = self.page.sbStepPcb.value() >=0
 		#module_exists   = self.page.sbModule.value()  >=0
@@ -260,15 +277,17 @@ class func(object):
 
 		self.page.pbGoShipment.setEnabled(mode_view and shipments_exist)
 
-		self.page.leInsertUser.setReadOnly(   not (mode_creating or mode_editing) )
+		#self.page.leInsertUser.setReadOnly(   not (mode_creating or mode_editing) )
 		self.page.leLocation.setReadOnly(     not (mode_creating or mode_editing) )
 		self.page.leBarcode.setReadOnly(      not (mode_creating or mode_editing) )
 		self.page.leManufacturer.setReadOnly( not (mode_creating or mode_editing) )
 		self.page.cbType.setEnabled(               mode_creating or mode_editing  )
 		self.page.cbResolutionType.setEnabled(     mode_creating or mode_editing  )
 		self.page.cbShape.setEnabled(              mode_creating or mode_editing  )
-		self.page.cbChirality.setEnabled(          mode_creating or mode_editing  )
+		self.page.cbGrade.setEnabled(              mode_creating or mode_editing  )
+		#self.page.cbChirality.setEnabled(          mode_creating or mode_editing  )
 		self.page.cbInstitution.setEnabled(        mode_creating or mode_editing  )
+		self.page.cbInsertUser.setEnabled(         mode_creating or mode_editing  )
 		self.page.sbNumRocs.setReadOnly(      not (mode_creating or mode_editing) )
 		self.page.sbChannels.setReadOnly(     not (mode_creating or mode_editing) )
 
@@ -276,14 +295,14 @@ class func(object):
 		self.page.pbAddComment.setEnabled(   mode_creating or mode_editing)
 		self.page.pteWriteComment.setEnabled(mode_creating or mode_editing)
 
-		self.page.leDaq.setReadOnly(        not (mode_creating or mode_editing) )
-		self.page.cbInspection.setEnabled(       mode_creating or mode_editing  )
-		self.page.cbDaqOK.setEnabled(            mode_creating or mode_editing  )
+		#self.page.leDaq.setReadOnly(        not (mode_creating or mode_editing) )
+		self.page.cbGrade.setEnabled(            mode_creating or mode_editing  )
+		#self.page.cbDaqOK.setEnabled(            mode_creating or mode_editing  )
 		self.page.dsbFlatness.setReadOnly(  not (mode_creating or mode_editing) )
 		self.page.dsbThickness.setReadOnly( not (mode_creating or mode_editing) )
 
-		self.page.pbAddToPlotter.setEnabled(mode_view and daq_data_exists)
-		self.page.pbGoPlotter.setEnabled(   mode_view and daq_data_exists)
+		#self.page.pbAddToPlotter.setEnabled(mode_view and daq_data_exists)
+		#self.page.pbGoPlotter.setEnabled(   mode_view and daq_data_exists)
 
 		self.page.pbAddFiles.setEnabled(mode_creating or mode_editing)
 		self.page.pbDeleteFile.setEnabled(mode_creating or mode_editing)
@@ -346,7 +365,7 @@ class func(object):
 	@enforce_mode(['editing','creating'])
 	def saveEditing(self,*args,**kwargs):
 
-		self.pcb.insertion_user  = str(self.page.leInsertUser.text()      )   if str(self.page.leInsertUser.text()        ) else None
+		#self.pcb.insertion_user  = str(self.page.leInsertUser.text()      )   if str(self.page.leInsertUser.text()        ) else None
 		self.pcb.location        = str(self.page.leLocation.text()        )   if str(self.page.leLocation.text()          ) else None
 		self.pcb.barcode         = str(self.page.leBarcode.text()         )   if str(self.page.leBarcode.text()           ) else None
 		self.pcb.manufacturer    = str(self.page.leManufacturer.text()    )   if str(self.page.leManufacturer.text()      ) else None
@@ -354,8 +373,10 @@ class func(object):
 		self.pcb.resolution_type = str(self.page.cbResolutionType.currentText()) \
                                                                               if str(self.page.cbType.currentText()       ) else None
 		self.pcb.shape           = str(self.page.cbShape.currentText()    )   if str(self.page.cbShape.currentText()      ) else None
-		self.pcb.chirality       = str(self.page.cbChirality.currentText())   if str(self.page.cbChirality.currentText()  ) else None
+		self.pcb.grade           = str(self.page.cbGrade.currentText()    )   if str(self.page.cbGrade.currentText()      ) else None
+		#self.pcb.chirality       = str(self.page.cbChirality.currentText())   if str(self.page.cbChirality.currentText()  ) else None
 		self.pcb.institution     = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
+		self.pcb.insertion_user  = str(self.page.cbInsertUser.currentText())  if str(self.page.cbInsertUser.currentText())  else None
 		self.pcb.num_rocs        = self.page.sbNumRocs.value()  if self.page.sbNumRocs.value()  >=0 else None
 		self.pcb.channels        = self.page.sbChannels.value() if self.page.sbChannels.value() >=0 else None
 
@@ -364,9 +385,9 @@ class func(object):
 		for i in range(num_comments):
 			self.pcb.comments.append(str(self.page.listComments.item(i).text()))
 
-		self.pcb.daq        = str(self.page.leDaq.text()              ) if str(self.page.leDaq.text()              ) else None
-		self.pcb.inspection = str(self.page.cbInspection.currentText()) if str(self.page.cbInspection.currentText()) else None
-		self.pcb.daq_ok     = str(self.page.cbDaqOK.currentText()     ) if str(self.page.cbDaqOK.currentText()     ) else None
+		#self.pcb.daq        = str(self.page.leDaq.text()              ) if str(self.page.leDaq.text()              ) else None
+		self.pcb.grade      = str(self.page.cbGrade.currentText())      if str(self.page.cbGrade.currentText())      else None
+		#self.pcb.daq_ok     = str(self.page.cbDaqOK.currentText()     ) if str(self.page.cbDaqOK.currentText()     ) else None
 		self.pcb.flatness   =     self.page.dsbFlatness.value()         if     self.page.dsbFlatness.value()  >=0    else None
 		self.pcb.thickness  =     self.page.dsbThickness.value()        if     self.page.dsbThickness.value() >=0    else None
 
@@ -428,20 +449,25 @@ class func(object):
 
 	@enforce_mode(['editing', 'creating'])
 	def getFile(self,*args,**kwargs):
-		f = self.fwnd.getfile()
-		if f:
+		f = self.fwnd.getdir()
+		# Directory containing root files.  Search recursively for roots:
+		files = glob.glob(f + '/**/*.root', recursive=True)
+		if files != []:
 			# Need to call this to ensure that necessary dirs for storing item are created
-			print("Got file.  Saving to ensure creation of filemanager location...")
+			print("Got files.  Saving to ensure creation of filemanager location...")
 			self.pcb.save()
-
-			fname = os.path.split(f)[1]  # Name of file
-			fdir, fname_ = self.pcb.get_filedir_filename()
-			new_filepath = fdir + '/' + fname
-			print("GETFILE:  Copying file", f, "to", new_filepath)
-			shutil.copyfile(f, new_filepath)
-			self.page.listComments.addItem(new_filepath)
-			self.pcb.test_files.append(new_filepath)
+			for f in files:
+				fname = os.path.split(f)[1]  # Name of file
+				fdir, fname_ = self.pcb.get_filedir_filename()
+				tmp_filepath = (fdir + '/' + fname).rsplit('.', 1)  # Only want the last . to get replaced...
+				new_filepath = "_upload.".join(tmp_filepath)
+				print("GETFILE:  Copying file", f, "to", new_filepath)
+				shutil.copyfile(f, new_filepath)
+				self.page.listComments.addItem(new_filepath)
+				self.pcb.test_files.append(new_filepath)
 			self.update_info()
+		else:
+			print("WARNING:  Failed to find root files in chosen directory!")
 
 	@enforce_mode(['editing', 'creating'])
 	def deleteFile(self,*args,**kwargs):
@@ -457,6 +483,13 @@ class func(object):
 			self.pcb.test_files.remove(new_filepath)
 			self.update_info()
 
+
+	def filesToUpload(self):
+		# Return a list of all files to upload to DB
+		if self.pcb is None:
+			return []
+		else:
+			return self.pcb.filesToUpload()
 
 
 	@enforce_mode('view')

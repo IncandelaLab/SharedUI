@@ -27,8 +27,6 @@ I_TRAY_COMPONENT_DNE = "sensor component tray does not exist or is not selected"
 I_TRAY_ASSEMBLY_DNE  = "assembly tray does not exist or is not selected"
 I_BATCH_ARALDITE_DNE     = "araldite batch does not exist or is not selected"
 I_BATCH_ARALDITE_EXPIRED = "araldite batch has expired"
-I_BATCH_LOCTITE_DNE      = "loctite batch does not exist or is not selected"
-I_BATCH_LOCTITE_EXPIRED  = "loctite batch has expired"
 
 # baseplates
 I_BASEPLATE_NOT_READY    = "baseplate(s) in position(s) {} is not ready for sensor application. reason: {}"
@@ -61,6 +59,9 @@ I_SIZE_MISMATCH_8 = "* list of 8-inch objects selected: {}"
 # institution
 I_INSTITUTION = "some selected objects are not at this institution: {}"
 
+# Missing user
+I_USER_DNE = "no kapton step user selected"
+
 # supply batch empty
 I_BATCH_ARALDITE_EMPTY = "araldite batch is empty"
 
@@ -83,7 +84,7 @@ class func(object):
 		self.tray_component_sensor = fm.tray_component_sensor()
 		self.tray_assembly         = fm.tray_assembly()
 		self.batch_araldite        = fm.batch_araldite()
-		self.batch_loctite         = fm.batch_loctite()
+		#self.batch_loctite         = fm.batch_loctite()
 
 		self.step_pcb = fm.step_pcb()
 		self.step_pcb_exists = None
@@ -259,6 +260,13 @@ class func(object):
 		self.page.pbGoTrayComponent.clicked.connect(self.goTrayComponent)
 
 		self.page.pbRunStartNow     .clicked.connect(self.setRunStartNow)
+		self.page.pbRunStopNow      .clicked.connect(self.setRunStopNow)
+
+		auth_users = fm.userManager.getAuthorizedUsers(PAGE_NAME)
+		self.index_users = {auth_users[i]:i for i in range(len(auth_users))}
+		for user in self.index_users.keys():
+			self.page.cbUserPerformed.addItem(user)
+
 
 	@enforce_mode('view')
 	def update_info(self,ID=None,*args,**kwargs):
@@ -275,7 +283,12 @@ class func(object):
 		if self.step_pcb_exists:
 			self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.step_pcb.institution, -1))
 
-			self.page.leUserPerformed.setText(self.step_pcb.user_performed)
+			#self.page.leUserPerformed.setText(self.step_pcb.user_performed)
+			if not self.step_pcb.user_performed in self.index_users.keys() and not self.step_pcb.user_performed is None:
+				# Insertion user was deleted from user page...just add user to the dropdown
+				self.index_users[self.step_pcb.user_performed] = max(self.index_users.values()) + 1
+				self.page.cbUserPerformed.addItem(self.step_pcb.user_performed)
+			self.page.cbUserPerformed.setCurrentIndex(self.index_users.get(self.step_pcb.user_performed, -1))
 			self.page.leLocation.setText(self.step_pcb.location)
 
 			#date_performed = self.step_pcb.date_performed  #Now redundant
@@ -293,9 +306,18 @@ class func(object):
 				localtime = list(time.localtime(run_start))
 				self.page.dtRunStart.setDate(QtCore.QDate(*localtime[0:3]))
 				self.page.dtRunStart.setTime(QtCore.QTime(*localtime[3:6]))
+			if run_stop is None:
+				self.page.dtRunStop.setDate(QtCore.QDate(*NO_DATE))
+				self.page.dtRunStop.setTime(QtCore.QTime(0,0,0))
+			else:
+				localtime = list(time.localtime(run_stop))
+				self.page.dtRunStop.setDate(QtCore.QDate(*localtime[0:3]))
+				self.page.dtRunStop.setTime(QtCore.QTime(*localtime[3:6]))
 
-			self.page.leCureTemperature.setText(self.step_pcb.cure_temperature)
-			self.page.leCureHumidity.setText(self.step_pcb.cure_humidity)
+			#self.page.leCureTemperature.setText(self.step_pcb.cure_temperature)
+			#self.page.leCureHumidity.setText(self.step_pcb.cure_humidity)
+			self.page.dsbCureTemperature.setValue(self.step_pcb.cure_temperature if self.step_pcb.cure_temperature else 70)
+			self.page.sbCureHumidity    .setValue(self.step_pcb.cure_humidity    if self.step_pcb.cure_humidity    else 10)
 
 			self.page.sbBatchAraldite.setValue(self.step_pcb.batch_araldite if not (self.step_pcb.batch_araldite is None) else -1)
 			self.page.sbTrayAssembly.setValue( self.step_pcb.tray_assembly  if not (self.step_pcb.tray_assembly  is None) else -1)
@@ -309,6 +331,7 @@ class func(object):
 					self.sb_tools[i].setValue(-1)
 
 			if not (self.step_pcb.pcbs is None):
+				print("self.pcbs:", self.step_pcb.pcbs)
 				for i in range(6):
 					#self.sb_pcbs[i].setValue(self.step_pcb.pcbs[i] if not (self.step_pcb.pcbs[i] is None) else -1)
 					self.le_pcbs[i].setText(self.step_pcb.pcbs[i] if not (self.step_pcb.pcbs[i] is None) else "")
@@ -337,12 +360,17 @@ class func(object):
 
 		else:
 			self.page.cbInstitution.setCurrentIndex(-1)
-			self.page.leUserPerformed.setText("")
+			#self.page.leUserPerformed.setText("")
+			self.page.cbUserPerformed.setCurrentIndex(-1)
 			self.page.leLocation.setText("")
 			self.page.dtRunStart.setDate(QtCore.QDate(*NO_DATE))
 			self.page.dtRunStart.setTime(QtCore.QTime(0,0,0))
-			self.page.leCureTemperature.setText("")
-			self.page.leCureHumidity.setText("")
+			self.page.dtRunStop.setDate(QtCore.QDate(*NO_DATE))
+			self.page.dtRunStop.setTime(QtCore.QTime(0,0,0))
+			#self.page.leCureTemperature.setText("")
+			#self.page.leCureHumidity.setText("")
+			self.page.dsbCureTemperature.setValue(-1)
+			self.page.sbCureHumidity.setValue(-1)
 			self.page.sbBatchAraldite.setValue(-1)
 			self.page.sbTrayComponent.setValue(-1)
 			self.page.sbTrayAssembly.setValue(-1)
@@ -388,12 +416,16 @@ class func(object):
 		self.page.cbInstitution.setEnabled(mode_creating or mode_editing)
 
 		self.page.pbRunStartNow     .setEnabled(mode_creating or mode_editing)
+		self.page.pbRunStopNow      .setEnabled(mode_creating or mode_editing)
 
-		self.page.leUserPerformed  .setReadOnly(mode_view)
+		#self.page.leUserPerformed  .setReadOnly(mode_view)
+		self.page.cbUserPerformed  .setEnabled( mode_creating or mode_editing)
 		self.page.leLocation       .setReadOnly(mode_view)
 		self.page.dtRunStart       .setReadOnly(mode_view)
-		self.page.leCureTemperature.setReadOnly(mode_view)
-		self.page.leCureHumidity   .setReadOnly(mode_view)
+		#self.page.leCureTemperature.setReadOnly(mode_view)
+		#self.page.leCureHumidity   .setReadOnly(mode_view)
+		self.page.dsbCureTemperature.setReadOnly(mode_view)
+		self.page.sbCureHumidity   .setReadOnly(mode_view)
 		self.page.sbTrayComponent  .setReadOnly(mode_view)
 		self.page.sbTrayAssembly   .setReadOnly(mode_view)
 		self.page.sbBatchAraldite  .setReadOnly(mode_view)
@@ -475,7 +507,7 @@ class func(object):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
 		#self.baseplates[which].load(self.sb_baseplates[which].value())
-		self.baseplates[which].load(self.le_baseplates[which].text())
+		self.baseplates[which].load(self.le_baseplates[which].text(), query_db=False)
 		self.updateIssues()
 
 	@enforce_mode(['editing','creating'])
@@ -483,7 +515,7 @@ class func(object):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
 		#self.pcbs[which].load(self.sb_pcbs[which].value())
-		self.pcbs[which].load(self.le_pcbs[which].text())
+		self.pcbs[which].load(self.le_pcbs[which].text(), query_db=False)
 		self.updateIssues()
 
 	#New
@@ -492,7 +524,7 @@ class func(object):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
 		#self.protomodules[which].load(self.sb_protomodules[which].value())
-		self.protomodules[which].load(self.le_protomodules[which].text())
+		self.protomodules[which].load(self.le_protomodules[which].text(), query_db=False)
 		self.updateIssues()
 
 	@enforce_mode(['editing','creating'])
@@ -500,7 +532,7 @@ class func(object):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
 		#self.modules[which].load(self.sb_modules[which].value())
-		self.modules[which].load(self.le_modules[which].text())
+		self.modules[which].load(self.le_modules[which].text(), query_db=False)
 		self.updateIssues()
 
 
@@ -535,8 +567,11 @@ class func(object):
 		issues = []
 		objects = []
 
-		if self.step_pcb.institution == None:
+		if self.step_pcb.institution is None:
 			issues.append(I_INSTITUTION_NOT_SELECTED)
+
+		#if self.step_pcb.user_performed is None:
+		#	issues.append(I_USER_DNE)
 
 		# tooling and supplies--copied over
 		if self.tray_component_sensor.ID is None:
@@ -554,9 +589,10 @@ class func(object):
 		else:
 			objects.append(self.batch_araldite)
 			if not (self.batch_araldite.date_expires is None):
-				expires = datetime.date(*self.batch_araldite.date_expires)
-				today = datetime.date(*time.localtime()[:3])
-				if today > expires:
+				ydm = self.batch_araldite.date_expires.split('-')
+				expires = QtCore.QDate(int(ydm[2]), int(ydm[0]), int(ydm[1]))  #datetime.date(*self.batch_araldite.date_expires)
+				#today = datetime.date(*time.localtime()[:3])
+				if QtCore.QDate.currentDate() > expires:
 					issues.append(I_BATCH_ARALDITE_EXPIRED)
 			if self.batch_araldite.is_empty:
 				issues.append(I_BATCH_ARALDITE_EMPTY)
@@ -720,17 +756,20 @@ class func(object):
 	def saveEditing(self,*args,**kwargs):
 		self.step_pcb.institution = self.page.cbInstitution.currentText()
 
-		self.step_pcb.user_performed = str( self.page.leUserPerformed.text() )
+		#self.step_pcb.user_performed = str( self.page.leUserPerformed.text() )
+		self.step_pcb.user_performed = str(self.page.cbUserPerformed.currentText()) if str(self.page.cbUserPerformed.currentText()) else None
 		self.step_pcb.location = str( self.page.leLocation.text() )
 
 		#if self.page.dtRunStart.date().year() == NO_DATE[0]:
 		#	self.step_pcb.run_start = None
 		#else:
 		self.step_pcb.run_start = self.page.dtRunStart.dateTime().toTime_t()
+		self.step_pcb.run_stop  = self.page.dtRunStop.dateTime().toTime_t()
 
-
-		self.step_pcb.cure_humidity    = str(self.page.leCureHumidity.text())
-		self.step_pcb.cure_temperature = str(self.page.leCureTemperature.text())
+		#self.step_pcb.cure_humidity    = str(self.page.leCureHumidity.text())
+		#self.step_pcb.cure_temperature = str(self.page.leCureTemperature.text())
+		self.step_pcb.cure_humidity = self.page.sbCureHumidity.value()
+		self.step_pcb.cure_temperature = self.page.dsbCureTemperature.value()
 
 		tools        = []
 		pcbs         = []
@@ -772,7 +811,8 @@ class func(object):
 				temp_module.channels       = self.protomodules[i].channels
 				temp_module.size           = self.protomodules[i].size
 				temp_module.shape          = self.protomodules[i].shape
-				temp_module.chirality      = self.protomodules[i].chirality
+				temp_module.grade          = self.protomodules[i].grade
+				#temp_module.chirality      = self.protomodules[i].chirality
 
 				temp_module.baseplate      = self.protomodules[i].baseplate
 				temp_module.sensor         = self.protomodules[i].sensor
@@ -841,6 +881,18 @@ class func(object):
 		localtime = time.localtime()
 		self.page.dtRunStart.setDate(QtCore.QDate(*localtime[0:3]))
 		self.page.dtRunStart.setTime(QtCore.QTime(*localtime[3:6]))
+
+	def setRunStopNow(self, *args, **kwargs):
+		localtime = time.localtime()
+		self.page.dtRunStop.setDate(QtCore.QDate(*localtime[0:3]))
+		self.page.dtRunStop.setTime(QtCore.QTime(*localtime[3:6]))
+	
+	def filesToUpload(self):
+		# Return a list of all files to upload to DB
+		if self.step_pcb is None:
+			return []
+		else:
+			return self.step_pcb.filesToUpload()
 
 
 	@enforce_mode('view')
