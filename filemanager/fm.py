@@ -404,6 +404,7 @@ class fsobj(object):
 
 		self._load_from_dict(self.XML_STRUCT_DICT, xml_tree)
 
+		self.ID = ID
 		return True
 
 
@@ -528,9 +529,11 @@ class fsobj(object):
 			# item is a list (comments), dict (another XML layer), or string (var)
 			# If string, use getattr()
 			print("    dict_to_element:  name, dict are:", item_name, item)
+			"""
 			if item_name == 'DATA_SET':
 				# If DATA_SET found, need to append 1-6 separate elements, one for each part
 				# Find number of parts:  will be either protos or modules
+				print("dict_to_element:  found DATA_SET")
 				if not getattr(self, 'protomodules', None) is None:
 					num_parts = len(getattr(self, 'protomodules'))
 				elif not getattr(self, 'modules', None) is None:
@@ -545,8 +548,9 @@ class fsobj(object):
 					if data_set_dict is None:  print("ERROR: tried to use {} as DATA_SET dictionary".format(element_name))
 					child = self.dict_to_element(data_set_dict, element_name, data_set_index=i)  # New DATA_SET dict
 					parent.append(child)
+			"""
 
-			elif type(item) == dict:
+			if type(item) == dict:
 				print("  **Dict found.  Calling recursive case...")
 				# Recursive case: Create an element from the child dictionary.
 				# "Remember" whether currently in a DATA_SET
@@ -569,6 +573,7 @@ class fsobj(object):
 				# Base case 1:  List of comments.  Create an element for each one.
 				print("    Found list: ", getattr(self, item, None))
 				# Check for empty list!
+
 				if getattr(self, item, None) == []:
 					# If empty, need to add a placeholder so load() knows to add an empty list
 					child = Element(item_name)
@@ -577,6 +582,7 @@ class fsobj(object):
 				#else:
 				# If currently in a DATA_SET, need to treat differently!
 				if data_set_index:
+					print("FOUND DATA_SET LIST!  Adding item i:", data_set_index, str(getattr(self, item, None)[data_set_index]))
 					child = Element(item_name)
 					child.text = str(getattr(self, item, None)[data_set_index])
 					parent.append(child)
@@ -739,6 +745,7 @@ class fsobj_tool(fsobj):
 		print("Finished loading, ID type is ", type(self.ID))
 		print("...and location is", self.location)
 
+		self.ID = ID
 		return True
 
 
@@ -865,6 +872,7 @@ class fsobj_part(fsobj):
 		xml_tree = parse(xml_file)
 		self._load_from_dict(self.XML_STRUCT_DICT, xml_tree)
 
+		self.ID = ID
 		return True
 
 
@@ -1049,6 +1057,7 @@ class fsobj_assembly(fsobj):
 			setattr(self, var, idt)
 		"""
 
+		self.ID = ID
 		return True
 
 
