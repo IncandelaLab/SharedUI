@@ -495,32 +495,14 @@ class fsobj(object):
 		# structured according to that dictionary.
 		# NOTE:  This must be able to work recursively.  I.e. if one of the objs in the input_dict is a dict,
 		#    it reads *that* dictionary and creates an element for it, +appends it to current element.  Etc.
-		print("dict_to_element: element {}, input dict is".format(element_name))
+		print("***dict_to_element:*** element {}, input dict is".format(element_name))
 		print(input_dict, type(input_dict))
+		print("data_set_index:", data_set_index)
 
 		# NEW:  Add special case for multi-item assembly steps.  Will always appear in DATA_SET dict.
 		# If in DATA_SET, data_set_index will NOT be None.  If not None, and a list is found, return element i instead of the usual list handling case.
 		# ALT (since need to append all 6 DSs in special case:
-		"""
-		if element_name == 'DATA_SET' and type(input_dict) is str:
-			print("FOUND DATA SET")
-			# Create one DATA_SET for every module/protomodule found.
-			num_parts = 0
-			if not getattr(self, 'protomodules', None) is None:
-				num_parts = len(getattr(self, 'protomodules'))
-			elif not getattr(self, 'modules', None) is None:
-				num_parts = len(getattr(self, 'modules'))
-			else:
-				print("ERROR:  Got DATA_SET item, but object has no modules or protomodules!")
-			print("Found {} parts in dataset".format(num_parts))
-			for i in range(num_parts):
-				# For each part, use input_dict (is a str, usually 'DATA_SET_DICT')
-				data_set_dict = getattr(self, input_dict, None)
-				print("Got data set dict:", data_set_dict)
-				if data_set_dict is None:  print("ERROR: tried to use {} as DATA_SET dictionary".format(element_name))
-				child = self.dict_to_element(data_set_dict, element_name, data_set_index=i)  # New DATA_SET dict
-				parent.append(child)
-		"""
+
 		
 		parent = Element(element_name)
 		
@@ -529,29 +511,10 @@ class fsobj(object):
 			# item is a list (comments), dict (another XML layer), or string (var)
 			# If string, use getattr()
 			print("    dict_to_element:  name, dict are:", item_name, item)
-			"""
-			if item_name == 'DATA_SET':
-				# If DATA_SET found, need to append 1-6 separate elements, one for each part
-				# Find number of parts:  will be either protos or modules
-				print("dict_to_element:  found DATA_SET")
-				if not getattr(self, 'protomodules', None) is None:
-					num_parts = len(getattr(self, 'protomodules'))
-				elif not getattr(self, 'modules', None) is None:
-					num_parts = len(getattr(self, 'modules'))
-				else:
-					print("ERROR:  Object has neither modules nor protomodules, but DATA_SET was found!")
-				print("Found {} parts in dataset".format(num_parts))
-				for i in range(num_parts):
-					# For each part, use input_dict (is a str, usually 'DATA_SET_DICT')
-					data_set_dict = getattr(self, item, None)
-					print("Got data set dict:", data_set_dict)
-					if data_set_dict is None:  print("ERROR: tried to use {} as DATA_SET dictionary".format(element_name))
-					child = self.dict_to_element(data_set_dict, element_name, data_set_index=i)  # New DATA_SET dict
-					parent.append(child)
-			"""
+
 
 			if type(item) == dict:
-				print("  **Dict found.  Calling recursive case...")
+				#print("  **Dict found.  Calling recursive case...")
 				# Recursive case: Create an element from the child dictionary.
 				# "Remember" whether currently in a DATA_SET
 				child = self.dict_to_element(item, item_name, data_set_index=data_set_index)
@@ -565,26 +528,24 @@ class fsobj(object):
 				# "PART":[{part_dict_1}, {part_dict_2}]; both have to be labeled w/ "PART"
 				for it in item:
 					# For each item, create elements recursively and append to parent
-					ch = self.dict_to_element(it, item_name)
+					ch = self.dict_to_element(it, item_name, data_set_index=data_set_index)
 					if item_name == "PART":
 						ch.set('mode', 'auto')
 					parent.append(ch)
 			elif type(getattr(self, item, None)) == list:  #type(item) == list:
 				# Base case 1:  List of comments.  Create an element for each one.
 				print("    Found list: ", getattr(self, item, None))
-				# Check for empty list!
 
-				if getattr(self, item, None) == []:
+				# If currently in a DATA_SET, need to treat differently!
+				if data_set_index != None:
+					#print("\nFOUND DATA_SET LIST!  Adding item i:", data_set_index, str(getattr(self, item, None)[data_set_index]), '\n')
+					child = Element(item_name)
+					child.text = str(getattr(self, item, None)[data_set_index])
+					parent.append(child)
+				elif getattr(self, item, None) == []:
 					# If empty, need to add a placeholder so load() knows to add an empty list
 					child = Element(item_name)
 					child.text = '[]'
-					parent.append(child)
-				#else:
-				# If currently in a DATA_SET, need to treat differently!
-				if data_set_index:
-					print("FOUND DATA_SET LIST!  Adding item i:", data_set_index, str(getattr(self, item, None)[data_set_index]))
-					child = Element(item_name)
-					child.text = str(getattr(self, item, None)[data_set_index])
 					parent.append(child)
 				else:
 					for comment in getattr(self, item, None):
@@ -832,7 +793,7 @@ class fsobj_part(fsobj):
 
 	def load(self, ID, on_property_missing = "warn", query_db=True):
 		print("LOADING PART {}".format(ID))
-		if ID == "":
+		if ID == "" or ID == None:
 			self.clear()
 			return False
 
@@ -986,7 +947,7 @@ class fsobj_assembly(fsobj):
 
 
 	def load(self, ID, on_property_missing = "warn"):
-		if ID == -1:
+		if ID == -1 or ID == None:
 			self.clear()
 			return False
 
@@ -2740,8 +2701,21 @@ class step_sensor(fsobj_assembly):
 		return 'SENSOR_COMPONENT_TRAY_{}_{}'.format(self.institution, self.tray_component_sensor)
 
 	@property
+	def sensor_tool_names(self):
+		names = []
+		for i in range(6):
+			tmp_tool = tool_sensor()
+			if self.tools[i] is None:
+				names.append(None)
+			elif tmp_tool.load(self.tools[i], self.institution):
+				names.append("SNSR_TOOL_{}_{}".format(self.institution, self.tools[i]))
+			else:
+				names.append(None)
+		return names
+
+	@property
 	def assembly_rows(self):
-		return [1, 1, 2, 2, 3, 3]
+		return [1, 2, 3, 1, 2, 3]
 
 	@property
 	def assembly_cols(self):
@@ -2752,7 +2726,7 @@ class step_sensor(fsobj_assembly):
 		offsts = []
 		for i in range(6):
 			tmp_proto = protomodule()
-			if not self.protomodules[i]:
+			if self.protomodules[i] is None:
 				offsts.append(None)
 			elif tmp_proto.load(self.protomodules[i]):
 				offsts.append(tmp_proto.offset_translation_x)
@@ -2765,7 +2739,7 @@ class step_sensor(fsobj_assembly):
 		offsts = []
 		for i in range(6):
 			tmp_proto = protomodule()
-			if not self.protomodules[i]:
+			if self.protomodules[i] is None:
 				offsts.append(None)
 			if tmp_proto.load(self.protomodules[i]):
 				offsts.append(tmp_proto.offset_translation_y)
@@ -2778,7 +2752,7 @@ class step_sensor(fsobj_assembly):
 		offsts = []
 		for i in range(6):
 			tmp_proto = protomodule()
-			if not self.protomodules[i]:
+			if self.protomodules[i] is None:
 				offsts.append(None)
 			if tmp_proto.load(self.protomodules[i]):
 				offsts.append(tmp_proto.offset_rotation)
@@ -2840,12 +2814,12 @@ class step_sensor(fsobj_assembly):
 			'PLT_ASM_COL':			'assembly_cols',
 			'COMP_TRAY_NAME':		'comp_tray_name',
 			'SNSR_SER_NUM':			'sensors',
-			'SNSR_CMP_ROW':			'assembly_row',  # These should always be the same as above...right?
-			'SNSR_CMP_COL':			'assembly_col',
+			'SNSR_CMP_ROW':			'assembly_rows',  # These should always be the same as above...right?
+			'SNSR_CMP_COL':			'assembly_cols',
 			'SNSR_X_OFFST':			'snsr_x_offsts',
 			'SNSR_Y_OFFST':			'snsr_y_offsts',
 			'SNSR_ANG_OFFST':		'snsr_ang_offsts',
-			'PCKUP_TOOL_NAME':		'sensor_tool_name',
+			'PCKUP_TOOL_NAME':		'sensor_tool_names',  # note: list
 			'GLUE_TYPE':			'GLUE_TYPE',
 			'GLUE_BATCH_NUM':		'batch_araldite',
 			'SLVR_EPXY_TYPE':		'SLVR_EPXY_TYPE',
@@ -2985,8 +2959,21 @@ class step_pcb(fsobj_assembly):
 		return 'PCB_COMPONENT_TRAY_{}_{}'.format(self.institution, self.tray_component_pcb)
 
 	@property
+	def pcb_tool_names(self):
+		names = []
+		for i in range(6):
+			tmp_tool = tool_pcb()
+			if self.tools[i] is None:
+				names.append(None)
+			elif tmp_tool.load(self.tools[i], self.institution):
+				names.append("PCB_TOOL_{}_{}".format(self.institution, self.tools[i]))
+			else:
+				names.append(None)
+		return names
+
+	@property
 	def assembly_rows(self):
-		return [1, 1, 2, 2, 3, 3]
+		return [1, 2, 3, 1, 2, 3]
 
 	@property
 	def assembly_cols(self):
@@ -3047,7 +3034,7 @@ class step_pcb(fsobj_assembly):
 			'PCB_SER_NUM':			'pcbs',
 			'PCB_CMP_ROW':			'assembly_row',  # These should always be the same as above...right?
 			'PCB_CMP_COL':			'assembly_col',
-			'PCKUP_TOOL_NAME':		'pcb_tool_name',
+			'PCKUP_TOOL_NAME':		'pcb_tool_names',
 			'GLUE_TYPE':			'GLUE_TYPE',
 			'GLUE_BATCH_NUM':		'batch_araldite',
 			'SLVR_EPXY_TYPE':		'SLVR_EPXY_TYPE',

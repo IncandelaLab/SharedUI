@@ -728,8 +728,6 @@ class func(object):
 
 
 
-
-
 	@enforce_mode('view')
 	def startCreating(self,*args,**kwargs):
 		if not self.step_pcb_exists:
