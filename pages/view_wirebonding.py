@@ -208,7 +208,7 @@ class func(object):
 		self.page.cbPreinspection.setCurrentIndex(  INDEX_INSPECTION.get(self.module.preinspection  , -1))
 		self.page.sbBatchSylgard .setValue(self.module.wirebonding_sylgard if self.module.wirebonding_sylgard else -1)
 		self.page.sbBatchBondWire.setValue(self.module.wirebonding_bond_wire if self.module.wirebonding_bond_wire else -1)
-		self.page.sbBatchWedge   .setValue(self.module.wirebonding_wedge if self.wirebonding_wedge else -1)
+		self.page.sbBatchWedge   .setValue(self.module.wirebonding_wedge if self.module.wirebonding_wedge else -1)
 
 		# Back wirebonding
 		self.page.ckWirebondingBack.setChecked(       False if self.module.wirebonding_back          is None else self.module.wirebonding_back         )
