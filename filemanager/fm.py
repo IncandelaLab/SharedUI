@@ -2161,7 +2161,7 @@ class module(fsobj_part):
 
 		# wirebonding
 		# NEW: NOTE:  This info is filled out using the wirebonding page exclusively!
-		"sirebonding_completed",
+		"wirebonding_completed",
 		"wirebonding_comments",  # Comments from wirebonding page only
 		"wirebonding_date",
 
