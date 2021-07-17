@@ -275,7 +275,7 @@ class func(object):
 		else:
 			self.page.sbID.setValue(ID)
 
-		self.step_pcb_exists = self.step_pcb.load(ID)
+		self.step_pcb_exists = (ID == self.step_pcb.ID)  #self.step_pcb.load(ID)
 
 		self.page.listIssues.clear()
 		self.page.leStatus.clear()

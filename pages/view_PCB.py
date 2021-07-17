@@ -186,10 +186,7 @@ class func(object):
 		else:
 			#self.page.sbID.setValue(ID)
 			self.page.leID.setText(ID)
-		#if do_load:
-		#	self.pcb_exists = self.pcb.load(ID)
-		#else:
-		#	self.pcb_exists = False
+		self.pcb_exists = (ID == self.pcb.ID)
 		
 		#self.page.leID.setText(self.pcb.ID)
 

@@ -144,7 +144,7 @@ class func(object):
 			#self.page.sbID.setValue(ID)
 			self.page.leID.setText(ID)
 
-		self.protomodule_exists = self.protomodule.load(ID)
+		self.protomodule_exists = (ID == self.protomodule.ID)  #self.protomodule.load(ID)
 
 		#self.page.leID.setText(self.protomodule.ID)
 

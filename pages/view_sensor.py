@@ -183,7 +183,7 @@ class func(object):
 		#	self.sensor_exists = False
 
 		#self.page.leID.setText(self.sensor.ID)
-		self.sensor_exists = self.sensor.load(ID)
+		self.sensor_exists = (ID == self.sensor.ID) #self.sensor.load(ID)
 
 		self.page.listShipments.clear()
 		for shipment in self.sensor.shipments:

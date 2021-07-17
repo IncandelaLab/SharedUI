@@ -169,10 +169,9 @@ class func(object):
 			#self.page.sbID.setValue(ID)
 			self.page.leID.setText(ID)
 
-		#self.baseplate_exists = self.baseplate.load(ID)
+		self.baseplate_exists = (ID == self.baseplate.ID)  #self.baseplate.load(ID)
 
 		#self.page.leID.setText(self.baseplate.ID)
-		self.baseplate_exists = self.baseplate.load(ID)
 
 		self.page.listShipments.clear()
 		for shipment in self.baseplate.shipments:

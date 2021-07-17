@@ -276,7 +276,7 @@ class func(object):
 		else:
 			self.page.sbID.setValue(ID)
 
-		self.step_sensor_exists = self.step_sensor.load(ID)
+		self.step_sensor_exists = (ID == self.step_sensor.ID) #self.step_sensor.load(ID)
 
 		self.page.listIssues.clear()
 		self.page.leStatus.clear()

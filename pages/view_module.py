@@ -189,7 +189,7 @@ class func(object):
 		else:
 			self.module_exists = False
 		
-		#elf.module_exists = self.module.load(ID)
+		self.module_exists = (ID == self.module.ID)
 		
 		# shipments and location
 		#self.page.leInsertUser.setText("" if self.module.insertion_user is None else self.module.insertion_user)
