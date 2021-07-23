@@ -180,8 +180,11 @@ class func(object):
 		else:
 			self.page.leID.setText(ID)
 		
-		self.module_exists = self.module.load(ID)
-		
+		#self.module_exists = self.module.load(ID)
+		self.module_exists = False
+		if getattr(self.module, 'ID', None) != None:
+			self.module_exists = (ID == self.module.ID)
+
 		# shipments and location
 		#self.page.leInsertUser.setText("" if self.module.insertion_user is None else self.module.insertion_user)
 		#self.page.leLocation.setText("" if self.module.location is None else self.module.location)

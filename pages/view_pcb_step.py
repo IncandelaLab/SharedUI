@@ -87,7 +87,7 @@ class func(object):
 		#self.batch_loctite         = fm.batch_loctite()
 
 		self.step_pcb = fm.step_pcb()
-		self.step_pcb_exists = None
+		self.step_pcb_exists = False
 
 		#self.MAC = fm.MAC
 
@@ -275,7 +275,9 @@ class func(object):
 		else:
 			self.page.sbID.setValue(ID)
 
-		self.step_pcb_exists = (ID == self.step_pcb.ID)  #self.step_pcb.load(ID)
+		#self.step_pcb_exists = (ID == self.step_pcb.ID)  #self.step_pcb.load(ID)
+		if getattr(self.step_pcb, 'ID', None) != None:
+			self.step_pcb_exists = (ID == self.step_pcb.ID)
 
 		self.page.listIssues.clear()
 		self.page.leStatus.clear()
