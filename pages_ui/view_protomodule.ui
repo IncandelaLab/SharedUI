@@ -118,7 +118,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Shape</string>
+     <string>Geometry</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>

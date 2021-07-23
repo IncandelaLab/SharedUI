@@ -16,7 +16,7 @@ PAGE_NAME_DICT = {
 	'pcb':         'PCBs',
 	'protomodule': 'protomodules',
 	'module':      'modules',
-	'shipment':    'shipments',
+	#'shipment':    'shipments',
 }
 
 PART_DICT = {
@@ -28,10 +28,28 @@ PART_DICT = {
 	'shipment':    fm.shipment,
 }
 
+INDEX_INSTITUTION = {
+	'CERN':0,
+	'FNAL':1,
+	'UCSB':2,
+	'UMN':3,
+	'HEPHY':4,
+	'HPK':5,
+}
+
+INDEX_SHAPE = {
+	'full':0,
+	'half':1,
+	'five':2,
+	'three':3,
+	'semi':4,
+	'semi(-)':5,
+	'choptwo':6,
+}
+
 INDEX_MATERIAL = {
-	'Cu':0,
-	'CuW':1,
-	'PCB':2,
+	'CuW':0,
+	'PCB':1,
 }
 
 INDEX_TYPE = {
@@ -51,12 +69,12 @@ INDEX_TYPE = {
 	'HGCROC dummy':6,
 }
 
-INDEX_INSTITUTION = {
-	'CERN':0,
-	'FNAL':1,
-	'UCSB':2,
-	'UMN':3,
+INDEX_CHANNEL = {
+	'HD':0,
+	'LD':1,
 }
+
+
 
 #assorted useful vars
 
@@ -88,8 +106,9 @@ class func(object):
 		self.mode = 'setup'
 
 	# This fn is so search page can access the part lists of the other relevant pages...
-	def setPageList(self, pageList):
-		self.pageList = pageList
+	# outdated
+	#def setPageList(self, pageList):
+	#	self.pageList = pageList
 
 
 	def setup(self):
@@ -99,17 +118,46 @@ class func(object):
 		#self.update_info()
 
 	def rig(self):
+		"""
 		self.page.pbSearchInstitution.clicked.connect(self.searchInstitution)
 		self.page.pbSearchRecDate.clicked.connect(    self.searchRecDate)
 		self.page.pbSearchBType.clicked.connect(      self.searchBType)
 		self.page.pbSearchSType.clicked.connect(      self.searchSType)
 		self.page.pbSearchPType.clicked.connect(      self.searchPType)
+		"""
+		self.page.pbSearch.clicked.connect(self.search)
 
 		self.page.pbClearResults.clicked.connect(     self.clearResults)
 		self.page.pbGoToPart.clicked.connect(         self.goToPart)
 
 		self.page.lwPartList.setEnabled(True)
+		self.updateElements()
 
+	def search(self, *args, **kwargs):
+		return
+		"""
+		print("Searching for parts")
+		# Go into the partlist.  Saved format is "name":"date created"
+		# For each part, load it and check for the corresp attribute
+		# - BUT do not load from DB!  load(query_db=False)
+		partname = self.page.cbPartType.currentText()
+		filename = os.sep.join([ fm.DATADIR, 'partlist', partname+'s.json' ])
+		with open(filename, 'r') as opfl:
+			part_list = json.load(opfl)
+
+		found_parts = []
+
+		# Check whether each part matches the search criteria
+		for identifier in part_list:
+			part = partclass()
+			assert part.load(identifier)
+			# Check all search criteria:
+			for prop in {'institution':'cbInstitution', 'geometry':'cbShape', ''}
+				if x.currentText() == loaded_part_text:
+					found_parts.append(identifier)
+		"""
+
+	"""
 	def searchInstitution(self,*args,**kwargs):
 		print("Searching for institution...")
 		self.clearResults()
@@ -135,7 +183,7 @@ class func(object):
 
 		self.displayResults(found_parts)
 
-		
+
 	def searchRecDate(self,*args,**kwargs):
 		self.clearResults()
 		search_date = [*self.page.dReceived.date().getDate()]
@@ -225,8 +273,21 @@ class func(object):
 					found_parts.append("{} {}".format(partname, identifier))
 		
 		self.displayResults(found_parts)
-
+	"""
 	
+	def updateElements(self):
+		# Update enabled/disabled elements
+		# institution, geometry are always enabled (EXCEPT when assembly steps added)
+		part_type = self.page.cbPartType.currentText()
+		self.page.cbInstitution   .setEnabled(part_type != '')
+		self.page.cbShape         .setEnabled(part_type != '')
+		self.page.cbMaterial      .setEnabled(part_type == 'baseplate')
+		self.page.cbThickness     .setEnabled(part_type == 'sensor')
+		self.page.cbChannelDensity.setEnabled(part_type == 'sensor')
+		self.page.cbPCBType       .setEnabled(part_type == 'PCB')
+		self.page.dCreated        .setReadOnly(part_type != 'protomodule' and part_type != 'module')
+
+
 	def clearResults(self,*args,**kwargs):
 		# empty lwPartList
 		self.page.lwPartList.clear()

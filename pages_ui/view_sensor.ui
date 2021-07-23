@@ -182,7 +182,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Sensor type</string>
+     <string>Resolution type</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>

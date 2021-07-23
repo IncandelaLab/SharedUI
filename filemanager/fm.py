@@ -331,8 +331,8 @@ class fsobj(object):
 	# - Else assign normally.
 	# Utility used for load():  Set vars of obj using struct_dict, xml_tree
 	def _load_from_dict(self, struct_dict, xml_tree):
-		print("ITEMLIST LIST IS:")
-		print("    ", self.ITEMLIST_LIST)
+		#print("ITEMLIST LIST IS:")
+		#print("    ", self.ITEMLIST_LIST)
 		for item_name, item in struct_dict.items():
 			# item_name = XML tag name, item = name of var/prop to assign
 			if type(item) is dict:
@@ -342,7 +342,7 @@ class fsobj(object):
 				itemdata = xml_tree.findall('.//'+item_name)  # List of all contents of matching tags
 				# NOTE:  Items could be text or ints!  Convert accordingly.
 				itemdata = [self._convert_str(it.text) for it in itemdata]
-				print("_load_from_dict:  list item {} found!  Contents: {}".format(item, itemdata))
+				#print("_load_from_dict:  list item {} found!  Contents: {}".format(item, itemdata))
 				if itemdata == []:
 					setattr(self, item, None)
 				elif itemdata == ['[]'] or itemdata == '[]':
@@ -350,9 +350,9 @@ class fsobj(object):
 				else:
 					setattr(self, item, itemdata)  # Should be a list containing contents; just assign it to the var
 			else:
-				print("_load_from_dict: ordinary XML item {} found!".format(item_name))
+				#print("_load_from_dict: ordinary XML item {} found!".format(item_name))
 				itemdata = xml_tree.find('.//'+item_name)  # NOTE:  itemdata is an Element, not text!
-				print("Loaded item text is", itemdata.text, "; item is", item)
+				#print("Loaded item text is", itemdata.text, "; item is", item)
 				if itemdata.text.isdigit():  # If int:
 					idt = int(itemdata.text)
 				elif itemdata.text.replace('.','',1).isdigit():  # If float:
@@ -803,15 +803,15 @@ class fsobj_part(fsobj):
 			data = json.load(opfl)
 			if not str(ID) in data.keys():
 				if not query_db:
-					print("Part not found, and no DB query requested.  Returning false...")
+					#print("Part not found, and no DB query requested.  Returning false...")
 					return False
-				print("PART NOT FOUND.  REQUESTING FROM DB...")
+				#print("PART NOT FOUND.  REQUESTING FROM DB...")
 				search_conditions = {'SERIAL_NUMBER':'\''+ID+'\''}  # Only condition needed; ID must be surrounded by quotes
 				# For each XML file/table needed, make a request:
 				# Should automatically determine where file should be saved AND add part to list
 				self.ID = ID
 				part_request = self.request_XML(self.PART_TABLE, search_conditions)
-				print("request_XML completed")
+				#print("request_XML completed")
 				if not part_request:
 					print("Part not found.  Returning false...")
 					self.clear()
@@ -853,8 +853,6 @@ class fsobj_part(fsobj):
 		# search_conditions is a dict:  {param_name:param_value}
 		for param, value in search_conditions.items():
 			sql_request = sql_request + ' p.{}={}'.format(param, value)
-		print("TEMP:  Using sql command")
-		print(sql_request)
 
 		try:
 			api = rh.RhApi(url='https://cmsdca.cern.ch/hgc_rhapi', debug=True, sso='login')
@@ -880,14 +878,14 @@ class fsobj_part(fsobj):
 		# https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior
 		#dt = datetime.datetime.strptime(date, '%d-%b-%y')
 
-		print("TEST:  found date", date)
+		#print("TEST:  found date", date)
 		filedir, filename = self.get_filedir_filename(ID, date)
 
 		if suffix:  filename = filename.replace('.xml', suffix+'.xml')
 
 		if not os.path.exists(filedir):
 			os.makedirs(filedir)
-		print("WRITING TO FILE:", os.path.join(filedir, filename))
+		#print("WRITING TO FILE:", os.path.join(filedir, filename))
 		with open(os.path.join(filedir, filename), 'w') as f:
 			f.write(xml_string)
 
