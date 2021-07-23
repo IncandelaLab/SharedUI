@@ -276,6 +276,7 @@ class func(object):
 			self.page.sbID.setValue(ID)
 
 		#self.step_pcb_exists = (ID == self.step_pcb.ID)  #self.step_pcb.load(ID)
+		self.step_pcb_exists = False
 		if getattr(self.step_pcb, 'ID', None) != None:
 			self.step_pcb_exists = (ID == self.step_pcb.ID)
 

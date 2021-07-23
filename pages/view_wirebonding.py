@@ -179,9 +179,11 @@ class func(object):
 			ID = self.page.leID.text()
 		else:
 			self.page.leID.setText(ID)
-		
+		print("module ID is", ID)
+
 		#self.module_exists = self.module.load(ID)
 		self.module_exists = False
+		print("obj mod id", self.module.ID)
 		if getattr(self.module, 'ID', None) != None:
 			self.module_exists = (ID == self.module.ID)
 
@@ -349,7 +351,7 @@ class func(object):
 		self.setMainSwitchingEnabled(mode_view) 
 		self.page.leID.setReadOnly(not mode_view)
 
-		self.page.pbEdit  .setEnabled( mode_view and     module_exists )
+		self.page.pbEdit  .setEnabled( mode_view )  # and     module_exists )
 		self.page.pbSave  .setEnabled( mode_creating or mode_editing   )
 		self.page.pbCancel.setEnabled( mode_creating or mode_editing   )
 
@@ -478,14 +480,16 @@ class func(object):
 			if not site_format_check(pte.toPlainText()):
 				pteErrs.append(name)
 		# Check batch errors:  existence, emptiness, expiration
-		if self.wirebonding_sylgard is None:
+		"""
+		if self.module.wirebonding_sylgard is None:
 			pteErrs.append("Sylgard missing")
-		if self.wirebonding_bond_wire is None:
+		if self.module.wirebonding_bond_wire is None:
 			pteErrs.append("Bond wire missing")
-		if self.wirebonding_wedge is None:
+		if self.module.wirebonding_wedge is None:
 			pteErrs.append("Wedge missing")
+		"""
 		tmp_sylgard = fm.batch_sylgard()
-		if not tmp_sylgard.load(self.sbBatchSylgard.value()):
+		if not tmp_sylgard.load(self.page.sbBatchSylgard.value()):
 			pteErrs.append("Sylgard DNE")
 		else:
 			if not (tmp_sylgard.date_expires) is None:
@@ -494,7 +498,7 @@ class func(object):
 				if QtCore.QDate.currentDate() > expires:  pteErrs.append("Sylgard expired")
 			if tmp_sylgard.is_empty:  pteErrs.append("Sylgard empty")
 		tmp_bond_wire = fm.batch_bond_wire()
-		if not tmp_bond_wire.load(self.sbBatchBondWire.value()):
+		if not tmp_bond_wire.load(self.page.sbBatchBondWire.value()):
 			pteErrs.append("Bond wire DNE")
 		else:
 			if not (tmp_bond_wire.date_expires) is None:
@@ -503,7 +507,7 @@ class func(object):
 				if QtCore.QDate.currentDate() > expires:  pteErrs.append("Bond wire expired")
 			if tmp_bond_wire.is_empty:  pteErrs.append("Bond wire empty")
 		tmp_wedge = fm.batch_wedge()
-		if not tmp_wedge.load(self.sbBatchWedge.value()):
+		if not tmp_wedge.load(self.page.sbBatchWedge.value()):
 			pteErrs.append("Wedge DNE")
 		else:
 			if not (tmp_wedge.date_expires) is None:
@@ -529,7 +533,7 @@ class func(object):
 		#self.module.insertion_user = str(self.page.leInsertUser.text()   ) if str(self.page.leInsertUser.text())         else None
 		#self.module.location    = str(self.page.leLocation.text()        ) if str(self.page.leLocation.text())           else None
 		#self.module.institution = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
-		datew = self.dWirebonding.date()
+		datew = self.page.dWirebonding.date()
 		self.module.wirebonding_date = "{}-{}-{}".format(datew.month(), datew.day(), datew.year())
 
 		# comments
@@ -561,7 +565,7 @@ class func(object):
 
 		# back encapsulation
 		self.module.encapsulation_back            = self.page.ckEncapsulationBack.isChecked()
-		self.module.encapsulation_user_back       = str(self.page.cbEncapsulationUserBack.currentText()             ) if str(self.page.leEncapsulationUserBack.currentText()             ) else None
+		self.module.encapsulation_user_back       = str(self.page.cbEncapsulationUserBack.currentText()             ) if str(self.page.cbEncapsulationUserBack.currentText()             ) else None
 		self.module.encapsulation_inspection_back = str(self.page.cbEncapsulationInspectionBack.currentText()) if str(self.page.cbEncapsulationInspectionBack.currentText()) else None
 		if self.page.dtCureStartBack.date().year() == NO_DATE[0]:
 			self.module.encapsulation_cure_start_back = None
