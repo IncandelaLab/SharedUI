@@ -150,7 +150,7 @@ class func(object):
 			part_list = json.load(opfl)
 
 		search_dict = { self.page.cbInstitution:'institution', self.page.cbShape:'shape',
-						self.page.cbMaterial:'material', self.page.cbThickness'type',
+						self.page.cbMaterial:'material', self.page.cbThickness:'type',
 						self.page.cbChannelDensity:'resolution_type', self.page.cbPCBType:'type' }
 		# Treat dCreated separately
 		# Search criteria will be a dict:  'var_name':'value'
