@@ -760,7 +760,7 @@ class func(object):
 	def startEditing(self,*args,**kwargs):
 		tmp_step = fm.step_pcb()
 		tmp_ID = self.page.sbID.value()
-		tmp_exists = tmp_step.load(ID)
+		tmp_exists = tmp_step.load(tmp_ID)
 		if tmp_exists:
 			self.step_pcb = tmp_step
 			self.mode = 'editing'
