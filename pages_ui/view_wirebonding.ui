@@ -137,7 +137,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>120</y>
+     <y>90</y>
      <width>211</width>
      <height>21</height>
     </rect>
@@ -150,7 +150,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>280</y>
+     <y>260</y>
      <width>171</width>
      <height>21</height>
     </rect>
@@ -163,9 +163,9 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>300</y>
+     <y>280</y>
      <width>281</width>
-     <height>191</height>
+     <height>211</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -178,7 +178,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>140</y>
+      <y>160</y>
       <width>241</width>
       <height>17</height>
      </rect>
@@ -191,7 +191,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>20</y>
+      <y>40</y>
       <width>171</width>
       <height>21</height>
      </rect>
@@ -207,7 +207,7 @@
     <property name="geometry">
      <rect>
       <x>2</x>
-      <y>60</y>
+      <y>80</y>
       <width>141</width>
       <height>16</height>
      </rect>
@@ -233,7 +233,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>170</y>
+      <y>190</y>
       <width>181</width>
       <height>20</height>
      </rect>
@@ -249,7 +249,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>80</y>
+      <y>100</y>
       <width>281</width>
       <height>51</height>
      </rect>
@@ -259,7 +259,7 @@
     <property name="geometry">
      <rect>
       <x>170</x>
-      <y>20</y>
+      <y>40</y>
       <width>111</width>
       <height>21</height>
      </rect>
@@ -272,7 +272,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>170</y>
+      <y>190</y>
       <width>101</width>
       <height>21</height>
      </rect>
@@ -281,12 +281,48 @@
      <number>-1</number>
     </property>
    </widget>
+   <widget class="QDateEdit" name="dWirebondingBack">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>20</y>
+      <width>111</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="calendarPopup">
+     <bool>true</bool>
+    </property>
+    <property name="date">
+     <date>
+      <year>2021</year>
+      <month>1</month>
+      <day>1</day>
+     </date>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_15">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>20</y>
+      <width>171</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Back wirebonding date</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
   </widget>
   <widget class="QFrame" name="frame_2">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>140</y>
+     <y>110</y>
      <width>282</width>
      <height>21</height>
     </rect>
@@ -836,7 +872,7 @@
    <property name="geometry">
     <rect>
      <x>340</x>
-     <y>190</y>
+     <y>180</y>
      <width>171</width>
      <height>21</height>
     </rect>
@@ -849,9 +885,9 @@
    <property name="geometry">
     <rect>
      <x>340</x>
-     <y>210</y>
+     <y>200</y>
      <width>281</width>
-     <height>271</height>
+     <height>291</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -864,7 +900,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>220</y>
+      <y>240</y>
       <width>241</width>
       <height>17</height>
      </rect>
@@ -877,7 +913,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>20</y>
+      <y>40</y>
       <width>181</width>
       <height>21</height>
      </rect>
@@ -893,7 +929,7 @@
     <property name="geometry">
      <rect>
       <x>2</x>
-      <y>140</y>
+      <y>160</y>
       <width>141</width>
       <height>16</height>
      </rect>
@@ -919,7 +955,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>250</y>
+      <y>270</y>
       <width>181</width>
       <height>20</height>
      </rect>
@@ -935,7 +971,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>160</y>
+      <y>180</y>
       <width>281</width>
       <height>51</height>
      </rect>
@@ -945,7 +981,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>80</y>
+      <y>100</y>
       <width>281</width>
       <height>51</height>
      </rect>
@@ -958,7 +994,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>60</y>
+      <y>80</y>
       <width>251</width>
       <height>16</height>
      </rect>
@@ -971,7 +1007,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>20</y>
+      <y>40</y>
       <width>101</width>
       <height>21</height>
      </rect>
@@ -984,7 +1020,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>250</y>
+      <y>270</y>
       <width>101</width>
       <height>21</height>
      </rect>
@@ -993,12 +1029,48 @@
      <number>-1</number>
     </property>
    </widget>
+   <widget class="QLineEdit" name="lineEdit_18">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>20</y>
+      <width>171</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Front wirebonding date</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QDateEdit" name="dWirebondingFront">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>20</y>
+      <width>111</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="calendarPopup">
+     <bool>true</bool>
+    </property>
+    <property name="date">
+     <date>
+      <year>2021</year>
+      <month>1</month>
+      <day>1</day>
+     </date>
+    </property>
+   </widget>
   </widget>
   <widget class="QFrame" name="frame_7">
    <property name="geometry">
     <rect>
      <x>340</x>
-     <y>520</y>
+     <y>530</y>
      <width>281</width>
      <height>141</height>
     </rect>
@@ -1221,7 +1293,7 @@
    <property name="geometry">
     <rect>
      <x>340</x>
-     <y>500</y>
+     <y>510</y>
      <width>181</width>
      <height>16</height>
     </rect>
@@ -1273,42 +1345,6 @@
    </property>
    <property name="text">
     <string>Errors:</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_15">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>90</y>
-     <width>141</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>wirebonding date</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QDateEdit" name="dWirebonding">
-   <property name="geometry">
-    <rect>
-     <x>150</x>
-     <y>90</y>
-     <width>141</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="calendarPopup">
-    <bool>true</bool>
-   </property>
-   <property name="date">
-    <date>
-     <year>2021</year>
-     <month>1</month>
-     <day>1</day>
-    </date>
    </property>
   </widget>
   <widget class="QPlainTextEdit" name="pteWriteCommentEncap">
@@ -1380,7 +1416,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>180</y>
+     <y>150</y>
      <width>171</width>
      <height>21</height>
     </rect>
@@ -1393,7 +1429,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>200</y>
+     <y>170</y>
      <width>281</width>
      <height>61</height>
     </rect>

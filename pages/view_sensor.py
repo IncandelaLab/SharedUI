@@ -9,10 +9,10 @@ OBJECTTYPE = "sensor"
 DEBUG = False
 
 INDEX_TYPE = {
-	'100 um':0,
+	'120 um':0,
 	'200 um':1,
 	'300 um':2,
-	'500 um':3,
+	#'500 um':3,
 }
 
 INDEX_SIZE = {

@@ -1305,32 +1305,14 @@ class baseplate(fsobj_part):
 		"shape",        # 
 		#"rotation",     # 
 
-		# kapton number
-		# REMOVED -- all kapton layers are currently double layers
-		#"num_kaptons", # number of kaptons; 0/None for pcb baseplates, 0/None 1 or 2 for metal baseplates
-
 		# baseplate qualification 
 		#"corner_heights",      # list of corner heights
 		"flatness",
-		#"kapton_tape_applied", # only for metal baseplates (not pcb baseplates)
-		                       # True if kapton tape has been applied
 		#"thickness",           # measure thickness of baseplate
 		"grade",   # A, B, or C
 
-		# kapton application (1)
-		#"step_kapton", # ID of step_kapton that applied the kapton to it
-		# REMOVED
-
-		# kaptonized baseplate qualification (1)
-		#"check_leakage",    # None if not checked yet; True if passed; False if failed
-		#"check_surface",    # None if not checked yet; True if passed; False if failed
 		"check_edges_firm", # None if not checked yet; True if passed; False if failed
 		"check_glue_spill", # None if not checked yet; True if passed; False if failed
-		#"kapton_flatness",  # flatness of kapton layer after curing
-
-		# kapton application (2) - for double kapton baseplates
-		# REMOVED -- see above
-		#"step_kapton_2", # ID of the step_kapton that applied the second kapton
 
 		# sensor application
 		"step_sensor", # which step_sensor used it
@@ -1374,6 +1356,12 @@ class baseplate(fsobj_part):
 		"SERIAL_NUMBER":"ID",
 		"COMMENT_DESCRIPTION":"description",
 		"LOCATION":"institution",
+		# NEW:
+		"NOMINAL_THICKNESS":"nomthickness",
+		"FLATNESS":"flatness",
+		"MATERIAL":"material",
+		"GRADE":"grade",
+		"COMMENTS":"comments",
 	}}}
 
 	# List of vars that should NOT be edited in the GUI and are only loaded from DB
@@ -1533,13 +1521,11 @@ class sensor(fsobj_part):
 		"shipments", # list of shipments that this part has been in
 
 		# characteristics (defined upon reception)
-		#"serial",
 		"barcode",
 		"manufacturer",
 		"type",         # NEW:  This is now chosen from a drop-down menu
 		"thickness",
 		"size",         # 
-		#"channels",     # 
 		"channel_density",  # HD or LD
 		"shape",        # 
 		"grade",
@@ -1551,16 +1537,10 @@ class sensor(fsobj_part):
 		# sensor step
 		"step_sensor", # which step_sensor placed this sensor
 		"protomodule", # which protomodule this sensor is a part of
-		#NEW, WIP
-		#"semi_type",   #semiconductor type--either P or N
 
 		# NOTE:  kapton step has been moved to sensor!
 		"step_kapton",
-		#"kapton_flatness",
-		#"check_edges_firm",
 		"check_glue_spill",
-		#"thickness",
-		#"corner_heights",
 
 		# associations to other objects
 		"module", # which module this sensor is a part of
@@ -1597,7 +1577,11 @@ class sensor(fsobj_part):
 		"SERIAL_NUMBER":"ID",
 		"COMMENT_DESCRIPTION":"description",
 		"LOCATION":"institution",
-		"MANUFACTURER":"manufacturer",
+		#"MANUFACTURER":"manufacturer",
+		# NEW:
+		"VISUAL_INSPECTION":"inspection",
+		"GRADE":"grade",
+		"COMMENTS":"comments",
 		#"PREDEFINED_ATTRIBUTES":{  # Ignore this for now...
 		#	"ATTRIBUTE":{
 		#		"NAME":"HGC Silicon Sensor Type",
@@ -1708,54 +1692,6 @@ class sensor(fsobj_part):
 		else:
 			return True, ""
 
-	# OLD
-	"""
-	def save(self):  #NEW for XML generation
-		
-		# FIRST:  If not all necessary vars are defined, don't save the XML file.
-		required_vars = [self.size, self.comments, self.location, self.institution]
-		#contents = vars(self)
-		for vr in required_vars:
-			if vr is None:
-				# If any undef var found, save the json file only and return
-				print("NOTE:  missing required data, baseplate XML not saved.")
-				super(sensor, self).save()
-				return
-
-		# TAKE 2:  This time, use gen_xml(input_dict) to streamline things.
-		name_dict = {
-			'NAME':  'HGC Silicon Sensor Type',
-			'VALUE': '200DD',
-		}
-		attr_dict = {
-			'ATTRIBUTE': name_dict,
-		}
-		part_dict = {
-			'KIND_OF_PART':          'HPK {} Inch {} Cell Silicon Sensor'.format('Six' if self.size=='6'
-																				else 'Eight', self.channels),
-			'RECORD_INSERTION_USER': self.insertion_user,   # NOTE:  This may have to be redone when XML uploading is implemented!
-			'SERIAL_NUMBER':         self.ID,
-			'COMMENT_DESCRIPTION':   self.comments,   # Note:  Requires special treatment
-			'LOCATION':              self.location,
-			'MANUFACTURER':          "DUMMY_MANUFACTURER", #self.manufacturer,
-			'PREDEFINED_ATTRIBUTES': attr_dict,
-		}
-		parts_dict = {
-			'PART': part_dict,
-		}
-		root_dict = {
-			'PARTS': parts_dict,
-		}
-
-		# CREATE XML FILE OBJECT:
-		xml_tree = self.generate_xml(root_dict)
-
-		# Save json (order fixed):
-		super(sensor, self).save()
-
-		# Save:
-		self.save_xml(xml_tree)
-	"""	
 
 
 class pcb(fsobj_part):
@@ -1839,6 +1775,10 @@ class pcb(fsobj_part):
 		"COMMENT_DESCRIPTION":"comment_description",
 		"LOCATION":"institution",
 		"MANUFACTURER":"manufacturer",
+		"FLATNESS":"flatness",
+		"THICKNESS":"thickness",
+		"GRADE":"grade",
+		"COMMENTS":"comments",
 	}}}
 
 	DAQ_DATADIR = 'daq'
@@ -2161,7 +2101,8 @@ class module(fsobj_part):
 		# NEW: NOTE:  This info is filled out using the wirebonding page exclusively!
 		"wirebonding_completed",
 		"wirebonding_comments",  # Comments from wirebonding page only
-		"wirebonding_date",
+		"wirebonding_date_back",
+		"wirebonding_date_front",
 
 		"wirebonding_sylgard",
 		"wirebonding_bond_wire",
@@ -2270,7 +2211,9 @@ class module(fsobj_part):
 		"test_files":[],
 	}
 
-	ITEMLIST_LIST = ['comments', 'shipments', 'wirebonding_comments', 'encapsulation_comments', 'test_files']
+	ITEMLIST_LIST = ['comments', 'shipments', 'wirebonding_comments', 'encapsulation_comments', 'test_files',
+		'wirebonding_unbonded_channels_back', 'wirebonding_unbonded_channels_front'
+	]
 
 	XML_STRUCT_DICT = { "data":{"row":{
 		"ID":"id_number",
@@ -2763,10 +2706,10 @@ class step_sensor(fsobj_assembly):
 	COND_TABLE = 'c4260'
 	ASSM_TABLE_NAME = 'HGC_PRTO_MOD_ASMBLY'
 	COND_TABLE_NAME = 'HGC_PRTO_MOD_ASMBLY_COND'
-	ASSM_TABLE_DESC = 'HGC Six Inch Proto Module Assembly'
-	COND_TABLE_DESC = 'HGC Six Inch Proto Module Curing Cond'
-	RUN_TYPE        = 'HGC 6inch Proto Module Assembly'
-	CMT_DESCR = 'Build 6inch proto modules'
+	ASSM_TABLE_DESC = 'HGC Eight Inch Proto Module Assembly'
+	COND_TABLE_DESC = 'HGC Eight Inch Proto Module Curing Cond'
+	RUN_TYPE        = 'HGC 8inch Proto Module Assembly'
+	CMT_DESCR = 'Build 8inch proto modules'
 	VNUM = 1
 
 	# Vars for tables - constants

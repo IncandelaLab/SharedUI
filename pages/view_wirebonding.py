@@ -193,9 +193,12 @@ class func(object):
 
 		# characteristics
 		#self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.module.institution, -1))
-		if not self.module.wirebonding_date is None:
-			date = self.module.wirebonding_date.split('-') # m d y format
-			self.page.dWirebonding.setDate(QtCore.QDate(int(date[2]), int(date[0]), int(date[1]))) # y m d
+		if not self.module.wirebonding_date_back is None:
+			date = self.module.wirebonding_date_back.split('-') # m d y format
+			self.page.dWirebondingBack.setDate(QtCore.QDate(int(date[2]), int(date[0]), int(date[1]))) # y m d
+		if not self.module.wirebonding_date_front is None:
+			date = self.module.wirebonding_date_front.split('-') # m d y format
+			self.page.dWirebondingFront.setDate(QtCore.QDate(int(date[2]), int(date[0]), int(date[1]))) # y m d
 
 		# comments
 		self.page.listComments.clear()
@@ -211,9 +214,9 @@ class func(object):
 
 		# pre-wirebonding qualification
 		self.page.cbPreinspection.setCurrentIndex(  INDEX_INSPECTION.get(self.module.preinspection  , -1))
-		self.page.sbBatchSylgard .setValue(self.module.wirebonding_sylgard if self.module.wirebonding_sylgard else -1)
-		self.page.sbBatchBondWire.setValue(self.module.wirebonding_bond_wire if self.module.wirebonding_bond_wire else -1)
-		self.page.sbBatchWedge   .setValue(self.module.wirebonding_wedge if self.module.wirebonding_wedge else -1)
+		self.page.sbBatchSylgard .setValue(self.module.wirebonding_sylgard if self.module.wirebonding_sylgard != None else -1)
+		self.page.sbBatchBondWire.setValue(self.module.wirebonding_bond_wire if self.module.wirebonding_bond_wire != None else -1)
+		self.page.sbBatchWedge   .setValue(self.module.wirebonding_wedge if self.module.wirebonding_wedge != None else -1)
 
 		# Back wirebonding
 		self.page.ckWirebondingBack.setChecked(       False if self.module.wirebonding_back          is None else self.module.wirebonding_back         )
@@ -232,8 +235,8 @@ class func(object):
 			self.page.cbWirebondsRepairedUserBack.addItem(self.module.wirebonds_repaired_user_back)
 		self.page.cbWirebondsRepairedUserBack.setCurrentIndex(self.index_users_wb.get(self.module.wirebonds_repaired_user_back, -1))
 
-
-		self.page.pteUnbondedChannelsBack.setPlainText(        "" if self.module.wirebonding_unbonded_channels_back          is None else SITE_SEP.join(self.module.wirebonding_unbonded_channels_back         ))
+		print("JOINING:", self.module.wirebonding_unbonded_channels_back)
+		self.page.pteUnbondedChannelsBack.setPlainText(        "" if self.module.wirebonding_unbonded_channels_back          is None else SITE_SEP.join([str(c) for c in self.module.wirebonding_unbonded_channels_back]         ))
 		#self.page.pteWirebondsDamagedBack.setPlainText(     "" if self.module.wirebonds_damaged_back       is None else SITE_SEP.join(self.module.wirebonds_damaged_back      ))
 		#self.page.pteWirebondsRepairedListBack.setPlainText("" if self.module.wirebonds_repaired_list_back is None else SITE_SEP.join(self.module.wirebonds_repaired_list_back))
 
@@ -282,7 +285,7 @@ class func(object):
 		#self.page.leWirebondingUserFront.setText(      "" if self.module.wirebonding_user_front         is None else self.module.wirebonding_user_front        )
 		#self.page.leWirebondsRepairedUserFront.setText("" if self.module.wirebonds_repaired_user_front  is None else self.module.wirebonds_repaired_user_front )
 		#self.page.pteWirebondingChannelsSkipFront.setPlainText( "" if self.module.wirebonding_skip_channels_front    is None else SITE_SEP.join(self.module.wirebonding_skip_channels_front   ))
-		self.page.pteUnbondedChannelsFront.setPlainText(        "" if self.module.wirebonding_unbonded_channels_front is None else SITE_SEP.join(self.module.wirebonding_unbonded_channels_front))
+		self.page.pteUnbondedChannelsFront.setPlainText(        "" if self.module.wirebonding_unbonded_channels_front is None else SITE_SEP.join([str(c) for c in self.module.wirebonding_unbonded_channels_front]))
 		if not self.module.wirebonding_user_front in self.index_users_wf.keys() and not self.module.wirebonding_user_front is None:
 			# Insertion user was deleted from user page...just add user to the dropdown
 			self.index_users[self.module.wirebonding_user_front] = max(self.index_users_wf.values()) + 1
@@ -533,8 +536,10 @@ class func(object):
 		#self.module.insertion_user = str(self.page.leInsertUser.text()   ) if str(self.page.leInsertUser.text())         else None
 		#self.module.location    = str(self.page.leLocation.text()        ) if str(self.page.leLocation.text())           else None
 		#self.module.institution = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
-		datew = self.page.dWirebonding.date()
-		self.module.wirebonding_date = "{}-{}-{}".format(datew.month(), datew.day(), datew.year())
+		datew = self.page.dWirebondingBack.date()
+		self.module.wirebonding_date_back  = "{}-{}-{}".format(datew.month(), datew.day(), datew.year())
+		datew = self.page.dWirebondingFront.date()
+		self.module.wirebonding_date_front = "{}-{}-{}".format(datew.month(), datew.day(), datew.year())
 
 		# comments
 		num_comments = self.page.listComments.count()

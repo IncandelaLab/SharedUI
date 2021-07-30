@@ -25,53 +25,58 @@ PART_DICT = {
 	'pcb':         fm.pcb,
 	'protomodule': fm.protomodule,
 	'module':      fm.module,
-	'shipment':    fm.shipment,
+	#'shipment':    fm.shipment,
 }
 
 INDEX_INSTITUTION = {
-	'CERN':0,
-	'FNAL':1,
-	'UCSB':2,
-	'UMN':3,
-	'HEPHY':4,
-	'HPK':5,
+	'':0,
+	'CERN':1,
+	'FNAL':2,
+	'UCSB':3,
+	'UMN':4,
+	'HEPHY':5,
+	'HPK':6,
 }
 
 INDEX_SHAPE = {
-	'full':0,
-	'half':1,
-	'five':2,
-	'three':3,
-	'semi':4,
-	'semi(-)':5,
-	'choptwo':6,
+	'':0,
+	'full':1,
+	'half':2,
+	'five':3,
+	'three':4,
+	'semi':5,
+	'semi(-)':6,
+	'choptwo':7,
 }
 
 INDEX_MATERIAL = {
-	'CuW':0,
-	'PCB':1,
+	'':0,
+	'CuW':1,
+	'PCB':2,
 }
 
 INDEX_TYPE = {
-	'100 um':0,
-	'200 um':1,
-	'300 um':2,
-	'500 um':3,
+	'':0,
+	'120 um':1,
+	'200 um':2,
+	'300 um':3,
 }
 
 INDEX_TYPE = {
-	'HGCROCV1':0,
-	'HGCROCV2':1,
-	'HGCROCV3':2,
-	'SKIROCV1':3,
-	'SKIROCV2':4,
-	'SKIROCV3':5,
-	'HGCROC dummy':6,
+	'':0,
+	'HGCROCV1':1,
+	'HGCROCV2':2,
+	'HGCROCV3':3,
+	'SKIROCV1':4,
+	'SKIROCV2':5,
+	'SKIROCV3':6,
+	'HGCROC dummy':7,
 }
 
 INDEX_CHANNEL = {
-	'HD':0,
-	'LD':1,
+	'':0,
+	'HD':1,
+	'LD':2,
 }
 
 
@@ -127,6 +132,9 @@ class func(object):
 		"""
 		self.page.pbSearch.clicked.connect(self.search)
 
+		self.page.cbPartType.currentIndexChanged.connect( self.updateElements )
+		self.page.ckUseDate.stateChanged.connect( self.updateElements )
+
 		self.page.pbClearResults.clicked.connect(     self.clearResults)
 		self.page.pbGoToPart.clicked.connect(         self.goToPart)
 
@@ -134,7 +142,38 @@ class func(object):
 		self.updateElements()
 
 	def search(self, *args, **kwargs):
-		return
+		self.clearResults()
+		part_type = self.page.cbPartType.currentText()
+		part_temp = PART_DICT[part_type]()  # Constructs instance of searched-for class
+		part_file_name = os.sep.join([ fm.DATADIR, 'partlist', part_type+'s.json' ])
+		with open(part_file_name, 'r') as opfl:
+			part_list = json.load(opfl)
+
+		search_dict = { self.page.cbInstitution:'institution', self.page.cbShape:'shape',
+						self.page.cbMaterial:'material', self.page.cbThickness'type',
+						self.page.cbChannelDensity:'resolution_type', self.page.cbPCBType:'type' }
+		# Treat dCreated separately
+		# Search criteria will be a dict:  'var_name':'value'
+		search_criteria = {}
+		for box, qty in search_dict.items():
+			if box.isEnabled() and box.currentText != '':
+				search_criteria[qty] = box.currentText()
+		search_date = self.page.ckUseDate.isChecked()
+		if search_date:
+			d_c = self.page.dCreated.date()
+			d_created = "{}-{}-{}".format(d_c.month(), d_c.day(), d_c.year())
+
+		# Go through all parts in part_list, load each, and check qtys...
+		found_parts = []
+		for part_id, date in part_list.items():
+			part_temp.load(part_id, query_db=False)
+			found = True
+			for qty, value in search_criteria.items():
+				if getattr(part_temp, qty, None) != value:  found = False
+			if found:  found_parts.append("{} {}".format(part_type, part_id))
+
+		self.displayResults(found_parts)
+
 		"""
 		print("Searching for parts")
 		# Go into the partlist.  Saved format is "name":"date created"
@@ -285,7 +324,9 @@ class func(object):
 		self.page.cbThickness     .setEnabled(part_type == 'sensor')
 		self.page.cbChannelDensity.setEnabled(part_type == 'sensor')
 		self.page.cbPCBType       .setEnabled(part_type == 'PCB')
-		self.page.dCreated        .setReadOnly(part_type != 'protomodule' and part_type != 'module')
+		self.page.ckUseDate       .setEnabled(part_type != 'protomodule' and part_type != 'module')
+		useDate = self.page.ckUseDate.isChecked()
+		self.page.dCreated        .setReadOnly(not useDate or (part_type != 'protomodule' and part_type != 'module'))
 
 
 	def clearResults(self,*args,**kwargs):

@@ -312,7 +312,7 @@
     </property>
     <item>
      <property name="text">
-      <string>100 um</string>
+      <string>120 um</string>
      </property>
     </item>
     <item>
@@ -323,11 +323,6 @@
     <item>
      <property name="text">
       <string>300 um</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>500 um</string>
      </property>
     </item>
    </widget>
