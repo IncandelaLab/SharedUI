@@ -133,6 +133,7 @@ class func(object):
 		self.mode = 'view'
 		print("{} setup completed".format(PAGE_NAME))
 		self.update_info()
+		self.loadStep()
 
 	@enforce_mode('setup')
 	def rig(self):
@@ -248,7 +249,8 @@ class func(object):
 		self.page.sbTrayAssembly.editingFinished.connect(  self.loadTrayAssembly        )
 		self.page.sbBatchAraldite.editingFinished.connect( self.loadBatchAraldite       )
 
-		self.page.sbID.valueChanged.connect(self.update_info)
+		#self.page.sbID.valueChanged.connect(self.update_info)
+		self.page.sbID.valueChanged.connect(self.loadStep)
 
 		self.page.pbNew.clicked.connect(self.startCreating)
 		self.page.pbEdit.clicked.connect(self.startEditing)
@@ -730,22 +732,40 @@ class func(object):
 			self.page.pbSave.setEnabled(True)
 
 
+	@enforce_mode('view')
+	def loadStep(self,*args,**kwargs):
+		if self.page.sbID.value() == -1:  return
+		tmp_step = fm.step_pcb()
+		tmp_ID = self.page.sbID.value()
+		tmp_exists = tmp_step.load(tmp_ID)
+		if not tmp_exists:
+			self.update_info()
+		else:
+			self.step_pcb = tmp_step
+			self.update_info()
 
 	@enforce_mode('view')
 	def startCreating(self,*args,**kwargs):
-		if not self.step_pcb_exists:
+		if self.page.sbID.value() == -1:  return
+		tmp_step = fm.step_pcb()
+		tmp_ID = self.page.sbID.value()
+		tmp_exists = tmp_step.load(tmp_ID)
+		if not tmp_exists:
 			ID = self.page.sbID.value()
+			self.step_sensor.new(ID)
 			self.mode = 'creating'
-			self.step_pcb.new(ID)
 			self.updateElements()
-			self.loadAllObjects()
 
 	@enforce_mode('view')
 	def startEditing(self,*args,**kwargs):
-		if self.step_pcb_exists:
+		tmp_step = fm.step_pcb()
+		tmp_ID = self.page.sbID.value()
+		tmp_exists = tmp_step.load(ID)
+		if tmp_exists:
+			self.step_pcb = tmp_step
 			self.mode = 'editing'
-			self.updateElements()
 			self.loadAllObjects()
+			self.update_info()
 
 	@enforce_mode(['editing','creating'])
 	def cancelEditing(self,*args,**kwargs):

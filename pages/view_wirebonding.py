@@ -362,7 +362,8 @@ class func(object):
 		#self.page.leInsertUser.setReadOnly( not (mode_creating or mode_editing) )
 		#self.page.leLocation.setReadOnly(   not (mode_creating or mode_editing) )
 		#self.page.cbInstitution.setEnabled(      mode_creating or mode_editing  )
-		self.page.dWirebonding.setReadOnly(  not (mode_creating or mode_editing) )
+		self.page.dWirebondingBack.setReadOnly(  not (mode_creating or mode_editing) )
+		self.page.dWirebondingFront.setReadOnly( not (mode_creating or mode_editing) )
 
 		# comments
 		self.page.pbDeleteComment.setEnabled(mode_creating or mode_editing)

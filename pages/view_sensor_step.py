@@ -133,6 +133,7 @@ class func(object):
 		self.mode = 'view'
 		print("{} setup completed".format(PAGE_NAME))
 		self.update_info()
+		self.loadStep()  # sb starts at 0, so load by default
 
 	@enforce_mode('setup')
 	def rig(self):
@@ -248,7 +249,8 @@ class func(object):
 		self.page.sbBatchAraldite.editingFinished.connect( self.loadBatchAraldite       )
 		#self.page.sbBatchLoctite.editingFinished.connect(  self.loadBatchLoctite        )
 
-		self.page.sbID.valueChanged.connect(self.update_info)
+		#self.page.sbID.valueChanged.connect(self.update_info)
+		self.page.sbID.valueChanged.connect(self.loadStep)
 
 		self.page.pbNew.clicked.connect(self.startCreating)
 		self.page.pbEdit.clicked.connect(self.startEditing)
@@ -724,23 +726,40 @@ class func(object):
 			self.page.leStatus.setText(STATUS_NO_ISSUES)
 			self.page.pbSave.setEnabled(True)
 
-
+	@enforce_mode('view')
+	def loadStep(self,*args,**kwargs):
+		if self.page.sbID.value() == -1:  return
+		tmp_step = fm.step_sensor()
+		tmp_ID = self.page.sbID.value()
+		tmp_exists = tmp_step.load(tmp_ID)
+		if not tmp_exists:
+			self.update_info()
+		else:
+			self.step_sensor = tmp_step
+			self.update_info()
 
 	@enforce_mode('view')
 	def startCreating(self,*args,**kwargs):
-		if not self.step_sensor_exists:
+		if self.page.sbID.value() == -1:  return
+		tmp_step = fm.step_sensor()
+		tmp_ID = self.page.sbID.value()
+		tmp_exists = tmp_step.load(tmp_ID)
+		if not tmp_exists:
 			ID = self.page.sbID.value()
-			self.mode = 'creating'
 			self.step_sensor.new(ID)
+			self.mode = 'creating'
 			self.updateElements()
-			self.loadAllObjects()
 
 	@enforce_mode('view')
 	def startEditing(self,*args,**kwargs):
-		if self.step_sensor_exists:
+		tmp_step = fm.step_sensor()
+		tmp_ID = self.page.sbID.value()
+		tmp_exists = tmp_step.load(tmp_ID)
+		if tmp_exists:
+			self.step_sensor = tmp_step
 			self.mode = 'editing'
-			self.updateElements()
 			self.loadAllObjects()
+			self.update_info()
 
 	@enforce_mode(['editing','creating'])
 	def cancelEditing(self,*args,**kwargs):
