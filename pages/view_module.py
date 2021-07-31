@@ -490,7 +490,7 @@ class func(object):
 	def goPcb(self,*args,**kwargs):
 		#ID = self.page.sbPcb.value()
 		#if ID>=0:
-		ID = self.page.lePcb.value()
+		ID = self.page.lePcb.text()
 		if ID != "":
 			self.setUIPage('PCBs',ID=ID)
 
@@ -498,7 +498,7 @@ class func(object):
 	def goProtomodule(self,*args,**kwargs):
 		#ID = self.page.sbProtomodule.value()
 		#if ID>=0:
-		ID = self.page.leProtomodule.value()
+		ID = self.page.leProtomodule.text()
 		if ID != "":
 			self.setUIPage('protomodules',ID=ID)
 
@@ -592,7 +592,7 @@ class func(object):
 				raise TypeError("Expected type <str> for ID; got <{}>".format(type(ID)))
 			#if ID < 0:
 			#	raise ValueError("ID cannot be negative")
-			self.page.sbID.setValue(ID)
+			self.page.leID.setText(ID)
 
 	@enforce_mode('view')
 	def changed_to(self):

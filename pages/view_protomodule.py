@@ -394,7 +394,7 @@ class func(object):
 	@enforce_mode('view')
 	def goModule(self,*args,**kwargs):
 		#ID = self.page.sbModule.value()
-		ID = self.page.leModule.value()
+		ID = self.page.leModule.text()
 		#if ID >= 0:
 		if ID != "":
 			self.setUIPage('modules',ID=ID)

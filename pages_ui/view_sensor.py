@@ -323,7 +323,7 @@ class Ui_Form(object):
 
         self.retranslateUi(Form)
         self.cbShape.setCurrentIndex(-1)
-        self.cbType.setCurrentIndex(0)
+        self.cbType.setCurrentIndex(-1)
         self.cbInstitution.setCurrentIndex(-1)
         self.cbInsertUser.setCurrentIndex(-1)
         self.cbChannelDensity.setCurrentIndex(-1)

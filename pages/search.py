@@ -155,8 +155,11 @@ class func(object):
 		# Treat dCreated separately
 		# Search criteria will be a dict:  'var_name':'value'
 		search_criteria = {}
+		#print("Search criteria:")
 		for box, qty in search_dict.items():
-			if box.isEnabled() and box.currentText != '':
+			#print(qty, box.currentText())
+			if box.isEnabled() and box.currentText() != '':
+				#print("Adding <{}>".format(box.currentText()), qty)
 				search_criteria[qty] = box.currentText()
 		search_date = self.page.ckUseDate.isChecked()
 		if search_date:
@@ -169,6 +172,7 @@ class func(object):
 			part_temp.load(part_id, query_db=False)
 			found = True
 			for qty, value in search_criteria.items():
+				print("Part: {}, attr: {}".format(part_id, getattr(part_temp, qty, None)))
 				if getattr(part_temp, qty, None) != value:  found = False
 			if found:  found_parts.append("{} {}".format(part_type, part_id))
 
@@ -317,6 +321,7 @@ class func(object):
 	def updateElements(self):
 		# Update enabled/disabled elements
 		# institution, geometry are always enabled (EXCEPT when assembly steps added)
+		print("search, updateElements")
 		part_type = self.page.cbPartType.currentText()
 		self.page.cbInstitution   .setEnabled(part_type != '')
 		self.page.cbShape         .setEnabled(part_type != '')
@@ -324,9 +329,10 @@ class func(object):
 		self.page.cbThickness     .setEnabled(part_type == 'sensor')
 		self.page.cbChannelDensity.setEnabled(part_type == 'sensor')
 		self.page.cbPCBType       .setEnabled(part_type == 'PCB')
-		self.page.ckUseDate       .setEnabled(part_type != 'protomodule' and part_type != 'module')
+		self.page.ckUseDate       .setEnabled(part_type == 'protomodule' or part_type == 'module')
 		useDate = self.page.ckUseDate.isChecked()
-		self.page.dCreated        .setReadOnly(not useDate or (part_type != 'protomodule' and part_type != 'module'))
+		print("useDate is", useDate, ", total is...")
+		self.page.dCreated        .setReadOnly(not useDate or not (part_type == 'protomodule' or part_type == 'module'))
 
 
 	def clearResults(self,*args,**kwargs):

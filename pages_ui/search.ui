@@ -19,7 +19,7 @@
      <x>390</x>
      <y>60</y>
      <width>281</width>
-     <height>201</height>
+     <height>41</height>
     </rect>
    </property>
   </widget>
@@ -136,7 +136,7 @@
   <widget class="QComboBox" name="cbInstitution">
    <property name="geometry">
     <rect>
-     <x>150</x>
+     <x>200</x>
      <y>130</y>
      <width>131</width>
      <height>21</height>
@@ -186,7 +186,7 @@
     <rect>
      <x>30</x>
      <y>130</y>
-     <width>121</width>
+     <width>171</width>
      <height>20</height>
     </rect>
    </property>
@@ -200,7 +200,7 @@
   <widget class="QComboBox" name="cbShape">
    <property name="geometry">
     <rect>
-     <x>150</x>
+     <x>200</x>
      <y>150</y>
      <width>131</width>
      <height>21</height>
@@ -255,7 +255,7 @@
     <rect>
      <x>30</x>
      <y>150</y>
-     <width>121</width>
+     <width>171</width>
      <height>20</height>
     </rect>
    </property>
@@ -320,7 +320,7 @@
   <widget class="QComboBox" name="cbMaterial">
    <property name="geometry">
     <rect>
-     <x>150</x>
+     <x>200</x>
      <y>170</y>
      <width>131</width>
      <height>21</height>
@@ -350,12 +350,12 @@
     <rect>
      <x>30</x>
      <y>170</y>
-     <width>121</width>
+     <width>171</width>
      <height>20</height>
     </rect>
    </property>
    <property name="text">
-    <string>Material</string>
+    <string>Material (baseplate)</string>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -364,7 +364,7 @@
   <widget class="QComboBox" name="cbChannelDensity">
    <property name="geometry">
     <rect>
-     <x>150</x>
+     <x>200</x>
      <y>210</y>
      <width>131</width>
      <height>21</height>
@@ -392,7 +392,7 @@
   <widget class="QComboBox" name="cbThickness">
    <property name="geometry">
     <rect>
-     <x>150</x>
+     <x>200</x>
      <y>190</y>
      <width>131</width>
      <height>21</height>
@@ -427,12 +427,12 @@
     <rect>
      <x>30</x>
      <y>190</y>
-     <width>121</width>
+     <width>171</width>
      <height>20</height>
     </rect>
    </property>
    <property name="text">
-    <string>Thickness</string>
+    <string>Thickness (sensor)</string>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -443,12 +443,12 @@
     <rect>
      <x>30</x>
      <y>210</y>
-     <width>121</width>
+     <width>171</width>
      <height>20</height>
     </rect>
    </property>
    <property name="text">
-    <string>Resolution type</string>
+    <string>Resolution type (sensor)</string>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -460,7 +460,7 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>150</x>
+     <x>200</x>
      <y>250</y>
      <width>81</width>
      <height>21</height>
@@ -482,12 +482,12 @@
     <rect>
      <x>30</x>
      <y>250</y>
-     <width>121</width>
+     <width>171</width>
      <height>20</height>
     </rect>
    </property>
    <property name="text">
-    <string>Creation date</string>
+    <string>Creation date (*module)</string>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -496,7 +496,7 @@
   <widget class="QComboBox" name="cbPCBType">
    <property name="geometry">
     <rect>
-     <x>150</x>
+     <x>200</x>
      <y>230</y>
      <width>131</width>
      <height>21</height>
@@ -554,12 +554,12 @@
     <rect>
      <x>30</x>
      <y>230</y>
-     <width>121</width>
+     <width>171</width>
      <height>20</height>
     </rect>
    </property>
    <property name="text">
-    <string>PCB type</string>
+    <string>PCB type (PCB)</string>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -568,14 +568,14 @@
   <widget class="QCheckBox" name="ckUseDate">
    <property name="geometry">
     <rect>
-     <x>240</x>
+     <x>290</x>
      <y>250</y>
-     <width>21</width>
+     <width>71</width>
      <height>21</height>
     </rect>
    </property>
    <property name="text">
-    <string/>
+    <string>enable</string>
    </property>
   </widget>
  </widget>

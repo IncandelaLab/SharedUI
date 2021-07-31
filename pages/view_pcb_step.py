@@ -882,7 +882,7 @@ class func(object):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
 		#module = self.sb_modules[which].value()
-		module = self.le_modules[which].value()
+		module = self.le_modules[which].text()
 		self.setUIPage('modules',ID=module)
 
 	def goBatchAraldite(self,*args,**kwargs):
