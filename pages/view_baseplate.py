@@ -191,8 +191,8 @@ class func(object):
 		self.page.leBarcode      .setText("" if self.baseplate.barcode         is None else self.baseplate.barcode         )
 		self.page.leLocation     .setText("" if self.baseplate.location        is None else self.baseplate.location        )
 		#self.page.leManufacturer .setText("" if self.baseplate.manufacturer    is None else self.baseplate.manufacturer    )
-		self.page.dsbNomThickness.setValue(-1 if self.baseplate.nomthickness   is None else self.baseplate.nomthickness    )
-		if self.page.dsbNomThickness.value() == -1: self.page.dsbNomThickness.clear()
+		self.page.dsbThickness.setValue(-1 if self.baseplate.thickness   is None else self.baseplate.thickness    )
+		if self.page.dsbThickness.value() == -1: self.page.dsbThickness.clear()
 
 		self.page.listComments.clear()
 		for comment in self.baseplate.comments:
@@ -210,7 +210,7 @@ class func(object):
 
 		#self.page.leFlatness.setText("" if self.baseplate.flatness is None else str(round(self.baseplate.flatness,DISPLAY_PRECISION)))
 		self.page.dsbFlatness.setValue(-1 if self.baseplate.flatness is None else self.baseplate.flatness )
-		if self.page.dsbNomThickness.value() == -1: self.page.dsbNomThickness.clear()
+		if self.page.dsbThickness.value() == -1: self.page.dsbThickness.clear()
 		#self.page.dsbThickness.setValue(-1 if self.baseplate.thickness is None else self.baseplate.thickness)
 		#if self.page.dsbThickness.value() == -1: self.page.dsbThickness.clear()
 
@@ -277,7 +277,7 @@ class func(object):
 		#self.page.leManufacturer.setReadOnly(  not (mode_creating or mode_editing) )
 		self.page.cbMaterial.setEnabled(            mode_creating or mode_editing  )
 		self.page.leLocation.setReadOnly(      not (mode_creating or mode_editing) )
-		self.page.dsbNomThickness.setReadOnly( not (mode_creating or mode_editing) )
+		self.page.dsbThickness.setReadOnly( not (mode_creating or mode_editing) )
 		self.page.cbGrade.setEnabled(               mode_creating or mode_editing  )
 		self.page.dsbFlatness.setEnabled(           mode_creating or mode_editing  )
 
@@ -377,7 +377,7 @@ class func(object):
 		#self.baseplate.manufacturer   = str(self.page.leManufacturer.text())       if str(self.page.leManufacturer.text())       else None
 		self.baseplate.location       = str(self.page.leLocation.text())           if str(self.page.leLocation.text())           else None
 		self.baseplate.barcode        = str(self.page.leBarcode.text())            if str(self.page.leBarcode.text())            else None
-		self.baseplate.nomthickness   =     self.page.dsbNomThickness.value()      if self.page.dsbNomThickness.value() >=0      else None
+		self.baseplate.thickness   =     self.page.dsbThickness.value()      if self.page.dsbThickness.value() >=0      else None
 		self.baseplate.flatness       =     self.page.dsbFlatness.value()          if self.page.dsbFlatness.value() >= 0         else None
 		self.baseplate.grade          = str(self.page.cbGrade.currentText())       if str(self.page.cbGrade.currentText())       else None
 
@@ -476,6 +476,7 @@ class func(object):
 			#if ID < 0:
 			#	raise ValueError("ID cannot be negative")
 			self.page.leID.setText(ID)
+			self.loadPart()
 
 	@enforce_mode('view')
 	def changed_to(self):

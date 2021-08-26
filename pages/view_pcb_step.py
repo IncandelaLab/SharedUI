@@ -339,7 +339,7 @@ class func(object):
 				print("self.pcbs:", self.step_pcb.pcbs)
 				for i in range(6):
 					#self.sb_pcbs[i].setValue(self.step_pcb.pcbs[i] if not (self.step_pcb.pcbs[i] is None) else -1)
-					self.le_pcbs[i].setText(self.step_pcb.pcbs[i] if not (self.step_pcb.pcbs[i] is None) else "")
+					self.le_pcbs[i].setText(str(self.step_pcb.pcbs[i]) if not (self.step_pcb.pcbs[i] is None) else "")
 			else:
 				for i in range(6):
 					#self.sb_pcbs[i].setValue(-1)
@@ -348,7 +348,7 @@ class func(object):
 			if not (self.step_pcb.protomodules is None):
 				for i in range(6):
 					#self.sb_protomodules[i].setValue(self.step_pcb.protomodules[i] if not (self.step_pcb.protomodules[i] is None) else -1)
-					self.le_protomodules[i].setText(self.step_pcb.protomodules[i] if not (self.step_pcb.protomodules[i] is None) else "")
+					self.le_protomodules[i].setText(str(self.step_pcb.protomodules[i]) if not (self.step_pcb.protomodules[i] is None) else "")
 			else:
 				for i in range(6):
 					#self.sb_protomodules[i].setValue(-1)
@@ -357,7 +357,7 @@ class func(object):
 			if not (self.step_pcb.modules is None):
 				for i in range(6):
 					#self.sb_modules[i].setValue(self.step_pcb.modules[i] if not (self.step_pcb.modules[i] is None) else -1)
-					self.le_modules[i].setText(self.step_pcb.modules[i] if not (self.step_pcb.modules[i] is None) else "")
+					self.le_modules[i].setText(str(self.step_pcb.modules[i]) if not (self.step_pcb.modules[i] is None) else "")
 			else:
 				for i  in range(6):
 					#self.sb_modules[i].setValue(-1)
@@ -427,6 +427,7 @@ class func(object):
 		self.page.cbUserPerformed  .setEnabled( mode_creating or mode_editing)
 		self.page.leLocation       .setReadOnly(mode_view)
 		self.page.dtRunStart       .setReadOnly(mode_view)
+		self.page.dtRunStop        .setReadOnly(mode_view)
 		#self.page.leCureTemperature.setReadOnly(mode_view)
 		#self.page.leCureHumidity   .setReadOnly(mode_view)
 		self.page.dsbCureTemperature.setReadOnly(mode_view)
@@ -752,7 +753,7 @@ class func(object):
 		tmp_exists = tmp_step.load(tmp_ID)
 		if not tmp_exists:
 			ID = self.page.sbID.value()
-			self.step_sensor.new(ID)
+			self.step_pcb.new(ID)
 			self.mode = 'creating'
 			self.updateElements()
 
@@ -828,7 +829,7 @@ class func(object):
 				temp_module.institution    = self.step_pcb.institution
 				temp_module.location       = self.step_pcb.location
 				temp_module.insertion_user = self.step_pcb.user_performed
-				temp_module.thickness      = self.protomodules[i].thickness
+				temp_module.thickness      = self.protomodules[i].thickness + self.pcbs[i].thickness + 0.1
 				temp_module.channels       = self.protomodules[i].channels
 				temp_module.size           = self.protomodules[i].size
 				temp_module.shape          = self.protomodules[i].shape
@@ -925,6 +926,7 @@ class func(object):
 			if ID < 0:
 				raise ValueError("ID cannot be negative")
 			self.page.sbID.setValue(ID)
+			self.loadStep()
 
 	@enforce_mode('view')
 	def changed_to(self):

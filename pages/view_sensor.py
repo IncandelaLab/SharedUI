@@ -519,6 +519,7 @@ class func(object):
 			if not (type(ID) is str):
 				raise TypeError("Expected type <str> for ID; got <{}>".format(type(ID)))
 			self.page.leID.setText(ID)
+			self.loadPart()
 
 	@enforce_mode('view')
 	def changed_to(self):

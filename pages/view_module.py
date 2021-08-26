@@ -238,33 +238,18 @@ class func(object):
 			self.page.listComments.addItem(comment)
 		self.page.pteWriteComment.clear()
 
-		# finished module qualification
-		#self.page.ckHvCablesAttached.setChecked(False if self.module.hv_cables_attached is None else self.module.hv_cables_attached)
-		#self.page.leHvCablesAttachedUser.setText("" if self.module.hv_cables_attached_user is None else self.module.hv_cables_attached_user )
-		#self.page.leUnbiasedDaq.setText(         "" if self.module.unbiased_daq            is None else self.module.unbiased_daq            )
-		#self.page.leUnbiasedDaqUser.setText(     "" if self.module.unbiased_daq_user       is None else self.module.unbiased_daq_user       )
-		#self.page.leIv.setText(                  "" if self.module.iv                      is None else self.module.iv                      )
-		#self.page.leIvUser.setText(              "" if self.module.iv_user                 is None else self.module.iv_user                 )
-		#self.page.leBiasedDaq.setText(           "" if self.module.biased_daq              is None else self.module.biased_daq              )
-		#self.page.leBiasedDaqVoltage.setText(    "" if self.module.biased_daq_voltage      is None else self.module.biased_daq_voltage      )
-		#self.page.cbUnbiasedDaqOK.setCurrentIndex(INDEX_INSPECTION.get(self.module.unbiased_daq_ok, -1))
-		#self.page.cbIvOK.setCurrentIndex(         INDEX_INSPECTION.get(self.module.iv_ok          , -1))
-		#self.page.cbBiasedDaqOK.setCurrentIndex(  INDEX_INSPECTION.get(self.module.biased_daq_ok  , -1))
-
-		# iv datasets
-		#self.page.listIvData.clear()
-		#for iv in self.module.iv_data:
-		#	self.page.listIvData.addItem(iv)
-
-		# daq datasets
-		#self.page.listDaqData.clear()
-		#for daq in self.module.daq_data:
-		#	self.page.listDaqData.addItem(daq)
 
 		self.page.listFiles.clear()
 		for f in self.module.test_files:
 			name = os.path.split(f)[1]
 			self.page.listFiles.addItem(name)
+
+		self.page.dsbOffsetTranslationX.setValue( -1 if self.module.offset_translation_x is None else self.module.offset_translation_x )
+		self.page.dsbOffsetTranslationY.setValue( -1 if self.module.offset_translation_y is None else self.module.offset_translation_y )
+		self.page.dsbOffsetRotation.setValue(    -1 if self.module.offset_rotation    is None else self.module.offset_rotation    )
+		if self.page.dsbOffsetTranslationX.value() == -1: self.page.dsbOffsetTranslationX.clear()
+		if self.page.dsbOffsetTranslationY.value() == -1: self.page.dsbOffsetTranslationY.clear()
+		if self.page.dsbOffsetRotation.value() == -1: self.page.dsbOffsetRotation.clear()
 
 		self.updateElements()
 
@@ -328,31 +313,12 @@ class func(object):
 		self.page.pbAddComment.setEnabled(   mode_creating or mode_editing)
 		self.page.pteWriteComment.setEnabled(mode_creating or mode_editing)
 
-		# finished module qualification
-		#self.page.ckHvCablesAttached.setEnabled( mode_creating or mode_editing )
-		#self.page.leHvCablesAttachedUser.setReadOnly( not (mode_creating or mode_editing) )
-		#self.page.leUnbiasedDaq.setReadOnly(          not (mode_creating or mode_editing) )
-		#self.page.leUnbiasedDaqUser.setReadOnly(      not (mode_creating or mode_editing) )
-		#self.page.leIv.setReadOnly(                   not (mode_creating or mode_editing) )
-		#self.page.leIvUser.setReadOnly(               not (mode_creating or mode_editing) )
-		#self.page.leBiasedDaq.setReadOnly(            not (mode_creating or mode_editing) )
-		#self.page.leBiasedDaqVoltage.setReadOnly(     not (mode_creating or mode_editing) )
-		#self.page.cbUnbiasedDaqOK.setEnabled( mode_creating or mode_editing )
-		#self.page.cbIvOK.setEnabled(          mode_creating or mode_editing )
-		#self.page.cbBiasedDaqOK.setEnabled(   mode_creating or mode_editing )
-
-		# iv datasets
-		#self.page.pbIvAddToPlotter.setEnabled(mode_view and iv_data_exists)
-		#self.page.pbIvGoPlotter.setEnabled(   mode_view and iv_data_exists)
-
-		# daq datasets
-		#self.page.pbDaqAddToPlotter.setEnabled(mode_view and daq_data_exists)
-		#self.page.pbDaqGoPlotter.setEnabled(   mode_view and daq_data_exists)
-
-		# NEW, experimental
 		self.page.pbAddFiles.setEnabled(mode_creating or mode_editing)
 		self.page.pbDeleteFile.setEnabled(mode_creating or mode_editing)
 
+		self.page.dsbOffsetTranslationX.setReadOnly( not (mode_creating or mode_editing) )
+		self.page.dsbOffsetTranslationY.setReadOnly( not (mode_creating or mode_editing) )
+		self.page.dsbOffsetRotation.setReadOnly(    not (mode_creating or mode_editing) )
 
 #	# NEW, experimental
 #	@enforce_mode(['creating', 'editing'])
@@ -429,18 +395,9 @@ class func(object):
 		for i in range(num_comments):
 			self.module.comments.append(str(self.page.listComments.item(i).text()))
 
-		# finished module qualification
-		#self.module.hv_cables_attached  = self.page.ckHvCablesAttached.isChecked()
-		#self.module.hv_cables_attached_user = str(self.page.leHvCablesAttachedUser.text()) if str(self.page.leHvCablesAttachedUser.text()) else None
-		#self.module.unbiased_daq            = str(self.page.leUnbiasedDaq.text()         ) if str(self.page.leUnbiasedDaq.text()         ) else None
-		#self.module.unbiased_daq_user       = str(self.page.leUnbiasedDaqUser.text()     ) if str(self.page.leUnbiasedDaqUser.text()     ) else None
-		#self.module.iv                      = str(self.page.leIv.text()                  ) if str(self.page.leIv.text()                  ) else None
-		#self.module.iv_user                 = str(self.page.leIvUser.text()              ) if str(self.page.leIvUser.text()              ) else None
-		#self.module.biased_daq              = str(self.page.leBiasedDaq.text()           ) if str(self.page.leBiasedDaq.text()           ) else None
-		#self.module.biased_daq_voltage      = str(self.page.leBiasedDaqVoltage.text()    ) if str(self.page.leBiasedDaqVoltage.text()    ) else None
-		#self.module.unbiased_daq_ok = str(self.page.cbUnbiasedDaqOK.currentText()) if str(self.page.cbUnbiasedDaqOK.currentText()) else None
-		#self.module.iv_ok           = str(self.page.cbIvOK.currentText()         ) if str(self.page.cbIvOK.currentText()         ) else None
-		#self.module.biased_daq_ok   = str(self.page.cbBiasedDaqOK.currentText()  ) if str(self.page.cbBiasedDaqOK.currentText()  ) else None
+		self.protomodule.offset_translation_x = self.page.dsbOffsetTranslationX.value() if self.page.dsbOffsetTranslationX.value() >=0 else None
+		self.module.offset_translation_y = self.page.dsbOffsetTranslationY.value() if self.page.dsbOffsetTranslationY.value() >=0 else None
+		self.module.offset_rotation      = self.page.dsbOffsetRotation.value()    if self.page.dsbOffsetRotation.value()    >=0 else None
 
 		self.module.save()
 		self.mode = 'view'
@@ -593,6 +550,7 @@ class func(object):
 			#if ID < 0:
 			#	raise ValueError("ID cannot be negative")
 			self.page.leID.setText(ID)
+			self.loadPart()
 
 	@enforce_mode('view')
 	def changed_to(self):

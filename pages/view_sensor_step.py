@@ -26,9 +26,8 @@ STATUS_ISSUES    = "invalid (issues present)"
 I_TRAY_COMPONENT_DNE = "sensor component tray does not exist or is not selected"
 I_TRAY_ASSEMBLY_DNE  = "assembly tray does not exist or is not selected"
 I_BATCH_ARALDITE_DNE     = "araldite batch does not exist or is not selected"
+# NOTE: This is now a warning
 I_BATCH_ARALDITE_EXPIRED = "araldite batch has expired"
-#I_BATCH_LOCTITE_DNE      = "loctite batch does not exist or is not selected"
-#I_BATCH_LOCTITE_EXPIRED  = "loctite batch has expired"
 
 # baseplates
 I_BASEPLATE_NOT_READY  = "baseplate(s) in position(s) {} is not ready for sensor application. reason: {}"
@@ -228,6 +227,15 @@ class func(object):
 			self.page.pbGoProtoModule6,
 		]
 
+		# NEW:  To resolve bug where spinbox defaults to 0/prev value when left empty
+		self.pb_clears = [
+			self.page.pbClear1,
+			self.page.pbClear2,
+			self.page.pbClear3,
+			self.page.pbClear4,
+			self.page.pbClear5,
+			self.page.pbClear6,
+		]
 		
 		for i in range(6):
 			self.pb_go_tools[i].clicked.connect(       self.goTool       )
@@ -240,7 +248,9 @@ class func(object):
 			self.le_baseplates[i].textChanged.connect( self.loadBaseplate)
 			#self.sb_sensors[i].editingFinished.connect(    self.loadSensor    )
 			self.le_sensors[i].textChanged.connect( self.loadSensor)
-			self.le_protomodules[i].textChanged.connect( self.updateIssues)
+			#self.le_protomodules[i].textChanged.connect( self.updateIssues)
+
+			self.pb_clears[i].clicked.connect(self.clearRow)
 
 		self.page.cbInstitution.currentIndexChanged.connect( self.loadAllTools )
 
@@ -271,7 +281,7 @@ class func(object):
 			self.page.cbUserPerformed.addItem(user)
 
 
-	@enforce_mode('view')
+	@enforce_mode(['view','editing'])
 	def update_info(self,ID=None,*args,**kwargs):
 		if ID is None:
 			ID = self.page.sbID.value()
@@ -335,7 +345,7 @@ class func(object):
 			if not (self.step_sensor.sensors is None):
 				for i in range(6):
 					#self.sb_sensors[i].setValue(self.step_sensor.sensors[i] if not (self.step_sensor.sensors[i] is None) else -1)
-					self.le_sensors[i].setText(self.step_sensor.sensors[i] if not (self.step_sensor.sensors[i] is None) else "")
+					self.le_sensors[i].setText(str(self.step_sensor.sensors[i]) if not (self.step_sensor.sensors[i] is None) else "")
 			else:
 				for i in range(6):
 					#self.sb_sensors[i].setValue(-1)
@@ -344,7 +354,7 @@ class func(object):
 			if not (self.step_sensor.baseplates is None):
 				for i in range(6):
 					#self.sb_baseplates[i].setValue(self.step_sensor.baseplates[i] if not (self.step_sensor.baseplates[i] is None) else -1)
-					self.le_baseplates[i].setText(self.step_sensor.baseplates[i] if not (self.step_sensor.baseplates[i] is None) else "")
+					self.le_baseplates[i].setText(str(self.step_sensor.baseplates[i]) if not (self.step_sensor.baseplates[i] is None) else "")
 			else:
 				for i in range(6):
 					#self.sb_baseplates[i].setValue(-1)
@@ -353,7 +363,7 @@ class func(object):
 			if not (self.step_sensor.protomodules is None):
 				for i in range(6):
 					#self.sb_protomodules[i].setValue(self.step_sensor.protomodules[i] if not (self.step_sensor.protomodules[i] is None) else -1)
-					self.le_protomodules[i].setText(self.step_sensor.protomodules[i] if not (self.step_sensor.protomodules[i] is None) else "")
+					self.le_protomodules[i].setText(str(self.step_sensor.protomodules[i]) if not (self.step_sensor.protomodules[i] is None) else "")
 			else:
 				for i in range(6):
 					#self.sb_protomodules[i].setValue(-1)
@@ -399,7 +409,6 @@ class func(object):
 		if self.page.sbTrayComponent.value() == -1:  self.page.sbTrayComponent.clear()
 		if self.page.sbTrayAssembly.value()  == -1:  self.page.sbTrayAssembly.clear()
 
-
 		self.updateElements()
 
 	@enforce_mode(['view','editing','creating'])
@@ -422,6 +431,7 @@ class func(object):
 		self.page.cbInstitution.setEnabled(mode_creating or mode_editing)
 
 		self.page.pbRunStartNow     .setEnabled(mode_creating or mode_editing)
+		self.page.pbRunStopNow      .setEnabled(mode_creating or mode_editing)
 
 		#self.page.leUserPerformed  .setReadOnly(mode_view)
 		self.page.cbUserPerformed  .setEnabled( mode_creating or mode_editing)
@@ -449,7 +459,7 @@ class func(object):
 			#self.sb_protomodules[i].setReadOnly(mode_view)
 			self.le_sensors[i].setReadOnly(       mode_view)
 			self.le_baseplates[i].setReadOnly(    mode_view)
-			self.le_protomodules[i].setReadOnly(  mode_view)
+			#self.le_protomodules[i].setReadOnly(  mode_view)
 			self.pb_go_tools[i].setEnabled(       mode_view and tools_exist[i]       )
 			self.pb_go_sensors[i].setEnabled(     mode_view and sensors_exist[i]     )
 			self.pb_go_baseplates[i].setEnabled(  mode_view and baseplates_exist[i]  )
@@ -503,6 +513,7 @@ class func(object):
 	def loadToolSensor(self, *args, **kwargs):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
+		print("loadToolSensor: TEMP: sb value is {}".format(self.sb_tools[which].value()))
 		result = self.tools_sensor[which].load(self.sb_tools[which].value(), self.page.cbInstitution.currentText())
 		self.updateIssues()
 
@@ -577,25 +588,11 @@ class func(object):
 				expires = QtCore.QDate(int(ydm[2]), int(ydm[0]), int(ydm[1]))   # ymd format for constructor
 				#today = datetime.date(*time.localtime()[:3])
 				if QtCore.QDate.currentDate() > expires:  #today > expires:
-					issues.append(I_BATCH_ARALDITE_EXPIRED)
+					#issues.append(I_BATCH_ARALDITE_EXPIRED)
+					print("**WARNING:** Araldite batch is expired!")
 			if self.batch_araldite.is_empty:
 				issues.append(I_BATCH_ARALDITE_EMPTY)
 
-		#New
-		"""
-		if self.batch_loctite.ID is None:
-			issues.append(I_BATCH_LOCTITE_DNE)
-		else:
-			objects.append(self.batch_loctite)
-			if not (self.batch_loctite.date_expires is None):
-				ydm =  self.batch_loctite.date_expires.split('-')
-				expires = QtCore.QDate(int(ydm[2]), int(ydm[0]), int(ydm[1]))
-				#today = datetime.date(*time.localtime()[:3])
-				if QtCore.QDate.currentDate() > expires:
-					issues.append(I_BATCH_LOCTITE_EXPIRED)
-			if self.batch_loctite.is_empty:
-				issues.append(I_BATCH_LOCTITE_EMPTY)
-		"""
 
 		# rows
 		sensor_tools_selected = [_.value() for _ in self.sb_tools     ]
@@ -603,12 +600,12 @@ class func(object):
 		#sensors_selected      = [_.value() for _ in self.sb_sensors   ]
 		baseplates_selected   = [_.text() for _ in self.le_baseplates  ]
 		sensors_selected      = [_.text() for _ in self.le_sensors     ]
-		protomodules_selected = [_.text() for _ in self.le_protomodules]
+		#protomodules_selected = [_.text() for _ in self.le_protomodules]
 
 		sensor_tool_duplicates = [_ for _ in range(6) if sensor_tools_selected[_] >= 0 and sensor_tools_selected.count(sensor_tools_selected[_])>1]
 		baseplate_duplicates   = [_ for _ in range(6) if baseplates_selected[_]   != "" and baseplates_selected.count(  baseplates_selected[_]  )>1]
 		sensor_duplicates      = [_ for _ in range(6) if sensors_selected[_]      != "" and sensors_selected.count(     sensors_selected[_]     )>1]
-		protomodule_duplicates = [_ for _ in range(6) if protomodules_selected[_] != "" and sensors_selected.count(protomodules_selected[_]     )>1]
+		#protomodule_duplicates = [_ for _ in range(6) if protomodules_selected[_] != "" and sensors_selected.count(protomodules_selected[_]     )>1]
 		# Commenting this:  protomodule IDs should be determined by sensor, baseplate -> should never be duplicates.
 		#tmp_protomodule = fm.protomodule()
 		#protomodule_copies     = [_ for _ in range(6) if tmp_protomodule.load(protomodules_selected[_])]
@@ -619,8 +616,8 @@ class func(object):
 			issues.append(I_BASEPLATE_DUPLICATE.format(', '.join([str(_+1) for _ in baseplate_duplicates])))
 		if sensor_duplicates:
 			issues.append(I_SENSOR_DUPLICATE.format(', '.join([str(_+1) for _ in sensor_duplicates])))
-		if protomodule_duplicates:
-			issues.append(I_PROTOMODULE_DUPLICATE.format(', '.join([str(_+1) for _ in protomodule_duplicates])))
+		#if protomodule_duplicates:
+		#	issues.append(I_PROTOMODULE_DUPLICATE.format(', '.join([str(_+1) for _ in protomodule_duplicates])))
 		#if protomodule_copies:
 		#	issues.append(I_PROTOMODULE_COPY.format(', '.join([str(_+1) for _ in protomodule_duplicates])))
 
@@ -663,12 +660,12 @@ class func(object):
 					issues.append(I_BASEPLATE_SENSOR_SHAPE.format(self.baseplates[i].ID,    self.baseplates[i].shape, \
 																  self.sensors[i].ID, self.sensors[i].shape))
 
-			if protomodules_selected[i] != "":
-				num_parts += 1
+			#if protomodules_selected[i] != "":
+			#	num_parts += 1
 
 			if num_parts == 0:
 				rows_empty.append(i)
-			elif num_parts == 4:  #NOTE:  Was 2...
+			elif num_parts == 3:
 				rows_full.append(i)
 			else:
 				rows_incomplete.append(i)
@@ -794,12 +791,12 @@ class func(object):
 		protomodules = []
 		for i in range(6):
 			tools.append(       self.sb_tools[i].value()        if self.sb_tools[i].value()        >= 0 else None)
-			#sensors.append(     self.sb_sensors[i].value()      if self.sb_sensors[i].value()      >= 0 else None)
-			#baseplates.append(  self.sb_baseplates[i].value()   if self.sb_baseplates[i].value()   >= 0 else None)
-			#protomodules.append(self.sb_protomodules[i].value() if self.sb_protomodules[i].value() >= 0 else None)
 			sensors.append(     self.le_sensors[i].text()      if self.le_sensors[i].text() != "" else None)
 			baseplates.append(  self.le_baseplates[i].text()   if self.le_baseplates[i].text() != "" else None)
-			protomodules.append(self.le_protomodules[i].text() if self.le_protomodules[i].text() != "" else None)
+			if self.le_baseplates[i].text() != "" and self.le_sensors[i].text() != "":
+				protomodules.append("PROTO_{}_{}".format(self.le_baseplates[i].text(), self.le_sensors[i].text()))
+			else:
+				protomodules.append(None)
 		self.step_sensor.tools        = tools
 		self.step_sensor.sensors      = sensors
 		self.step_sensor.baseplates   = baseplates
@@ -813,14 +810,16 @@ class func(object):
 
 		# Add protomodule ID to baseplate, sensor lists; create protomodule if it doesn't exist:
 		for i in range(6):
-			if protomodules[i] is None:
+			if baseplates[i] is None:
 				# Row is empty; ignore
 				continue
 			temp_protomodule = fm.protomodule()
 			# Moved to active check (ensure no duplicates)
 			#proto_exists = temp_protomodule.load(protomodules[i])
 			#if not proto_exists:
-			temp_protomodule.new(protomodules[i])
+			# NEW:  Name is now the baseplate name + sensor name
+			temp_protomodule.new(protomodules[i]) #baseplates[i] + '_' + sensors[i])
+			#temp_protomodule.new(protomodules[i])
 			# Thickness = sum of baseplate and sensor, plus glue gaps
 			#sensor_thk_str = self.sensors[i].type  # Should be "[thickness] um"
 			#sensor_thk = float(sensor_thk_str.split()[0])/1000.0
@@ -832,7 +831,10 @@ class func(object):
 			temp_protomodule.institution    = self.step_sensor.institution
 			temp_protomodule.location       = self.step_sensor.location
 			temp_protomodule.insertion_user = self.step_sensor.user_performed
-			temp_protomodule.thickness      = temp_plt.nomthickness + temp_sensor.thickness + 0.0 # TBD
+			temp_protomodule.thickness  = temp_plt.thickness + temp_sensor.thickness + 0.1 # 100um=1 glue layer
+			if temp_plt.material == 'PCB':
+				temp_protomodule.thickness += 0.5
+			temp_protomodule.thickness      = temp_plt.thickness + temp_sensor.thickness + 0.1 # 100um=1 glue layer
 			temp_protomodule.channels       = 192 if temp_sensor.channel_density == 'LD' else 432
 			temp_protomodule.size           = temp_sensor.size
 			temp_protomodule.shape          = temp_sensor.shape
@@ -842,15 +844,17 @@ class func(object):
 			temp_protomodule.sensor         = temp_sensor.ID
 			temp_protomodule.step_kapton    = None #self.baseplates[i].step_kapton
 
+			# PROBLEM HERE:  Does not check for existing protomodule w/ same ID/different date before saving!!
 			temp_protomodule.save()
 
 			self.baseplates[i].step_sensor = self.step_sensor.ID
-			self.baseplates[i].protomodule = protomodules[i]
+			self.baseplates[i].protomodule = temp_protomodule.ID  #protomodules[i]
 			self.baseplates[i].save()
 			self.sensors[i].step_sensor = self.step_sensor.ID
-			self.sensors[i].protomodule = protomodules[i]
+			self.sensors[i].protomodule = temp_protomodule.ID  #protomodules[i]
 			self.sensors[i].save()
 
+		print("\n\n\nSAVING STEP SENSOR\n\n\n")
 		self.step_sensor.save()
 		self.unloadAllObjects()
 		self.mode = 'view'
@@ -865,6 +869,14 @@ class func(object):
 	def xmlModifiedReset(self):
 		self.xmlModList = []
 
+	# NEW:
+	def clearRow(self,*args,**kwargs):
+		sender_name = str(self.page.sender().objectName())
+		which = int(sender_name[-1]) - 1
+		self.sb_tools[which].clear()
+		self.le_sensors[which].clear()
+		self.le_baseplates[which].clear()
+		#self.le_protomodules[which].clear()
 
 	def goTool(self,*args,**kwargs):
 		sender_name = str(self.page.sender().objectName())
@@ -937,6 +949,7 @@ class func(object):
 			if ID < 0:
 				raise ValueError("ID cannot be negative")
 			self.page.sbID.setValue(ID)
+			self.loadStep()
 
 	@enforce_mode('view')
 	def changed_to(self):

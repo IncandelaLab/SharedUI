@@ -580,7 +580,7 @@ class fsobj(object):
 		self.partlistfile = os.sep.join([ DATADIR, 'partlist', part_name+'s.json' ])
 		with open(self.partlistfile, 'r') as opfl:
 			data = json.load(opfl)
-			if not self.ID in data.keys():
+			if not str(self.ID) in data.keys():  # Note:  str(self.ID) saved in add_part_to_list
 				# Object does not exist, so can't get filedir from get_filedir_filename()
 				# ...until the date has been set via add_part_to_list.  Do that now.
 				self.add_part_to_list()
@@ -592,14 +592,13 @@ class fsobj(object):
 
 		# Generate XML tree:
 		struct_dict = self.XML_STRUCT_DICT
-		print("IN SAVE: XML_STRUCT_DICT is")
-		print(struct_dict)
 
 		xml_tree = self.generate_xml(struct_dict)  #self.XML_STRUCT_DICT)
 
 		# Save xml file:
 		# Store in same directory as .json files, w/ same name:
 		filedir, filename = self.get_filedir_filename()  # self.ID)  #This should be unnecessary...
+		print("Filedir, filename are:", filedir, filename)
 		#filename = filename.replace('.json', '.xml')
 		if not os.path.exists(filedir):
 			os.makedirs(filedir)
@@ -610,14 +609,18 @@ class fsobj(object):
 		with open(filedir+'/'+filename, 'w') as f:
 			f.write(xmlstr)
 
-		# Return a list of all files to be uploaded to the DB
-		# (i.e. all files in the object's storage dir with "upload" in the filename)
-		def filesToUpload(self):
-			fdir, fname = self.get_filedir_filename()
-			# Grab all files in that directory
-			print("Preparing to upload {}, files {}".format(self, glob.glob(fdir + "/*upload*")))
-			return glob.glob(fdir + "/*upload*")
+	# Return a list of all files to be uploaded to the DB
+	# (i.e. all files in the object's storage dir with "upload" in the filename)
+	def filesToUpload(self):
+		fdir, fname = self.get_filedir_filename()
+		# Grab all files in that directory
+		print("Preparing to upload {}, files {}".format(self, glob.glob(fdir + "/*upload*")))
+		return glob.glob(fdir + "/*upload*")
 
+	# NEW:  All parts/assembly steps use this, bc can't write multiple XML tags w/ same name
+	@property
+	def comments_concat(self):
+		return ';;'.join(self.comments)
 
 
 # NEW FOR TOOLING:
@@ -820,7 +823,7 @@ class fsobj_part(fsobj):
 				#dcreated = time.localtime()
 				#dt = '{}-{}-{}'.format(dcreated.tm_mon, dcreated.tm_mday, dcreated.tm_year)
 			else:
-				dt = data[ID]  # date created
+				dt = data[str(ID)]  # date created
 
 		filedir, filename = self.get_filedir_filename(ID)  #, date=dt)
 		xml_file = os.sep.join([filedir, filename])
@@ -1300,7 +1303,7 @@ class baseplate(fsobj_part):
 		"barcode",
 		#"manufacturer", # name of company that manufactured this part
 		"material",     # physical material
-		"nomthickness", # nominal thickness
+		#"nomthickness", # nominal thickness
 		"size",         # hexagon width, numerical. 6 or 8 (integers) for 6-inch or 8-inch
 		"shape",        # 
 		#"rotation",     # 
@@ -1308,7 +1311,7 @@ class baseplate(fsobj_part):
 		# baseplate qualification 
 		#"corner_heights",      # list of corner heights
 		"flatness",
-		#"thickness",           # measure thickness of baseplate
+		"thickness",           # measure thickness of baseplate
 		"grade",   # A, B, or C
 
 		"check_edges_firm", # None if not checked yet; True if passed; False if failed
@@ -1357,11 +1360,11 @@ class baseplate(fsobj_part):
 		"COMMENT_DESCRIPTION":"description",
 		"LOCATION":"institution",
 		# NEW:
-		"NOMINAL_THICKNESS":"nomthickness",
+		"THICKNESS":"thickness",
 		"FLATNESS":"flatness",
 		"MATERIAL":"material",
 		"GRADE":"grade",
-		"COMMENTS":"comments",
+		"COMMENTS":"comments_concat",
 	}}}
 
 	# List of vars that should NOT be edited in the GUI and are only loaded from DB
@@ -1416,18 +1419,6 @@ class baseplate(fsobj_part):
 		else:
 			self.location = LOCATION_DICT[value]
 
-	"""
-	@property
-	def flatness(self):
-		# BASEPLATE flatness, not kapton flatness!
-		if self.corner_heights is None:
-			return None
-		else:
-			if None in self.corner_heights:
-				return None
-			else:
-				return max(self.corner_heights) - min(self.corner_heights)
-	"""
 
 	def ready_step_sensor(self, step_sensor = None, max_flatness = None):
 		if step_sensor == self.step_sensor:
@@ -1562,7 +1553,7 @@ class sensor(fsobj_part):
 	}
 
 	XML_STRUCT_DICT = { "data":{"row":{
-		"ID":"id_number",
+		#"ID":"id_number",
 		"KIND_OF_PART_ID":"kind_of_part_id",
 		"KIND_OF_PART":"kind_of_part", #TBD:  Property
 		"LOCATION_ID":"location_id", # same...
@@ -1579,9 +1570,10 @@ class sensor(fsobj_part):
 		"LOCATION":"institution",
 		#"MANUFACTURER":"manufacturer",
 		# NEW:
+		"THICKNESS":"thickness",
 		"VISUAL_INSPECTION":"inspection",
 		"GRADE":"grade",
-		"COMMENTS":"comments",
+		"COMMENTS":"comments_concat",
 		#"PREDEFINED_ATTRIBUTES":{  # Ignore this for now...
 		#	"ATTRIBUTE":{
 		#		"NAME":"HGC Silicon Sensor Type",
@@ -1778,7 +1770,7 @@ class pcb(fsobj_part):
 		"FLATNESS":"flatness",
 		"THICKNESS":"thickness",
 		"GRADE":"grade",
-		"COMMENTS":"comments",
+		"COMMENTS":"comments_concat",
 	}}}
 
 	DAQ_DATADIR = 'daq'
@@ -1972,12 +1964,16 @@ class protomodule(fsobj_part):
 		#"COMMENT_DESCRIPTION":"comment_description",
 		"LOCATION":"location",
 		"RECORD_INSERTION_USER":"insertion_user",
+		"THICKNESS":"thickness",
+		"FLATNESS":"flatness",
+		"GRADE":"grade",
 		#"PREDEFINED_ATTRIBUTES":{   # Ignore for now per Umesh
 		#	"ATTRIBUTE":{
 		#		"NAME":"AsmTrayPosn",
 		#		"VALUE":"assem_tray_posn",
 		#	}
 		#}
+		"COMMENTS":"comments_concat",
 		"CHILDREN":{
 			"PART":[{
 				"KIND_OF_PART":"baseplate_type",
@@ -2025,6 +2021,7 @@ class protomodule(fsobj_part):
 	def assm_tray_pos(self):
 		# If has a sensor step, grab the position of this sensor and return it here...
 		# "TRPOSN_11" in XML file makes no sense...temporarily using X_Y.
+		"""
 		if self.step_sensor is None:
 			print("assm_tray_posn:  no sensor step yet")
 			return "None"
@@ -2035,7 +2032,42 @@ class protomodule(fsobj_part):
 			return "None"
 		else:
 			position = temp_sensor_step.sensors.index(self.ID)
-			return "{}_{}".format(position%2, position//3)
+			return "{}_{}".format(position%2+1, position//3+1)
+		"""
+		return "{}_{}".format(self.assm_tray_row, assm_tray_col)
+
+	@property
+	def assm_tray_row(self):
+		# If has a sensor step, grab the position of this sensor and return it here...
+		# "TRPOSN_11" in XML file makes no sense...temporarily using X_Y.
+		if self.step_sensor is None:
+			print("assm_tray_posn:  no sensor step yet")
+			return "None"
+		temp_sensor_step = step_sensor()
+		found = temp_sensor_step.load(self.step_sensor)
+		if not found:
+			print("ERROR in assm_tray_pos:  protomodule has sensor step {}, but none found!".format(self.step_senosr))
+			return "None"
+		else:
+			print("Temp sensor step found.  Sensors:", temp_sensor_step.sensors)
+			position = temp_sensor_step.sensors.index(self.ID)
+			return position%2+1	
+
+	@property
+	def assm_tray_col(self):
+		# If has a sensor step, grab the position of this sensor and return it here...
+		# "TRPOSN_11" in XML file makes no sense...temporarily using X_Y.
+		if self.step_sensor is None:
+			print("assm_tray_posn:  no sensor step yet")
+			return "None"
+		temp_sensor_step = step_sensor()
+		found = temp_sensor_step.load(self.step_sensor)
+		if not found:
+			print("ERROR in assm_tray_pos:  protomodule has sensor step {}, but none found!".format(self.step_senosr))
+			return "None"
+		else:
+			position = temp_sensor_step.sensors.index(self.ID)
+			return position//3+1
 
 	@property
 	def baseplate_type(self):
@@ -2092,10 +2124,9 @@ class module(fsobj_part):
 		# module qualification
 		#"check_glue_spill",        # None if not yet checked; True if passed; False if failed
 		"preinspection",
-		#"check_glue_edge_contact", # None if not yet checked; True if passed; False if failed
-		#"unbonded_daq",      # name of dataset
-		#"unbonded_daq_user", # who performed test
-		#"unbonded_daq_ok",   # whether the output passes muster
+		"offset_translation_x",
+		"offset_translation_y",
+		"offset_rotation",
 
 		# wirebonding
 		# NEW: NOTE:  This info is filled out using the wirebonding page exclusively!
@@ -2212,7 +2243,8 @@ class module(fsobj_part):
 	}
 
 	ITEMLIST_LIST = ['comments', 'shipments', 'wirebonding_comments', 'encapsulation_comments', 'test_files',
-		'wirebonding_unbonded_channels_back', 'wirebonding_unbonded_channels_front'
+		#'wirebonding_unbonded_channels_back',
+		'wirebonding_unbonded_channels_front'
 	]
 
 	XML_STRUCT_DICT = { "data":{"row":{
@@ -2231,6 +2263,8 @@ class module(fsobj_part):
 		"COMMENT_DESCRIPTION":"description",
 		"LOCATION":"location",
 		"RECORD_INSERTION_USER":"insertion_user",
+		"GRADE":"grade",
+		"COMMENTS":"comments_concat",
 		"PREDEFINED_ATTRIBUTES":{
 			"ATTRIBUTE":{
 				"NAME":"AsmTrayPosn",
@@ -2238,7 +2272,7 @@ class module(fsobj_part):
 			},
 			"ATTRIBUTE":{
 				"NAME":"WireBonded",
-				"VALUE":"wirebonding_final_inspection_ok",
+				"VALUE":"wirebonding_completed",
 			}
 		},
 		"CHILDREN":{
@@ -2330,142 +2364,6 @@ class module(fsobj_part):
 			print("ERROR:  Could not find child PCB {}!".format(self.pcb))
 			return None
 		return temp_pcb.kind_of_part
-
-	"""
-	def fetch_datasets(self):
-		if self.ID is None:
-			err = "no module loaded; cannot fetch datasets"
-			raise ValueError(err)
-
-		filedir, filename = self.get_filedir_filename(self.ID)
-		iv_datadir  = os.sep.join([filedir, self.IV_DATADIR])
-		daq_datadir = os.sep.join([filedir, self.DAQ_DATADIR])
-		if os.path.exists(iv_datadir):
-			self.iv_data  = [_ for _ in os.listdir(iv_datadir ) if os.path.isfile(os.sep.join([iv_datadir ,_]))]
-		else:
-			self.iv_datadir = []
-		if os.path.exists(daq_datadir):
-			self.daq_data = [_ for _ in os.listdir(daq_datadir) if os.path.isfile(os.sep.join([daq_datadir,_]))]
-		else:
-			self.daq_data = []
-	
-
-	def save(self):
-		super(module, self).save()
-		filedir, filename = self.get_filedir_filename(self.ID)
-		if not os.path.exists(os.sep.join([filedir, self.IV_DATADIR, self.IV_BINS_DATADIR])):
-			os.makedirs(os.sep.join([filedir, self.IV_DATADIR, self.IV_BINS_DATADIR]))
-		if not os.path.exists(os.sep.join([filedir, self.DAQ_DATADIR])):
-			os.makedirs(os.sep.join([filedir, self.DAQ_DATADIR]))
-		self.fetch_datasets()
-
-	
-	def load_iv(self, which):
-		if isinstance(which, int):
-			which = self.iv_data[which]
-		filedir, filename = self.get_filedir_filename(self.ID)
-		file = os.sep.join([filedir, self.IV_DATADIR, which])
-		
-		if os.path.exists(file):
-			return numpy.loadtxt(file)
-		else:
-			return None
-
-	def load_iv_bins(self, which, direction='ad'):
-		if isinstance(which, int):
-			which = self.iv_data[which]
-
-		load_a = 'a' in direction
-		load_d = 'd' in direction
-
-		if (not load_a) and (not load_d):
-			err = 'must load at least one of ascending ("a") or descending ("d"), or both ("ad", default). Given {}'.format(direction)
-			raise ValueError(err)
-
-		filedir, filename = self.get_filedir_filename(self.ID)
-		iv_bins_datadir = os.sep.join([filedir, self.IV_DATADIR, self.IV_BINS_DATADIR])
-
-		file_a = os.sep.join([iv_bins_datadir, self.BA_FILENAME.format(which=which)])
-		file_d = os.sep.join([iv_bins_datadir, self.BD_FILENAME.format(which=which)])
-
-		if not (os.path.exists(file_a) and os.path.exists(file_d)):
-			self.make_iv_bins(which)
-
-		to_return = []
-
-		if load_a:
-			data_a = numpy.loadtxt(file_a)
-			to_return.append(data_a)
-			
-		if load_d:
-			data_d = numpy.loadtxt(file_d)
-			to_return.append(data_d)
-
-		return to_return
-
-	def load_daq(self, which):
-		if isinstance(which, int):
-			which = self.daq_data[which]
-
-		filedir, filename = self.get_filedir_filename(self.ID)
-		file = os.sep.join([filedir, self.DAQ_DATADIR, which])
-		print('load {}'.format(file))
-
-	def make_iv_bins(self, which, force=False):
-		#Creates bins for specified dataset. Won't overwrite unless force = True
-		# call automatically when loading bins if bins don't exist yet
-		# add kwarg to load_iv_bins to override this and force creation of bins from raw iv data
-		if isinstance(which, int):
-			which = self.iv_data[which]
-		
-		raw_data = self.load_iv(which)
-
-		asc_bins  = []
-		desc_bins = []
-
-		first_bin    = None
-		last_bin     = None
-		this_bin     = []
-		this_voltage = raw_data[0,1]
-		this_bin_asc = None
-		for data_point in raw_data:
-			if data_point[1] == this_voltage:
-				this_bin.append(data_point)
-			else:
-				if first_bin is None:
-					first_bin = this_bin
-				else:
-					if this_bin_asc:
-						asc_bins.append(this_bin)
-					else:
-						desc_bins.append(this_bin)
-
-				if data_point[1] > this_voltage:
-					this_bin_asc = True
-				else:
-					this_bin_asc = False
-
-				this_voltage = data_point[1]
-				this_bin     = [data_point]
-
-		fb_raw = numpy.array(first_bin)
-		lb_raw = numpy.array(this_bin)
-		ab_raw = [numpy.array(_) for _ in asc_bins]
-		db_raw = [numpy.array(_) for _ in desc_bins]
-
-		fb_mean = fb_raw[0:].mean(0)
-		lb_mean = lb_raw[0:].mean(0)
-		ab_mean = numpy.array([_[0:].mean(0) for _ in ab_raw])
-		db_mean = numpy.array([_[0:].mean(0) for _ in db_raw])
-
-		filedir, filename = self.get_filedir_filename(self.ID)
-
-		ba_filename = os.sep.join([filedir, self.IV_DATADIR, self.IV_BINS_DATADIR, self.BA_FILENAME]).format(which=which)
-		bd_filename = os.sep.join([filedir, self.IV_DATADIR, self.IV_BINS_DATADIR, self.BD_FILENAME]).format(which=which)
-
-		numpy.savetxt(ba_filename, ab_mean)
-		numpy.savetxt(bd_filename, db_mean)
-	"""
 
 
 
@@ -2748,6 +2646,7 @@ class step_sensor(fsobj_assembly):
 			'KIND_OF_PART':'temp_property',  # TBD
 			'SERIAL_NUMBER':'modules'
 		},
+		'COMMENTS':'comments_concat',
 		'DATA':{
 			'ASMBL_TRAY_NAME':		'assembly_tray_name',
 			'PLT_SER_NUM':			'baseplates',
@@ -2966,6 +2865,7 @@ class step_pcb(fsobj_assembly):
 			'KIND_OF_PART':'temp_property',  # TBD
 			'SERIAL_NUMBER':'modules'
 		},
+		'COMMENTS':'comments_concat',
 		'DATA':{
 			'ASMBL_TRAY_NAME':		'assembly_tray_name',
 			'PRTMOD_SER_NUM':		'protomodules',
@@ -3091,12 +2991,14 @@ class batch_sylgard(fsobj):  # was sylgar_thick
 		'date_received',
 		'date_expires',
 		'is_empty',
+		'curing_agent',
 	]
 	XML_STRUCT_DICT = {'BATCH':{
 		'ID':'ID',
 		'RECEIVE_DATE':'date_received',
 		'EXPIRE_DATE':'date_expires',
 		'IS_EMPTY':'is_empty',
+		'CURING_AGENT':'curing_agent',
 		'COMMENTS':'comments'
 	}}
 

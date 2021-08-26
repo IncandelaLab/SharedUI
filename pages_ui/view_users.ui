@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>add new user</string>
+    <string>create new user</string>
    </property>
   </widget>
   <widget class="QListWidget" name="lwUsers">

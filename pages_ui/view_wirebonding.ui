@@ -204,10 +204,13 @@
     </property>
    </widget>
    <widget class="QLabel" name="label_3">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>2</x>
-      <y>80</y>
+      <y>60</y>
       <width>141</width>
       <height>16</height>
      </rect>
@@ -246,10 +249,13 @@
     </property>
    </widget>
    <widget class="QPlainTextEdit" name="pteUnbondedChannelsBack">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>100</y>
+      <y>80</y>
       <width>281</width>
       <height>51</height>
      </rect>
@@ -315,6 +321,38 @@
     </property>
     <property name="readOnly">
      <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_47">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>130</y>
+      <width>171</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Unbonded areas (/18)</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="sbUnbondedChannelsBack">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>130</y>
+      <width>111</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="minimum">
+     <number>-1</number>
+    </property>
+    <property name="maximum">
+     <number>18</number>
     </property>
    </widget>
   </widget>
@@ -1501,7 +1539,7 @@
      <number>-1</number>
     </property>
     <property name="maximum">
-     <number>999999</number>
+     <number>2147483647</number>
     </property>
    </widget>
    <widget class="QSpinBox" name="sbBatchBondWire">
@@ -1517,7 +1555,7 @@
      <number>-1</number>
     </property>
     <property name="maximum">
-     <number>999999</number>
+     <number>2147483647</number>
     </property>
    </widget>
    <widget class="QSpinBox" name="sbBatchWedge">
@@ -1533,7 +1571,7 @@
      <number>-1</number>
     </property>
     <property name="maximum">
-     <number>999999</number>
+     <number>2147483647</number>
     </property>
    </widget>
   </widget>

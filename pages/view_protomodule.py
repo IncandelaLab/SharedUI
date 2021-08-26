@@ -169,9 +169,9 @@ class func(object):
 
 		self.page.sbStepSensor.setValue(-1 if self.protomodule.step_sensor is None else self.protomodule.step_sensor)
 		#self.page.sbSensor.setValue(    -1 if self.protomodule.sensor      is None else self.protomodule.sensor     )
-		self.page.leSensor.setText(     "" if self.protomodule.sensor      is None else self.protomodule.sensor     )
+		self.page.leSensor.setText(     "" if self.protomodule.sensor      is None else str(self.protomodule.sensor)     )
 		#self.page.sbBaseplate.setValue( -1 if self.protomodule.baseplate   is None else self.protomodule.baseplate  )
-		self.page.leBaseplate.setText(  "" if self.protomodule.baseplate   is None else self.protomodule.baseplate  )
+		self.page.leBaseplate.setText(  "" if self.protomodule.baseplate   is None else str(self.protomodule.baseplate)  )
 		if self.page.sbStepSensor.value() == -1: self.page.sbStepSensor.clear()
 		#if self.page.sbSensor.value()     == -1: self.page.sbSensor.clear()
 		#if self.page.sbBaseplate.value()  == -1: self.page.sbBaseplate.clear()
@@ -420,6 +420,7 @@ class func(object):
 			#	raise ValueError("ID cannot be negative")
 			#self.page.sbID.setValue(ID)
 			self.page.leID.setText(ID)
+			self.loadPart()
 
 	@enforce_mode('view')
 	def changed_to(self):

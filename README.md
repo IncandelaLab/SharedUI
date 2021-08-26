@@ -6,13 +6,15 @@
 
 This GUI requires Python 3.  It's been tested thoroughly with Python 3.7 and less thoroughly with Python 3.6; versions 3.4 and earlier are incompatible with PyQt5.
 
-Two packages are required:  numpy and PyQt5.  Previous versions of the GUI used PyQt4 instead, but the code is no longer compatible with it.  Installation instructions for PyQt5 can be found [here.](https://doc.bccnsoft.com/docs/PyQt5/installation.html)
+Several packages are required:  numpy, PyQt5, and requests.  All three can be installed with pip normally.  Previous versions of the GUI used PyQt4 instead, but the code is no longer compatible with it.  Installation instructions for PyQt5 can be found [here.](https://doc.bccnsoft.com/docs/PyQt5/installation.html)
 
-Additionally, the [CMS DB loader](https://github.com/valdasraps/cmsdbldr) is now required.  It can be installed with the following commands:
+Additionally, you'll need to install the [CMS DB loader](https://github.com/valdasraps/cmsdbldr).  It can be installed with the following commands:
 
 - `pip install ilock`
 - `git clone https://github.com/valdasraps/cmsdbldr.git`
 - `export PYTHONPATH=$PYTHONPATH:[install-dir]/cmsdbldr/src/main/python`
+
+The GUI also depends on the [resthub API.](https://github.com/valdasraps/resthub)  As before, you will need to clone the repo and add `[install-dir]/resthub/clients/python/src/main/python` to your `$PYTHONPATH`.
 
 It's recommended to use Qt Creator for editing the .ui files.  If it's not already installed, you can download it from the Qt Creator tab of [this page.](https://www.qt.io/offline-installers)  After making changes to the .ui files, run the script `compile.sh` (or `compile.bat`) in the .ui files' directory to carry all of the changes over to the corresponding .py files.  (Note:  Adding new .ui files will require you to modify compile.sh and compile.bat accordingly.)
 
@@ -42,5 +44,3 @@ Like the production step pages, the shipping page will display errors unless all
 
 This step may undergo substantial revision in the future.
 
-
-WARNING:  Future updates to the GUI will require the [resthub API.](https://github.com/valdasraps/resthub)  (You will need to clone the repo and add `[install-dir]/resthub/clients/python/src/main/python` to your `$PYTHONPATH`.)  However, it's not necessary yet.

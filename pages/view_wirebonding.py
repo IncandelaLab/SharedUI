@@ -235,8 +235,8 @@ class func(object):
 			self.page.cbWirebondsRepairedUserBack.addItem(self.module.wirebonds_repaired_user_back)
 		self.page.cbWirebondsRepairedUserBack.setCurrentIndex(self.index_users_wb.get(self.module.wirebonds_repaired_user_back, -1))
 
-		print("JOINING:", self.module.wirebonding_unbonded_channels_back)
-		self.page.pteUnbondedChannelsBack.setPlainText(        "" if self.module.wirebonding_unbonded_channels_back          is None else SITE_SEP.join([str(c) for c in self.module.wirebonding_unbonded_channels_back]         ))
+		self.page.sbUnbondedChannelsBack.setValue(self.module.wirebonding_unbonded_channels_back if self.module.wirebonding_unbonded_channels_back else -1)
+		#self.page.pteUnbondedChannelsBack.setPlainText(        "" if self.module.wirebonding_unbonded_channels_back          is None else SITE_SEP.join([str(c) for c in self.module.wirebonding_unbonded_channels_back]         ))
 		#self.page.pteWirebondsDamagedBack.setPlainText(     "" if self.module.wirebonds_damaged_back       is None else SITE_SEP.join(self.module.wirebonds_damaged_back      ))
 		#self.page.pteWirebondsRepairedListBack.setPlainText("" if self.module.wirebonds_repaired_list_back is None else SITE_SEP.join(self.module.wirebonds_repaired_list_back))
 
@@ -330,7 +330,7 @@ class func(object):
 			self.page.dtCureStopFront.setTime(QtCore.QTime(*localtime[3:6]))
 
 
-		# wirebonding qualification
+		#CuringAgent wirebonding qualification
 		#self.page.ckWirebondingFinalInspection.setChecked(False if self.module.wirebonding_final_inspection is None else self.module.wirebonding_final_inspection)
 		#self.page.leWirebondingFinalInspectionUser.setText("" if self.module.wirebonding_final_inspection_user is None else self.module.wirebonding_final_inspection_user)
 		if not self.module.wirebonding_final_inspection_user in self.index_users_fi.keys() and not self.module.wirebonding_final_inspection_user is None:
@@ -388,7 +388,8 @@ class func(object):
 		#self.page.leWirebondsRepairedUserBack.setReadOnly(  not (mode_creating or mode_editing) )
 		self.page.cbWirebondingUserBack.setEnabled(      mode_creating or mode_editing )
 		self.page.cbWirebondsRepairedUserBack.setEnabled(mode_creating or mode_editing )
-		self.page.pteUnbondedChannelsBack.setReadOnly(         not (mode_creating or mode_editing) )
+		self.page.sbUnbondedChannelsBack.setReadOnly(not (mode_creating or mode_editing) )
+		#self.page.pteUnbondedChannelsBack.setReadOnly(         not (mode_creating or mode_editing) )
 		#self.page.pteWirebondsDamagedBack.setReadOnly(      not (mode_creating or mode_editing) )
 		#self.page.pteWirebondsRepairedListBack.setReadOnly( not (mode_creating or mode_editing) )
 
@@ -471,7 +472,7 @@ class func(object):
 	def saveEditing(self,*args,**kwargs):
 		# First, check text boxes for errors; do nothing if found
 		self.page.leErrors.clear()
-		pteList = {"unbonded_back":self.page.pteUnbondedChannelsBack,
+		pteList = {#"unbonded_back":self.page.pteUnbondedChannelsBack,
 				   # "damaged_back":self.page.pteWirebondsDamagedBack,
 				   # "repaired_back":self.page.pteWirebondsRepairedListBack,
 				   "skip_front":self.page.pteWirebondingChannelsSkipFront,
@@ -565,7 +566,8 @@ class func(object):
 		#self.module.wirebonds_repaired_back       = self.page.ckWirebondsRepairedBack.isChecked()
 		self.module.wirebonding_user_back         = str(self.page.cbWirebondingUserBack.currentText()      ) if str(self.page.cbWirebondingUserBack.currentText()      ) else None
 		self.module.wirebonds_repaired_user_back  = str(self.page.cbWirebondsRepairedUserBack.currentText()) if str(self.page.cbWirebondsRepairedUserBack.currentText()) else None
-		self.module.wirebonding_unbonded_channels_back = separate_sites(str(self.page.pteUnbondedChannelsBack.toPlainText()        )) if str(self.page.pteUnbondedChannelsBack.toPlainText()        ) else None
+		self.module.wirebonding_unbonded_channels_back = self.page.sbUnbondedChannelsBack.value()
+		#self.module.wirebonding_unbonded_channels_back = separate_sites(str(self.page.pteUnbondedChannelsBack.toPlainText()        )) if str(self.page.pteUnbondedChannelsBack.toPlainText()        ) else None
 		#self.module.wirebonds_damaged_back          = separate_sites(str(self.page.pteWirebondsDamagedBack.toPlainText()     )) if str(self.page.pteWirebondsDamagedBack.toPlainText()     ) else None
 		#self.module.wirebonds_repaired_list_back    = separate_sites(str(self.page.pteWirebondsRepairedListBack.toPlainText())) if str(self.page.pteWirebondsRepairedListBack.toPlainText()) else None
 

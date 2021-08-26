@@ -183,7 +183,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Nominal thickness (mm)</string>
+     <string>Thickness (mm)</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -327,7 +327,7 @@
      <string>ID (date sent) (SENDER to RECEIVER)</string>
     </property>
    </widget>
-   <widget class="QDoubleSpinBox" name="dsbNomThickness">
+   <widget class="QDoubleSpinBox" name="dsbThickness">
     <property name="geometry">
      <rect>
       <x>180</x>
@@ -610,7 +610,7 @@
    <zorder>lineEdit_3</zorder>
    <zorder>leLocation</zorder>
    <zorder>listShipments</zorder>
-   <zorder>dsbNomThickness</zorder>
+   <zorder>dsbThickness</zorder>
    <zorder>lineEdit_15</zorder>
    <zorder>frame</zorder>
    <zorder>cbMaterial</zorder>

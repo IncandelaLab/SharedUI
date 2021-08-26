@@ -18,6 +18,7 @@ class simple_fsobj_vc(object):
 		pteWriteComment,
 		pbDeleteComment,
 		pbAddComment,
+		leCuring=None  # NEW
 		):
 
 		self.fsobj_exists    = None
@@ -33,6 +34,7 @@ class simple_fsobj_vc(object):
 		self.pteWriteComment = pteWriteComment
 		self.pbDeleteComment = pbDeleteComment
 		self.pbAddComment    = pbAddComment
+		self.leCuring        = leCuring  # None if nonexistent
 
 	def update_info(self,ID=None,*args,**kwargs):
 		if ID is None:
@@ -54,6 +56,11 @@ class simple_fsobj_vc(object):
 
 			self.ckIsEmpty.setChecked(self.fsobj.is_empty)
 
+			if not self.leCuring is None:
+				print("FOUND LE CURING")
+				print("SETTING TO:", self.fsobj.curing_agent)
+				self.leCuring.setText(self.fsobj.curing_agent)
+
 			self.listComments.clear()
 			for comment in self.fsobj.comments:
 				self.listComments.addItem(comment)
@@ -66,6 +73,8 @@ class simple_fsobj_vc(object):
 			self.dExpires.setDate(QtCore.QDate(2020,1,1))
 
 			self.ckIsEmpty.setChecked(False)
+			if not self.leCuring is None:
+				self.leCuring.clear()
 
 			self.listComments.clear()
 			self.pteWriteComment.clear()
@@ -91,6 +100,10 @@ class simple_fsobj_vc(object):
 		#   dateE.year(), dateE.month(), dateE.day())  #self.dExpires.date().getDate()
 
 		self.fsobj.is_empty = self.ckIsEmpty.isChecked()
+		if not self.leCuring is None:
+			print("\n\nLE CURING EXIST\n\n")
+			if self.leCuring.text() != '':  self.fsobj.curing_agent = self.leCuring.text()
+			else:  self.fsobj.curing_agent = None
 
 		self.fsobj.save()
 		self.update_info()
@@ -157,6 +170,7 @@ class func(object):
 			self.page.pteSylgardWriteComment,
 			self.page.pbSylgardDeleteComment,
 			self.page.pbSylgardAddComment,
+			self.page.leSylgardCuring,
 			)
 		"""
 		self.batch_sylgard_thin = simple_fsobj_vc(
@@ -356,6 +370,8 @@ class func(object):
 		self.page.ckIsSylgardEmpty.setEnabled(mode_editing_batch_sylgard)
 		#self.page.ckIsSylgardThinEmpty.setEnabled(mode_editing_batch_sylgard_thin)
 		self.page.ckIsBondWireEmpty.setEnabled(mode_editing_batch_bond_wire)
+
+		self.page.leSylgardCuring.setEnabled(mode_editing_batch_sylgard)
 
 		self.page.pbAralditeDeleteComment.setEnabled(mode_editing_batch_araldite)
 		self.page.pbWedgeDeleteComment.setEnabled(mode_editing_batch_wedge)

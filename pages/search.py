@@ -79,6 +79,19 @@ INDEX_CHANNEL = {
 	'LD':2,
 }
 
+INDEX_ROW = {
+	'':0,
+	'1':1,
+	'2':2,
+	'3':3,
+}
+
+INDEX_COL = {
+	'':0,
+	'1':1,
+	'2':2,
+}
+
 
 
 #assorted useful vars
@@ -151,7 +164,8 @@ class func(object):
 
 		search_dict = { self.page.cbInstitution:'institution', self.page.cbShape:'shape',
 						self.page.cbMaterial:'material', self.page.cbThickness:'type',
-						self.page.cbChannelDensity:'resolution_type', self.page.cbPCBType:'type' }
+						self.page.cbChannelDensity:'resolution_type', self.page.cbPCBType:'type',
+						self.page.cbAssmRow:'assm_tray_row', self.page.cbAssmCol:'assm_tray_col' }
 		# Treat dCreated separately
 		# Search criteria will be a dict:  'var_name':'value'
 		search_criteria = {}
@@ -173,150 +187,12 @@ class func(object):
 			found = True
 			for qty, value in search_criteria.items():
 				print("Part: {}, attr: {}".format(part_id, getattr(part_temp, qty, None)))
-				if getattr(part_temp, qty, None) != value:  found = False
+				if str(getattr(part_temp, qty, None)) != value:  found = False
 			if found:  found_parts.append("{} {}".format(part_type, part_id))
 
 		self.displayResults(found_parts)
 
-		"""
-		print("Searching for parts")
-		# Go into the partlist.  Saved format is "name":"date created"
-		# For each part, load it and check for the corresp attribute
-		# - BUT do not load from DB!  load(query_db=False)
-		partname = self.page.cbPartType.currentText()
-		filename = os.sep.join([ fm.DATADIR, 'partlist', partname+'s.json' ])
-		with open(filename, 'r') as opfl:
-			part_list = json.load(opfl)
 
-		found_parts = []
-
-		# Check whether each part matches the search criteria
-		for identifier in part_list:
-			part = partclass()
-			assert part.load(identifier)
-			# Check all search criteria:
-			for prop in {'institution':'cbInstitution', 'geometry':'cbShape', ''}
-				if x.currentText() == loaded_part_text:
-					found_parts.append(identifier)
-		"""
-
-	"""
-	def searchInstitution(self,*args,**kwargs):
-		print("Searching for institution...")
-		self.clearResults()
-
-		search_institution = self.page.cbInstitution.currentText()
-		# A file for each searchable part type currently exists at fm.DATADIR/partlist/.
-		# ...formatted as a list of ID numbers.  Load it w/ json.load() to retrieve...
-		found_parts = []
-
-		for partname, partclass in PART_DICT.items():
-			if partname == 'shipment':  continue
-
-			filename = os.sep.join([ fm.DATADIR, 'partlist', partname+'s.json' ])
-			with open(filename, 'r') as opfl:
-				part_list = json.load(opfl)
-
-			# Check whether each part matches the search criteria
-			for identifier in part_list:
-				part = partclass()  # I am PRETTY sure this works
-				assert part.load(identifier)
-				if part.institution == search_institution:
-					found_parts.append("{} {}".format(partname, identifier))
-
-		self.displayResults(found_parts)
-
-
-	def searchRecDate(self,*args,**kwargs):
-		self.clearResults()
-		search_date = [*self.page.dReceived.date().getDate()]
-		print("Searching rec date!")
-		found_parts = []
-
-		for partname, partclass in PART_DICT.items():
-			if partname != 'shipment':  continue
-
-			filename = os.sep.join([ fm.DATADIR, 'partlist', partname+'s.json' ])
-			with open(filename, 'r') as opfl:
-				part_list = json.load(opfl)
-			print("Found parts: ", part_list)
-			# Check whether each part matches the search criteria
-			for identifier in part_list:
-				part = partclass()  # I am PRETTY sure this works
-				assert part.load(identifier)
-				print(part.date_received)
-				print(search_date)
-				if part.date_received == search_date:
-					found_parts.append("{} {}".format(partname, identifier))
-
-		self.displayResults(found_parts)
-
-	def searchBType(self,*args,**kwargs):
-		self.clearResults()
-		search_btype = self.page.cbBType.currentText()
-		
-		found_parts = []
-
-		for partname, partclass in PART_DICT.items():
-			if partname != 'baseplate':  continue
-
-			filename = os.sep.join([ fm.DATADIR, 'partlist', partname+'s.json' ])
-			with open(filename, 'r') as opfl:
-				part_list = json.load(opfl)
-
-			# Check whether each part matches the search criteria
-			for identifier in part_list:
-				part = partclass()  # I am PRETTY sure this works
-				assert part.load(identifier)
-				if part.material == search_btype:
-					found_parts.append("{} {}".format(partname, identifier))
-
-		self.displayResults(found_parts)
-
-	def searchSType(self,*args,**kwargs):
-		self.clearResults()
-		search_stype = self.page.cbSType.currentText()
-		
-		found_parts = []
-
-		for partname, partclass in PART_DICT.items():
-			if partname != 'sensor':  continue
-
-			filename = os.sep.join([ fm.DATADIR, 'partlist', partname+'s.json' ])
-			with open(filename, 'r') as opfl:
-				part_list = json.load(opfl)
-
-			# Check whether each part matches the search criteria
-			for identifier in part_list:
-				part = partclass()  # I am PRETTY sure this works
-				assert part.load(identifier)
-				if part.type == search_stype:
-					found_parts.append("{} {}".format(partname, identifier))
-
-		self.displayResults(found_parts)
-	
-	def searchPType(self,*args,**kwargs):
-		self.clearResults()
-		search_ptype = self.page.cbPType.currentText()
-		
-		found_parts = []
-
-		for partname, partclass in PART_DICT.items():
-			if partname != 'shipment':  continue
-
-			filename = os.sep.join([ fm.DATADIR, 'partlist', partname+'s.json' ])
-			with open(filename, 'r') as opfl:
-				part_list = json.load(opfl)
-
-			# Check whether each part matches the search criteria
-			for identifier in part_list:
-				part = partclass()  # I am PRETTY sure this works
-				assert part.load(identifier)
-				if part.type == search_ptype:
-					found_parts.append("{} {}".format(partname, identifier))
-		
-		self.displayResults(found_parts)
-	"""
 	
 	def updateElements(self):
 		# Update enabled/disabled elements
@@ -333,7 +209,8 @@ class func(object):
 		useDate = self.page.ckUseDate.isChecked()
 		print("useDate is", useDate, ", total is...")
 		self.page.dCreated        .setReadOnly(not useDate or not (part_type == 'protomodule' or part_type == 'module'))
-
+		self.page.cbAssmRow       .setEnabled(part_type == 'protomodule' or part_type == 'module')
+		self.page.cbAssmCol       .setEnabled(part_type == 'protomodule' or part_type == 'module')
 
 	def clearResults(self,*args,**kwargs):
 		# empty lwPartList
