@@ -16,7 +16,7 @@ from xml.etree.ElementTree import tostring
 from xml.etree.ElementTree import fromstring
 import csv
 
-import rhapi as rh
+import rhapi_nolock as rh
 from xml.dom import minidom
 
 
