@@ -2971,8 +2971,8 @@ class batch_wedge(fsobj):
 	FILEDIR = os.sep.join(['supplies','batch_wedge','{date}'])
 	FILENAME = 'batch_wedge_{ID:0>5}.xml'
 	PROPERTIES = [
-		'date_received',
-		'date_expires',
+		#'date_received',
+		#'date_expires',
 		'is_empty',
 	]
 	XML_STRUCT_DICT = {'BATCH':{

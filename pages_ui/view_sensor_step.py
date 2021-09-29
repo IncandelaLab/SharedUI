@@ -414,7 +414,7 @@ class Ui_Form(object):
         self.pbCancel.setText(_translate("Form", "Cancel"))
         self.pbSave.setText(_translate("Form", "Save"))
         self.lineEdit_12.setText(_translate("Form", "position"))
-        self.lineEdit_14.setText(_translate("Form", "protomodule serial (automatic)"))
+        self.lineEdit_14.setText(_translate("Form", "protomodule serial (auto-set)"))
         self.lineEdit_15.setText(_translate("Form", "1 (1, 1)"))
         self.lineEdit_16.setText(_translate("Form", "2 (1, 2)"))
         self.lineEdit_17.setText(_translate("Form", "3 (2, 1)"))

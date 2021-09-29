@@ -7,7 +7,7 @@ DEBUG = False
 class simple_fsobj_vc(object):
 	def __init__(self,
 		fsobj,
-		sbID,
+		sbID,  # NOTE:  Now can be a le instead!
 		dReceived,
 		dExpires,
 		ckIsEmpty,
@@ -38,21 +38,29 @@ class simple_fsobj_vc(object):
 
 	def update_info(self,ID=None,*args,**kwargs):
 		if ID is None:
-			ID = self.sbID.value()
+			#print("** SB TYPE IS **", type(self.sbID).__name__)
+			if type(self.sbID).__name__ == 'QLineEdit':
+				ID = self.sbID.text()
+			else:
+				ID = self.sbID.value()
 		else:
-			self.sbID.setValue(ID)
+			if type(self.sbID).__name__ == 'QLineEdit':
+				self.sbID.setText(ID)
+			else:
+				self.sbID.setValue(ID)
 		self.fsobj_exists = self.fsobj.load(ID)
 
 		if self.fsobj_exists:
 			self.pbEditNew.setText("edit")
 
-			# Load date:
-			ydm = self.fsobj.date_received.split('-')
-			# Note:  QDate constructor format is ymd
-			self.dReceived.setDate(QtCore.QDate(int(ydm[2]), int(ydm[0]), int(ydm[1])))  #*self.fsobj.date_received))
-			ydm = self.fsobj.date_expires.split('-')
-			self.dExpires .setDate(QtCore.QDate(int(ydm[2]), int(ydm[0]), int(ydm[1])))   #*self.fsobj.date_expires))
-			print("DATE SET TO:", self.dExpires.date())
+			if self.dReceived != None:
+				# Load date:
+				ydm = self.fsobj.date_received.split('-')
+				# Note:  QDate constructor format is ymd
+				self.dReceived.setDate(QtCore.QDate(int(ydm[2]), int(ydm[0]), int(ydm[1])))  #*self.fsobj.date_received))
+				ydm = self.fsobj.date_expires.split('-')
+				self.dExpires .setDate(QtCore.QDate(int(ydm[2]), int(ydm[0]), int(ydm[1])))   #*self.fsobj.date_expires))
+				print("DATE SET TO:", self.dExpires.date())
 
 			self.ckIsEmpty.setChecked(self.fsobj.is_empty)
 
@@ -68,9 +76,9 @@ class simple_fsobj_vc(object):
 
 		else:
 			self.pbEditNew.setText("new")
-
-			self.dReceived.setDate(QtCore.QDate(2020,1,1))
-			self.dExpires.setDate(QtCore.QDate(2020,1,1))
+			if self.dReceived != None:
+				self.dReceived.setDate(QtCore.QDate(2020,1,1))
+				self.dExpires.setDate(QtCore.QDate(2020,1,1))
 
 			self.ckIsEmpty.setChecked(False)
 			if not self.leCuring is None:
@@ -81,7 +89,10 @@ class simple_fsobj_vc(object):
 
 	def start_editing(self,*args,**kwargs):
 		if not self.fsobj_exists:
-			self.fsobj.new(self.sbID.value())
+			if type(self.sbID).__name__ == 'QLineEdit':
+				self.fsobj.new(self.sbID.text())
+			else:
+				self.fsobj.new(self.sbID.value())
 
 	def cancel_editing(self,*args,**kwargs):
 		self.update_info()
@@ -91,13 +102,14 @@ class simple_fsobj_vc(object):
 		for i in range(self.listComments.count()):
 			comments.append(self.listComments.item(i).text())
 		self.fsobj.comments = comments
-
-		dateR = self.dReceived.date()
-		self.fsobj.date_received = "{}-{}-{}".format(dateR.month(), dateR.day(), dateR.year())
-		#   dateR.year(), dateR.month(), dateR.day())  #self.dReceived.date().getDate()
-		dateE = self.dExpires.date()
-		self.fsobj.date_expires  = "{}-{}-{}".format(dateE.month(), dateE.day(), dateE.year())
-		#   dateE.year(), dateE.month(), dateE.day())  #self.dExpires.date().getDate()
+		
+		if self.dReceived != None:
+			dateR = self.dReceived.date()
+			self.fsobj.date_received = "{}-{}-{}".format(dateR.month(), dateR.day(), dateR.year())
+			#   dateR.year(), dateR.month(), dateR.day())  #self.dReceived.date().getDate()
+			dateE = self.dExpires.date()
+			self.fsobj.date_expires  = "{}-{}-{}".format(dateE.month(), dateE.day(), dateE.year())
+			#   dateE.year(), dateE.month(), dateE.day())  #self.dExpires.date().getDate()
 
 		self.fsobj.is_empty = self.ckIsEmpty.isChecked()
 		if not self.leCuring is None:
@@ -129,7 +141,7 @@ class func(object):
 
 		self.batch_araldite = simple_fsobj_vc(
 			fm.batch_araldite(),
-			self.page.sbAralditeID,
+			self.page.leAralditeID, #self.page.sbAralditeID,
 			self.page.dAralditeReceived,
 			self.page.dAralditeExpires,
 			self.page.ckIsAralditeEmpty,
@@ -145,8 +157,8 @@ class func(object):
 		self.batch_wedge = simple_fsobj_vc(
 			fm.batch_wedge(),
 			self.page.sbWedgeID,
-			self.page.dWedgeReceived,
-			self.page.dWedgeExpires,
+			None, #self.page.dWedgeReceived,
+			None, #self.page.dWedgeExpires,
 			self.page.ckIsWedgeEmpty,
 			self.page.pbWedgeEditNew,
 			self.page.pbWedgeSave,
@@ -249,7 +261,8 @@ class func(object):
 
 	@enforce_mode('setup')
 	def rig(self):
-		self.page.sbAralditeID.valueChanged.connect(self.update_info_batch_araldite)
+		#self.page.sbAralditeID.valueChanged.connect(self.update_info_batch_araldite)
+		self.page.leAralditeID.textChanged.connect(self.update_info_batch_araldite)
 		self.page.sbWedgeID.valueChanged.connect(self.update_info_batch_wedge)
 		self.page.sbSylgardID.valueChanged.connect(self.update_info_batch_sylgard)
 		#self.page.sbSylgardThinID.valueChanged.connect(self.update_info_batch_sylgard_thin)
@@ -329,7 +342,8 @@ class func(object):
 
 		self.setMainSwitchingEnabled(mode_view)
 
-		self.page.sbAralditeID.setEnabled(not mode_editing_batch_araldite)
+		#self.page.sbAralditeID.setEnabled(not mode_editing_batch_araldite)
+		self.page.leAralditeID.setEnabled(not mode_editing_batch_araldite)
 		self.page.sbWedgeID.setEnabled(not mode_editing_batch_wedge)
 		self.page.sbSylgardID.setEnabled(not mode_editing_batch_sylgard)
 		#self.page.sbSylgardThinID.setEnabled(not mode_editing_batch_sylgard_thin)
@@ -354,13 +368,13 @@ class func(object):
 		self.page.pbBondWireCancel.setEnabled(mode_editing_batch_bond_wire)
 
 		self.page.dAralditeReceived.setEnabled(mode_editing_batch_araldite)
-		self.page.dWedgeReceived.setEnabled(mode_editing_batch_wedge)
+		#self.page.dWedgeReceived.setEnabled(mode_editing_batch_wedge)
 		self.page.dSylgardReceived.setEnabled(mode_editing_batch_sylgard)
 		#self.page.dSylgardThinReceived.setEnabled(mode_editing_batch_sylgard_thin)
 		self.page.dBondWireReceived.setEnabled(mode_editing_batch_bond_wire)
 
 		self.page.dAralditeExpires.setEnabled(mode_editing_batch_araldite)
-		self.page.dWedgeExpires.setEnabled(mode_editing_batch_wedge)
+		#self.page.dWedgeExpires.setEnabled(mode_editing_batch_wedge)
 		self.page.dSylgardExpires.setEnabled(mode_editing_batch_sylgard)
 		#self.page.dSylgardThinExpires.setEnabled(mode_editing_batch_sylgard_thin)
 		self.page.dBondWireExpires.setEnabled(mode_editing_batch_bond_wire)
