@@ -695,7 +695,7 @@ class func(object):
 		#if rows_module_dne:
 		#	issues.append(I_MODULE_DNE.format(     ', '.join([str(_+1) for _ in rows_module_dne])))
 
-		objects_6in = []
+		objects_8in = []
 		objects_8in = []
 		objects_not_here = []
 
@@ -703,7 +703,7 @@ class func(object):
 
 			size = getattr(obj, "size", None)
 			if size in [6.0, 6, '6']:
-				objects_6in.append(obj)
+				objects_8in.append(obj)
 			if size in [8.0, 8, '8']:
 				objects_8in.append(obj)
 
@@ -711,9 +711,9 @@ class func(object):
 			if not (institution in [None, self.page.cbInstitution.currentText()]):  #self.MAC]):
 				objects_not_here.append(obj)
 
-		if len(objects_6in) and len(objects_8in):
+		if len(objects_8in) and len(objects_8in):
 			issues.append(I_SIZE_MISMATCH)
-			issues.append(I_SIZE_MISMATCH_6.format(', '.join([str(_) for _ in objects_6in])))
+			issues.append(I_SIZE_MISMATCH_6.format(', '.join([str(_) for _ in objects_8in])))
 			issues.append(I_SIZE_MISMATCH_8.format(', '.join([str(_) for _ in objects_8in])))
 
 		if objects_not_here:

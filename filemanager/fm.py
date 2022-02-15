@@ -466,6 +466,8 @@ class fsobj(object):
 					root.append(child)
 			"""
 			if item_name == "DATA_SET":
+				self.make_dataset_element(root, item)
+				"""
 				# Special treatment.  First, find number of datasets to save, one for each module/protomodule:
 				num_parts = 0
 				protomodules = getattr(self, 'protomodules', None)
@@ -482,12 +484,32 @@ class fsobj(object):
 					# Create a DATA_SET for each part
 					child = self.dict_to_element(dataset_dict, item_name, data_set_index=i)
 					root.append(child)
+				"""
 			else:
 				print("  List not found in generate_xml.  Calling dict to element on...")
 				print(item, item_name)
 				child = self.dict_to_element(item, item_name)
 				root.append(child)
 		return tree
+
+
+	def make_dataset_element(self, parent, item):
+		# NEW:  If DATA_SET encountered, need to write one DATA_SET for each *module assembled.
+		num_parts = 0
+		protomodules = getattr(self, 'protomodules', None)
+		modules = getattr(self, 'modules', None)
+		if protomodules:
+			num_parts = sum([1 for p in protomodules if p])  # List with Nones if no protomodule
+		elif modules:
+			num_parts = sum([1 for p in modules if p])
+		else:  print("ERROR: failed to find protomodules, modules in generate_xml()!")
+		dataset_dict = getattr(self, item, None)
+		if not dataset_dict:  print("ERROR: failed to find dataset dict!")
+		print("Creating DATA_SET_DICT, num parts is", num_parts)
+		for i in range(num_parts):
+			# Create a DATA_SET for each part
+			child = self.dict_to_element(dataset_dict, "DATA_SET", data_set_index=i)
+			parent.append(child)
 
 
 	def dict_to_element(self, input_dict, element_name, data_set_index=None):
@@ -512,9 +534,28 @@ class fsobj(object):
 			# If string, use getattr()
 			print("    dict_to_element:  name, dict are:", item_name, item)
 
-
-			if type(item) == dict:
-				#print("  **Dict found.  Calling recursive case...")
+			if item_name == "DATA_SET":
+				self.make_dataset_element(parent, item)
+				"""
+				# SPECIAL CASE:  Write one DATA_SET element for each assembled part.
+				num_parts = 0
+				protomodules = getattr(self, 'protomodules', None)
+				modules = getattr(self, 'modules', None)
+				if protomodules:
+					num_parts = sum([1 for p in protomodules if p])  # List with Nones if no protomodule
+				elif modules:
+					num_parts = sum([1 for p in modules if p])
+				else:  print("ERROR: failed to find protomodules, modules in generate_xml()!")
+				dataset_dict = getattr(self, item, None)
+				if not dataset_dict:  print("ERROR: failed to find dataset dict!")
+				print("Creating DATA_SET_DICT, num parts is", num_parts)
+				for i in range(num_parts):
+					# Create a DATA_SET for each part
+					child = self.dict_to_element(dataset_dict, item_name, data_set_index=i)
+					root.append(child)
+				"""
+			elif type(item) == dict:
+				print("  **Dict found.  Calling recursive case...")
 				# Recursive case: Create an element from the child dictionary.
 				# "Remember" whether currently in a DATA_SET
 				child = self.dict_to_element(item, item_name, data_set_index=data_set_index)
@@ -2825,8 +2866,8 @@ class step_pcb(fsobj_assembly):
 	COND_TABLE_NAME = 'HGC_MOD_ASMBLY_COND'
 	ASSM_TABLE_DESC = 'HGC Six Inch Module Assembly'
 	COND_TABLE_DESC = 'HGC Six Inch Module Curing Cond'
-	RUN_TYPE        = 'HGC 6inch Module Assembly'
-	CMT_DESCR = 'Build 6inch modules'
+	RUN_TYPE        = 'HGC 8inch Module Assembly'
+	CMT_DESCR = 'Build 8inch modules'
 	VNUM = 1
 
 	# Vars for tables - constants
