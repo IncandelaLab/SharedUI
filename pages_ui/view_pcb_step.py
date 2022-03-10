@@ -249,7 +249,7 @@ class Ui_Form(object):
         self.leLocation.setGeometry(QtCore.QRect(800, 160, 131, 20))
         self.leLocation.setObjectName("leLocation")
         self.lineEdit_25 = QtWidgets.QLineEdit(Form)
-        self.lineEdit_25.setGeometry(QtCore.QRect(10, 110, 151, 20))
+        self.lineEdit_25.setGeometry(QtCore.QRect(10, 100, 151, 20))
         self.lineEdit_25.setReadOnly(True)
         self.lineEdit_25.setObjectName("lineEdit_25")
         self.dtRunStart = QtWidgets.QDateTimeEdit(Form)
@@ -317,7 +317,7 @@ class Ui_Form(object):
         self.sbID.setGeometry(QtCore.QRect(100, 10, 61, 21))
         self.sbID.setObjectName("sbID")
         self.cbInstitution = QtWidgets.QComboBox(Form)
-        self.cbInstitution.setGeometry(QtCore.QRect(160, 110, 91, 21))
+        self.cbInstitution.setGeometry(QtCore.QRect(160, 100, 91, 21))
         self.cbInstitution.setObjectName("cbInstitution")
         self.cbInstitution.addItem("")
         self.cbInstitution.addItem("")
@@ -351,8 +351,11 @@ class Ui_Form(object):
         self.dsbCureTemperature.setProperty("value", 70.0)
         self.dsbCureTemperature.setObjectName("dsbCureTemperature")
         self.label = QtWidgets.QLabel(Form)
-        self.label.setGeometry(QtCore.QRect(290, 80, 331, 41))
+        self.label.setGeometry(QtCore.QRect(370, 20, 331, 41))
         self.label.setObjectName("label")
+        self.ckCheckFeet = QtWidgets.QCheckBox(Form)
+        self.ckCheckFeet.setGeometry(QtCore.QRect(280, 95, 341, 31))
+        self.ckCheckFeet.setObjectName("ckCheckFeet")
 
         self.retranslateUi(Form)
         self.cbInstitution.setCurrentIndex(-1)
@@ -427,4 +430,5 @@ class Ui_Form(object):
         self.pbRunStopNow.setText(_translate("Form", "set to now"))
         self.label.setText(_translate("Form", "Warning:  all parts must be downloaded locally\n"
 "before assembly"))
+        self.ckCheckFeet.setText(_translate("Form", "Check:  correct feet are installed on pickup tool"))
 

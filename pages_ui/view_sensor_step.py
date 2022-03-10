@@ -370,7 +370,7 @@ class Ui_Form(object):
         self.sbCureHumidity.setProperty("value", 10)
         self.sbCureHumidity.setObjectName("sbCureHumidity")
         self.label = QtWidgets.QLabel(Form)
-        self.label.setGeometry(QtCore.QRect(290, 80, 331, 41))
+        self.label.setGeometry(QtCore.QRect(310, 20, 331, 41))
         self.label.setObjectName("label")
         self.pbClear1 = QtWidgets.QPushButton(Form)
         self.pbClear1.setGeometry(QtCore.QRect(690, 160, 51, 21))
@@ -390,6 +390,9 @@ class Ui_Form(object):
         self.pbClear6 = QtWidgets.QPushButton(Form)
         self.pbClear6.setGeometry(QtCore.QRect(690, 260, 51, 21))
         self.pbClear6.setObjectName("pbClear6")
+        self.ckCheckFeet = QtWidgets.QCheckBox(Form)
+        self.ckCheckFeet.setGeometry(QtCore.QRect(290, 95, 341, 31))
+        self.ckCheckFeet.setObjectName("ckCheckFeet")
 
         self.retranslateUi(Form)
         self.cbInstitution.setCurrentIndex(-1)
@@ -470,4 +473,5 @@ class Ui_Form(object):
         self.pbClear4.setText(_translate("Form", "clear"))
         self.pbClear5.setText(_translate("Form", "clear"))
         self.pbClear6.setText(_translate("Form", "clear"))
+        self.ckCheckFeet.setText(_translate("Form", "Check:  correct feet are installed on pickup tool"))
 

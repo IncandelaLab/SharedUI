@@ -34,7 +34,7 @@ MAC_ID_RANGES = {
 }
 
 # NEW
-LOCATION_DICT = {  # For loading from LOCATION_ID XML tag
+LOCATION_DICT = {  # For loading from/to LOCATION_ID XML tag
 	1780: "FNAL",
 	1781: "UMN",
 	1782: "UCSB",
@@ -536,24 +536,6 @@ class fsobj(object):
 
 			if item_name == "DATA_SET":
 				self.make_dataset_element(parent, item)
-				"""
-				# SPECIAL CASE:  Write one DATA_SET element for each assembled part.
-				num_parts = 0
-				protomodules = getattr(self, 'protomodules', None)
-				modules = getattr(self, 'modules', None)
-				if protomodules:
-					num_parts = sum([1 for p in protomodules if p])  # List with Nones if no protomodule
-				elif modules:
-					num_parts = sum([1 for p in modules if p])
-				else:  print("ERROR: failed to find protomodules, modules in generate_xml()!")
-				dataset_dict = getattr(self, item, None)
-				if not dataset_dict:  print("ERROR: failed to find dataset dict!")
-				print("Creating DATA_SET_DICT, num parts is", num_parts)
-				for i in range(num_parts):
-					# Create a DATA_SET for each part
-					child = self.dict_to_element(dataset_dict, item_name, data_set_index=i)
-					root.append(child)
-				"""
 			elif type(item) == dict:
 				print("  **Dict found.  Calling recursive case...")
 				# Recursive case: Create an element from the child dictionary.
@@ -564,7 +546,7 @@ class fsobj(object):
 					child.set('mode','auto')
 				parent.append(child)
 			elif type(item) == list:
-				# Second recursive case:  for multiple parts, comments, etc
+				# Second recursive case:  for multiple parts, etc
 				print("    Found list of vals to store for", item_name, item)
 				# "PART":[{part_dict_1}, {part_dict_2}]; both have to be labeled w/ "PART"
 				for it in item:
@@ -661,7 +643,10 @@ class fsobj(object):
 	# NEW:  All parts/assembly steps use this, bc can't write multiple XML tags w/ same name
 	@property
 	def comments_concat(self):
-		return ';;'.join(self.comments)
+		cmts = ';;'.join(self.comments)
+		# Impose len reqt of 4000 chars (for DB)
+		if len(cmts) > 4000:  cmts = cmts[:4000]
+		return cmts
 
 
 # NEW FOR TOOLING:
@@ -1215,26 +1200,6 @@ class shipment(fsobj):
 		"modules",
 	]
 
-	"""
-	XML_STRUCT_DICT = {'SHIPMENT':{
-		'ID':'ID',
-		'SENDER':'sender',
-		'RECIEVER':'receiver',
-		"date_sent",
-		"date_received",
-
-		"sendOrReceive",  #NEW, may be unnecessary
-		"fedex_id", # NEW
-
-		"kaptons",
-		"baseplates",
-		"sensors",
-		"pcbs",
-		"protomodules",
-		"modules",
-
-	}}
-	"""
 
 	def save(self):
 		super(shipment,self).save()
@@ -1372,8 +1337,6 @@ class baseplate(fsobj_part):
 		# Will be given straight to the upload file, or held onto
 		"id_number",
 		"parent_ID",
-		"kind_of_part_id",
-		"kind_of_part",
 		#"location_id",
 		"description",
 	]
@@ -1421,30 +1384,16 @@ class baseplate(fsobj_part):
 
 
 	@property
-	def kind_of_part(self): # Determined entirely by size
-		if self.size == 6:
-			size_str = "Six"
-		elif self.size == 8:
-			size_str = "Eight"
-		elif self.size == None:
-			return None
-		else:
-			print("ERROR:  size {} does not exist".format(self.size))
-			return None
-		return "HGC {} Inch Plate".format(size_str)
+	def kind_of_part(self):
+		return "{} {} Baseplate".format(self.material, self.shape)
 	@kind_of_part.setter
 	def kind_of_part(self, value):
 		# Parse and read in the baseplate size
 		if value is None or value == "None":
-			self.size = None
-			return
-		size_str = value.split()[1]
-		if size_str == "Six":
-			self.size = 6
-		elif size_str == "Eight":
-			self.size = 8
+			self.material = None
+			self.shape = None
 		else:
-			print("ERROR:  Unexpected baseplate size {} loaded".format(size_str))
+			self.material, self.shape = value.split()[:2]
 
 	@property
 	def location_id(self):
@@ -1556,7 +1505,6 @@ class sensor(fsobj_part):
 		"barcode",
 		"manufacturer",
 		"type",         # NEW:  This is now chosen from a drop-down menu
-		"thickness",
 		"size",         # 
 		"channel_density",  # HD or LD
 		"shape",        # 
@@ -1581,8 +1529,6 @@ class sensor(fsobj_part):
 		"insertion_user",
 		# NEW:  Data to be read from base XML file
 		"id_number",
-		"kind_of_part_id",
-		"kind_of_part",
 		"location_id",
 		"description",
 
@@ -1630,35 +1576,25 @@ class sensor(fsobj_part):
 
 	ITEMLIST_LIST = ['comments', 'shipments']
 
-
-	"""
 	@property
-	def kind_of_part(self): # Determined entirely by size
-		if self.size == 6:
-			size_str = "Six"
-		elif self.size == 8:
-			size_str = "Eight"
-		else:
-			print("ERROR:  size {} does not exist".format(self.size))
-			return None
-		return "HPK {} Inch {} Cell Silicon Sensor".format(size_str, self.channels)
+	def resolution(self):
+		return 'HD' if self.type=='120um' else 'LD'
+
+	@property
+	def kind_of_part(self):
+		return "{} {} {} Si sensor".format(self.resolution, self.type, self.shape)
 	@kind_of_part.setter
 	def kind_of_part(self, value):
 		# Parse and read in the baseplate size
 		if value is None:
-			self.channels = None
-			return
-		parsestr = value.split() # ex. "HPK Six Inch 256 Cell Silicon Sensor"
-		size_str = parsestr[1]
-		self.channels = parsestr[3]
-		if size_str == "Six":
-			self.size = 6
-		elif size_str == "Eight":
-			self.size = 8
+			self.type = None
+			self.shape = None
 		else:
-			print("ERROR:  Unexpected sensor size {} loaded".format(size_str))
-	"""
+			self.type, self.shape = value.split()[1:3]]
 
+	@property
+	def thickness(self):
+		return float(self.type.split()[0])/1000
 
 	@property
 	def location_id(self):
@@ -1742,7 +1678,7 @@ class pcb(fsobj_part):
 		"barcode", 
 		"manufacturer", # 
 		"type",         # 
-		"resolution_type", # NEW
+		"resolution",   # NEW
 		"num_rocs",     # NEW
 		"size",         # 
 		"channels",     # 
@@ -1824,18 +1760,17 @@ class pcb(fsobj_part):
 	ITEMLIST_LIST = ['comments', 'shipments', 'test_files']
 
 	# WIP, go back and fix!
-	"""
+	
 	@property
 	def kind_of_part(self): # Determined entirely by size
-		return "HGC {} Hex PCB".format(self.resolution_type)
+		return "{} {} PCB".format(self.resolution, self.shape)
 	@kind_of_part.setter
 	def kind_of_part(self, value):
-		# Parse and read in the baseplate size
-		res_str = value.split()[1]
-		if not res_str in ['HD', 'LD']:
-			print("ERROR:  Unexpected resolution type {}".format(res_str))
-		self.resolution_type = res_str  # HD or LD
-	"""
+		if value is None:
+			self.resolution = None
+			self.shape = None
+		else:
+			self.resolution, self.shape = value.split()[:2]
 	
 	@property
 	def location_id(self):
@@ -1863,73 +1798,6 @@ class pcb(fsobj_part):
 		else:
 			self.daq_data = []
 
-	"""
-	def load(self,ID):
-		success = super(pcb,self).load(ID)
-		#if success:
-		#	self.fetch_datasets()
-		return success
-	"""
-
-	# OLD (?)
-	"""
-	def save(self):  #NEW for XML generation
-		
-		# FIRST:  If not all necessary vars are defined, don't save the XML file.
-		required_vars = [self.size, self.comments, self.location, self.institution]
-		#contents = vars(self)
-		for vr in required_vars:
-			if vr is None:
-				# If any undef var found, save the json file only and return
-				print("NOTE:  missing required data, baseplate XML not saved.")
-				super(pcb, self).save()
-				return
-
-		# TAKE 2:  This time, use gen_xml(input_dict) to streamline things.
-		part_dict = {
-			'KIND_OF_PART':          'HGC {} Inch {} Channel PCB'.format('Six' if self.size=='6' else 'Eight', self.channels),
-			'RECORD_INSERTION_USER': self.insertion_user,   # NOTE:  This may have to be redone when XML uploading is implemented!
-			'SERIAL_NUMBER':         self.ID,
-			'COMMENT_DESCRIPTION':   self.comments,   # Note:  Requires special treatment
-			'LOCATION':              self.location,
-			'MANUFACTURER':          self.manufacturer,
-		}
-
-		parts_dict = {
-			'PART': part_dict,
-		}
-		root_dict = {
-			'PARTS': parts_dict,
-		}
-
-		# CREATE XML FILE OBJECT:
-		xml_tree = self.generate_xml(root_dict)
-
-		# Order changed:
-		super(pcb, self).save()
-
-		# Save:
-		self.save_xml(xml_tree)
-		
-		# From old save():
-		filedir, filename = self.get_filedir_filename(self.ID)
-		if not os.path.exists(os.sep.join([filedir, self.DAQ_DATADIR])):
-			os.makedirs(os.sep.join([filedir, self.DAQ_DATADIR]))
-		self.fetch_datasets()
-		self.fetch_datasets()
-	"""
-
-	# OLD
-	"""
-	def load_daq(self,which):
-		if isinstance(which, int):
-			which = self.daq_data[which]
-
-		filedir, filename = self.get_filedir_filename()
-		file = os.sep.join([filedir, self.DAQ_DATADIR, which])
-
-		print('load {}'.format(file))
-	"""
 
 
 class protomodule(fsobj_part):
@@ -2034,29 +1902,19 @@ class protomodule(fsobj_part):
 
 	ITEMLIST_LIST = ['comments', 'shipments']
 
-	# WIP, go back and fix
-	"""
 	@property
-	def kind_of_part(self): # Determined entirely by size
-		if self.size == 6:
-			size_str = "Six"
-		elif self.size == 8:
-			size_str = "Eight"
-		else:
-			print("ERROR:  size {} does not exist".format(self.size))
-			return Nonei
-		return "HGC {} Inch Silicon Protomodule".format(size_str)
+	def kind_of_part(self):
+		if not self.sensor or not self.baseplate:  return None
+		return '{} {} {} {} Si Protomodule'.format('EM' if self.baseplate.material=='W/Cu' else 'HAD', 
+                                                   self.sensor.resolution, self.sensor.type, self.shape)
+
 	@kind_of_part.setter
 	def kind_of_part(self, value):
 		# Parse and read in the baseplate size
-		res_str = value.split()[1]
-		if res_str == "Six":
-			self.size = 6
-		elif res_str == "Eight":
-			self.size = 8
+		if value is None:
+			return None
 		else:
-			print("Read unrecognized protomodule size {}".format(res_str))
-	"""
+			print("PLACEHOLDER:  Need to handle case:  downloaded module w/o corresponding pcb/protomod")
 
 	@property
 	def assm_tray_pos(self):
@@ -2260,8 +2118,6 @@ class module(fsobj_part):
 		# NEW:  Data to be read from base XML file
 		"id_number",
 		"part_parent_id",
-		"kind_of_part_id",
-		"kind_of_part",
 		"location_id",
 		"description",
 
@@ -2304,13 +2160,14 @@ class module(fsobj_part):
 		"COMMENT_DESCRIPTION":"description",
 		"LOCATION":"location",
 		"RECORD_INSERTION_USER":"insertion_user",
+		"THICKNES":"thickness",
 		"GRADE":"grade",
 		"COMMENTS":"comments_concat",
 		"PREDEFINED_ATTRIBUTES":{
-			"ATTRIBUTE":{
-				"NAME":"AsmTrayPosn",
-				"VALUE":"assem_tray_posn",
-			},
+			#"ATTRIBUTE":{  # ignore for now per Umesh
+			#	"NAME":"AsmTrayPosn",
+			#	"VALUE":"assem_tray_posn",
+			#},
 			"ATTRIBUTE":{
 				"NAME":"WireBonded",
 				"VALUE":"wirebonding_completed",
@@ -2341,27 +2198,19 @@ class module(fsobj_part):
 	]
 
 
-	# GO BACK and fix
-	"""
 	@property
-	def kind_of_part(self): # Determined entirely by size
-		if self.size == 6:
-			size_str = "Six"
-		elif self.size == 8:
-			size_str = "Eight"
-		else:
-			print("ERROR:  size {} does not exist".format(self.size))
-			return None
-		return "HGC {} Inch Plate".format(size_str)
+	def kind_of_part(self):
+		if not self.sensor or not self.baseplate:  return None
+		return '{} {} {} {} Si Module'.format('EM' if self.baseplate.material=='W/Cu' else 'HAD', 
+                                                   self.sensor.resolution, self.sensor.type, self.shape)
+
 	@kind_of_part.setter
 	def kind_of_part(self, value):
 		# Parse and read in the baseplate size
-		res_str = value.split()[1]
-		if not res_str in ['HD', 'LD']:
-			print("ERROR:  Unexpected resolution type {}".format(res_str))
-		self.resolution_type = res_str  # HD or LD
-	"""
-
+		if value is None:
+			return None
+		else:
+			print("PLACEHOLDER:  Need to handle case:  downloaded module w/o corresponding pcb/protomod")
 
 	# TEMPORARY:  May want to fix this...
 	@property
@@ -2412,83 +2261,6 @@ class module(fsobj_part):
 ###############  assembly steps  ##############
 ###############################################
 
-class step_kapton(fsobj):  # NOTE:  Not an assembly object!  (doesn't have 2 XML files, not in DB)
-	OBJECTNAME = "kapton step"
-	FILEDIR    = os.sep.join(['steps','kapton','{date}'])
-	FILENAME   = 'kapton_assembly_step_{ID:0>5}.xml'
-	PROPERTIES = [
-		'user_performed', # name of user who performed step
-		'institution', # institution where step was performed
-		'location', # location at institution where step was performed
-		#'date_performed', # date step was performed
-		'run_start',  # unix time @ start of run
-		# Currently replacing all other time info:
-		#'run_stop',   # unix time @ end of run
-
-		#'cure_start',       # unix time @ start of curing
-		#'cure_stop',        # unix time @ end of curing
-		'cure_temperature', # Average temperature during curing (centigrade)
-		'cure_humidity',    # Average humidity during curing (percent)
-
-		'kaptons_inspected', # list of kapton inspection results, ordered by component tray location. should all be True (don't use a kapton if it doesn't pass)
-		'tools',      # list of pickup tool IDs, ordered by pickup tool location
-		#'baseplates', # list of baseplate   IDs, ordered by assembly tray position
-		'sensors',  # NEW:  List of sensors!
-
-		'tray_component_sensor', # ID of component tray used
-		'tray_assembly',         # ID of assembly tray used
-		'batch_araldite',        # ID of araldite batch used
-	]
-
-
-	"""@property
-	def cure_duration(self):
-		if (self.cure_stop is None) or (self.cure_start is None):
-			return None
-		else:
-			return self.cure_stop - self.cure_start
-	"""
-
-	# New:  Convert time_t to correctly-formatted date string
-	@property
-	def run_start_xml(self):
-		if self.run_start is None:
-			return None
-		localtime = list(time.localtime(self.run_start))
-		qdate = QtCore.QDate(*localtime[0:3])
-		qtime = QtCore.QTime(*localtime[3:6])
-		datestr = "{}-{}-{} {}:{}:{}".format(qdate.year(), qdate.month(), qdate.day(), \
-                                             qtime.hour(), qtime.minute(), qtime.second())
-		return datestr
-
-
-
-	def save(self):
-		super(step_kapton, self).save()
-		inst_sensor = sensor()
-
-		for i in range(6):
-			sensor_exists = False if self.sensors[i] is None else inst_sensor.load(self.sensors[i])
-			if sensor_exists:
-
-				# If baseplate has no step_kapton or if its step_kapton is the one being edited now:
-				if (inst_sensor.step_kapton is None) or (inst_sensor.step_kapton == self.ID):
-					inst_sensor.step_kapton = self.ID
-					inst_sensor.save()
-					inst_sensor.clear()
-				else:
-					print("ERROR:  Sensor {} has already been assigned a kapton step!".format(inst_sensor.ID))
-					print("*WARNING:  ready_step_kapton should prevent this from working!")
-					assert(False)
-
-			# Unnecessary code; this would only activate on empty rows and do nothing
-			#else:
-			#	if not (self.baseplates[i] is None):
-			#		print("step_kapton {} cannot write to baseplate {}: does not exist".format(self.ID, self.baseplates[i]))
-
-
-
-
 class step_sensor(fsobj_assembly):
 	OBJECTNAME = "sensor step"
 	FILEDIR    = os.sep.join(['steps','sensor','{date}'])
@@ -2519,6 +2291,8 @@ class step_sensor(fsobj_assembly):
 		# TEMP:
 		'kind_of_part_id',
 		'kind_of_part',
+
+		'check_tool_feet',
 	]
 
 	ITEMLIST_LIST = ['comments', 'shipments', 'tools', 'sensors', 'baseplates', 'protomodules']
@@ -2540,6 +2314,14 @@ class step_sensor(fsobj_assembly):
 	@temp_property.setter
 	def temp_property(self, value):
 		pass
+
+	@property
+	def curing_time_hrs(self):
+		if self.run_start is None or self.run_stop is None:
+			return None
+		start_time = list(time.localtime(self.run_start))
+		stop_time  = list(time.localtime(self.run_stop ))
+		telapsed = start_time.secsTo(stop_time) / (60.0**2)
 
 	# New:  Convert time_t to correctly-formatted date string
 	@property
@@ -2776,6 +2558,8 @@ class step_pcb(fsobj_assembly):
 		'tray_component_pcb', # ID of component tray used
 		'tray_assembly',      # ID of assembly  tray used
 		'batch_araldite',     # ID of araldite batch used
+
+		'check_tool_feet',
 	]
 
 
@@ -2799,6 +2583,14 @@ class step_pcb(fsobj_assembly):
 	@temp_property.setter
 	def temp_property(self, value):
 		pass
+
+	@property
+	def curing_time_hrs(self):
+		if self.run_start is None or self.run_stop is None:
+			return None
+		start_time = list(time.localtime(self.run_start))
+		stop_time  = list(time.localtime(self.run_stop ))
+		telapsed = start_time.secsTo(stop_time) / (60.0**2)
 
 	# New:  Convert time_t to correctly-formatted date string
 	@property

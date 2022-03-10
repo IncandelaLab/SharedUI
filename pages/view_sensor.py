@@ -9,32 +9,21 @@ OBJECTTYPE = "sensor"
 DEBUG = False
 
 INDEX_TYPE = {
-	'120 um':0,
-	'200 um':1,
-	'300 um':2,
+	'120um':0,
+	'200um':1,
+	'300um':2,
 	#'500 um':3,
 }
 
-INDEX_SIZE = {
-	8:0,
-	"8":0,
-	6:1,
-	"6":1,
-}
-
 INDEX_SHAPE = {
-	'full':0,
-	'half':1,
-	'five':2,
-	'three':3,
-	'semi':4,
-	'semi(-)':5,
-	'choptwo':6,
-}
-
-INDEX_SEMI = {
-	"P-type":0,
-	"N-type":1,
+	'Full',
+	'Top',
+	'Bottom',
+	'Left',
+	'Right',
+	'Five',
+	'Three',
+	'Full+Three'
 }
 
 INDEX_INSPECTION = {
@@ -387,8 +376,6 @@ class func(object):
 		#self.sensor.channels     =     self.page.sbChannels.value()           if     self.page.sbChannels.value() >=0       else None
 		self.sensor.channel_density = str(self.page.cbChannelDensity.currentText())  if str(self.page.cbChannelDensity.currentText())  else None
 		self.sensor.grade        = str(self.page.cbGrade.currentText())  if str(self.page.cbGrade.currentText())  else None
-
-		self.sensor.thickness = float(self.sensor.type.split()[0])/1000 # Strip out the thickness
 
 		num_comments = self.page.listComments.count()
 		self.sensor.comments = []

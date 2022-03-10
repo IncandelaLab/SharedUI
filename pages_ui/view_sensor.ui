@@ -127,7 +127,22 @@
     </item>
     <item>
      <property name="text">
-      <string>half</string>
+      <string>top</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>bottom</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>left</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>right</string>
      </property>
     </item>
     <item>
@@ -142,17 +157,7 @@
     </item>
     <item>
      <property name="text">
-      <string>semi</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>semi(-)</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>choptwo</string>
+      <string>full+three</string>
      </property>
     </item>
    </widget>
@@ -312,17 +317,17 @@
     </property>
     <item>
      <property name="text">
-      <string>120 um</string>
+      <string>120um</string>
      </property>
     </item>
     <item>
      <property name="text">
-      <string>200 um</string>
+      <string>200um</string>
      </property>
     </item>
     <item>
      <property name="text">
-      <string>300 um</string>
+      <string>300um</string>
      </property>
     </item>
    </widget>

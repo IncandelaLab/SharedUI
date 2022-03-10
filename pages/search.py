@@ -38,17 +38,6 @@ INDEX_INSTITUTION = {
 	'HPK':6,
 }
 
-INDEX_SHAPE = {
-	'':0,
-	'full':1,
-	'half':2,
-	'five':3,
-	'three':4,
-	'semi':5,
-	'semi(-)':6,
-	'choptwo':7,
-}
-
 INDEX_MATERIAL = {
 	'':0,
 	'CuW':1,

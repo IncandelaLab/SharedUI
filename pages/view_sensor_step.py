@@ -67,6 +67,8 @@ I_USER_DNE = "no sensor step user selected"
 I_BATCH_ARALDITE_EMPTY = "araldite batch is empty"
 #I_BATCH_LOCTITE_EMPTY  = "loctite batch is empty"
 
+I_NO_TOOL_CHK = "pickup tool feet have not been checked"
+
 class func(object):
 	def __init__(self,fm,page,setUIPage,setSwitchingEnabled):
 		self.page      = page
@@ -369,6 +371,7 @@ class func(object):
 					#self.sb_protomodules[i].setValue(-1)
 					self.le_protomodules[i].setText("")
 
+			self.page.ckCheckFeet.setChecked(self.step_sensor.check_tool_feet if not (self.step_sensor.check_tool_feet is None) else False)
 
 		else:
 			self.page.cbInstitution.setCurrentIndex(-1)
@@ -396,6 +399,7 @@ class func(object):
 				self.le_sensors[i].setText("")
 				self.le_baseplates[i].setText("")
 				self.le_protomodules[i].setText("")
+			self.page.ckCheckFeet.setChecked(False)
 
 		for i in range(6):
 			if self.sb_tools[i].value()        == -1:  self.sb_tools[i].clear()
@@ -470,6 +474,7 @@ class func(object):
 		self.page.pbSave.setEnabled(   mode_creating or mode_editing        )
 		self.page.pbCancel.setEnabled( mode_creating or mode_editing        )
 
+		self.page.ckCheckFeet.setReadOnly(mode_view)
 
 
 	#NEW:  Add all load() functions
@@ -710,6 +715,9 @@ class func(object):
 		if objects_not_here:
 			issues.append(I_INSTITUTION.format([str(_) for _ in objects_not_here]))
 
+		if not self.page.ckCheckFeet.isChecked():
+			issues.append(I_NO_TOOL_CHK)
+
 
 		self.page.listIssues.clear()
 		for issue in issues:
@@ -853,6 +861,8 @@ class func(object):
 			self.sensors[i].step_sensor = self.step_sensor.ID
 			self.sensors[i].protomodule = temp_protomodule.ID  #protomodules[i]
 			self.sensors[i].save()
+
+		self.step_sensor.check_tool_feet = self.ckCheckFeet.isChecked()
 
 		print("\n\n\nSAVING STEP SENSOR\n\n\n")
 		self.step_sensor.save()

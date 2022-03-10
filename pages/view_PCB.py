@@ -24,21 +24,15 @@ INDEX_RESOLUTION = {
 	'LD':1,
 }
 
-INDEX_SIZE = {
-	8:0,
-	"8":0,
-	6:1,
-	"6":1,
-}
-
 INDEX_SHAPE = {
-	'full':0,
-	'half':1,
-	'five':2,
-	'three':3,
-	'semi':4,
-	'semi(-)':5,
-	'choptwo':6,
+	'Full',
+	'Top',
+	'Bottom',
+	'Left',
+	'Right',
+	'Five',
+	'Three',
+	'Full+Three'
 }
 
 INDEX_CHIRALITY = {
@@ -65,7 +59,7 @@ INDEX_INSTITUTION = {
 	'HPK':5,
 }
 
-INDEX_RESOLUTION_TYPE = {
+INDEX_RESOLUTION = {
 	'HD':0,
 	'LD':1,
 }
@@ -199,7 +193,7 @@ class func(object):
 		self.page.leBarcode.setText(     "" if self.pcb.barcode        is None else self.pcb.barcode     )
 		self.page.leManufacturer.setText("" if self.pcb.manufacturer   is None else self.pcb.manufacturer)
 		self.page.cbType.setCurrentIndex(          INDEX_TYPE.get(           self.pcb.type,-1)           )
-		self.page.cbResolutionType.setCurrentIndex(INDEX_RESOLUTION_TYPE.get(self.pcb.resolution_type,-1))
+		self.page.cbResolution.setCurrentIndex(INDEX_RESOLUTION.get(self.pcb.resolution,-1))
 		self.page.cbShape.setCurrentIndex(         INDEX_SHAPE.get(          self.pcb.shape,-1)          )
 		#self.page.cbChirality.setCurrentIndex(     INDEX_CHIRALITY.get(      self.pcb.chirality,-1)      )
 		self.page.cbGrade.setCurrentIndex(         INDEX_GRADE.get(          self.pcb.grade, -1)         )
@@ -279,7 +273,7 @@ class func(object):
 		self.page.leBarcode.setReadOnly(      not (mode_creating or mode_editing) )
 		self.page.leManufacturer.setReadOnly( not (mode_creating or mode_editing) )
 		self.page.cbType.setEnabled(               mode_creating or mode_editing  )
-		self.page.cbResolutionType.setEnabled(     mode_creating or mode_editing  )
+		self.page.cbResolution.setEnabled(         mode_creating or mode_editing  )
 		self.page.cbShape.setEnabled(              mode_creating or mode_editing  )
 		self.page.cbGrade.setEnabled(              mode_creating or mode_editing  )
 		#self.page.cbChirality.setEnabled(          mode_creating or mode_editing  )
@@ -363,14 +357,13 @@ class func(object):
 	def saveEditing(self,*args,**kwargs):
 
 		#self.pcb.insertion_user  = str(self.page.leInsertUser.text()      )   if str(self.page.leInsertUser.text()        ) else None
-		self.pcb.location        = str(self.page.leLocation.text()        )   if str(self.page.leLocation.text()          ) else None
-		self.pcb.barcode         = str(self.page.leBarcode.text()         )   if str(self.page.leBarcode.text()           ) else None
-		self.pcb.manufacturer    = str(self.page.leManufacturer.text()    )   if str(self.page.leManufacturer.text()      ) else None
-		self.pcb.type            = str(self.page.cbType.currentText()     )   if str(self.page.cbType.currentText()       ) else None
-		self.pcb.resolution_type = str(self.page.cbResolutionType.currentText()) \
-                                                                              if str(self.page.cbType.currentText()       ) else None
-		self.pcb.shape           = str(self.page.cbShape.currentText()    )   if str(self.page.cbShape.currentText()      ) else None
-		self.pcb.grade           = str(self.page.cbGrade.currentText()    )   if str(self.page.cbGrade.currentText()      ) else None
+		self.pcb.location        = str(self.page.leLocation.text()         )  if str(self.page.leLocation.text()          ) else None
+		self.pcb.barcode         = str(self.page.leBarcode.text()          )  if str(self.page.leBarcode.text()           ) else None
+		self.pcb.manufacturer    = str(self.page.leManufacturer.text()     )  if str(self.page.leManufacturer.text()      ) else None
+		self.pcb.type            = str(self.page.cbType.currentText()      )  if str(self.page.cbType.currentText()       ) else None
+		self.pcb.resolution      = str(self.page.cbResolution.currentText())  if str(self.page.cbType.currentText()       ) else None
+		self.pcb.shape           = str(self.page.cbShape.currentText()     )  if str(self.page.cbShape.currentText()      ) else None
+		self.pcb.grade           = str(self.page.cbGrade.currentText()     )  if str(self.page.cbGrade.currentText()      ) else None
 		#self.pcb.chirality       = str(self.page.cbChirality.currentText())   if str(self.page.cbChirality.currentText()  ) else None
 		self.pcb.institution     = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
 		self.pcb.insertion_user  = str(self.page.cbInsertUser.currentText())  if str(self.page.cbInsertUser.currentText())  else None

@@ -68,6 +68,7 @@ I_BATCH_ARALDITE_EMPTY = "araldite batch is empty"
 # NEW
 I_INSTITUTION_NOT_SELECTED = "no institution selected"
 
+I_NO_TOOL_CHK = "pickup tool feet have not been checked"
 
 
 class func(object):
@@ -235,7 +236,7 @@ class func(object):
 			self.pb_go_protomodules[i].clicked.connect(self.goProtomodule)
 			self.pb_go_modules[i].clicked.connect(     self.goModule     )
 
-			self.sb_tools[i].editingFinished.connect(       self.loadToolSensor )
+			self.sb_tools[i].editingFinished.connect(       self.loadToolPcb )
 			#self.sb_pcbs[i].editingFinished.connect(        self.loadPcb        )
 			#self.sb_protomodules[i].editingFinished.connect(self.loadProtomodule)
 			#self.sb_modules[i].editingFinished.connect(     self.loadModule     )
@@ -363,6 +364,8 @@ class func(object):
 					#self.sb_modules[i].setValue(-1)
 					self.le_modules[i].setText("")
 
+			self.page.ckCheckFeet.setChecked(self.step_pcb.check_tool_feet if not (self.step_pcb.check_tool_feet is None) else False)
+
 		else:
 			self.page.cbInstitution.setCurrentIndex(-1)
 			#self.page.leUserPerformed.setText("")
@@ -387,6 +390,7 @@ class func(object):
 				self.le_pcbs[i].setText("")
 				self.le_protomodules[i].setText("")
 				self.le_modules[i].setText("")
+			self.page.ckCheckFeet.setChecked(False)
 
 		
 		for i in range(6):
@@ -458,6 +462,7 @@ class func(object):
 		self.page.pbSave.setEnabled(   mode_creating or mode_editing     )
 		self.page.pbCancel.setEnabled( mode_creating or mode_editing     )
 
+		self.page.ckCheckFeet.setReadOnly(mode_view)
 
 
 	#NEW:  Add all load() functions
@@ -502,7 +507,7 @@ class func(object):
 		self.batch_araldite.clear()
 
 	@enforce_mode(['editing','creating'])
-	def loadToolSensor(self, *args, **kwargs):
+	def loadToolPcb(self, *args, **kwargs):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
 		self.tools_pcb[which].load(self.sb_tools[which].value(), self.page.cbInstitution.currentText())
@@ -719,6 +724,8 @@ class func(object):
 		if objects_not_here:
 			issues.append(I_INSTITUTION.format([str(_) for _ in objects_not_here]))
 
+		if not self.page.ckCheckFeet.isChecked():
+			issues.append(I_NO_TOOL_CHK)
 
 		self.page.listIssues.clear()
 		for issue in issues:
@@ -852,6 +859,8 @@ class func(object):
 			self.protomodules[i].step_pcb = self.step_pcb.ID
 			self.protomodules[i].module = modules[i]
 			self.protomodules[i].save()
+
+		self.step_pcb.check_tool_feet = self.ckCheckFeet.isChecked()
 
 		self.step_pcb.save()
 		self.unloadAllObjects()

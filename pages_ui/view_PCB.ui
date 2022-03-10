@@ -526,54 +526,6 @@
     <string>PCB placement step</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="cbShape">
-   <property name="geometry">
-    <rect>
-     <x>190</x>
-     <y>420</y>
-     <width>81</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="currentIndex">
-    <number>-1</number>
-   </property>
-   <item>
-    <property name="text">
-     <string>full</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>half</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>five</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>three</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>semi</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>semi(-)</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>choptwo</string>
-    </property>
-   </item>
-  </widget>
   <widget class="QLineEdit" name="lineEdit_20">
    <property name="geometry">
     <rect>
@@ -972,6 +924,59 @@
    <property name="maximum">
     <number>2147483647</number>
    </property>
+  </widget>
+  <widget class="QComboBox" name="cbShape">
+   <property name="geometry">
+    <rect>
+     <x>190</x>
+     <y>420</y>
+     <width>81</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="currentIndex">
+    <number>-1</number>
+   </property>
+   <item>
+    <property name="text">
+     <string>full</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>top</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>bottom</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>left</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>right</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>five</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>three</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>full+three</string>
+    </property>
+   </item>
   </widget>
  </widget>
  <resources/>

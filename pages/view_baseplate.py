@@ -6,26 +6,20 @@ DEBUG = False
 
 DISPLAY_PRECISION = 4
 
-INDEX_SIZE = {
-	8:0,
-	"8":0,
-	6:1,
-	"6":1,
-}
-
 INDEX_MATERIAL = {
-	'CuW':0,
+	'W/Cu':0,
 	'PCB':1,
 }
 
 INDEX_SHAPE = {
-	'full':0,
-	'half':1,
-	'five':2,
-	'three':3,
-	'semi':4,
-	'semi(-)':5,
-	'choptwo':6,
+	'Full',
+	'Top',
+	'Bottom',
+	'Left',
+	'Right',
+	'Five',
+	'Three',
+	'Full+Three'
 }
 
 #INDEX_CHIRALITY = {

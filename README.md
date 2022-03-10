@@ -24,7 +24,7 @@ In addition to the above requirements, all users will need a lxplus account.  Fu
 
 Running the GUI is straightforward:  Run `python mainUI.py` in a terminal to launch it.  On Windows, you can run the batch file `run.bat` instead through either the terminal or the file manager.  All data will automatically be stored as .json files in the directory `/path/to/SharedUI/filemanager_data`.  (Some pages will also produce one or more XML files, but this is still preliminary.)
 
-The GUI is divided into three sections:  Parts, tooling, and supplies; production steps and testing routines; and shipping.
+The GUI is divided into two main sections:  Parts, tooling, and supplies; and production steps and testing routines.
 
 ###Parts, tooling, and supplies
 
@@ -36,11 +36,4 @@ Note that protomodules and modules are automatically createdy by the sensor plac
 
 Once all necessary information in the parts, tooling, and supplies section has been filled in, you can proceed to the production steps.  The production step pages are broadly similar to the previous ones, but with one major difference:  the data will be automatically checked for errors, and if any are found, a message will appear in the status box.  Once all errors have been resolved, you can save the step.
 
-Currently, the wirebonding and testing routine pages have not been implemented.
-
-###Shipping
-
-Like the production step pages, the shipping page will display errors unless all of the referenced parts exist.
-
-This step may undergo substantial revision in the future.
 

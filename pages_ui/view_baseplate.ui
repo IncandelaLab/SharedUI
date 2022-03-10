@@ -205,54 +205,6 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QComboBox" name="cbShape">
-    <property name="geometry">
-     <rect>
-      <x>180</x>
-      <y>240</y>
-      <width>80</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="currentIndex">
-     <number>-1</number>
-    </property>
-    <item>
-     <property name="text">
-      <string>full</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>half</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>five</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>three</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>semi</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>semi(-)</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>choptwo</string>
-     </property>
-    </item>
-   </widget>
    <widget class="QPushButton" name="pbGoShipment">
     <property name="geometry">
      <rect>
@@ -472,7 +424,7 @@
     </property>
     <item>
      <property name="text">
-      <string>CuW</string>
+      <string>W/Cu</string>
      </property>
     </item>
     <item>
@@ -604,6 +556,59 @@
      <number>-1</number>
     </property>
    </widget>
+   <widget class="QComboBox" name="cbShape">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>240</y>
+      <width>81</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>-1</number>
+    </property>
+    <item>
+     <property name="text">
+      <string>full</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>top</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>bottom</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>left</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>right</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>five</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>three</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>full+three</string>
+     </property>
+    </item>
+   </widget>
    <zorder>lineEdit_4</zorder>
    <zorder>lineEdit_11</zorder>
    <zorder>lineEdit_10</zorder>
@@ -615,13 +620,13 @@
    <zorder>frame</zorder>
    <zorder>cbMaterial</zorder>
    <zorder>pbGoShipment</zorder>
-   <zorder>cbShape</zorder>
    <zorder>lineEdit_39</zorder>
    <zorder>lineEdit_38</zorder>
    <zorder>lineEdit_9</zorder>
    <zorder>leBarcode</zorder>
    <zorder>cbInstitution</zorder>
    <zorder>cbInsertUser</zorder>
+   <zorder>cbShape</zorder>
   </widget>
   <widget class="QPushButton" name="pbGoProtomodule">
    <property name="geometry">

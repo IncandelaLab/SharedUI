@@ -19,7 +19,7 @@
      <x>10</x>
      <y>118</y>
      <width>261</width>
-     <height>531</height>
+     <height>551</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -163,7 +163,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>510</y>
+      <y>530</y>
       <width>101</width>
       <height>21</height>
      </rect>
@@ -176,7 +176,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>290</y>
+      <y>310</y>
       <width>141</width>
       <height>21</height>
      </rect>
@@ -192,7 +192,7 @@
     <property name="geometry">
      <rect>
       <x>140</x>
-      <y>290</y>
+      <y>310</y>
       <width>121</width>
       <height>21</height>
      </rect>
@@ -205,7 +205,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>440</y>
+      <y>460</y>
       <width>261</width>
       <height>71</height>
      </rect>
@@ -215,7 +215,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>310</y>
+      <y>330</y>
       <width>261</width>
       <height>121</height>
      </rect>
@@ -258,54 +258,6 @@
     <property name="singleStep">
      <double>0.100000000000000</double>
     </property>
-   </widget>
-   <widget class="QComboBox" name="cbShape">
-    <property name="geometry">
-     <rect>
-      <x>180</x>
-      <y>229</y>
-      <width>81</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="currentIndex">
-     <number>-1</number>
-    </property>
-    <item>
-     <property name="text">
-      <string>full</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>half</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>five</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>three</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>semi</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>semi(-)</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>choptwo</string>
-     </property>
-    </item>
    </widget>
    <widget class="QLineEdit" name="lineEdit_52">
     <property name="geometry">
@@ -445,6 +397,101 @@
      <bool>true</bool>
     </property>
    </widget>
+   <widget class="QComboBox" name="cbShape">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>230</y>
+      <width>81</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>-1</number>
+    </property>
+    <item>
+     <property name="text">
+      <string>full</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>top</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>bottom</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>left</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>right</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>five</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>three</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>full+three</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_23">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>270</y>
+      <width>181</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Resolution</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="cbResolution">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>270</y>
+      <width>81</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>-1</number>
+    </property>
+    <item>
+     <property name="text">
+      <string>HD</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>LD</string>
+     </property>
+    </item>
+   </widget>
    <zorder>lineEdit_9</zorder>
    <zorder>lineEdit_3</zorder>
    <zorder>leLocation</zorder>
@@ -458,7 +505,6 @@
    <zorder>listComments</zorder>
    <zorder>lineEdit_4</zorder>
    <zorder>dsbThickness</zorder>
-   <zorder>cbShape</zorder>
    <zorder>sbChannels</zorder>
    <zorder>pbGoShipment</zorder>
    <zorder>lineEdit_52</zorder>
@@ -467,6 +513,9 @@
    <zorder>cbInsertUser</zorder>
    <zorder>cbGrade</zorder>
    <zorder>lineEdit_22</zorder>
+   <zorder>cbShape</zorder>
+   <zorder>lineEdit_23</zorder>
+   <zorder>cbResolution</zorder>
   </widget>
   <widget class="QFrame" name="frame_3">
    <property name="geometry">
