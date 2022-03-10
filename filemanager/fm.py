@@ -1590,7 +1590,7 @@ class sensor(fsobj_part):
 			self.type = None
 			self.shape = None
 		else:
-			self.type, self.shape = value.split()[1:3]]
+			self.type, self.shape = value.split()[1:3]
 
 	@property
 	def thickness(self):

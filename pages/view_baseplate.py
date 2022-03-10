@@ -12,14 +12,14 @@ INDEX_MATERIAL = {
 }
 
 INDEX_SHAPE = {
-	'Full',
-	'Top',
-	'Bottom',
-	'Left',
-	'Right',
-	'Five',
-	'Three',
-	'Full+Three'
+	'Full':0,
+	'Top':1,
+	'Bottom':2,
+	'Left':3,
+	'Right':4,
+	'Five':5,
+	'Three':6,
+	'Full+Three':7,
 }
 
 #INDEX_CHIRALITY = {

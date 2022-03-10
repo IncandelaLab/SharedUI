@@ -24,6 +24,8 @@ In addition to the above requirements, all users will need a lxplus account.  Fu
 
 Running the GUI is straightforward:  Run `python mainUI.py` in a terminal to launch it.  On Windows, you can run the batch file `run.bat` instead through either the terminal or the file manager.  All data will automatically be stored as .json files in the directory `/path/to/SharedUI/filemanager_data`.  (Some pages will also produce one or more XML files, but this is still preliminary.)
 
+In order to set up an ssh connection for communication with the DB, you will need to enter your lxplus username and password.  (Note: This functionality is not technically necessary until the DB has been set up and is ready for downloading/uploading, but has been implemented in advance.)
+
 The GUI is divided into two main sections:  Parts, tooling, and supplies; and production steps and testing routines.
 
 ###Parts, tooling, and supplies
