@@ -14,14 +14,14 @@ SITE_SEP = ', '
 NO_DATE = [2000,1,1]
 
 INDEX_SHAPE = {
-	'Full',
-	'Top',
-	'Bottom',
-	'Left',
-	'Right',
-	'Five',
-	'Three',
-	'Full+Three'
+	'Full':0,
+	'Top':1,
+	'Bottom':2,
+	'Left':3,
+	'Right':4,
+	'Five':5,
+	'Three':6,
+	'Full+Three':7
 }
 
 INDEX_GRADE = {
@@ -37,12 +37,8 @@ INDEX_CHIRALITY = {
 }
 
 INDEX_INSPECTION = {
-	'yes':0,
 	'pass':0,
-	True:0,
-	'no':1,
 	'fail':1,
-	False:1,
 }
 
 INDEX_INSTITUTION = {
@@ -193,19 +189,22 @@ class func(object):
 			self.page.listShipments.addItem(str(shipment))
 
 		# characteristics
-		self.page.sbChannels.setValue(  -1 if self.module.channels    is None else self.module.channels   )
+		#self.page.sbChannels.setValue(  -1 if self.module.channels    is None else self.module.channels   )
 		self.page.dsbThickness.setValue(-1 if self.module.thickness   is None else self.module.thickness  )
+		self.page.dsbFlatness.setValue( -1 if self.module.flatness    is None else self.module.flatness   )
 		self.page.cbShape.setCurrentIndex(      INDEX_SHAPE.get(      self.module.shape    , -1)  )
 		self.page.cbGrade.setCurrentIndex(      INDEX_GRADE.get(      self.module.grade    , -1)  )
 		#self.page.cbChirality.setCurrentIndex(  INDEX_CHIRALITY.get(  self.module.chirality, -1)  )
 		self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.module.institution, -1))
+		self.page.cbInspection.setCurrentIndex( INDEX_INSPECTION.get( self.module.inspection,  -1))
 		if not self.module.insertion_user in self.index_users.keys() and not self.module.insertion_user is None:
 			# Insertion user was deleted from user page...just add user to the dropdown
 			self.index_users[self.module.insertion_user] = max(self.index_users.values()) + 1
 			self.page.cbInsertUser.addItem(self.module.insertion_user)
 		self.page.cbInsertUser.setCurrentIndex(self.index_users.get(self.module.insertion_user, -1))
-		if self.page.sbChannels.value()   == -1: self.page.sbChannels.clear()
+		#if self.page.sbChannels.value()   == -1: self.page.sbChannels.clear()
 		if self.page.dsbThickness.value() == -1: self.page.dsbThickness.clear()
+		if self.page.dsbFlatness.value()  == -1: self.page.dsbFlatness.clear()
 
 		# parts and steps
 		self.page.sbStepKapton.setValue(   -1 if self.module.step_kapton   is None else self.module.step_kapton   )
@@ -285,13 +284,15 @@ class func(object):
 		# characteristics
 		#self.page.leInsertUser.setReadOnly( not (mode_creating or mode_editing) )
 		self.page.leLocation.setReadOnly(   not (mode_creating or mode_editing) )
-		self.page.sbChannels.setReadOnly(   not (mode_creating or mode_editing) )
+		#self.page.sbChannels.setReadOnly(   not (mode_creating or mode_editing) )
+		self.page.dsbFlatness.setReadOnly(  not (mode_creating or mode_editing) )
 		self.page.dsbThickness.setReadOnly( not (mode_creating or mode_editing) )
 		#self.page.cbShape.setEnabled(            mode_creating or mode_editing  )
 		#self.page.cbChirality.setEnabled(        mode_creating or mode_editing  )
 		self.page.cbGrade.setEnabled(            mode_creating or mode_editing  )
 		self.page.cbInstitution.setEnabled(      mode_creating or mode_editing  )
 		self.page.cbInsertUser.setEnabled(       mode_creating or mode_editing  )
+		self.page.cbInspection.setEnabled(       mode_creating or mode_editing  )
 
 		# parts and steps
 		self.page.pbGoStepKapton.setEnabled(   mode_view and step_kapton_exists   )
@@ -375,13 +376,15 @@ class func(object):
 		# characteristics
 		#self.module.insertion_user = str(self.page.leInsertUser.text()   ) if str(self.page.leInsertUser.text())         else None
 		self.module.location        = str(self.page.leLocation.text()        ) if str(self.page.leLocation.text())             else None
-		self.module.channels        =     self.page.sbChannels.value()         if self.page.sbChannels.value()   >= 0          else None
+		#self.module.channels        =     self.page.sbChannels.value()         if self.page.sbChannels.value()   >= 0          else None
+		self.module.flatness        =     self.page.dsbFlatness.value()        if self.page.dsbFlatness.value()  >= 0          else None
 		self.module.thickness       =     self.page.dsbThickness.value()       if self.page.dsbThickness.value() >= 0          else None
 		#self.module.shape           = str(self.page.cbShape.currentText()    ) if str(self.page.cbShape.currentText()        ) else None
 		#self.module.chirality       = str(self.page.cbChirality.currentText()) if str(self.page.cbChirality.currentText()    ) else None
 		self.module.institution     = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
 		self.module.insertion_user  = str(self.page.cbInsertUser.currentText())  if str(self.page.cbInsertUser.currentText())  else None
 		self.module.grade           = str(self.page.cbGrade.currentText())       if str(self.page.cbGrade.currentText())       else None
+		self.module.inspection      = str(self.page.cbInspection.currentText())  if str(self.page.cbInspection.currentText())  else None
 
 		# comments
 		num_comments = self.page.listComments.count()

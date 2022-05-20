@@ -2004,6 +2004,7 @@ class module(fsobj_part):
 		# characteristics - taken from child parts upon creation of module
 		"insertion_user",
 		"thickness",   # sum of protomodule and sensor, plus glue gap
+		"flatness",    # NEW
 		"channels",    # from protomodule or pcb (identical)
 		"size",        # from protomodule or pcb (identical)
 		"shape",       # from protomodule or pcb (identical)
@@ -2272,6 +2273,8 @@ class step_sensor(fsobj_assembly):
 
 		'run_start',  # New--unix time @ start of run
 		'run_stop',  # New--unix time @ end of run
+		'cure_start',
+		'cure_stop',
 
 		# Note:  Semiconductors types are stored in the sensor objects
 
@@ -2544,6 +2547,8 @@ class step_pcb(fsobj_assembly):
 		
 		'run_start',  # unix time @ start of run
 		'run_stop',   # unix time @ start of run
+		'cure_start',
+		'cure_stop',
 		
 		#'cure_start',       # unix time @ start of curing
 		#'cure_stop',        # unix time @ end of curing

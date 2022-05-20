@@ -308,9 +308,22 @@ class func(object):
 			self.page.cbUserPerformed.setCurrentIndex(self.index_users.get(self.step_sensor.user_performed, -1))
 			self.page.leLocation.setText(self.step_sensor.location)
 
+			# New
+			times_to_set = [(self.step_sensor.run_start,  self.page.dtRunStart),
+							(self.step_sensor.run_stop,   self.page.dtRunStop),
+							(self.step_sensor.cure_start, self.page.dtCureStart),
+							(self.step_sensor.cure_stop,  self.page.dtCureStop)]
+			for st, dt in times_to_set:
+				if st is None:
+					dt.setDate(QtCore.QDate(*NO_DATE))
+					dt.setTime(QtCore.QTime(0,0,0))
+				else:
+					localtime = list(time.localtime(st))
+					dt.setDate(QtCore.QDate(*localtime[0:3]))
+					dt.setTime(QtCore.QDate(*localtiem[3:6]))
+			"""
 			run_start = self.step_sensor.run_start
 			run_stop  = self.step_sensor.run_stop
-			# New
 			if run_start is None:
 				self.page.dtRunStart.setDate(QtCore.QDate(*NO_DATE))
 				self.page.dtRunStart.setTime(QtCore.QTime(0,0,0))
@@ -325,7 +338,7 @@ class func(object):
 				localtime = list(time.localtime(run_stop))
 				self.page.dtRunStop.setDate(QtCore.QDate(*localtime[0:3]))
 				self.page.dtRunStop.setTime(QtCore.QTime(*localtime[3:6]))
-
+			"""
 
 			#self.page.leCureTemperature.setText(self.step_sensor.cure_temperature)
 			#self.page.leCureHumidity.setText(self.step_sensor.cure_humidity)
@@ -474,7 +487,7 @@ class func(object):
 		self.page.pbSave.setEnabled(   mode_creating or mode_editing        )
 		self.page.pbCancel.setEnabled( mode_creating or mode_editing        )
 
-		self.page.ckCheckFeet.setReadOnly(mode_view)
+		self.page.ckCheckFeet.setCheckable(not mode_view)
 
 
 	#NEW:  Add all load() functions
