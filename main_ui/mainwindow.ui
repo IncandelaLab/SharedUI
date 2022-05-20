@@ -40,6 +40,9 @@
         </item>
         <item>
          <widget class="QListWidget" name="listUsers">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
             <horstretch>0</horstretch>
@@ -49,12 +52,12 @@
           <property name="maximumSize">
            <size>
             <width>16777215</width>
-            <height>40</height>
+            <height>30</height>
            </size>
           </property>
           <item>
            <property name="text">
-            <string>users</string>
+            <string>Users</string>
            </property>
           </item>
          </widget>
@@ -101,17 +104,17 @@
           </property>
           <item>
            <property name="text">
-            <string>search for parts</string>
+            <string>Search for parts</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>baseplates</string>
+            <string>Baseplates</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>sensors</string>
+            <string>Sensors</string>
            </property>
           </item>
           <item>
@@ -121,22 +124,22 @@
           </item>
           <item>
            <property name="text">
-            <string>protomodules</string>
+            <string>Protomodules</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>modules</string>
+            <string>Modules</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>tooling</string>
+            <string>Tooling</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>supplies</string>
+            <string>Supplies</string>
            </property>
           </item>
          </widget>
@@ -172,7 +175,7 @@
           <property name="minimumSize">
            <size>
             <width>0</width>
-            <height>65</height>
+            <height>105</height>
            </size>
           </property>
           <property name="verticalScrollBarPolicy">
@@ -186,17 +189,27 @@
           </property>
           <item>
            <property name="text">
-            <string>sensor placement steps</string>
+            <string>1. Sensor - pre-assembly</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>PCB placement steps</string>
+            <string>2. Sensor - post-assembly</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>wirebonding and encapsulating</string>
+            <string>3. PCB - pre-assembly</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>4. PCB - post-assembly</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>5. Wirebonding &amp; encapsulating</string>
            </property>
           </item>
          </widget>
@@ -216,6 +229,9 @@
         </item>
         <item>
          <widget class="QLineEdit" name="lineEdit_2">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>Shipping and receiving</string>
           </property>
@@ -223,6 +239,9 @@
         </item>
         <item>
          <widget class="QListWidget" name="listShippingAndReceiving">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
             <horstretch>0</horstretch>
@@ -280,6 +299,9 @@
            </property>
           </widget>
           <widget class="QPushButton" name="pbUploadObject">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="geometry">
             <rect>
              <x>29</x>
@@ -319,7 +341,7 @@
           </widget>
           <widget class="QPushButton" name="pbUploadDate">
            <property name="enabled">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
            <property name="geometry">
             <rect>
@@ -340,6 +362,9 @@
            </property>
           </widget>
           <widget class="QDateEdit" name="dUpload">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="geometry">
             <rect>
              <x>35</x>

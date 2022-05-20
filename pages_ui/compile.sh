@@ -5,9 +5,9 @@
 echo "Working in directory:"
 pwd
 for f in "view_module" "view_baseplate" "view_sensor" "view_PCB" \
-    "view_protomodule" "view_sensor_step" \
-    "view_pcb_step" "view_tooling" "view_supplies" \
-    "view_shipment" "routine_iv" "search" "view_wirebonding"\
+    "view_protomodule" "view_sensor_step" "view_sensor_post" \
+    "view_pcb_step" "view_pcb_post" "view_tooling" "view_supplies" \
+    "view_shipment" "search" "view_wirebonding"\
     "view_users" "../main_ui/mainwindow"
 do
     command="pyuic5 $f.ui -o $f.py"

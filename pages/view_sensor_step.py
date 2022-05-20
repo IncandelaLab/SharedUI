@@ -53,7 +53,6 @@ I_PROTOMODULE_COPY      = "protomodule has already been created: {}"
 
 # compatibility
 I_SIZE_MISMATCH = "size mismatch between some selected objects"
-I_SIZE_MISMATCH_6 = "* list of 6-inch objects selected: {}"
 I_SIZE_MISMATCH_8 = "* list of 8-inch objects selected: {}"
 
 # location
@@ -61,11 +60,10 @@ I_INSTITUTION = "some selected objects are not at this institution: {}"
 I_INSTITUTION_NOT_SELECTED = "no institution selected"
 
 # Missing user
-I_USER_DNE = "no sensor step user selected"
+#I_USER_DNE = "no sensor step user selected"
 
 # supply batch empty
 I_BATCH_ARALDITE_EMPTY = "araldite batch is empty"
-#I_BATCH_LOCTITE_EMPTY  = "loctite batch is empty"
 
 I_NO_TOOL_CHK = "pickup tool feet have not been checked"
 
@@ -81,12 +79,9 @@ class func(object):
 		self.tray_component_sensor = fm.tray_component_sensor()
 		self.tray_assembly         = fm.tray_assembly()
 		self.batch_araldite        = fm.batch_araldite()
-		#self.batch_loctite         = fm.batch_loctite()
 
 		self.step_sensor = fm.step_sensor()
 		self.step_sensor_exists = None
-
-		#self.MAC = fm.MAC
 
 		self.mode = 'setup'
 
@@ -154,15 +149,6 @@ class func(object):
 			self.page.pbGoTool5,
 			self.page.pbGoTool6,
 		]
-		"""
-		self.sb_sensors = [
-			self.page.sbSensor1,
-			self.page.sbSensor2,
-			self.page.sbSensor3,
-			self.page.sbSensor4,
-			self.page.sbSensor5,
-			self.page.sbSensor6,
-		]"""
 		self.le_sensors = [
 			self.page.leSensor1,
 			self.page.leSensor2,
@@ -179,14 +165,6 @@ class func(object):
 			self.page.pbGoSensor5,
 			self.page.pbGoSensor6,
 		]
-		"""self.sb_baseplates = [
-			self.page.sbBaseplate1,
-			self.page.sbBaseplate2,
-			self.page.sbBaseplate3,
-			self.page.sbBaseplate4,
-			self.page.sbBaseplate5,
-			self.page.sbBaseplate6,
-		]"""
 		self.le_baseplates = [
 			self.page.leBaseplate1,
 			self.page.leBaseplate2,
@@ -203,15 +181,6 @@ class func(object):
 			self.page.pbGoBaseplate5,
 			self.page.pbGoBaseplate6,
 		]
-		"""
-		self.sb_protomodules = [
-			self.page.sbProtoModule1,
-			self.page.sbProtoModule2,
-			self.page.sbProtoModule3,
-			self.page.sbProtoModule4,
-			self.page.sbProtoModule5,
-			self.page.sbProtoModule6,
-		]"""
 		self.le_protomodules = [
 			self.page.leProtomodule1,
 			self.page.leProtomodule2,
@@ -246,11 +215,8 @@ class func(object):
 			self.pb_go_protomodules[i].clicked.connect(self.goProtomodule)
 			#NEW:  Unsure about whether any of the above will get replaced (specifically baseplate)
 			self.sb_tools[i].editingFinished.connect(      self.loadToolSensor)
-			#self.sb_baseplates[i].editingFinished.connect( self.loadBaseplate )
 			self.le_baseplates[i].textChanged.connect( self.loadBaseplate)
-			#self.sb_sensors[i].editingFinished.connect(    self.loadSensor    )
 			self.le_sensors[i].textChanged.connect( self.loadSensor)
-			#self.le_protomodules[i].textChanged.connect( self.updateIssues)
 
 			self.pb_clears[i].clicked.connect(self.clearRow)
 
@@ -259,9 +225,7 @@ class func(object):
 		self.page.sbTrayComponent.editingFinished.connect( self.loadTrayComponentSensor )
 		self.page.sbTrayAssembly.editingFinished.connect(  self.loadTrayAssembly        )
 		self.page.sbBatchAraldite.editingFinished.connect( self.loadBatchAraldite       )
-		#self.page.sbBatchLoctite.editingFinished.connect(  self.loadBatchLoctite        )
 
-		#self.page.sbID.valueChanged.connect(self.update_info)
 		self.page.sbID.valueChanged.connect(self.loadStep)
 
 		self.page.pbNew.clicked.connect(self.startCreating)
@@ -270,7 +234,6 @@ class func(object):
 		self.page.pbCancel.clicked.connect(self.cancelEditing)
 
 		self.page.pbGoBatchAraldite.clicked.connect(self.goBatchAraldite)
-		#self.page.pbGoBatchLoctite.clicked.connect(self.goBatchLoctite)
 		self.page.pbGoTrayAssembly.clicked.connect(self.goTrayAssembly)
 		self.page.pbGoTrayComponent.clicked.connect(self.goTrayComponent)
 
@@ -279,8 +242,8 @@ class func(object):
 
 		auth_users = fm.userManager.getAuthorizedUsers(PAGE_NAME)
 		self.index_users = {auth_users[i]:i for i in range(len(auth_users))}
-		for user in self.index_users.keys():
-			self.page.cbUserPerformed.addItem(user)
+		#for user in self.index_users.keys():
+		#	self.page.cbUserPerformed.addItem(user)
 
 
 	@enforce_mode(['view','editing'])
@@ -300,15 +263,15 @@ class func(object):
 		if self.step_sensor_exists:
 
 			self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.step_sensor.institution, -1))
-			#self.page.leUserPerformed.setText(self.step_sensor.user_performed)
-			if not self.step_sensor.user_performed in self.index_users.keys() and not self.step_sensor.user_performed is None:
-				# Insertion user was deleted from user page...just add user to the dropdown
-				self.index_users[self.step_sensor.user_performed] = max(self.index_users.values()) + 1
-				self.page.cbUserPerformed.addItem(self.step_sensor.user_performed)
-			self.page.cbUserPerformed.setCurrentIndex(self.index_users.get(self.step_sensor.user_performed, -1))
-			self.page.leLocation.setText(self.step_sensor.location)
+			#if not self.step_sensor.user_performed in self.index_users.keys() and not self.step_sensor.user_performed is None:
+			#	# Insertion user was deleted from user page...just add user to the dropdown
+			#	self.index_users[self.step_sensor.user_performed] = max(self.index_users.values()) + 1
+			#	self.page.cbUserPerformed.addItem(self.step_sensor.user_performed)
+			#self.page.cbUserPerformed.setCurrentIndex(self.index_users.get(self.step_sensor.user_performed, -1))
+			#self.page.leLocation.setText(self.step_sensor.location)
 
 			# New
+			"""
 			times_to_set = [(self.step_sensor.run_start,  self.page.dtRunStart),
 							(self.step_sensor.run_stop,   self.page.dtRunStop),
 							(self.step_sensor.cure_start, self.page.dtCureStart),
@@ -322,31 +285,9 @@ class func(object):
 					dt.setDate(QtCore.QDate(*localtime[0:3]))
 					dt.setTime(QtCore.QDate(*localtiem[3:6]))
 			"""
-			run_start = self.step_sensor.run_start
-			run_stop  = self.step_sensor.run_stop
-			if run_start is None:
-				self.page.dtRunStart.setDate(QtCore.QDate(*NO_DATE))
-				self.page.dtRunStart.setTime(QtCore.QTime(0,0,0))
-			else:
-				localtime = list(time.localtime(run_start))
-				self.page.dtRunStart.setDate(QtCore.QDate(*localtime[0:3]))
-				self.page.dtRunStart.setTime(QtCore.QTime(*localtime[3:6]))
-			if run_stop is None:
-				self.page.dtRunStop.setDate(QtCore.QDate(*NO_DATE))
-				self.page.dtRunStop.setTime(QtCore.QTime(0,0,0))
-			else:
-				localtime = list(time.localtime(run_stop))
-				self.page.dtRunStop.setDate(QtCore.QDate(*localtime[0:3]))
-				self.page.dtRunStop.setTime(QtCore.QTime(*localtime[3:6]))
-			"""
 
-			#self.page.leCureTemperature.setText(self.step_sensor.cure_temperature)
-			#self.page.leCureHumidity.setText(self.step_sensor.cure_humidity)
-			self.page.dsbCureTemperature.setValue(self.step_sensor.cure_temperature if self.step_sensor.cure_temperature else 70)
-			self.page.sbCureHumidity    .setValue(self.step_sensor.cure_humidity    if self.step_sensor.cure_humidity    else 10)
 
 			self.page.sbBatchAraldite.setValue(self.step_sensor.batch_araldite if not (self.step_sensor.batch_araldite is None) else -1)
-			#self.page.sbBatchLoctite.setValue( self.step_sensor.batch_loctite  if not (self.step_sensor.batch_loctite  is None) else -1)
 			self.page.sbTrayAssembly.setValue( self.step_sensor.tray_assembly  if not (self.step_sensor.tray_assembly  is None) else -1)
 			self.page.sbTrayComponent.setValue(self.step_sensor.tray_component_sensor if not (self.step_sensor.tray_component_sensor is None) else -1)
 
@@ -359,56 +300,36 @@ class func(object):
 
 			if not (self.step_sensor.sensors is None):
 				for i in range(6):
-					#self.sb_sensors[i].setValue(self.step_sensor.sensors[i] if not (self.step_sensor.sensors[i] is None) else -1)
 					self.le_sensors[i].setText(str(self.step_sensor.sensors[i]) if not (self.step_sensor.sensors[i] is None) else "")
 			else:
 				for i in range(6):
-					#self.sb_sensors[i].setValue(-1)
-					self.le_sensors[i].setText("")
 
 			if not (self.step_sensor.baseplates is None):
 				for i in range(6):
-					#self.sb_baseplates[i].setValue(self.step_sensor.baseplates[i] if not (self.step_sensor.baseplates[i] is None) else -1)
 					self.le_baseplates[i].setText(str(self.step_sensor.baseplates[i]) if not (self.step_sensor.baseplates[i] is None) else "")
 			else:
 				for i in range(6):
-					#self.sb_baseplates[i].setValue(-1)
 					self.le_baseplates[i].setText("")
 
 			if not (self.step_sensor.protomodules is None):
 				for i in range(6):
-					#self.sb_protomodules[i].setValue(self.step_sensor.protomodules[i] if not (self.step_sensor.protomodules[i] is None) else -1)
 					self.le_protomodules[i].setText(str(self.step_sensor.protomodules[i]) if not (self.step_sensor.protomodules[i] is None) else "")
 			else:
 				for i in range(6):
-					#self.sb_protomodules[i].setValue(-1)
 					self.le_protomodules[i].setText("")
 
 			self.page.ckCheckFeet.setChecked(self.step_sensor.check_tool_feet if not (self.step_sensor.check_tool_feet is None) else False)
 
 		else:
 			self.page.cbInstitution.setCurrentIndex(-1)
-			#self.page.leUserPerformed.setText("")
 			self.page.cbUserPerformed.setCurrentIndex(-1)
 			self.page.leLocation.setText("")
-			self.page.dtRunStart.setDate(QtCore.QDate(*NO_DATE))
-			self.page.dtRunStart.setTime(QtCore.QTime(0,0,0))
-			self.page.dtRunStop.setDate(QtCore.QDate(*NO_DATE))
-			self.page.dtRunStop.setTime(QtCore.QTime(0,0,0))
 
-			#self.page.leCureTemperature.setText("")
-			#self.page.leCureHumidity.setText("")
-			self.page.dsbCureTemperature.setValue(-1)
-			self.page.sbCureHumidity.setValue(-1)
 			self.page.sbBatchAraldite.setValue(-1)
-			#self.page.sbBatchLoctite.setValue(-1)
 			self.page.sbTrayComponent.setValue(-1)
 			self.page.sbTrayAssembly.setValue(-1)
 			for i in range(6):
 				self.sb_tools[i].setValue(-1)
-				#self.sb_sensors[i].setValue(-1)
-				#self.sb_baseplates[i].setValue(-1)
-				#self.sb_protomodules[i].setValue(-1)
 				self.le_sensors[i].setText("")
 				self.le_baseplates[i].setText("")
 				self.le_protomodules[i].setText("")
@@ -416,13 +337,9 @@ class func(object):
 
 		for i in range(6):
 			if self.sb_tools[i].value()        == -1:  self.sb_tools[i].clear()
-			#if self.sb_sensors[i].value()      == -1:  self.sb_sensors[i].clear()
-			#if self.sb_baseplates[i].value()   == -1:  self.sb_baseplates[i].clear()
-			#if self.sb_protomodules[i].value() == -1:  self.sb_protomodules[i].clear()
 		
 
 		if self.page.sbBatchAraldite.value() == -1:  self.page.sbBatchAraldite.clear()
-		#if self.page.sbBatchLoctite.value()  == -1:  self.page.sbBatchLoctite.clear()
 		if self.page.sbTrayComponent.value() == -1:  self.page.sbTrayComponent.clear()
 		if self.page.sbTrayAssembly.value()  == -1:  self.page.sbTrayAssembly.clear()
 
@@ -434,9 +351,6 @@ class func(object):
 		mode_editing  = self.mode == 'editing'
 		mode_creating = self.mode == 'creating'
 		tools_exist        = [_.value()>=0 for _ in self.sb_tools       ]
-		#sensors_exist      = [_.value()>=0 for _ in self.sb_sensors     ]
-		#baseplates_exist   = [_.value()>=0 for _ in self.sb_baseplates  ]
-		#protomodules_exist = [_.value()>=0 for _ in self.sb_protomodules]
 		sensors_exist      = [_.text()!="" for _ in self.le_sensors]
 		baseplates_exist   = [_.text()!="" for _ in self.le_baseplates]
 		protomodules_exist = [_.text()!="" for _ in self.le_protomodules]
@@ -450,33 +364,20 @@ class func(object):
 		self.page.pbRunStartNow     .setEnabled(mode_creating or mode_editing)
 		self.page.pbRunStopNow      .setEnabled(mode_creating or mode_editing)
 
-		#self.page.leUserPerformed  .setReadOnly(mode_view)
-		self.page.cbUserPerformed  .setEnabled( mode_creating or mode_editing)
-		self.page.leLocation       .setReadOnly(mode_view)
-		self.page.dtRunStart       .setReadOnly(mode_view)
-		self.page.dtRunStop        .setReadOnly(mode_view)
-		#self.page.leCureTemperature.setReadOnly(mode_view)
-		#self.page.leCureHumidity   .setReadOnly(mode_view)
-		self.page.dsbCureTemperature.setReadOnly(mode_view)
-		self.page.sbCureHumidity   .setReadOnly(mode_view)
+		#self.page.cbUserPerformed  .setEnabled( mode_creating or mode_editing)
+		#self.page.leLocation       .setReadOnly(mode_view)
 		self.page.sbTrayComponent  .setReadOnly(mode_view)
 		self.page.sbTrayAssembly   .setReadOnly(mode_view)
 		self.page.sbBatchAraldite  .setReadOnly(mode_view)
-		#self.page.sbBatchLoctite   .setReadOnly(mode_view)
 
 		self.page.pbGoTrayComponent.setEnabled(mode_view and self.page.sbTrayComponent.value() >= 0)
 		self.page.pbGoTrayAssembly .setEnabled(mode_view and self.page.sbTrayAssembly .value() >= 0)
 		self.page.pbGoBatchAraldite.setEnabled(mode_view and self.page.sbBatchAraldite.value() >= 0)
-		#self.page.pbGoBatchLoctite .setEnabled(mode_view and self.page.sbBatchLoctite .value() >= 0)
 
 		for i in range(6):
 			self.sb_tools[i].setReadOnly(       mode_view)
-			#self.sb_sensors[i].setReadOnly(     mode_view)
-			#self.sb_baseplates[i].setReadOnly(  mode_view)
-			#self.sb_protomodules[i].setReadOnly(mode_view)
 			self.le_sensors[i].setReadOnly(       mode_view)
 			self.le_baseplates[i].setReadOnly(    mode_view)
-			#self.le_protomodules[i].setReadOnly(  mode_view)
 			self.pb_go_tools[i].setEnabled(       mode_view and tools_exist[i]       )
 			self.pb_go_sensors[i].setEnabled(     mode_view and sensors_exist[i]     )
 			self.pb_go_baseplates[i].setEnabled(  mode_view and baseplates_exist[i]  )
@@ -495,15 +396,12 @@ class func(object):
 	def loadAllObjects(self,*args,**kwargs):
 		for i in range(6):
 			result = self.tools_sensor[i].load(self.sb_tools[i].value(),      self.page.cbInstitution.currentText())
-			#self.baseplates[i].load(  self.sb_baseplates[i].value())
-			#self.sensors[i].load(     self.sb_sensors[i].value()   )
 			self.baseplates[i].load(self.le_baseplates[i].text())
 			self.sensors[i].load(   self.le_sensors[i].text())
 
 		self.tray_component_sensor.load(self.page.sbTrayComponent.value(), self.page.cbInstitution.currentText())
 		self.tray_assembly.load(        self.page.sbTrayAssembly.value(),  self.page.cbInstitution.currentText())
 		self.batch_araldite.load(       self.page.sbBatchAraldite.value())
-		#self.batch_loctite.load(        self.page.sbBatchLoctite.value() )
 		self.updateIssues()
 
 	@enforce_mode(['editing','creating'])
@@ -525,13 +423,11 @@ class func(object):
 		self.tray_component_sensor.clear()
 		self.tray_assembly.clear()
 		self.batch_araldite.clear()
-		#self.batch_loctite.clear()
 
 	@enforce_mode(['editing','creating'])
 	def loadToolSensor(self, *args, **kwargs):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
-		print("loadToolSensor: TEMP: sb value is {}".format(self.sb_tools[which].value()))
 		result = self.tools_sensor[which].load(self.sb_tools[which].value(), self.page.cbInstitution.currentText())
 		self.updateIssues()
 
@@ -539,7 +435,6 @@ class func(object):
 	def loadBaseplate(self, *args, **kwargs):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
-		#self.baseplates[which].load(self.sb_baseplates[which].value())
 		self.baseplates[which].load(self.le_baseplates[which].text(), query_db=False)
 		self.updateIssues()
 
@@ -547,7 +442,6 @@ class func(object):
 	def loadSensor(self, *args, **kwargs):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
-		#self.sensors[which].load(self.sb_sensors[which].value())
 		self.sensors[which].load(self.le_sensors[which].text(), query_db=False)
 		self.updateIssues()
 
@@ -565,12 +459,6 @@ class func(object):
 	def loadBatchAraldite(self, *args, **kwargs):
 		self.batch_araldite.load(self.page.sbBatchAraldite.value())
 		self.updateIssues()
-	"""
-	@enforce_mode(['editing','creating'])
-	def loadBatchLoctite(self, *args, **kwargs):
-		self.batch_loctite.load(self.page.sbBatchLoctite.value())
-		self.updateIssues()
-	"""
 
 
 	#NEW:  Add updateIssues and modify conditions accordingly
@@ -614,19 +502,12 @@ class func(object):
 
 		# rows
 		sensor_tools_selected = [_.value() for _ in self.sb_tools     ]
-		#baseplates_selected   = [_.value() for _ in self.sb_baseplates]
-		#sensors_selected      = [_.value() for _ in self.sb_sensors   ]
 		baseplates_selected   = [_.text() for _ in self.le_baseplates  ]
 		sensors_selected      = [_.text() for _ in self.le_sensors     ]
-		#protomodules_selected = [_.text() for _ in self.le_protomodules]
 
 		sensor_tool_duplicates = [_ for _ in range(6) if sensor_tools_selected[_] >= 0 and sensor_tools_selected.count(sensor_tools_selected[_])>1]
 		baseplate_duplicates   = [_ for _ in range(6) if baseplates_selected[_]   != "" and baseplates_selected.count(  baseplates_selected[_]  )>1]
 		sensor_duplicates      = [_ for _ in range(6) if sensors_selected[_]      != "" and sensors_selected.count(     sensors_selected[_]     )>1]
-		#protomodule_duplicates = [_ for _ in range(6) if protomodules_selected[_] != "" and sensors_selected.count(protomodules_selected[_]     )>1]
-		# Commenting this:  protomodule IDs should be determined by sensor, baseplate -> should never be duplicates.
-		#tmp_protomodule = fm.protomodule()
-		#protomodule_copies     = [_ for _ in range(6) if tmp_protomodule.load(protomodules_selected[_])]
 
 		if sensor_tool_duplicates:
 			issues.append(I_TOOL_SENSOR_DUPLICATE.format(', '.join([str(_+1) for _ in sensor_tool_duplicates])))
@@ -634,10 +515,6 @@ class func(object):
 			issues.append(I_BASEPLATE_DUPLICATE.format(', '.join([str(_+1) for _ in baseplate_duplicates])))
 		if sensor_duplicates:
 			issues.append(I_SENSOR_DUPLICATE.format(', '.join([str(_+1) for _ in sensor_duplicates])))
-		#if protomodule_duplicates:
-		#	issues.append(I_PROTOMODULE_DUPLICATE.format(', '.join([str(_+1) for _ in protomodule_duplicates])))
-		#if protomodule_copies:
-		#	issues.append(I_PROTOMODULE_COPY.format(', '.join([str(_+1) for _ in protomodule_duplicates])))
 
 		rows_empty           = []
 		rows_full            = []
@@ -678,9 +555,6 @@ class func(object):
 					issues.append(I_BASEPLATE_SENSOR_SHAPE.format(self.baseplates[i].ID,    self.baseplates[i].shape, \
 																  self.sensors[i].ID, self.sensors[i].shape))
 
-			#if protomodules_selected[i] != "":
-			#	num_parts += 1
-
 			if num_parts == 0:
 				rows_empty.append(i)
 			elif num_parts == 3:
@@ -705,16 +579,14 @@ class func(object):
 
 
 		objects_8in = []
-		objects_8in = []
 		objects_not_here = []
 
 		for obj in objects:
 
 			size = getattr(obj, "size", None)
-			if size in [6.0, 6, '6']:
-				objects_8in.append(obj)
 			if size in [8.0, 8, '8']:
 				objects_8in.append(obj)
+			else:   print("WARINING: POSSIBLE ERROR: obj size is {} and not 8!".format(size))
 
 			institution = getattr(obj, "institution", None)
 			if not (institution in [None, self.page.cbInstitution.currentText()]):
@@ -722,7 +594,6 @@ class func(object):
 
 		if len(objects_8in) and len(objects_8in):
 			issues.append(I_SIZE_MISMATCH)
-			issues.append(I_SIZE_MISMATCH_6.format(', '.join([str(_) for _ in objects_8in])))
 			issues.append(I_SIZE_MISMATCH_8.format(', '.join([str(_) for _ in objects_8in])))
 
 		if objects_not_here:
@@ -790,21 +661,8 @@ class func(object):
 
 		self.step_sensor.institution = self.page.cbInstitution.currentText()
 
-		#self.step_sensor.user_performed = str( self.page.leUserPerformed.text() )
-		self.step_sensor.user_performed = str(self.page.cbUserPerformed.currentText()) if str(self.page.cbUserPerformed.currentText()) else None
-		self.step_sensor.location = str( self.page.leLocation.text() )
-
-		# Honestly not sure what the point of this part is...
-		#if self.page.dtRunStart.date().year() == NO_DATE[0]:
-		#	self.step_sensor.run_start = None
-		#else:
-		self.step_sensor.run_start = self.page.dtRunStart.dateTime().toTime_t()
-		self.step_sensor.run_stop  = self.page.dtRunStop.dateTime().toTime_t()
-
-		#self.step_sensor.cure_humidity    = str(self.page.leCureHumidity.text())
-		#self.step_sensor.cure_temperature = str(self.page.leCureTemperature.text())
-		self.step_sensor.cure_humidity = self.page.sbCureHumidity.value()
-		self.step_sensor.cure_temperature = self.page.dsbCureTemperature.value()
+		#self.step_sensor.user_performed = str(self.page.cbUserPerformed.currentText()) if str(self.page.cbUserPerformed.currentText()) else None
+		#self.step_sensor.location = str( self.page.leLocation.text() )
 
 		tools = []
 		sensors = []
@@ -826,7 +684,6 @@ class func(object):
 		self.step_sensor.tray_component_sensor = self.page.sbTrayComponent.value() if self.page.sbTrayComponent.value() >= 0 else None
 		self.step_sensor.tray_assembly         = self.page.sbTrayAssembly.value()  if self.page.sbTrayAssembly.value()  >= 0 else None
 		self.step_sensor.batch_araldite        = self.page.sbBatchAraldite.value() if self.page.sbBatchAraldite.value() >= 0 else None
-		#self.step_sensor.batch_loctite         = self.page.sbBatchLoctite.value()  if self.page.sbBatchLoctite.value()  >= 0 else None
 
 
 		# Add protomodule ID to baseplate, sensor lists; create protomodule if it doesn't exist:
@@ -836,11 +693,7 @@ class func(object):
 				continue
 			temp_protomodule = fm.protomodule()
 			# Moved to active check (ensure no duplicates)
-			#proto_exists = temp_protomodule.load(protomodules[i])
-			#if not proto_exists:
-			# NEW:  Name is now the baseplate name + sensor name
-			temp_protomodule.new(protomodules[i]) #baseplates[i] + '_' + sensors[i])
-			#temp_protomodule.new(protomodules[i])
+			temp_protomodule.new(protomodules[i])
 			# Thickness = sum of baseplate and sensor, plus glue gaps
 			#sensor_thk_str = self.sensors[i].type  # Should be "[thickness] um"
 			#sensor_thk = float(sensor_thk_str.split()[0])/1000.0
@@ -899,7 +752,6 @@ class func(object):
 		self.sb_tools[which].clear()
 		self.le_sensors[which].clear()
 		self.le_baseplates[which].clear()
-		#self.le_protomodules[which].clear()
 
 	def goTool(self,*args,**kwargs):
 		sender_name = str(self.page.sender().objectName())
@@ -910,50 +762,33 @@ class func(object):
 	def goSensor(self,*args,**kwargs):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
-		#sensor = self.sb_sensors[which].value()
 		sensor = self.le_sensors[which].text()
 		self.setUIPage('sensors',ID=sensor)
 
 	def goBaseplate(self,*args,**kwargs):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
-		#baseplate = self.sb_baseplates[which].value()
 		baseplate = self.le_baseplates[which].text()
 		self.setUIPage('baseplates',ID=baseplate)
 
 	def goProtomodule(self,*args,**kwargs):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
-		#protomodule = self.sb_protomodules[which].value()
 		protomodule = self.le_protomodules[which].text()
 		self.setUIPage('protomodules',ID=protomodule)
 
 	def goBatchAraldite(self,*args,**kwargs):
 		batch_araldite = self.page.sbBatchAraldite.value()
 		self.setUIPage('supplies',batch_araldite=batch_araldite)
-	"""
-	def goBatchLoctite(self,*args,**kwargs):
-		batch_loctite = self.page.sbBatchLoctite.value()
-		self.setUIPage('supplies',batch_loctite=batch_loctite)
-	"""
+
 	def goTrayComponent(self,*args,**kwargs):
 		tray_component_sensor = self.page.sbTrayComponent.value()
 		self.setUIPage('tooling',tray_component_sensor=tray_component_sensor)
 
 	def goTrayAssembly(self,*args,**kwargs):
 		tray_assembly = self.page.sbTrayAssembly.value()
-		print(tray_assembly)
 		self.setUIPage('tooling',tray_assembly=tray_assembly)
 
-	def setRunStartNow(self, *args, **kwargs):
-		localtime = time.localtime()
-		self.page.dtRunStart.setDate(QtCore.QDate(*localtime[0:3]))
-		self.page.dtRunStart.setTime(QtCore.QTime(*localtime[3:6]))
-
-	def setRunStopNow(self, *args, **kwargs):
-		localtime = time.localtime()
-		self.page.dtRunStop.setDate(QtCore.QDate(*localtime[0:3]))
-		self.page.dtRunStop.setTime(QtCore.QTime(*localtime[3:6]))
 
 	def filesToUpload(self):
 		# Return a list of all files to upload to DB

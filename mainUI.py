@@ -22,14 +22,15 @@ from pages.search           import func as cls_func_search
 
 #from pages.view_kapton_step import func as cls_func_view_kapton_step
 from pages.view_sensor_step import func as cls_func_view_sensor_step
+from pages.view_sensor_post import func as cls_func_view_sensor_post
 from pages.view_pcb_step    import func as cls_func_view_pcb_step
+from pages.view_pcb_post    import func as cls_func_view_pcb_post
 from pages.view_wirebonding import func as cls_func_view_wirebonding
 
 from pages.view_tooling     import func as cls_func_view_tooling
 from pages.view_supplies    import func as cls_func_view_supplies
 
-# from pages.routine_iv       import func as cls_func_routine_iv
-from pages.view_shipment    import func as cls_func_shipment
+#from pages.view_shipment    import func as cls_func_shipment
 
 
 
@@ -81,23 +82,28 @@ class widget_search(wdgt.QWidget,form_search):
 		self.setupUi(self)
 
 
-"""
-from pages_ui.view_kapton_step import Ui_Form as form_view_kapton_step
-class widget_view_kapton_step(wdgt.QWidget,form_view_kapton_step):
-	def __init__(self,parent):
-		super(widget_view_kapton_step,self).__init__(parent)
-		self.setupUi(self)
-"""
 from pages_ui.view_sensor_step import Ui_Form as form_view_sensor_step
 class widget_view_sensor_step(wdgt.QWidget,form_view_sensor_step):
 	def __init__(self,parent):
 		super(widget_view_sensor_step,self).__init__(parent)
 		self.setupUi(self)
 
+from pages_ui.view_sensor_post import Ui_Form as form_view_sensor_post
+class widget_view_sensor_post(wdgt.QWidget,form_view_sensor_post):
+	def __init__(self,parent):
+		super(widget_view_sensor_post,self).__init__(parent)
+		self.setupUi(self)
+
 from pages_ui.view_pcb_step import Ui_Form as form_view_pcb_step
 class widget_view_pcb_step(wdgt.QWidget, form_view_pcb_step):
 	def __init__(self,parent):
 		super(widget_view_pcb_step,self).__init__(parent)
+		self.setupUi(self)
+
+from pages_ui.view_pcb_post import Ui_Form as form_view_pcb_post
+class widget_view_pcb_post(wdgt.QWidget, form_view_pcb_post):
+	def __init__(self,parent):
+		super(widget_view_pcb_post,self).__init__(parent)
 		self.setupUi(self)
 
 from pages_ui.view_wirebonding import Ui_Form as form_view_wirebonding
@@ -120,51 +126,45 @@ class widget_view_supplies(wdgt.QWidget, form_view_supplies):
 		self.setupUi(self)
 
 
-# from pages_ui.routine_iv import Ui_Form as form_routine_iv
-# class widget_routine_iv(wdgt.QWidget, form_routine_iv):
-# 	def __init__(self,parent):
-# 		super(widget_routine_iv,self).__init__(parent)
-# 		self.setupUi(self)
-
-from pages_ui.view_shipment import Ui_Form as form_shipment
-class widget_shipment(wdgt.QWidget, form_shipment):
-	def __init__(self,parent):
-		super(widget_shipment,self).__init__(parent)
-		self.setupUi(self)
+#from pages_ui.view_shipment import Ui_Form as form_shipment
+#class widget_shipment(wdgt.QWidget, form_shipment):
+#	def __init__(self,parent):
+#		super(widget_shipment,self).__init__(parent)
+#		self.setupUi(self)
 
 
 
 
 # Dict of page IDs by name (as the name shows up in the page list widgets)
 PAGE_IDS = {
-	'users'                  : 0,
-	'search for parts'       : 1,
-	'baseplates'             : 2,
-	'sensors'                : 3,
+	'Users'                  : 0,
+	'Search for parts'       : 1,
+	'Baseplates'             : 2,
+	'Sensors'                : 3,
 	'PCBs'                   : 4,
-	'protomodules'           : 5,
-	'modules'                : 6,
-	'tooling'                : 7,
-	'supplies'               : 8,
+	'Protomodules'           : 5,
+	'Modules'                : 6,
+	'Tooling'                : 7,
+	'Supplies'               : 8,
 
-	#'kapton placement steps' : 9,
-	'sensor placement steps' : 9,
-	'PCB placement steps'    : 10,
-	'wirebonding and encapsulating' : 11,
+	'1. Sensor - pre-assembly' : 9,
+	'2. Sensor - post-assembly': 10,
+	'3. PCB - pre-assembly'    : 11,
+	'4. PCB - pre-assembly'    : 12,
+	'5. Wirebonding & encapsulation' : 13,
 
-	'shipments'               :12, #WARNING:  Order has been switched
+	#'shipments'               :12, # Disabled indefinitely
 }
 
 # List of all pages where DB expects info to upload
 UPLOAD_ENABLED_PAGES = [
-	'baseplates',  # All part pages
-	'sensors',
-	'PCBs',
-	'protomodules',
-	'modules',
-	#'kapton placement steps',  # ...and assembly steps
-	'sensor placement steps',
-	'PCB placement steps'
+	#'Baseplates',  # In theory, should never have to upload these
+	#'Sensors',
+	#'PCBs',
+	'Protomodules',
+	'Modules',
+	'2. Sensor - post-assembly',
+	'4. PCB - pre-assembly'
 ]
 
 
@@ -234,12 +234,13 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		self.page_view_tooling     = widget_view_tooling(None)     ; self.swPages.addWidget(self.page_view_tooling)
 		self.page_view_supplies    = widget_view_supplies(None)    ; self.swPages.addWidget(self.page_view_supplies)	# NEW
 
-		#self.page_view_kapton_step = widget_view_kapton_step(None) ; self.swPages.addWidget(self.page_view_kapton_step)
 		self.page_view_sensor_step = widget_view_sensor_step(None) ; self.swPages.addWidget(self.page_view_sensor_step)
+		self.page_view_sensor_post = widget_view_sensor_post(None) ; self.swPages.addWidget(self.page_view_sensor_post)
 		self.page_view_pcb_step    = widget_view_pcb_step(None)    ; self.swPages.addWidget(self.page_view_pcb_step)
+		self.page_view_pcb_post    = widget_view_pcb_post(None)    ; self.swPages.addWidget(self.page_view_pcb_post)
 		self.page_view_wirebonding = widget_view_wirebonding(None) ; self.swPages.addWidget(self.page_view_wirebonding)
 
-		self.page_shipment         = widget_shipment(None)         ; self.swPages.addWidget(self.page_shipment)
+		#self.page_shipment         = widget_shipment(None)         ; self.swPages.addWidget(self.page_shipment)
 
 
 	def initPages(self):
@@ -252,16 +253,16 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		self.func_view_protomodule = cls_func_view_protomodule(      fm, self.page_view_protomodule, self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_module      = cls_func_view_module(           fm, self.page_view_module     , self.setUIPage, self.setSwitchingEnabled)
 
-		#self.func_view_kapton_step = cls_func_view_kapton_step(      fm, self.page_view_kapton_step, self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_sensor_step = cls_func_view_sensor_step(      fm, self.page_view_sensor_step, self.setUIPage, self.setSwitchingEnabled)
+		self.func_view_sensor_post = cls_func_view_sensor_post(      fm, self.page_view_sensor_post, self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_pcb_step    = cls_func_view_pcb_step(         fm, self.page_view_pcb_step   , self.setUIPage, self.setSwitchingEnabled)
+		self.func_view_pcb_post    = cls_func_view_pcb_post(         fm, self.page_view_pcb_post   , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_wirebonding = cls_func_view_wirebonding(      fm, self.page_view_wirebonding, self.setUIPage, self.setSwitchingEnabled)
 
 		self.func_view_tooling     = cls_func_view_tooling(          fm, self.page_view_tooling    , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_supplies    = cls_func_view_supplies(         fm, self.page_view_supplies   , self.setUIPage, self.setSwitchingEnabled)
 
-		# self.func_routine_iv       = cls_func_routine_iv(            fm, self.page_routine_iv      , self.setUIPage, self.setSwitchingEnabled)
-		self.func_shipment         = cls_func_shipment(              fm, self.page_shipment        , self.setUIPage, self.setSwitchingEnabled)
+		#self.func_shipment         = cls_func_shipment(              fm, self.page_shipment        , self.setUIPage, self.setSwitchingEnabled)
 
 		# This list must be in the same order that the pages are in in the stackedWidget in the main UI file.
 		# This is the same order as in the dict PAGE_IDS
@@ -277,13 +278,13 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 			self.func_view_tooling,
 			self.func_view_supplies,
 
-			#self.func_view_kapton_step,
 			self.func_view_sensor_step,
+			self.func_view_sensor_post,
 			self.func_view_pcb_step,
+			self.func_view_pcb_post,
 			self.func_view_wirebonding,
 
-			self.func_shipment,  #WARNING:  Order has been switched.
-			# self.func_routine_iv,
+			#self.func_shipment,  #WARNING:  Order has been switched.
 			]
 
 

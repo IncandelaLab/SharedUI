@@ -219,22 +219,6 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_9">
-   <property name="geometry">
-    <rect>
-     <x>660</x>
-     <y>312</y>
-     <width>131</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>cure humidity (%)</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
   <widget class="QPushButton" name="pbEdit">
    <property name="geometry">
     <rect>
@@ -246,22 +230,6 @@
    </property>
    <property name="text">
     <string>Edit</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_8">
-   <property name="geometry">
-    <rect>
-     <x>660</x>
-     <y>282</y>
-     <width>131</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>cure temp (C)</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
    </property>
   </widget>
   <widget class="QPushButton" name="pbSave">
@@ -317,22 +285,6 @@
    </property>
    <property name="text">
     <string>Cancel</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_2">
-   <property name="geometry">
-    <rect>
-     <x>660</x>
-     <y>80</y>
-     <width>151</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>who performed step</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
    </property>
   </widget>
   <widget class="QSpinBox" name="sbTool6">
@@ -893,61 +845,6 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_10">
-   <property name="geometry">
-    <rect>
-     <x>660</x>
-     <y>160</y>
-     <width>131</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>run start</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbRunStartNow">
-   <property name="geometry">
-    <rect>
-     <x>940</x>
-     <y>160</y>
-     <width>91</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>set to now</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_3">
-   <property name="geometry">
-    <rect>
-     <x>660</x>
-     <y>100</y>
-     <width>151</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>location</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="leLocation">
-   <property name="geometry">
-    <rect>
-     <x>810</x>
-     <y>100</y>
-     <width>131</width>
-     <height>20</height>
-    </rect>
-   </property>
-  </widget>
   <widget class="QLineEdit" name="lineEdit_25">
    <property name="geometry">
     <rect>
@@ -961,43 +858,6 @@
     <string>Institution (for tools)</string>
    </property>
    <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QDateTimeEdit" name="dtRunStart">
-   <property name="geometry">
-    <rect>
-     <x>790</x>
-     <y>160</y>
-     <width>151</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="dateTime">
-    <datetime>
-     <hour>0</hour>
-     <minute>0</minute>
-     <second>0</second>
-     <year>2020</year>
-     <month>1</month>
-     <day>1</day>
-    </datetime>
-   </property>
-   <property name="maximumDate">
-    <date>
-     <year>2030</year>
-     <month>12</month>
-     <day>31</day>
-    </date>
-   </property>
-   <property name="minimumDate">
-    <date>
-     <year>2000</year>
-     <month>1</month>
-     <day>1</day>
-    </date>
-   </property>
-   <property name="calendarPopup">
     <bool>true</bool>
    </property>
   </widget>
@@ -1234,111 +1094,6 @@
     </property>
    </item>
   </widget>
-  <widget class="QComboBox" name="cbUserPerformed">
-   <property name="geometry">
-    <rect>
-     <x>810</x>
-     <y>80</y>
-     <width>131</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="currentIndex">
-    <number>-1</number>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_27">
-   <property name="geometry">
-    <rect>
-     <x>660</x>
-     <y>180</y>
-     <width>131</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>run stop</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbRunStopNow">
-   <property name="geometry">
-    <rect>
-     <x>940</x>
-     <y>180</y>
-     <width>91</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>set to now</string>
-   </property>
-  </widget>
-  <widget class="QDateTimeEdit" name="dtRunStop">
-   <property name="geometry">
-    <rect>
-     <x>790</x>
-     <y>180</y>
-     <width>151</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="dateTime">
-    <datetime>
-     <hour>0</hour>
-     <minute>0</minute>
-     <second>0</second>
-     <year>2020</year>
-     <month>1</month>
-     <day>1</day>
-    </datetime>
-   </property>
-   <property name="maximumDate">
-    <date>
-     <year>2030</year>
-     <month>12</month>
-     <day>31</day>
-    </date>
-   </property>
-   <property name="minimumDate">
-    <date>
-     <year>2000</year>
-     <month>1</month>
-     <day>1</day>
-    </date>
-   </property>
-   <property name="calendarPopup">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QSpinBox" name="sbCureHumidity">
-   <property name="geometry">
-    <rect>
-     <x>790</x>
-     <y>310</y>
-     <width>71</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <property name="value">
-    <number>10</number>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="dsbCureTemperature">
-   <property name="geometry">
-    <rect>
-     <x>790</x>
-     <y>280</y>
-     <width>69</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <property name="value">
-    <double>70.000000000000000</double>
-   </property>
-  </widget>
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
@@ -1364,164 +1119,6 @@ before assembly</string>
    </property>
    <property name="text">
     <string>Check:  correct feet are installed on pickup tool</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_3">
-   <property name="geometry">
-    <rect>
-     <x>660</x>
-     <y>220</y>
-     <width>101</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Curing</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbCureStartNow">
-   <property name="geometry">
-    <rect>
-     <x>940</x>
-     <y>240</y>
-     <width>91</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>set to now</string>
-   </property>
-  </widget>
-  <widget class="QDateTimeEdit" name="dtCureStart">
-   <property name="geometry">
-    <rect>
-     <x>790</x>
-     <y>240</y>
-     <width>151</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="dateTime">
-    <datetime>
-     <hour>0</hour>
-     <minute>0</minute>
-     <second>0</second>
-     <year>2020</year>
-     <month>1</month>
-     <day>1</day>
-    </datetime>
-   </property>
-   <property name="maximumDate">
-    <date>
-     <year>2030</year>
-     <month>12</month>
-     <day>31</day>
-    </date>
-   </property>
-   <property name="minimumDate">
-    <date>
-     <year>2000</year>
-     <month>1</month>
-     <day>1</day>
-    </date>
-   </property>
-   <property name="calendarPopup">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_28">
-   <property name="geometry">
-    <rect>
-     <x>660</x>
-     <y>240</y>
-     <width>131</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>cure start</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbCureStopNow">
-   <property name="geometry">
-    <rect>
-     <x>940</x>
-     <y>260</y>
-     <width>91</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>set to now</string>
-   </property>
-  </widget>
-  <widget class="QDateTimeEdit" name="dtCureStop">
-   <property name="geometry">
-    <rect>
-     <x>790</x>
-     <y>260</y>
-     <width>151</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="dateTime">
-    <datetime>
-     <hour>0</hour>
-     <minute>0</minute>
-     <second>0</second>
-     <year>2020</year>
-     <month>1</month>
-     <day>1</day>
-    </datetime>
-   </property>
-   <property name="maximumDate">
-    <date>
-     <year>2030</year>
-     <month>12</month>
-     <day>31</day>
-    </date>
-   </property>
-   <property name="minimumDate">
-    <date>
-     <year>2000</year>
-     <month>1</month>
-     <day>1</day>
-    </date>
-   </property>
-   <property name="calendarPopup">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_29">
-   <property name="geometry">
-    <rect>
-     <x>660</x>
-     <y>260</y>
-     <width>131</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>cure stop</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_2">
-   <property name="geometry">
-    <rect>
-     <x>660</x>
-     <y>140</y>
-     <width>101</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Assembly run</string>
    </property>
   </widget>
  </widget>
