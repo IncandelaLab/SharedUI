@@ -194,7 +194,6 @@ class func(object):
 		self.page.dsbFlatness.setValue( -1 if self.module.flatness    is None else self.module.flatness   )
 		self.page.cbShape.setCurrentIndex(      INDEX_SHAPE.get(      self.module.shape    , -1)  )
 		self.page.cbGrade.setCurrentIndex(      INDEX_GRADE.get(      self.module.grade    , -1)  )
-		#self.page.cbChirality.setCurrentIndex(  INDEX_CHIRALITY.get(  self.module.chirality, -1)  )
 		self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.module.institution, -1))
 		self.page.cbInspection.setCurrentIndex( INDEX_INSPECTION.get( self.module.inspection,  -1))
 		if not self.module.insertion_user in self.index_users.keys() and not self.module.insertion_user is None:

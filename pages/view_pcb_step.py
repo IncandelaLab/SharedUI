@@ -80,7 +80,6 @@ class func(object):
 		self.tray_component_sensor = fm.tray_component_sensor()
 		self.tray_assembly         = fm.tray_assembly()
 		self.batch_araldite        = fm.batch_araldite()
-		#self.batch_loctite         = fm.batch_loctite()
 
 		self.step_pcb = fm.step_pcb()
 		self.step_pcb_exists = False
@@ -198,6 +197,16 @@ class func(object):
 			self.page.pbGoModule6,
 		]
 
+		# NEW:  To resolve bug where spinbox defaults to 0/prev value when left empty
+        self.pb_clears = [
+			self.page.pbClear1,
+			self.page.pbClear2,
+			self.page.pbClear3,
+			self.page.pbClear4,
+			self.page.pbClear5,
+			self.page.pbClear6,
+		]
+
 		for i in range(6):
 			self.pb_go_tools[i].clicked.connect(       self.goTool       )
 			self.pb_go_pcbs[i].clicked.connect(        self.goPcb        )
@@ -242,7 +251,6 @@ class func(object):
 		else:
 			self.page.sbID.setValue(ID)
 
-		#self.step_pcb_exists = (ID == self.step_pcb.ID)  #self.step_pcb.load(ID)
 		self.step_pcb_exists = False
 		if getattr(self.step_pcb, 'ID', None) != None:
 			self.step_pcb_exists = (ID == self.step_pcb.ID)
@@ -260,6 +268,17 @@ class func(object):
 				self.page.cbUserPerformed.addItem(self.step_pcb.user_performed)
 			self.page.cbUserPerformed.setCurrentIndex(self.index_users.get(self.step_pcb.user_performed, -1))
 			self.page.leLocation.setText(self.step_pcb.location)
+
+			times_to_set = [(self.step_sensor.run_start,  self.page.dtRunStart),
+			                (self.step_sensor.run_stop,   self.page.dtRunStop)]
+			for st, dt in times_to_set:
+				if st is None:
+					dt.setDate(QtCore.QDate(*NO_DATE))
+					dt.setTime(QtCore.QTime(0,0,0))
+				else:
+					localtime = list(time.localtime(st))
+					dt.setDate(QtCore.QDate(*localtime[0:3]))
+					dt.setTime(QtCore.QDate(*localtiem[3:6]))
 
 
 			self.page.sbBatchAraldite.setValue(self.step_pcb.batch_araldite if not (self.step_pcb.batch_araldite is None) else -1)
@@ -301,6 +320,11 @@ class func(object):
 			self.page.cbInstitution.setCurrentIndex(-1)
 			self.page.cbUserPerformed.setCurrentIndex(-1)
 			self.page.leLocation.setText("")
+			self.page.dtRunStart.setDate(QtCore.QDate(*NO_DATE))
+			self.page.dtRunStart.setTime(QtCore.QTime(0,0,0))
+			self.page.dtRunStop.setDate(QtCore.QDate(*NO_DATE))
+			self.page.dtRunStop.setTime(QtCore.QTime(0,0,0))
+
 			self.page.sbBatchAraldite.setValue(-1)
 			self.page.sbTrayComponent.setValue(-1)
 			self.page.sbTrayAssembly.setValue(-1)
@@ -522,8 +546,6 @@ class func(object):
 		rows_tool_dne        = []
 		rows_pcb_dne         = []
 		rows_protomodule_dne = []
-		rows_module_na       = []
-
 
 		for i in range(6):
 			num_parts = 0
@@ -583,7 +605,6 @@ class func(object):
 
 		if len(objects_8in):
 			issues.append(I_SIZE_MISMATCH)
-			issues.append(I_SIZE_MISMATCH_6.format(', '.join([str(_) for _ in objects_8in])))
 			issues.append(I_SIZE_MISMATCH_8.format(', '.join([str(_) for _ in objects_8in])))
 
 		if objects_not_here:
@@ -653,6 +674,9 @@ class func(object):
 		self.step_pcb.user_performed = str(self.page.cbUserPerformed.currentText()) if str(self.page.cbUserPerformed.currentText()) else None
 		self.step_pcb.location = str( self.page.leLocation.text() )
 
+		self.step_pcb.run_start  = self.page.dtRunStart.dateTime().toTime_t()
+		self.step_pcb.run_stop   = self.page.dtRunStop.dateTime().toTime_t()
+
 		tools        = []
 		pcbs         = []
 		protomodules = []
@@ -716,6 +740,14 @@ class func(object):
 		self.update_info()
 
 
+	# NEW:
+	def clearRow(self,*args,**kwargs):
+		sender_name = str(self.page.sender().objectName())
+		which = int(sender_name[-1]) - 1
+		self.sb_tools[which].clear()
+		self.le_sensors[which].clear()
+		self.le_baseplates[which].clear()
+
 	def goTool(self,*args,**kwargs):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1 # last character of sender name is integer 1 through 6; subtract one for zero index
@@ -752,6 +784,16 @@ class func(object):
 		tray_assembly = self.page.sbTrayAssembly.value()
 		print(tray_assembly)
 		self.setUIPage('tooling',tray_assembly=tray_assembly)
+
+	def setRunStartNow(self, *args, **kwargs):
+		localtime = time.localtime()
+		self.page.dtRunStart.setDate(QtCore.QDate(*localtime[0:3]))
+		self.page.dtRunStart.setTime(QtCore.QTime(*localtime[3:6]))
+
+	def setRunStopNow(self, *args, **kwargs):
+		localtime = time.localtime()
+		self.page.dtRunStop.setDate(QtCore.QDate(*localtime[0:3]))
+		self.page.dtRunStop.setTime(QtCore.QTime(*localtime[3:6]))
 
 	def filesToUpload(self):
 		# Return a list of all files to upload to DB

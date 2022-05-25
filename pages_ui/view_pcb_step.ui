@@ -1121,6 +1121,284 @@ before assembly</string>
     <string>Check:  correct feet are installed on pickup tool</string>
    </property>
   </widget>
+  <widget class="QLineEdit" name="leLocation">
+   <property name="geometry">
+    <rect>
+     <x>880</x>
+     <y>180</y>
+     <width>131</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QDateTimeEdit" name="dtRunStart">
+   <property name="geometry">
+    <rect>
+     <x>820</x>
+     <y>240</y>
+     <width>151</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="dateTime">
+    <datetime>
+     <hour>0</hour>
+     <minute>0</minute>
+     <second>0</second>
+     <year>2020</year>
+     <month>1</month>
+     <day>1</day>
+    </datetime>
+   </property>
+   <property name="maximumDate">
+    <date>
+     <year>2030</year>
+     <month>12</month>
+     <day>31</day>
+    </date>
+   </property>
+   <property name="minimumDate">
+    <date>
+     <year>2000</year>
+     <month>1</month>
+     <day>1</day>
+    </date>
+   </property>
+   <property name="calendarPopup">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_27">
+   <property name="geometry">
+    <rect>
+     <x>730</x>
+     <y>260</y>
+     <width>91</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>run stop</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_2">
+   <property name="geometry">
+    <rect>
+     <x>730</x>
+     <y>160</y>
+     <width>151</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>who performed step</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="cbUserPerformed">
+   <property name="geometry">
+    <rect>
+     <x>880</x>
+     <y>160</y>
+     <width>131</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="currentIndex">
+    <number>-1</number>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pbRunStartNow">
+   <property name="geometry">
+    <rect>
+     <x>970</x>
+     <y>240</y>
+     <width>91</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>set to now</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>730</x>
+     <y>220</y>
+     <width>101</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Assembly run</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pbRunStopNow">
+   <property name="geometry">
+    <rect>
+     <x>970</x>
+     <y>260</y>
+     <width>91</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>set to now</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_3">
+   <property name="geometry">
+    <rect>
+     <x>730</x>
+     <y>180</y>
+     <width>151</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>location</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QDateTimeEdit" name="dtRunStop">
+   <property name="geometry">
+    <rect>
+     <x>820</x>
+     <y>260</y>
+     <width>151</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="dateTime">
+    <datetime>
+     <hour>0</hour>
+     <minute>0</minute>
+     <second>0</second>
+     <year>2020</year>
+     <month>1</month>
+     <day>1</day>
+    </datetime>
+   </property>
+   <property name="maximumDate">
+    <date>
+     <year>2030</year>
+     <month>12</month>
+     <day>31</day>
+    </date>
+   </property>
+   <property name="minimumDate">
+    <date>
+     <year>2000</year>
+     <month>1</month>
+     <day>1</day>
+    </date>
+   </property>
+   <property name="calendarPopup">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_10">
+   <property name="geometry">
+    <rect>
+     <x>730</x>
+     <y>240</y>
+     <width>91</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>run start</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pbClear6">
+   <property name="geometry">
+    <rect>
+     <x>650</x>
+     <y>260</y>
+     <width>51</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>clear</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pbClear5">
+   <property name="geometry">
+    <rect>
+     <x>650</x>
+     <y>240</y>
+     <width>51</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>clear</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pbClear3">
+   <property name="geometry">
+    <rect>
+     <x>650</x>
+     <y>200</y>
+     <width>51</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>clear</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pbClear4">
+   <property name="geometry">
+    <rect>
+     <x>650</x>
+     <y>220</y>
+     <width>51</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>clear</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pbClear2">
+   <property name="geometry">
+    <rect>
+     <x>650</x>
+     <y>180</y>
+     <width>51</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>clear</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pbClear1">
+   <property name="geometry">
+    <rect>
+     <x>650</x>
+     <y>160</y>
+     <width>51</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>clear</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>

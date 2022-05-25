@@ -242,11 +242,11 @@ class func(object):
 
 		auth_users = fm.userManager.getAuthorizedUsers(PAGE_NAME)
 		self.index_users = {auth_users[i]:i for i in range(len(auth_users))}
-		#for user in self.index_users.keys():
-		#	self.page.cbUserPerformed.addItem(user)
+		for user in self.index_users.keys():
+			self.page.cbUserPerformed.addItem(user)
 
 
-	@enforce_mode(['view','editing'])
+	@enforce_mode('view')  #['view','editing'])
 	def update_info(self,ID=None,*args,**kwargs):
 		if ID is None:
 			ID = self.page.sbID.value()
@@ -263,19 +263,17 @@ class func(object):
 		if self.step_sensor_exists:
 
 			self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.step_sensor.institution, -1))
-			#if not self.step_sensor.user_performed in self.index_users.keys() and not self.step_sensor.user_performed is None:
-			#	# Insertion user was deleted from user page...just add user to the dropdown
-			#	self.index_users[self.step_sensor.user_performed] = max(self.index_users.values()) + 1
-			#	self.page.cbUserPerformed.addItem(self.step_sensor.user_performed)
-			#self.page.cbUserPerformed.setCurrentIndex(self.index_users.get(self.step_sensor.user_performed, -1))
-			#self.page.leLocation.setText(self.step_sensor.location)
+			if not self.step_sensor.user_performed in self.index_users.keys() and not self.step_sensor.user_performed is None:
+				# Insertion user was deleted from user page...just add user to the dropdown
+				self.index_users[self.step_sensor.user_performed] = max(self.index_users.values()) + 1
+				self.page.cbUserPerformed.addItem(self.step_sensor.user_performed)
+			self.page.cbUserPerformed.setCurrentIndex(self.index_users.get(self.step_sensor.user_performed, -1))
+			self.page.leLocation.setText(self.step_sensor.location)
 
 			# New
-			"""
+			
 			times_to_set = [(self.step_sensor.run_start,  self.page.dtRunStart),
-							(self.step_sensor.run_stop,   self.page.dtRunStop),
-							(self.step_sensor.cure_start, self.page.dtCureStart),
-							(self.step_sensor.cure_stop,  self.page.dtCureStop)]
+							(self.step_sensor.run_stop,   self.page.dtRunStop)]
 			for st, dt in times_to_set:
 				if st is None:
 					dt.setDate(QtCore.QDate(*NO_DATE))
@@ -284,7 +282,7 @@ class func(object):
 					localtime = list(time.localtime(st))
 					dt.setDate(QtCore.QDate(*localtime[0:3]))
 					dt.setTime(QtCore.QDate(*localtiem[3:6]))
-			"""
+			
 
 
 			self.page.sbBatchAraldite.setValue(self.step_sensor.batch_araldite if not (self.step_sensor.batch_araldite is None) else -1)
@@ -324,6 +322,10 @@ class func(object):
 			self.page.cbInstitution.setCurrentIndex(-1)
 			self.page.cbUserPerformed.setCurrentIndex(-1)
 			self.page.leLocation.setText("")
+			self.page.dtRunStart.setDate(QtCore.QDate(*NO_DATE))
+			self.page.dtRunStart.setTime(QtCore.QTime(0,0,0))
+			self.page.dtRunStop.setDate(QtCore.QDate(*NO_DATE))
+			self.page.dtRunStop.setTime(QtCore.QTime(0,0,0))
 
 			self.page.sbBatchAraldite.setValue(-1)
 			self.page.sbTrayComponent.setValue(-1)
@@ -364,8 +366,10 @@ class func(object):
 		self.page.pbRunStartNow     .setEnabled(mode_creating or mode_editing)
 		self.page.pbRunStopNow      .setEnabled(mode_creating or mode_editing)
 
-		#self.page.cbUserPerformed  .setEnabled( mode_creating or mode_editing)
-		#self.page.leLocation       .setReadOnly(mode_view)
+		self.page.cbUserPerformed  .setEnabled( mode_creating or mode_editing)
+		self.page.leLocation       .setReadOnly(mode_view)
+		self.page.dtRunStart       .setReadOnly(mode_view)
+		self.page.dtRunStop        .setReadOnly(mode_view)
 		self.page.sbTrayComponent  .setReadOnly(mode_view)
 		self.page.sbTrayAssembly   .setReadOnly(mode_view)
 		self.page.sbBatchAraldite  .setReadOnly(mode_view)
@@ -392,6 +396,7 @@ class func(object):
 
 
 	#NEW:  Add all load() functions
+
 	@enforce_mode(['editing','creating'])
 	def loadAllObjects(self,*args,**kwargs):
 		for i in range(6):
@@ -492,10 +497,9 @@ class func(object):
 			if not (self.batch_araldite.date_expires is None):
 				ydm =  self.batch_araldite.date_expires.split('-')
 				expires = QtCore.QDate(int(ydm[2]), int(ydm[0]), int(ydm[1]))   # ymd format for constructor
-				#today = datetime.date(*time.localtime()[:3])
 				if QtCore.QDate.currentDate() > expires:  #today > expires:
-					#issues.append(I_BATCH_ARALDITE_EXPIRED)
-					print("**WARNING:** Araldite batch is expired!")
+					issues.append(I_BATCH_ARALDITE_EXPIRED)
+					#print("**WARNING:** Araldite batch is expired!")
 			if self.batch_araldite.is_empty:
 				issues.append(I_BATCH_ARALDITE_EMPTY)
 
@@ -661,8 +665,11 @@ class func(object):
 
 		self.step_sensor.institution = self.page.cbInstitution.currentText()
 
-		#self.step_sensor.user_performed = str(self.page.cbUserPerformed.currentText()) if str(self.page.cbUserPerformed.currentText()) else None
-		#self.step_sensor.location = str( self.page.leLocation.text() )
+		self.step_sensor.user_performed = str(self.page.cbUserPerformed.currentText()) if str(self.page.cbUserPerformed.currentText()) else None
+		self.step_sensor.location = str( self.page.leLocation.text() )
+
+		self.step_sensor.run_start  = self.page.dtRunStart.dateTime().toTime_t()
+		self.step_sensor.run_stop   = self.page.dtRunStop.dateTime().toTime_t()
 
 		tools = []
 		sensors = []
@@ -788,6 +795,16 @@ class func(object):
 	def goTrayAssembly(self,*args,**kwargs):
 		tray_assembly = self.page.sbTrayAssembly.value()
 		self.setUIPage('tooling',tray_assembly=tray_assembly)
+
+	def setRunStartNow(self, *args, **kwargs):
+		localtime = time.localtime()
+		self.page.dtRunStart.setDate(QtCore.QDate(*localtime[0:3]))
+		self.page.dtRunStart.setTime(QtCore.QTime(*localtime[3:6]))
+
+	def setRunStopNow(self, *args, **kwargs):
+		localtime = time.localtime()
+		self.page.dtRunStop.setDate(QtCore.QDate(*localtime[0:3]))
+		self.page.dtRunStop.setTime(QtCore.QTime(*localtime[3:6]))
 
 
 	def filesToUpload(self):

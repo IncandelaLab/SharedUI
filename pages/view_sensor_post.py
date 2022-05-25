@@ -19,6 +19,12 @@ INDEX_INSTITUTION = {
 	'HPK':5,
 }
 
+INDEX_GRADE = {
+	'A':0,
+	'B':1,
+	'C':2,
+}
+
 STATUS_NO_ISSUES = "valid (no issues)"
 STATUS_ISSUES    = "invalid (issues present)"
 
@@ -123,7 +129,61 @@ class func(object):
 			self.page.pbGoProtoModule6,
 		]
 
-		
+		self.dsb_offsets_x = [
+			self.page.dsbOffX1,
+			self.page.dsbOffX2,
+			self.page.dsbOffX3,
+			self.page.dsbOffX4,
+			self.page.dsbOffX5,
+			self.page.dsbOffX6,
+		]
+
+		self.dsb_offsets_y = [
+			self.page.dsbOffY1,
+			self.page.dsbOffY2,
+			self.page.dsbOffY3,
+			self.page.dsbOffY4,
+			self.page.dsbOffY5,
+			self.page.dsbOffY6,
+		]
+
+		self.dsb_offsets_rot = [
+			self.page.dsbOffRot1,
+			self.page.dsbOffRot2,
+			self.page.dsbOffRot3,
+			self.page.dsbOffRot4,
+			self.page.dsbOffRot5,
+			self.page.dsbOffRot6,
+		]
+
+		self.dsb_flatness = [
+			self.page.dsbFlatness1,
+			self.page.dsbFlatness2,
+			self.page.dsbFlatness3,
+			self.page.dsbFlatness4,
+			self.page.dsbFlatness5,
+			self.page.dsbFlatness6,
+		]
+
+		self.dsb_thickness = [
+			self.page.dsbThickness1,
+			self.page.dsbThickness2,
+			self.page.dsbThickness3,
+			self.page.dsbThickness4,
+			self.page.dsbThickness5,
+			self.page.dsbThickness6,
+		]
+
+		self.cb_grades = [
+			self.page.cbGrade1,
+			self.page.cbGrade2,
+			self.page.cbGrade3,
+			self.page.cbGrade4,
+			self.page.cbGrade5,
+			self.page.cbGrade6,
+		]
+
+
 		for i in range(6):
 			self.pb_go_protomodules[i].clicked.connect(self.goProtomodule)
 
@@ -141,8 +201,6 @@ class func(object):
 		self.page.pbGoTrayAssembly.clicked.connect(self.goTrayAssembly)
 		self.page.pbGoTrayComponent.clicked.connect(self.goTrayComponent)
 
-		self.page.pbRunStartNow     .clicked.connect(self.setRunStartNow)
-		self.page.pbRunStopNow      .clicked.connect(self.setRunStopNow)
 		self.page.pbCureStartNow    .clicked.connect(self.setCureStartNow)
 		self.page.pbCureStopNow     .clicked.connect(self.setCureStopNow)
 
@@ -169,18 +227,9 @@ class func(object):
 		if self.step_sensor_exists:
 
 			self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.step_sensor.institution, -1))
-			#self.page.leUserPerformed.setText(self.step_sensor.user_performed)
-			if not self.step_sensor.user_performed in self.index_users.keys() and not self.step_sensor.user_performed is None:
-				# Insertion user was deleted from user page...just add user to the dropdown
-				self.index_users[self.step_sensor.user_performed] = max(self.index_users.values()) + 1
-				self.page.cbUserPerformed.addItem(self.step_sensor.user_performed)
-			self.page.cbUserPerformed.setCurrentIndex(self.index_users.get(self.step_sensor.user_performed, -1))
-			self.page.leLocation.setText(self.step_sensor.location)
 
 			# New
-			times_to_set = [(self.step_sensor.run_start,  self.page.dtRunStart),
-							(self.step_sensor.run_stop,   self.page.dtRunStop),
-							(self.step_sensor.cure_start, self.page.dtCureStart),
+			times_to_set = [(self.step_sensor.cure_start, self.page.dtCureStart),
 							(self.step_sensor.cure_stop,  self.page.dtCureStop)]
 			for st, dt in times_to_set:
 				if st is None:
@@ -216,26 +265,43 @@ class func(object):
 
 			if not (self.step_sensor.protomodules is None):
 				for i in range(6):
-					self.le_protomodules[i].setText(str(self.step_sensor.protomodules[i]) if not (self.step_sensor.protomodules[i] is None) else "")
+					proto = self.step_sensor.protomodules[i]
+					self.le_protomodules[i].setText(str(proto) if not (proto is None) else "")
+					self.dsb_offsets_x[i]  .setValue(proto.offset_translation_x if not (proto.offset_translation_x is None) else 0)
+					self.dsb_offsets_y[i]  .setValue(proto.offset_translation_y if not (proto.offset_translation_y is None) else 0)
+					self.dsb_offsets_rot[i].setValue(proto.offfset_rotation     if not (proto.offset_rotation      is None) else 0)
+					self.dsb_thickness[i]  .setValue(proto.thickness            if not (proto.thickness            is None) else 0)
+					self.dsb_flatness[i]   .setValue(proto.flatness             if not (proto.flatness             is None) else 0)
+					self.cb_grades[i]      .setCurrentIndex(INDEX_GRADE.get(proto.grade, -1))
+
 			else:
 				for i in range(6):
 					self.le_protomodules[i].setText("")
+					self.dsb_offsets_x[i].setValue(0)
+					self.dsb_offsets_y[i].setValue(0)
+					self.dsb_offsets_rot[i].setValue(0)
+					self.dsb_thickness[i].setValue(-1)
+					self.dsb_flatness[i].setValue(0)
+					self.cb_grades[i].setCurrentIndex(-1)
 
 		else:
 			self.page.cbInstitution.setCurrentIndex(-1)
-			self.page.cbUserPerformed.setCurrentIndex(-1)
-			self.page.leLocation.setText("")
-			self.page.dtRunStart.setDate(QtCore.QDate(*NO_DATE))
-			self.page.dtRunStart.setTime(QtCore.QTime(0,0,0))
-			self.page.dtRunStop.setDate(QtCore.QDate(*NO_DATE))
-			self.page.dtRunStop.setTime(QtCore.QTime(0,0,0))
+			self.page.dtCureStart.setDate(QtCore.QDate(*NO_DATE))
+			self.page.dtCureStart.setTime(QtCore.QTime(0,0,0))
+			self.page.dtCureStop.setDate(QtCore.QDate(*NO_DATE))
+			self.page.dtCureStop.setTime(QtCore.QTime(0,0,0))
 
 			self.page.dsbCureTemperature.setValue(-1)
 			self.page.sbCureHumidity.setValue(-1)
 			self.page.sbBatchAraldite.setValue(-1)
 			for i in range(6):
 				self.le_protomodules[i].setText("")
-
+				self.dsb_offsets_x[i].setValue(0)
+				self.dsb_offsets_y[i].setValue(0)
+				self.dsb_offsets_rot[i].setValue(0)
+				self.dsb_thickness[i].setValue(-1)
+				self.dsb_flatness[i].setValue(0)
+				self.cb_grades[i].setCurrentIndex(-1)
 
 		if self.page.sbBatchAraldite.value() == -1:  self.page.sbBatchAraldite.clear()
 
@@ -253,13 +319,11 @@ class func(object):
 
 		self.page.cbInstitution.setEnabled(mode_editing)
 
-		self.page.pbRunStartNow     .setEnabled(mode_editing)
-		self.page.pbRunStopNow      .setEnabled(mode_editing)
+		self.page.pbCureStartNow     .setEnabled(mode_editing)
+		self.page.pbCureStopNow      .setEnabled(mode_editing)
 
-		self.page.cbUserPerformed  .setEnabled(mode_editing)
-		self.page.leLocation       .setReadOnly(mode_view)
-		self.page.dtRunStart       .setReadOnly(mode_view)
-		self.page.dtRunStop        .setReadOnly(mode_view)
+		#self.page.cbUserPerformed  .setEnabled(mode_editing)
+		#self.page.leLocation       .setReadOnly(mode_view)
 		self.page.dtCureStart      .setReadOnly(mode_view)
 		self.page.dtCureStop       .setReadOnly(mode_view)
 		self.page.dsbCureTemperature.setReadOnly(mode_view)
@@ -269,64 +333,53 @@ class func(object):
 		self.page.pbGoBatchAraldite.setEnabled(mode_view and self.page.sbBatchAraldite.value() >= 0)
 
 		for i in range(6):
-			self.pb_go_protomodules[i].setEnabled(mode_view and protomodules_exist[i])
+			self.pb_go_protomodules[i].setEnabled(   mode_view and protomodules_exist[i])
+			self.dsb_offsets_x[i]  .setReadOnly(not (mode_view and protomodules_exist[i]))
+			self.dsb_offsets_y[i]  .setReadOnly(not (mode_view and protomodules_exist[i]))
+			self.dsb_offsets_rot[i].setReadOnly(not (mode_view and protomodules_exist[i]))
+			self.dsb_thickness[i]  .setReadOnly(not (mode_view and protomodules_exist[i]))
+			self.dsb_flatness[i]   .setReadOnly(not (mode_view and protomodules_exist[i]))
+			self.cb_grades[i]         .setEnabled(   mode_view and protomodules_exist[i])
 
-		#self.page.pbNew.setEnabled(    mode_view and not step_sensor_exists )
 		self.page.pbEdit.setEnabled(   mode_view and     step_sensor_exists )
 		self.page.pbSave.setEnabled(   mode_editing        )
 		self.page.pbCancel.setEnabled( mode_editing        )
 
-	#NEW:  Add all load() functions
-	@enforce_mode(['editing'])
+
+	@enforce_mode('editing')
 	def loadAllObjects(self,*args,**kwargs):
-		#for i in range(6):
-		#	result = self.tools_sensor[i].load(self.sb_tools[i].value(),      self.page.cbInstitution.currentText())
-		#	self.baseplates[i].load(self.le_baseplates[i].text())
-		#	self.sensors[i].load(   self.le_sensors[i].text())
+		for i in range(6):
+			self.protomodules[i].load(self.le_protomodules[i].text())
 
 		self.batch_araldite.load(       self.page.sbBatchAraldite.value())
 		self.updateIssues()
 
-	@enforce_mode(['editing'])
+	@enforce_mode('editing')
 	def loadAllTools(self,*args,**kwargs):  # Same as above, but load only tools:
-		self.step_sensor.institution = self.page.cbInstitution.currentText()
+		self.batch_araldite.load(       self.page.sbBatchAraldite.value())
 		self.updateIssues()
 
-	@enforce_mode(['editing'])
+	@enforce_mode('editing')
 	def unloadAllObjects(self,*args,**kwargs):
-		#for i in range(6):
-		#	self.tools_sensor[i].clear()
-		#	self.baseplates[i].clear()
-		#	self.sensors[i].clear()
+		for i in range(6):
+			self.protomodules[i].clear()
 
-		#self.tray_component_sensor.clear()
-		#self.tray_assembly.clear()
 		self.batch_araldite.clear()
 
-	@enforce_mode(['editing'])
-	def loadToolSensor(self, *args, **kwargs):
-		sender_name = str(self.page.sender().objectName())
-		which = int(sender_name[-1]) - 1
-		print("loadToolSensor: TEMP: sb value is {}".format(self.sb_tools[which].value()))
-		result = self.tools_sensor[which].load(self.sb_tools[which].value(), self.page.cbInstitution.currentText())
-		self.updateIssues()
-
-	@enforce_mode(['editing'])
+	@enforce_mode('editing')
 	def loadBatchAraldite(self, *args, **kwargs):
 		self.batch_araldite.load(self.page.sbBatchAraldite.value())
 		self.updateIssues()
 
 
 	#NEW:  Add updateIssues and modify conditions accordingly
-	@enforce_mode(['editing'])
+	@enforce_mode('editing')
 	def updateIssues(self,*args,**kwargs):
 		issues = []
 		objects = []
 
 		if self.step_sensor.institution is None:
 			issues.append(I_INSTITUTION_NOT_SELECTED)
-
-		# tooling and supplies--copied over
 
 		if self.batch_araldite.ID is None:
 			issues.append(I_BATCH_ARALDITE_DNE)
@@ -337,8 +390,8 @@ class func(object):
 				expires = QtCore.QDate(int(ydm[2]), int(ydm[0]), int(ydm[1]))   # ymd format for constructor
 				#today = datetime.date(*time.localtime()[:3])
 				if QtCore.QDate.currentDate() > expires:  #today > expires:
-					#issues.append(I_BATCH_ARALDITE_EXPIRED)
-					print("**WARNING:** Araldite batch is expired!")
+					issues.append(I_BATCH_ARALDITE_EXPIRED)
+					#print("**WARNING:** Araldite batch is expired!")
 			if self.batch_araldite.is_empty:
 				issues.append(I_BATCH_ARALDITE_EMPTY)
 
@@ -347,7 +400,7 @@ class func(object):
 		rows_empty           = []
 		rows_full            = []
 		rows_incomplete      = []
-		"""
+		
 		for i in range(6):
 			num_parts = 0
 
@@ -357,7 +410,7 @@ class func(object):
 				rows_full.append(i)
 			else:
 				rows_incomplete.append(i)
-		"""
+		
 
 		if not (len(rows_full) or len(rows_incomplete)):
 			issues.append(I_NO_PARTS_SELECTED)
@@ -423,39 +476,40 @@ class func(object):
 			self.loadAllObjects()
 			self.update_info()
 
-	@enforce_mode(['editing'])
+	@enforce_mode('editing')
 	def cancelEditing(self,*args,**kwargs):
 		self.unloadAllObjects()
 		self.mode = 'view'
 		self.update_info()
 
-	@enforce_mode(['editing'])
+	@enforce_mode('editing')
 	def saveEditing(self,*args,**kwargs):
 
-		self.step_sensor.institution = self.page.cbInstitution.currentText()
-
-		self.step_sensor.user_performed = str(self.page.cbUserPerformed.currentText()) if str(self.page.cbUserPerformed.currentText()) else None
-		self.step_sensor.location = str( self.page.leLocation.text() )
-
-		# Honestly not sure what the point of this part is...
-		self.step_sensor.run_start  = self.page.dtRunStart.dateTime().toTime_t()
-		self.step_sensor.run_stop   = self.page.dtRunStop.dateTime().toTime_t()
 		self.step_sensor.cure_start = self.page.dtCureStart.dateTime().toTime_t()
 		self.step_sensor.cure_stop  = self.page.dtCureStop.dateTime().toTime_t()
 
 		self.step_sensor.cure_humidity = self.page.sbCureHumidity.value()
 		self.step_sensor.cure_temperature = self.page.dsbCureTemperature.value()
 
-		protomodules = []
+		self.step_sensor.batch_araldite = self.page.sbBatchAraldite.value() if self.page.sbBatchAraldite.value() >= 0 else None
+
 		for i in range(6):
-			# ADD TO THIS
-			if self.step_sensor.protomodules[i]:  # if not none:
-				print("TEMP CODE, replace this ASAP")
-				# Set protomodule vars/quantities here
+			if self.step_sensor.protomodules[i] is None:  continue
 
-				self.step_sensor.protomodules[i].save()
+			proto = fm.protomodule()
+			if not proto.load(self.step_sensor.protomodules[i]):
+				print("FATAL ERROR:  post assembly step tried to load nonexistent protomod {}".format(self.step_sensor.protomodules[i]))
+				assert(False)
 
-		self.step_sensor.batch_araldite        = self.page.sbBatchAraldite.value() if self.page.sbBatchAraldite.value() >= 0 else None
+			# Set protomodule vars/quantities here
+			proto.offset_translation_x = self.dsb_offsets_x[i].value()
+			proto.offset_translation_y = self.dsb_offsets_y[i].value()
+			proto.offset_rotation      = self.dsb_offsets_rot[i].value()
+			proto.flatness             = self.dsb_flatness[i].value()
+			proto.thickness            = self.dsb_thickness[i].value()
+			proto.grade = str(self.cb_grades[i].currentText()) if self.cb_grades[i].currentText() else None
+
+			proto.save()
 
 
 		print("\n\n\nSAVING STEP SENSOR\n\n\n")
@@ -484,16 +538,6 @@ class func(object):
 	def goBatchAraldite(self,*args,**kwargs):
 		batch_araldite = self.page.sbBatchAraldite.value()
 		self.setUIPage('supplies',batch_araldite=batch_araldite)
-
-	def setRunStartNow(self, *args, **kwargs):
-		localtime = time.localtime()
-		self.page.dtRunStart.setDate(QtCore.QDate(*localtime[0:3]))
-		self.page.dtRunStart.setTime(QtCore.QTime(*localtime[3:6]))
-
-	def setRunStopNow(self, *args, **kwargs):
-		localtime = time.localtime()
-		self.page.dtRunStop.setDate(QtCore.QDate(*localtime[0:3]))
-		self.page.dtRunStop.setTime(QtCore.QTime(*localtime[3:6]))
 
 	def setCureStartNow(self, *args, **kwargs):
 		localtime = time.localtime()
