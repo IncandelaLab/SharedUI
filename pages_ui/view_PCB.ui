@@ -724,7 +724,7 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QComboBox" name="cbResolutionType">
+  <widget class="QComboBox" name="cbResolution">
    <property name="geometry">
     <rect>
      <x>190</x>

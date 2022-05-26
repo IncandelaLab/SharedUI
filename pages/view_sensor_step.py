@@ -128,7 +128,7 @@ class func(object):
 		self.rig()
 		self.mode = 'view'
 		print("{} setup completed".format(PAGE_NAME))
-		self.update_info()
+		#self.update_info()
 		self.loadStep()  # sb starts at 0, so load by default
 
 	@enforce_mode('setup')
@@ -220,11 +220,14 @@ class func(object):
 
 			self.pb_clears[i].clicked.connect(self.clearRow)
 
+		self.page.ckCheckFeet.stateChanged.connect(self.updateIssues)
+
 		self.page.cbInstitution.currentIndexChanged.connect( self.loadAllTools )
 
 		self.page.sbTrayComponent.editingFinished.connect( self.loadTrayComponentSensor )
 		self.page.sbTrayAssembly.editingFinished.connect(  self.loadTrayAssembly        )
-		self.page.sbBatchAraldite.editingFinished.connect( self.loadBatchAraldite       )
+		#self.page.sbBatchAraldite.editingFinished.connect( self.loadBatchAraldite       )
+		self.page.leBatchAraldite.textEdited.connect(self.loadBatchAraldite)
 
 		self.page.sbID.valueChanged.connect(self.loadStep)
 
@@ -246,7 +249,7 @@ class func(object):
 			self.page.cbUserPerformed.addItem(user)
 
 
-	@enforce_mode('view')  #['view','editing'])
+	@enforce_mode(['view','editing'])
 	def update_info(self,ID=None,*args,**kwargs):
 		if ID is None:
 			ID = self.page.sbID.value()
@@ -281,11 +284,12 @@ class func(object):
 				else:
 					localtime = list(time.localtime(st))
 					dt.setDate(QtCore.QDate(*localtime[0:3]))
-					dt.setTime(QtCore.QDate(*localtiem[3:6]))
+					dt.setTime(QtCore.QTime(*localtime[3:6]))
 			
 
 
-			self.page.sbBatchAraldite.setValue(self.step_sensor.batch_araldite if not (self.step_sensor.batch_araldite is None) else -1)
+			#self.page.sbBatchAraldite.setValue(self.step_sensor.batch_araldite if not (self.step_sensor.batch_araldite is None) else -1)
+			self.page.leBatchAraldite.setText(self.step_sensor.batch_araldite if not (self.step_sensor.batch_araldite is None) else "")
 			self.page.sbTrayAssembly.setValue( self.step_sensor.tray_assembly  if not (self.step_sensor.tray_assembly  is None) else -1)
 			self.page.sbTrayComponent.setValue(self.step_sensor.tray_component_sensor if not (self.step_sensor.tray_component_sensor is None) else -1)
 
@@ -301,6 +305,7 @@ class func(object):
 					self.le_sensors[i].setText(str(self.step_sensor.sensors[i]) if not (self.step_sensor.sensors[i] is None) else "")
 			else:
 				for i in range(6):
+					self.le_sensors[i].setText("")
 
 			if not (self.step_sensor.baseplates is None):
 				for i in range(6):
@@ -316,6 +321,7 @@ class func(object):
 				for i in range(6):
 					self.le_protomodules[i].setText("")
 
+			self.page.ckCheckFeet.setChecked(True)
 			self.page.ckCheckFeet.setChecked(self.step_sensor.check_tool_feet if not (self.step_sensor.check_tool_feet is None) else False)
 
 		else:
@@ -327,7 +333,8 @@ class func(object):
 			self.page.dtRunStop.setDate(QtCore.QDate(*NO_DATE))
 			self.page.dtRunStop.setTime(QtCore.QTime(0,0,0))
 
-			self.page.sbBatchAraldite.setValue(-1)
+			#self.page.sbBatchAraldite.setValue(-1)
+			self.page.leBatchAraldite.setText("")
 			self.page.sbTrayComponent.setValue(-1)
 			self.page.sbTrayAssembly.setValue(-1)
 			for i in range(6):
@@ -341,7 +348,7 @@ class func(object):
 			if self.sb_tools[i].value()        == -1:  self.sb_tools[i].clear()
 		
 
-		if self.page.sbBatchAraldite.value() == -1:  self.page.sbBatchAraldite.clear()
+		#if self.page.sbBatchAraldite.value() == -1:  self.page.sbBatchAraldite.clear()
 		if self.page.sbTrayComponent.value() == -1:  self.page.sbTrayComponent.clear()
 		if self.page.sbTrayAssembly.value()  == -1:  self.page.sbTrayAssembly.clear()
 
@@ -372,11 +379,13 @@ class func(object):
 		self.page.dtRunStop        .setReadOnly(mode_view)
 		self.page.sbTrayComponent  .setReadOnly(mode_view)
 		self.page.sbTrayAssembly   .setReadOnly(mode_view)
-		self.page.sbBatchAraldite  .setReadOnly(mode_view)
+		#self.page.sbBatchAraldite  .setReadOnly(mode_view)
+		self.page.leBatchAraldite  .setReadOnly(mode_view)
 
 		self.page.pbGoTrayComponent.setEnabled(mode_view and self.page.sbTrayComponent.value() >= 0)
 		self.page.pbGoTrayAssembly .setEnabled(mode_view and self.page.sbTrayAssembly .value() >= 0)
-		self.page.pbGoBatchAraldite.setEnabled(mode_view and self.page.sbBatchAraldite.value() >= 0)
+		#self.page.pbGoBatchAraldite.setEnabled(mode_view and self.page.sbBatchAraldite.value() >= 0)
+		self.page.pbGoBatchAraldite.setEnabled(mode_view and self.page.leBatchAraldite.text() != "")
 
 		for i in range(6):
 			self.sb_tools[i].setReadOnly(       mode_view)
@@ -392,7 +401,7 @@ class func(object):
 		self.page.pbSave.setEnabled(   mode_creating or mode_editing        )
 		self.page.pbCancel.setEnabled( mode_creating or mode_editing        )
 
-		self.page.ckCheckFeet.setCheckable(not mode_view)
+		self.page.ckCheckFeet.setEnabled(not mode_view)
 
 
 	#NEW:  Add all load() functions
@@ -406,7 +415,8 @@ class func(object):
 
 		self.tray_component_sensor.load(self.page.sbTrayComponent.value(), self.page.cbInstitution.currentText())
 		self.tray_assembly.load(        self.page.sbTrayAssembly.value(),  self.page.cbInstitution.currentText())
-		self.batch_araldite.load(       self.page.sbBatchAraldite.value())
+		#self.batch_araldite.load(       self.page.sbBatchAraldite.value())
+		self.batch_araldite.load(       self.page.leBatchAraldite.text())
 		self.updateIssues()
 
 	@enforce_mode(['editing','creating'])
@@ -462,7 +472,8 @@ class func(object):
 
 	@enforce_mode(['editing','creating'])
 	def loadBatchAraldite(self, *args, **kwargs):
-		self.batch_araldite.load(self.page.sbBatchAraldite.value())
+		#self.batch_araldite.load(self.page.sbBatchAraldite.value())
+		self.batch_araldite.load(self.page.leBatchAraldite.text())
 		self.updateIssues()
 
 
@@ -582,23 +593,13 @@ class func(object):
 			issues.append(I_SENSOR_DNE.format(', '.join([str(_+1) for _ in rows_sensor_dne])))
 
 
-		objects_8in = []
 		objects_not_here = []
 
 		for obj in objects:
 
-			size = getattr(obj, "size", None)
-			if size in [8.0, 8, '8']:
-				objects_8in.append(obj)
-			else:   print("WARINING: POSSIBLE ERROR: obj size is {} and not 8!".format(size))
-
 			institution = getattr(obj, "institution", None)
 			if not (institution in [None, self.page.cbInstitution.currentText()]):
 				objects_not_here.append(obj)
-
-		if len(objects_8in) and len(objects_8in):
-			issues.append(I_SIZE_MISMATCH)
-			issues.append(I_SIZE_MISMATCH_8.format(', '.join([str(_) for _ in objects_8in])))
 
 		if objects_not_here:
 			issues.append(I_INSTITUTION.format([str(_) for _ in objects_not_here]))
@@ -621,6 +622,7 @@ class func(object):
 
 	@enforce_mode('view')
 	def loadStep(self,*args,**kwargs):
+		print("\nin loadStep\n")
 		if self.page.sbID.value() == -1:  return
 		tmp_step = fm.step_sensor()
 		tmp_ID = self.page.sbID.value()
@@ -630,6 +632,7 @@ class func(object):
 		else:
 			self.step_sensor = tmp_step
 			self.update_info()
+		print("\nLoaded step\n")
 
 	@enforce_mode('view')
 	def startCreating(self,*args,**kwargs):
@@ -665,7 +668,7 @@ class func(object):
 
 		self.step_sensor.institution = self.page.cbInstitution.currentText()
 
-		self.step_sensor.user_performed = str(self.page.cbUserPerformed.currentText()) if str(self.page.cbUserPerformed.currentText()) else None
+		self.step_sensor.user_performed = str(self.page.cbUserPerformed.currentText()) if self.page.cbUserPerformed.currentText()!='' else None
 		self.step_sensor.location = str( self.page.leLocation.text() )
 
 		self.step_sensor.run_start  = self.page.dtRunStart.dateTime().toTime_t()
@@ -690,7 +693,8 @@ class func(object):
 
 		self.step_sensor.tray_component_sensor = self.page.sbTrayComponent.value() if self.page.sbTrayComponent.value() >= 0 else None
 		self.step_sensor.tray_assembly         = self.page.sbTrayAssembly.value()  if self.page.sbTrayAssembly.value()  >= 0 else None
-		self.step_sensor.batch_araldite        = self.page.sbBatchAraldite.value() if self.page.sbBatchAraldite.value() >= 0 else None
+		#self.step_sensor.batch_araldite        = self.page.sbBatchAraldite.value() if self.page.sbBatchAraldite.value() >= 0 else None
+		self.step_sensor.batch_araldite        = self.page.leBatchAraldite.text() if self.page.leBatchAraldite.text() else None
 
 
 		# Add protomodule ID to baseplate, sensor lists; create protomodule if it doesn't exist:
@@ -735,7 +739,7 @@ class func(object):
 			self.sensors[i].protomodule = temp_protomodule.ID  #protomodules[i]
 			self.sensors[i].save()
 
-		self.step_sensor.check_tool_feet = self.ckCheckFeet.isChecked()
+		self.step_sensor.check_tool_feet = self.page.ckCheckFeet.isChecked()
 
 		print("\n\n\nSAVING STEP SENSOR\n\n\n")
 		self.step_sensor.save()
@@ -785,7 +789,8 @@ class func(object):
 		self.setUIPage('protomodules',ID=protomodule)
 
 	def goBatchAraldite(self,*args,**kwargs):
-		batch_araldite = self.page.sbBatchAraldite.value()
+		#batch_araldite = self.page.sbBatchAraldite.value()
+		batch_araldite = self.page.leBatchAraldite.text()
 		self.setUIPage('supplies',batch_araldite=batch_araldite)
 
 	def goTrayComponent(self,*args,**kwargs):

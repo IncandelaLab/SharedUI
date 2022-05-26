@@ -157,8 +157,8 @@ class func(object):
 		self.batch_wedge = simple_fsobj_vc(
 			fm.batch_wedge(),
 			self.page.sbWedgeID,
-			None, #self.page.dWedgeReceived,
-			None, #self.page.dWedgeExpires,
+			self.page.dWedgeReceived,
+			self.page.dWedgeExpires,
 			self.page.ckIsWedgeEmpty,
 			self.page.pbWedgeEditNew,
 			self.page.pbWedgeSave,
@@ -368,13 +368,13 @@ class func(object):
 		self.page.pbBondWireCancel.setEnabled(mode_editing_batch_bond_wire)
 
 		self.page.dAralditeReceived.setEnabled(mode_editing_batch_araldite)
-		#self.page.dWedgeReceived.setEnabled(mode_editing_batch_wedge)
+		self.page.dWedgeReceived.setEnabled(mode_editing_batch_wedge)
 		self.page.dSylgardReceived.setEnabled(mode_editing_batch_sylgard)
 		#self.page.dSylgardThinReceived.setEnabled(mode_editing_batch_sylgard_thin)
 		self.page.dBondWireReceived.setEnabled(mode_editing_batch_bond_wire)
 
 		self.page.dAralditeExpires.setEnabled(mode_editing_batch_araldite)
-		#self.page.dWedgeExpires.setEnabled(mode_editing_batch_wedge)
+		self.page.dWedgeExpires.setEnabled(mode_editing_batch_wedge)
 		self.page.dSylgardExpires.setEnabled(mode_editing_batch_sylgard)
 		#self.page.dSylgardThinExpires.setEnabled(mode_editing_batch_sylgard_thin)
 		self.page.dBondWireExpires.setEnabled(mode_editing_batch_bond_wire)

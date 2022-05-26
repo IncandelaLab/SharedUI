@@ -67,15 +67,6 @@ class func(object):
 
 	@enforce_mode('setup')
 	def rig(self):
-		#self.page.sbShipmentID.valueChanged.connect(self.update_info)
-
-		#self.page.pbShipmentNew.clicked.connect(self.startCreating)
-		#self.page.pbShipmentEdit.clicked.connect(self.startEditing)
-		#self.page.pbShipmentSave.clicked.connect(self.saveEditing)
-		#self.page.pbShipmentCancel.clicked.connect(self.cancelEditing)
-
-		#self.page.pbSentNow.clicked.connect(self.setShipmentSentNow)
-		#self.page.pbReceivedNow.clicked.connect(self.setShipmentReceivedNow)
 
 		self.page.pbAddUser.clicked.connect(self.addUser)
 		self.page.pbDeleteSelected.clicked.connect(self.deleteSelected)
@@ -90,12 +81,6 @@ class func(object):
 		# - Update all check boxes, username box, isAdmin
 		# - Ensure userlist is up to date
 
-
-		#if ID is None:
-		#	ID = self.page.sbShipmentID.value()
-		#else:
-		#	self.page.sbShipmentID.setValue(ID)
-
 		row = self.page.lwUsers.currentRow()
 		print("ROW:", row)
 		if row >= 0 and self.mode != 'view':
@@ -106,13 +91,6 @@ class func(object):
 		self.user_exists = self.currentUser != None
 		print("CURRENT USER:", self.currentUser)
 		print("pre username text:", self.currentUser if self.user_exists else "")
-
-		#Added for loops in updateInfo
-		#if self.shipment.modules is None:       self.shipment.modules      = []
-		#if self.shipment.baseplates is None:    self.shipment.baseplates   = []
-		#if self.shipment.sensors is None:       self.shipment.sensors      = []
-		#if self.shipment.pcbs is None:          self.shipment.pcbs         = []
-		#if self.shipment.protomodules is None:  self.shipment.protomodules = []
 
 		self.page.lwUsers.clear()
 		userlist = fm.userManager.getAllUsers()
@@ -132,30 +110,14 @@ class func(object):
 		self.page.cbPcb        .setChecked(False if userperms is None else userperms[2])
 		self.page.cbProtomodule.setChecked(False if userperms is None else userperms[3])
 		self.page.cbModule     .setChecked(False if userperms is None else userperms[4])
-		#self.page.cbStepKapton .setChecked(False if userperms is None else userperms[5])
-		self.page.cbStepSensor .setChecked(False if userperms is None else userperms[6])
+		self.page.cbStepSensor .setChecked(False if userperms is None else userperms[5])
 		self.page.cbStepPcb    .setChecked(False if userperms is None else userperms[7])
-		#self.page.cbWirebonding.setChecked(False if userperms is None else userperms[8])
-		self.page.cbBackWirebonding   .setChecked(False if userperms is None else userperms[8])
-		self.page.cbFrontWirebonding  .setChecked(False if userperms is None else userperms[9])
-		self.page.cbBackEncapsulation .setChecked(False if userperms is None else userperms[10])
-		self.page.cbFrontEncapsulation.setChecked(False if userperms is None else userperms[11])
-		self.page.cbTestBonds         .setChecked(False if userperms is None else userperms[12])
-		self.page.cbFinalInspection   .setChecked(False if userperms is None else userperms[13])
-
-
-		"""
-		if not self.shipment.sendOrReceive is None:
-			self.page.cbShipmentType.setCurrentIndex(INDEX_SEND_RECV.get(self.shipment.sendOrReceive))
-		self.page.leSender  .setText("" if self.shipment.sender   is None else self.shipment.sender)
-		self.page.leReceiver.setText("" if self.shipment.receiver is None else self.shipment.receiver)
-		self.page.leFedEx   .setText("" if self.shipment.fedex_id is None else self.shipment.fedex_id)
-		if not self.shipment.date_sent is None:
-			self.page.dSent.setDate(QtCore.QDate(*self.shipment.date_sent))
-		if not self.shipment.date_received is None:
-			self.page.dReceived.setDate(QtCore.QDate(*self.shipment.date_received))
-		#self.page.cbPartType.setCurrentIndex() should only be used once
-		"""
+		self.page.cbBackWirebonding   .setChecked(False if userperms is None else userperms[9])
+		self.page.cbFrontWirebonding  .setChecked(False if userperms is None else userperms[10])
+		self.page.cbBackEncapsulation .setChecked(False if userperms is None else userperms[11])
+		self.page.cbFrontEncapsulation.setChecked(False if userperms is None else userperms[12])
+		self.page.cbTestBonds         .setChecked(False if userperms is None else userperms[13])
+		self.page.cbFinalInspection   .setChecked(False if userperms is None else userperms[14])
 
 		self.updateElements()
 
@@ -183,10 +145,8 @@ class func(object):
 		self.page.cbPcb          .setEnabled(mode_creating or mode_editing)
 		self.page.cbProtomodule  .setEnabled(mode_creating or mode_editing)
 		self.page.cbModule       .setEnabled(mode_creating or mode_editing)
-		#self.page.cbStepKapton   .setEnabled(mode_creating or mode_editing)
 		self.page.cbStepSensor   .setEnabled(mode_creating or mode_editing)
 		self.page.cbStepPcb      .setEnabled(mode_creating or mode_editing)
-		#self.page.cbWirebonding  .setEnabled(mode_creating or mode_editing)
 		self.page.cbBackEncapsulation .setEnabled(mode_creating or mode_editing)
 		self.page.cbBackWirebonding   .setEnabled(mode_creating or mode_editing)
 		self.page.cbFrontEncapsulation.setEnabled(mode_creating or mode_editing)
@@ -229,10 +189,10 @@ class func(object):
 				self.page.cbPcb.isChecked(),
 				self.page.cbProtomodule.isChecked(),
 				self.page.cbModule.isChecked(),
-				#self.page.cbStepKapton.isChecked(),
 				self.page.cbStepSensor.isChecked(),
+				self.page.cbStepSensor.isChecked(),  # post
 				self.page.cbStepPcb.isChecked(),
-				#self.page.cbWirebonding.isChecked(),
+				self.page.cbStepPcb.isChecked(),  # post
 				self.page.cbBackWirebonding.isChecked(),
 				self.page.cbFrontWirebonding.isChecked(),
 				self.page.cbBackEncapsulation.isChecked(),

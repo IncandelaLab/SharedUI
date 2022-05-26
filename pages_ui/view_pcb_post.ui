@@ -306,56 +306,11 @@
     <string>Cancel</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_11">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>330</y>
-     <width>161</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>araldite batch</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QSpinBox" name="sbBatchAraldite">
-   <property name="geometry">
-    <rect>
-     <x>170</x>
-     <y>330</y>
-     <width>71</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="minimum">
-    <number>-1</number>
-   </property>
-   <property name="maximum">
-    <number>999999</number>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbGoBatchAraldite">
-   <property name="geometry">
-    <rect>
-     <x>240</x>
-     <y>330</y>
-     <width>51</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>go to</string>
-   </property>
-  </widget>
   <widget class="QLineEdit" name="lineEdit_26">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>540</y>
+     <y>500</y>
      <width>61</width>
      <height>20</height>
     </rect>
@@ -371,7 +326,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>370</y>
+     <y>330</y>
      <width>721</width>
      <height>171</height>
     </rect>
@@ -384,7 +339,7 @@
    <property name="geometry">
     <rect>
      <x>70</x>
-     <y>540</y>
+     <y>500</y>
      <width>171</width>
      <height>20</height>
     </rect>
@@ -1507,7 +1462,7 @@ before assembly</string>
     </property>
    </item>
   </widget>
-  <widget class="QComboBox" name="cbGrade">
+  <widget class="QComboBox" name="cbGrade1">
    <property name="enabled">
     <bool>true</bool>
    </property>

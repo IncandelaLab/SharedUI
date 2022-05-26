@@ -19,6 +19,9 @@ import csv
 import rhapi_nolock as rh
 from xml.dom import minidom
 
+# IMPORTANT NOTE:  Setting this to false disables DB communication.  Purely for debugging.
+ENABLE_DB_COMMUNICATION = False
+
 
 BASEPLATE_MATERIALS_NO_KAPTON = ['pcb']
 
@@ -119,7 +122,8 @@ class UserManager:
 		self.userList = []
 		self.pageList = ['view_baseplate', 'view_sensor', 'view_pcb',
 				    'view_protomodule', 'view_module',
-					'view_sensor_step', 'view_pcb_step',
+					'view_sensor_step', 'view_sensor_post',
+					'view_pcb_step', 'view_pcb_post',
                     # NOTE:  'view_wirebonding' -> each individual wirebonding step
 					'wirebonding_back', 'wirebonding_front',
 					'encapsulation_back', 'encapsulation_front',
@@ -178,6 +182,7 @@ class UserManager:
 
 	def getAuthorizedUsers(self, pagename):
 		page_index = self.pageList.index(pagename)
+		print("GETTING AUTH USERS FOR {}.  page index={}.".format(pagename, page_index))
 		return [user['username'] for user in self.userList if user['permissions'][page_index]]
 
 	def getAdminUsers(self):
@@ -353,7 +358,9 @@ class fsobj(object):
 				#print("_load_from_dict: ordinary XML item {} found!".format(item_name))
 				itemdata = xml_tree.find('.//'+item_name)  # NOTE:  itemdata is an Element, not text!
 				#print("Loaded item text is", itemdata.text, "; item is", item)
-				if itemdata.text.isdigit():  # If int:
+				if itemdata.text is None:
+					print("Found None search result in _load_from_dict(): {}".format(item_name))
+				elif itemdata.text.isdigit():  # If int:
 					idt = int(itemdata.text)
 				elif itemdata.text.replace('.','',1).isdigit():  # If float:
 					idt = float(itemdata.text)
@@ -869,6 +876,11 @@ class fsobj_part(fsobj):
 	# NEW: Must save to correct location!
 	def request_XML(self, table_name, search_conditions, suffix=None):
 		print("CALLING request_XML")
+
+		if not ENABLE_DB_COMMUNICATION:
+			print("Warning:  DB communication is disabled!")
+			return False
+
 		# Same as the assembly version, EXCEPT TIME_START -> .
 
 		# NOTE NOTE NOTE:  Must save file in correct location AND add_part_to_list!
@@ -1594,7 +1606,7 @@ class sensor(fsobj_part):
 
 	@property
 	def thickness(self):
-		return float(self.type.split()[0])/1000
+		return float(self.type.split('um')[0])/1000
 
 	@property
 	def location_id(self):

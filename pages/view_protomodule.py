@@ -5,14 +5,14 @@ OBJECTTYPE = "protomodule"
 DEBUG = False
 
 INDEX_SHAPE = {
-	'Full',
-	'Top',
-	'Bottom',
-	'Left',
-	'Right',
-	'Five',
-	'Three',
-	'Full+Three'
+	'Full':0,
+	'Top':1,
+	'Bottom':2,
+	'Left':3,
+	'Right':4,
+	'Five':5,
+	'Three':6,
+	'Full+Three':7
 }
 
 INDEX_GRADE = {
@@ -225,8 +225,7 @@ class func(object):
 		#self.page.leInsertUser.setReadOnly(not (mode_creating or mode_editing) )
 		self.page.leLocation.setReadOnly(  not (mode_creating or mode_editing) )
 		self.page.cbShape.setEnabled(           mode_creating or mode_editing  )
-		self.page.cbGrade.setEnabled(           mode_creating or mode_editing  )
-		#self.page.cbChirality.setEnabled(       mode_creating or mode_editing  )
+		#self.page.cbGrade.setEnabled(           mode_creating or mode_editing  )
 		self.page.cbInstitution.setEnabled(     mode_creating or mode_editing  )
 		self.page.cbInsertUser.setEnabled(      mode_creating or mode_editing  )
 		self.page.dsbThickness.setReadOnly(not (mode_creating or mode_editing) )
@@ -242,9 +241,9 @@ class func(object):
 		self.page.pbGoStepPcb.setEnabled(    mode_view and step_pcb_exists    )
 		self.page.pbGoModule.setEnabled(     mode_view and module_exists      )
 
-		self.page.dsbOffsetTranslationX.setReadOnly( not (mode_creating or mode_editing) )
-		self.page.dsbOffsetTranslationY.setReadOnly( not (mode_creating or mode_editing) )
-		self.page.dsbOffsetRotation.setReadOnly(    not (mode_creating or mode_editing) )
+		#self.page.dsbOffsetTranslationX.setReadOnly( not (mode_creating or mode_editing) )
+		#self.page.dsbOffsetTranslationY.setReadOnly( not (mode_creating or mode_editing) )
+		#self.page.dsbOffsetRotation.setReadOnly(    not (mode_creating or mode_editing) )
 		self.page.dsbFlatness.setReadOnly(          not (mode_creating or mode_editing) )
 		#self.page.cbCheckCracks.setEnabled(              mode_creating or mode_editing  )
 		#self.page.cbCheckGlueSpill.setEnabled(           mode_creating or mode_editing  )
@@ -307,7 +306,7 @@ class func(object):
 		#self.protomodule.insertion_user = str(self.page.leInsertUser.text()      ) if str(self.page.leInsertUser.text()      ) else None
 		self.protomodule.location       = str(self.page.leLocation.text()          ) if str(self.page.leLocation.text()        ) else None
 		self.protomodule.shape          = str(self.page.cbShape.currentText()      ) if str(self.page.cbShape.currentText()    ) else None
-		self.protomodule.grade          = str(self.page.cbGrade.currentText()      ) if str(self.page.cbGrade.currentText()    ) else None
+		#self.protomodule.grade          = str(self.page.cbGrade.currentText()      ) if str(self.page.cbGrade.currentText()    ) else None
 		#self.protomodule.chirality      = str(self.page.cbChirality.currentText()  ) if str(self.page.cbChirality.currentText()) else None
 		self.protomodule.institution    = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
 		self.protomodule.insertion_user = str(self.page.cbInsertUser.currentText())  if str(self.page.cbInsertUser.currentText())  else None
@@ -319,10 +318,10 @@ class func(object):
 		for i in range(num_comments):
 			self.protomodule.comments.append(str(self.page.listComments.item(i).text()))
 
-		self.protomodule.offset_translation_x = self.page.dsbOffsetTranslationX.value() if self.page.dsbOffsetTranslationX.value() >=0 else None
-		self.protomodule.offset_translation_y = self.page.dsbOffsetTranslationY.value() if self.page.dsbOffsetTranslationY.value() >=0 else None
-		self.protomodule.offset_rotation	  = self.page.dsbOffsetRotation.value()    if self.page.dsbOffsetRotation.value()    >=0 else None
-		self.protomodule.flatness	          = self.page.dsbFlatness.value()          if self.page.dsbFlatness.value()          >=0 else None
+		#self.protomodule.offset_translation_x = self.page.dsbOffsetTranslationX.value() if self.page.dsbOffsetTranslationX.value() >=0 else None
+		#self.protomodule.offset_translation_y = self.page.dsbOffsetTranslationY.value() if self.page.dsbOffsetTranslationY.value() >=0 else None
+		#self.protomodule.offset_rotation	  = self.page.dsbOffsetRotation.value()    if self.page.dsbOffsetRotation.value()    >=0 else None
+		#self.protomodule.flatness	          = self.page.dsbFlatness.value()          if self.page.dsbFlatness.value()          >=0 else None
 		#self.protomodule.check_cracks	    = str(self.page.cbCheckCracks.currentText()   ) if str(self.page.cbCheckCracks.currentText()   ) else None
 		#self.protomodule.check_glue_spill	= str(self.page.cbCheckGlueSpill.currentText()) if str(self.page.cbCheckGlueSpill.currentText()) else None
 

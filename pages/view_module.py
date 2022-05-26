@@ -141,7 +141,6 @@ class func(object):
 
 		self.page.pbGoShipment.clicked.connect(self.goShipment)
 
-		self.page.pbGoStepKapton.clicked.connect(   self.goStepKapton   )
 		self.page.pbGoStepSensor.clicked.connect(   self.goStepSensor   )
 		self.page.pbGoStepPcb.clicked.connect(      self.goStepPcb      )
 		self.page.pbGoBaseplate.clicked.connect(    self.goBaseplate    )
@@ -206,14 +205,12 @@ class func(object):
 		if self.page.dsbFlatness.value()  == -1: self.page.dsbFlatness.clear()
 
 		# parts and steps
-		self.page.sbStepKapton.setValue(   -1 if self.module.step_kapton   is None else self.module.step_kapton   )
 		self.page.sbStepSensor.setValue(   -1 if self.module.step_sensor   is None else self.module.step_sensor   )
 		self.page.sbStepPcb.setValue(      -1 if self.module.step_pcb      is None else self.module.step_pcb      )
 		self.page.leBaseplate.setText(    "" if self.module.baseplate     is None else self.module.baseplate     )
 		self.page.leSensor.setText(       "" if self.module.sensor        is None else self.module.sensor        )
 		self.page.lePcb.setText(          "" if self.module.pcb           is None else self.module.pcb           )
 		self.page.leProtomodule.setText(  "" if self.module.protomodule   is None else self.module.protomodule   )
-		if self.page.sbStepKapton.value()   == -1:  self.page.sbStepKapton.clear()
 		if self.page.sbStepSensor.value()   == -1:  self.page.sbStepSensor.clear()
 		if self.page.sbStepPcb.value()      == -1:  self.page.sbStepPcb.clear()
 		if self.page.leBaseplate.text()    == -1:  self.page.leBaseplate.clear()
@@ -252,10 +249,7 @@ class func(object):
 
 		module_exists   = self.module_exists
 		shipments_exist = self.page.listShipments.count() > 0
-		#daq_data_exists = self.page.listDaqData.count()   > 0
-		#iv_data_exists  = self.page.listIvData.count()    > 0
 
-		step_kapton_exists   = self.page.sbStepKapton.value()    >= 0
 		step_sensor_exists   = self.page.sbStepSensor.value()    >= 0
 		step_pcb_exists      = self.page.sbStepPcb.value()       >= 0
 		baseplate_exists   = self.page.leBaseplate.text()   != ""
@@ -284,17 +278,16 @@ class func(object):
 		#self.page.leInsertUser.setReadOnly( not (mode_creating or mode_editing) )
 		self.page.leLocation.setReadOnly(   not (mode_creating or mode_editing) )
 		#self.page.sbChannels.setReadOnly(   not (mode_creating or mode_editing) )
-		self.page.dsbFlatness.setReadOnly(  not (mode_creating or mode_editing) )
-		self.page.dsbThickness.setReadOnly( not (mode_creating or mode_editing) )
+		#self.page.dsbFlatness.setReadOnly(  not (mode_creating or mode_editing) )
+		#self.page.dsbThickness.setReadOnly( not (mode_creating or mode_editing) )
 		#self.page.cbShape.setEnabled(            mode_creating or mode_editing  )
 		#self.page.cbChirality.setEnabled(        mode_creating or mode_editing  )
-		self.page.cbGrade.setEnabled(            mode_creating or mode_editing  )
+		#self.page.cbGrade.setEnabled(            mode_creating or mode_editing  )
 		self.page.cbInstitution.setEnabled(      mode_creating or mode_editing  )
 		self.page.cbInsertUser.setEnabled(       mode_creating or mode_editing  )
 		self.page.cbInspection.setEnabled(       mode_creating or mode_editing  )
 
 		# parts and steps
-		self.page.pbGoStepKapton.setEnabled(   mode_view and step_kapton_exists   )
 		self.page.pbGoStepSensor.setEnabled(   mode_view and step_sensor_exists   )
 		self.page.pbGoStepPcb.setEnabled(      mode_view and step_pcb_exists      )
 		self.page.pbGoBaseplate.setEnabled(    mode_view and baseplate_exists     )
@@ -310,9 +303,9 @@ class func(object):
 		self.page.pbAddFiles.setEnabled(mode_creating or mode_editing)
 		self.page.pbDeleteFile.setEnabled(mode_creating or mode_editing)
 
-		self.page.dsbOffsetTranslationX.setReadOnly( not (mode_creating or mode_editing) )
-		self.page.dsbOffsetTranslationY.setReadOnly( not (mode_creating or mode_editing) )
-		self.page.dsbOffsetRotation.setReadOnly(    not (mode_creating or mode_editing) )
+		#self.page.dsbOffsetTranslationX.setReadOnly( not (mode_creating or mode_editing) )
+		#self.page.dsbOffsetTranslationY.setReadOnly( not (mode_creating or mode_editing) )
+		#self.page.dsbOffsetRotation.setReadOnly(    not (mode_creating or mode_editing) )
 
 #	# NEW, experimental
 #	@enforce_mode(['creating', 'editing'])
@@ -382,7 +375,7 @@ class func(object):
 		#self.module.chirality       = str(self.page.cbChirality.currentText()) if str(self.page.cbChirality.currentText()    ) else None
 		self.module.institution     = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
 		self.module.insertion_user  = str(self.page.cbInsertUser.currentText())  if str(self.page.cbInsertUser.currentText())  else None
-		self.module.grade           = str(self.page.cbGrade.currentText())       if str(self.page.cbGrade.currentText())       else None
+		#self.module.grade           = str(self.page.cbGrade.currentText())       if str(self.page.cbGrade.currentText())       else None
 		self.module.inspection      = str(self.page.cbInspection.currentText())  if str(self.page.cbInspection.currentText())  else None
 
 		# comments
@@ -460,12 +453,6 @@ class func(object):
 		item = self.page.listShipments.currentItem()
 		if not (item is None):
 			self.setUIPage('shipments',ID=str(item.text()))
-
-	@enforce_mode('view')
-	def goStepKapton(self,*args,**kwargs):
-		ID = self.page.sbStepKapton.value()
-		if ID>=0:
-			self.setUIPage('kapton placement steps',ID=ID)
 
 	@enforce_mode('view')
 	def goStepSensor(self,*args,**kwargs):

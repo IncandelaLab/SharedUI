@@ -16,14 +16,14 @@ INDEX_TYPE = {
 }
 
 INDEX_SHAPE = {
-	'Full',
-	'Top',
-	'Bottom',
-	'Left',
-	'Right',
-	'Five',
-	'Three',
-	'Full+Three'
+	'Full':0,
+	'Top':1,
+	'Bottom':2,
+	'Left':3,
+	'Right':4,
+	'Five':5,
+	'Three':6,
+	'Full+Three':7,
 }
 
 INDEX_INSPECTION = {
@@ -134,8 +134,6 @@ class func(object):
 		self.page.pbDeleteComment.clicked.connect(self.deleteComment)
 		self.page.pbAddComment.clicked.connect(self.addComment)
 
-		#self.page.pbGoStepKapton.clicked.connect(self.goStepKapton)
-
 		self.page.pbGoStepSensor.clicked.connect(self.goStepSensor)
 		self.page.pbGoProtomodule.clicked.connect(self.goProtomodule)
 		self.page.pbGoModule.clicked.connect(self.goModule)
@@ -214,14 +212,6 @@ class func(object):
 		#self.page.dsbThickness.setValue(-1 if self.sensor.thickness is None else self.sensor.thickness) 
 		#if self.page.dsbThickness.value() == -1: self.page.dsbThickness.clear() 
  
-		#self.page.sbStepKapton.setValue(-1 if self.sensor.step_kapton is None else self.sensor.step_kapton) 
-		#if self.page.sbStepKapton.value() == -1: self.page.sbStepKapton.clear() 
- 
-		#self.page.cbCheckEdgesFirm.setCurrentIndex(INDEX_CHECK.get(self.sensor.check_edges_firm, -1)) 
-		#self.page.cbCheckGlueSpill.setCurrentIndex(INDEX_CHECK.get(self.sensor.check_glue_spill, -1)) 
-		#self.page.dsbKaptonFlatness.setValue(-1 if self.sensor.kapton_flatness is None else self.sensor.kapton_flatness) 
-		#if self.page.dsbKaptonFlatness.value() == -1: self.page.dsbKaptonFlatness.clear()
-
 
 		self.page.cbInspection.setCurrentIndex(INDEX_INSPECTION.get(self.sensor.inspection,-1))
 
@@ -251,7 +241,6 @@ class func(object):
 		mode_editing  = self.mode == 'editing'
 		mode_creating = self.mode == 'creating'
 		
-		#step_kapton_exists = self.page.sbStepKapton.value()  >=0
 		sensor_exists      = self.sensor_exists
 		shipments_exist    = self.page.listShipments.count() > 0
 		step_sensor_exists = self.page.sbStepSensor.value()  >= 0
@@ -291,11 +280,6 @@ class func(object):
 		#for corner in self.corners:
 		#	corner.setReadOnly(not (mode_creating or mode_editing))
 		#self.page.dsbThickness.setReadOnly(not (mode_creating or mode_editing))
-
-		#self.page.pbGoStepKapton.setEnabled(mode_view and step_kapton_exists)
-		#self.page.cbCheckEdgesFirm.setEnabled(mode_creating or mode_editing)
-		#self.page.cbCheckGlueSpill.setEnabled(mode_creating or mode_editing)
-		#self.page.dsbKaptonFlatness.setReadOnly(not (mode_creating or mode_editing))
 
 		self.page.cbInspection.setEnabled(   mode_creating or mode_editing   )
 		self.page.pbGoStepSensor.setEnabled( mode_view and step_sensor_exists)
@@ -385,10 +369,6 @@ class func(object):
 		#self.sensor.corner_heights = [_.value() if _.value()>=0 else None for _ in self.corners]
 		#self.sensor.thickness = self.page.dsbThickness.value() if self.page.dsbThickness.value()>=0 else None
 
-		#self.sensor.check_edges_firm = str(self.page.cbCheckEdgesFirm.currentText()) if str(self.page.cbCheckEdgesFirm.currentText()) else None
-		#self.sensor.check_glue_spill = str(self.page.cbCheckGlueSpill.currentText()) if str(self.page.cbCheckGlueSpill.currentText()) else None
-		#self.sensor.kapton_flatness  =     self.page.dsbKaptonFlatness.value()       if self.page.dsbKaptonFlatness.value() >=0       else None
-
 		self.sensor.inspection = str(self.page.cbInspection.currentText()) if str(self.page.cbInspection.currentText()) else None
 
 		self.sensor.save()
@@ -423,12 +403,6 @@ class func(object):
 		item = self.page.listShipments.currentItem()
 		if not (item is None):
 			self.setUIPage('shipments',ID=str(item.text()))
-
-	@enforce_mode('view')
-	def goStepKapton(self,*args,**kwargs):
-		ID = self.page.sbStepKapton.value()
-		if ID >= 0:
-			self.setUIPage('kapton placement steps',ID=ID)
 
 	@enforce_mode('view')
 	def goStepSensor(self,*args,**kwargs):

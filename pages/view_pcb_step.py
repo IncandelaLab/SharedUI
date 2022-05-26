@@ -198,7 +198,7 @@ class func(object):
 		]
 
 		# NEW:  To resolve bug where spinbox defaults to 0/prev value when left empty
-        self.pb_clears = [
+		self.pb_clears = [
 			self.page.pbClear1,
 			self.page.pbClear2,
 			self.page.pbClear3,
@@ -218,11 +218,13 @@ class func(object):
 			self.le_protomodules[i].textChanged.connect(self.loadProtomodule)
 			self.le_modules[i].textChanged.connect(     self.loadModule     )
 
+		self.page.ckCheckFeet.stateChanged.connect(self.updateIssues)
+
 		self.page.cbInstitution.currentIndexChanged.connect( self.loadAllTools )
 
 		self.page.sbTrayComponent.editingFinished.connect( self.loadTrayComponentSensor )
 		self.page.sbTrayAssembly.editingFinished.connect(  self.loadTrayAssembly        )
-		self.page.sbBatchAraldite.editingFinished.connect( self.loadBatchAraldite       )
+		self.page.leBatchAraldite.textEdited.connect(self.loadBatchAraldite)
 
 		self.page.sbID.valueChanged.connect(self.loadStep)
 
@@ -244,7 +246,7 @@ class func(object):
 			self.page.cbUserPerformed.addItem(user)
 
 
-	@enforce_mode('view')
+	@enforce_mode(['view','editing'])
 	def update_info(self,ID=None,*args,**kwargs):
 		if ID is None:
 			ID = self.page.sbID.value()
@@ -269,8 +271,8 @@ class func(object):
 			self.page.cbUserPerformed.setCurrentIndex(self.index_users.get(self.step_pcb.user_performed, -1))
 			self.page.leLocation.setText(self.step_pcb.location)
 
-			times_to_set = [(self.step_sensor.run_start,  self.page.dtRunStart),
-			                (self.step_sensor.run_stop,   self.page.dtRunStop)]
+			times_to_set = [(self.step_pcb.run_start,  self.page.dtRunStart),
+			                (self.step_pcb.run_stop,   self.page.dtRunStop)]
 			for st, dt in times_to_set:
 				if st is None:
 					dt.setDate(QtCore.QDate(*NO_DATE))
@@ -278,10 +280,11 @@ class func(object):
 				else:
 					localtime = list(time.localtime(st))
 					dt.setDate(QtCore.QDate(*localtime[0:3]))
-					dt.setTime(QtCore.QDate(*localtiem[3:6]))
+					dt.setTime(QtCore.QTime(*localtime[3:6]))
 
 
-			self.page.sbBatchAraldite.setValue(self.step_pcb.batch_araldite if not (self.step_pcb.batch_araldite is None) else -1)
+			#self.page.sbBatchAraldite.setValue(self.step_pcb.batch_araldite if not (self.step_pcb.batch_araldite is None) else -1)
+			self.page.leBatchAraldite.setText(self.step_pcb.batch_araldite if not (self.step_pcb.batch_araldite is None) else -1)
 			self.page.sbTrayAssembly.setValue( self.step_pcb.tray_assembly  if not (self.step_pcb.tray_assembly  is None) else -1)
 			self.page.sbTrayComponent.setValue(self.step_pcb.tray_component_pcb if not (self.step_pcb.tray_component_pcb is None) else -1)
 
@@ -325,7 +328,7 @@ class func(object):
 			self.page.dtRunStop.setDate(QtCore.QDate(*NO_DATE))
 			self.page.dtRunStop.setTime(QtCore.QTime(0,0,0))
 
-			self.page.sbBatchAraldite.setValue(-1)
+			self.page.leBatchAraldite.setText("")
 			self.page.sbTrayComponent.setValue(-1)
 			self.page.sbTrayAssembly.setValue(-1)
 			for i in range(6):
@@ -339,7 +342,7 @@ class func(object):
 		for i in range(6):
 			if self.sb_tools[i].value()        == -1:  self.sb_tools[i].clear()
 		
-		if self.page.sbBatchAraldite.value() == -1:  self.page.sbBatchAraldite.clear()
+		#if self.page.sbBatchAraldite.value() == -1:  self.page.sbBatchAraldite.clear()
 		if self.page.sbTrayComponent.value() == -1:  self.page.sbTrayComponent.clear()
 		if self.page.sbTrayAssembly.value()  == -1:  self.page.sbTrayAssembly.clear()	
 		
@@ -368,11 +371,13 @@ class func(object):
 		self.page.leLocation       .setReadOnly(mode_view)
 		self.page.sbTrayComponent  .setReadOnly(mode_view)
 		self.page.sbTrayAssembly   .setReadOnly(mode_view)
-		self.page.sbBatchAraldite  .setReadOnly(mode_view)
+		#self.page.sbBatchAraldite  .setReadOnly(mode_view)
+		self.page.leBatchAraldite  .setReadOnly(mode_view)
 
 		self.page.pbGoTrayComponent.setEnabled(mode_view and self.page.sbTrayComponent.value() >= 0)
 		self.page.pbGoTrayAssembly .setEnabled(mode_view and self.page.sbTrayAssembly .value() >= 0)
-		self.page.pbGoBatchAraldite.setEnabled(mode_view and self.page.sbBatchAraldite.value() >= 0)
+		#self.page.pbGoBatchAraldite.setEnabled(mode_view and self.page.sbBatchAraldite.value() >= 0)
+		self.page.pbGoBatchAraldite.setEnabled(mode_view and self.page.leBatchAraldite.text() != "")
 
 		for i in range(6):
 			self.sb_tools[i].setReadOnly(       mode_view)
@@ -389,7 +394,7 @@ class func(object):
 		self.page.pbSave.setEnabled(   mode_creating or mode_editing     )
 		self.page.pbCancel.setEnabled( mode_creating or mode_editing     )
 
-		self.page.ckCheckFeet.setReadOnly(mode_view)
+		self.page.ckCheckFeet.setEnabled(not mode_view)
 
 
 	#NEW:  Add all load() functions
@@ -404,7 +409,8 @@ class func(object):
 
 		self.tray_component_sensor.load(self.page.sbTrayComponent.value(), self.page.cbInstitution.currentText())
 		self.tray_assembly.load(        self.page.sbTrayAssembly.value(),  self.page.cbInstitution.currentText())
-		self.batch_araldite.load(       self.page.sbBatchAraldite.value())
+		#self.batch_araldite.load(       self.page.sbBatchAraldite.value())
+		self.batch_araldite.load(       self.page.leBatchAraldite.text())
 		self.updateIssues()
 
 	@enforce_mode(['editing','creating'])
@@ -414,7 +420,8 @@ class func(object):
 			self.tools_pcb[i].load(self.sb_tools[i].value(),       self.page.cbInstitution.currentText())
 		self.tray_component_sensor.load(self.page.sbTrayComponent.value(), self.page.cbInstitution.currentText())
 		self.tray_assembly.load(        self.page.sbTrayAssembly.value(),  self.page.cbInstitution.currentText())
-		self.batch_araldite.load(       self.page.sbBatchAraldite.value())
+		#self.batch_araldite.load(       self.page.sbBatchAraldite.value())
+		self.batch_araldite.load(       self.page.leBatchAraldite.text())
 		self.updateIssues()
 
 
@@ -479,7 +486,8 @@ class func(object):
 
 	@enforce_mode(['editing','creating'])
 	def loadBatchAraldite(self, *args, **kwargs):
-		self.batch_araldite.load(self.page.sbBatchAraldite.value())
+		#self.batch_araldite.load(self.page.sbBatchAraldite.value())
+		self.batch_araldite.load(self.page.leBatchAraldite.text())
 		self.updateIssues()
 
 
@@ -590,22 +598,13 @@ class func(object):
 		if rows_protomodule_dne:
 			issues.append(I_PROTO_DNE.format(      ', '.join([str(_+1) for _ in rows_protomodule_dne])))
 
-		objects_8in = []
 		objects_not_here = []
 
 		for obj in objects:
 
-			size = getattr(obj, "size", None)
-			if size in [8.0, 8, '8']:
-				objects_8in.append(obj)
-
 			institution = getattr(obj, "institution", None)
 			if not (institution in [None, self.page.cbInstitution.currentText()]):  #self.MAC]):
 				objects_not_here.append(obj)
-
-		if len(objects_8in):
-			issues.append(I_SIZE_MISMATCH)
-			issues.append(I_SIZE_MISMATCH_8.format(', '.join([str(_) for _ in objects_8in])))
 
 		if objects_not_here:
 			issues.append(I_INSTITUTION.format([str(_) for _ in objects_not_here]))
@@ -694,7 +693,8 @@ class func(object):
 
 		self.step_pcb.tray_component_pcb    = self.page.sbTrayComponent.value() if self.page.sbTrayComponent.value() >= 0 else None
 		self.step_pcb.tray_assembly         = self.page.sbTrayAssembly.value()  if self.page.sbTrayAssembly.value()  >= 0 else None
-		self.step_pcb.batch_araldite        = self.page.sbBatchAraldite.value() if self.page.sbBatchAraldite.value() >= 0 else None
+		#self.step_pcb.batch_araldite        = self.page.sbBatchAraldite.value() if self.page.sbBatchAraldite.value() >= 0 else None
+		self.step_pcb.batch_araldite        = self.page.leBatchAraldite.text() if self.page.leBatchAraldite.text() != "" else None
 
 
 		for i in range(6):
@@ -732,7 +732,7 @@ class func(object):
 			self.protomodules[i].module = modules[i]
 			self.protomodules[i].save()
 
-		self.step_pcb.check_tool_feet = self.ckCheckFeet.isChecked()
+		self.step_pcb.check_tool_feet = self.page.ckCheckFeet.isChecked()
 
 		self.step_pcb.save()
 		self.unloadAllObjects()
@@ -773,7 +773,8 @@ class func(object):
 		self.setUIPage('modules',ID=module)
 
 	def goBatchAraldite(self,*args,**kwargs):
-		batch_araldite = self.page.sbBatchAraldite.value()
+		#batch_araldite = self.page.sbBatchAraldite.value()
+		batch_araldite = self.page.leBatchAraldite.text()
 		self.setUIPage('supplies',batch_araldite=batch_araldite)
 
 	def goTrayComponent(self,*args,**kwargs):

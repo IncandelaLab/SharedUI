@@ -201,7 +201,7 @@
   </widget>
   <widget class="QLineEdit" name="lineEdit_5">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="geometry">
     <rect>
@@ -220,7 +220,7 @@
   </widget>
   <widget class="QLineEdit" name="lineEdit_6">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="geometry">
     <rect>
@@ -326,7 +326,7 @@
   </widget>
   <widget class="QDateEdit" name="dWedgeReceived">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="geometry">
     <rect>
@@ -392,7 +392,7 @@
   </widget>
   <widget class="QDateEdit" name="dWedgeExpires">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="geometry">
     <rect>

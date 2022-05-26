@@ -6,7 +6,7 @@ from filemanager import fm
 
 NO_DATE = [2020,1,1]
 
-PAGE_NAME = "view_pcb_step"
+PAGE_NAME = "view_pcb_post"
 OBJECTTYPE = "PCB_step"
 DEBUG = False
 
@@ -28,10 +28,6 @@ INDEX_GRADE = {
 STATUS_NO_ISSUES = "valid (no issues)"
 STATUS_ISSUES    = "invalid (issues present)"
 
-# tooling and supplies
-I_BATCH_ARALDITE_DNE     = "araldite batch does not exist or is not selected"
-I_BATCH_ARALDITE_EXPIRED = "araldite batch has expired"
-
 # rows / positions
 I_NO_PARTS_SELECTED     = "no parts have been selected"
 I_ROWS_INCOMPLETE       = "positions {} are partially filled"
@@ -46,9 +42,6 @@ I_INSTITUTION = "some selected objects are not at this institution: {}"
 # Missing user
 I_USER_DNE = "no kapton step user selected"
 
-# supply batch empty
-I_BATCH_ARALDITE_EMPTY = "araldite batch is empty"
-
 # NEW
 I_INSTITUTION_NOT_SELECTED = "no institution selected"
 
@@ -59,9 +52,7 @@ class func(object):
 		self.setUIPage = setUIPage
 		self.setMainSwitchingEnabled = setSwitchingEnabled
 
-		#New stuff
 		self.modules      = [fm.module()      for _ in range(6)]
-		self.batch_araldite        = fm.batch_araldite()
 
 		self.step_pcb = fm.step_pcb()
 		self.step_pcb_exists = False
@@ -189,26 +180,22 @@ class func(object):
 
 		self.page.cbInstitution.currentIndexChanged.connect( self.loadAllTools )
 
-		self.page.sbBatchAraldite.editingFinished.connect( self.loadBatchAraldite       )
-
 		self.page.sbID.valueChanged.connect(self.loadStep)
 
 		self.page.pbEdit.clicked.connect(self.startEditing)
 		self.page.pbSave.clicked.connect(self.saveEditing)
 		self.page.pbCancel.clicked.connect(self.cancelEditing)
 
-		self.page.pbGoBatchAraldite.clicked.connect(self.goBatchAraldite)
-
 		self.page.pbCureStartNow    .clicked.connect(self.setCureStartNow)
-		self.page.pbCureStopNow     .clocked.connect(self.setCureStopNow)
+		self.page.pbCureStopNow     .clicked.connect(self.setCureStopNow)
 
-		auth_users = fm.userManager.getAuthorizedUsers(PAGE_NAME)
-		self.index_users = {auth_users[i]:i for i in range(len(auth_users))}
-		for user in self.index_users.keys():
-			self.page.cbUserPerformed.addItem(user)
+		#auth_users = fm.userManager.getAuthorizedUsers(PAGE_NAME)
+		#self.index_users = {auth_users[i]:i for i in range(len(auth_users))}
+		#for user in self.index_users.keys():
+		#	self.page.cbUserPerformed.addItem(user)
 
 
-	@enforce_mode('view')
+	@enforce_mode(['view','editing'])
 	def update_info(self,ID=None,*args,**kwargs):
 		if ID is None:
 			ID = self.page.sbID.value()
@@ -227,8 +214,8 @@ class func(object):
 			self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.step_pcb.institution, -1))
 
 			# New
-			times_to_set = [(self.step_sensor.cure_start, self.page.dtCureStart),
-			                (self.step_sensor.cure_stop,  self.page.dtCureStop)]
+			times_to_set = [(self.step_pcb.cure_start, self.page.dtCureStart),
+			                (self.step_pcb.cure_stop,  self.page.dtCureStop)]
 			for st, dt in times_to_set:
 				if st is None:
 					dt.setDate(QtCore.QDate(*NO_DATE))
@@ -236,7 +223,7 @@ class func(object):
 				else:
 					localtime = list(time.localtime(st))
 					dt.setDate(QtCore.QDate(*localtime[0:3]))
-					dt.setTime(QtCore.QDate(*localtiem[3:6]))
+					dt.setTime(QtCore.QTime(*localtime[3:6]))
 			"""
 			run_start = self.step_pcb.run_start
 			run_stop  = self.step_pcb.run_stop
@@ -258,15 +245,14 @@ class func(object):
 			self.page.dsbCureTemperature.setValue(self.step_pcb.cure_temperature if self.step_pcb.cure_temperature else 70)
 			self.page.sbCureHumidity    .setValue(self.step_pcb.cure_humidity    if self.step_pcb.cure_humidity    else 10)
 
-			self.page.sbBatchAraldite.setValue(self.step_pcb.batch_araldite if not (self.step_pcb.batch_araldite is None) else -1)
-
 			if not (self.step_pcb.modules is None):
 				for i in range(6):
-					mod = self.step_pcb.modules[i]
-					self.le_modules[i].setText(str(mod) if not (mod is None) else "")
+					mod = fm.module()
+					mod.load(self.step_pcb.modules[i])
+					self.le_modules[i].setText(mod.ID if not (mod is None) else "")
 					self.dsb_offsets_x[i]  .setValue(mod.offset_translation_x if not (mod.offset_translation_x is None) else 0)
 					self.dsb_offsets_y[i]  .setValue(mod.offset_translation_y if not (mod.offset_translation_y is None) else 0)
-					self.dsb_offsets_rot[i].setValue(mod.offfset_rotation     if not (mod.offset_rotation      is None) else 0)
+					self.dsb_offsets_rot[i].setValue(mod.offset_rotation     if not (mod.offset_rotation      is None) else 0)
 					self.dsb_thickness[i]  .setValue(mod.thickness            if not (mod.thickness            is None) else 0)
 					self.dsb_flatness[i]   .setValue(mod.flatness             if not (mod.flatness             is None) else 0)
 
@@ -288,7 +274,6 @@ class func(object):
 
 			self.page.dsbCureTemperature.setValue(-1)
 			self.page.sbCureHumidity.setValue(-1)
-			self.page.sbBatchAraldite.setValue(-1)
 			for i in range(6):
 				self.le_modules[i].setText("")
 				self.dsb_offsets_x[i].setValue(0)
@@ -297,7 +282,6 @@ class func(object):
 				self.dsb_thickness[i].setValue(-1)
 				self.dsb_flatness[i].setValue(0)
 
-		if self.page.sbBatchAraldite.value() == -1:  self.page.sbBatchAraldite.clear()
 		
 		self.updateElements()
 
@@ -313,31 +297,24 @@ class func(object):
 
 		self.page.cbInstitution.setEnabled(mode_editing)
 
-		self.page.pbRunStartNow     .setEnabled(mode_editing)
-		self.page.pbRunStopNow      .setEnabled(mode_editing)
 		self.page.pbCureStartNow     .setEnabled(mode_editing)
 		self.page.pbCureStopNow      .setEnabled(mode_editing)
 
-		self.page.cbUserPerformed  .setEnabled(mode_editing)
-		self.page.leLocation       .setReadOnly(mode_view)
-		self.page.dtRunStart       .setReadOnly(mode_view)
-		self.page.dtRunStop        .setReadOnly(mode_view)
+		#self.page.cbUserPerformed  .setEnabled(mode_editing)
 		self.page.dtCureStart      .setReadOnly(mode_view)
 		self.page.dtCureStop       .setReadOnly(mode_view)
 
 		self.page.dsbCureTemperature.setReadOnly(mode_view)
 		self.page.sbCureHumidity   .setReadOnly(mode_view)
-		self.page.sbBatchAraldite  .setReadOnly(mode_view)
-
-		self.page.pbGoBatchAraldite.setEnabled(mode_view and self.page.sbBatchAraldite.value() >= 0)
 
 		for i in range(6):
 			self.pb_go_modules[i].setEnabled(     mode_view and modules_exist[i]     )
-			self.dsb_offsets_x[i]  .setReadOnly(not (mode_view and modules_exist[i]))
-			self.dsb_offsets_y[i]  .setReadOnly(not (mode_view and modules_exist[i]))
-			self.dsb_offsets_rot[i].setReadOnly(not (mode_view and modules_exist[i]))
-			self.dsb_thickness[i]  .setReadOnly(not (mode_view and modules_exist[i]))
-			self.dsb_flatness[i]   .setReadOnly(not (mode_view and modules_exist[i]))
+			self.dsb_offsets_x[i]  .setReadOnly(not (mode_editing and modules_exist[i]))
+			self.dsb_offsets_y[i]  .setReadOnly(not (mode_editing and modules_exist[i]))
+			self.dsb_offsets_rot[i].setReadOnly(not (mode_editing and modules_exist[i]))
+			self.dsb_thickness[i]  .setReadOnly(not (mode_editing and modules_exist[i]))
+			self.dsb_flatness[i]   .setReadOnly(not (mode_editing and modules_exist[i]))
+			self.cb_grades[i]      .setEnabled(      mode_editing and modules_exist[i])
 
 
 		self.page.pbEdit.setEnabled(   mode_view and     step_pcb_exists )
@@ -350,13 +327,11 @@ class func(object):
 		for i in range(6):
 			self.modules[i].load(     self.le_modules[i].text()     )
 
-		self.batch_araldite.load(       self.page.sbBatchAraldite.value())
 		self.updateIssues()
 
 	@enforce_mode('editing')
 	def loadAllTools(self,*args,**kwargs):  # Same as above, but load only tools:
 		self.step_pcb.institution = self.page.cbInstitution.currentText()
-		self.batch_araldite.load(       self.page.sbBatchAraldite.value())
 		self.updateIssues()
 
 
@@ -364,14 +339,6 @@ class func(object):
 	def unloadAllObjects(self,*args,**kwargs):
 		for i in range(6):
 			self.modules[i].clear()
-
-		self.batch_araldite.clear()
-
-	@enforce_mode('editing')
-	def loadBatchAraldite(self, *args, **kwargs):
-		self.batch_araldite.load(self.page.sbBatchAraldite.value())
-		self.updateIssues()
-
 
 
 	#NEW:  Add updateIssues and modify conditions accordingly
@@ -382,18 +349,6 @@ class func(object):
 
 		if self.step_pcb.institution is None:
 			issues.append(I_INSTITUTION_NOT_SELECTED)
-
-		if self.batch_araldite.ID is None:
-			issues.append(I_BATCH_ARALDITE_DNE)
-		else:
-			objects.append(self.batch_araldite)
-			if not (self.batch_araldite.date_expires is None):
-				ydm = self.batch_araldite.date_expires.split('-')
-				expires = QtCore.QDate(int(ydm[2]), int(ydm[0]), int(ydm[1]))  #datetime.date(*self.batch_araldite.date_expires)
-				if QtCore.QDate.currentDate() > expires:
-					issues.append(I_BATCH_ARALDITE_EXPIRED)
-			if self.batch_araldite.is_empty:
-				issues.append(I_BATCH_ARALDITE_EMPTY)
 
 		#New
 		modules_selected      = [_.text() for _ in self.le_modules      ]
@@ -423,7 +378,6 @@ class func(object):
 			issues.append(I_ROWS_INCOMPLETE.format(', '.join(map(str,rows_incomplete))))
 
 
-		objects_8in = []
 		objects_not_here = []
 
 		for obj in objects:
@@ -435,10 +389,6 @@ class func(object):
 			institution = getattr(obj, "institution", None)
 			if not (institution in [None, self.page.cbInstitution.currentText()]):  #self.MAC]):
 				objects_not_here.append(obj)
-
-		if len(objects_8in):
-			issues.append(I_SIZE_MISMATCH)
-			issues.append(I_SIZE_MISMATCH_8.format(', '.join([str(_) for _ in objects_8in])))
 
 		if objects_not_here:
 			issues.append(I_INSTITUTION.format([str(_) for _ in objects_not_here]))
@@ -496,14 +446,12 @@ class func(object):
 		self.step_pcb.cure_temperature = self.page.dsbCureTemperature.value()
 
 
-		self.step_pcb.batch_araldite        = self.page.sbBatchAraldite.value() if self.page.sbBatchAraldite.value() >= 0 else None
-
 
 		for i in range(6):
-			if modules[i] is None:  continue
+			if self.step_pcb.modules[i] is None:  continue
 
 			module = fm.module()
-			if not module.load(protomodules[i]):
+			if not module.load(self.step_pcb.modules[i]):
 				print("FATAL ERROR:  post assembly step tried to load nonexistent mod {}".format(self.step_pcb.modules[i]))
 				assert(False)
 
@@ -531,10 +479,6 @@ class func(object):
 		#module = self.sb_modules[which].value()
 		module = self.le_modules[which].text()
 		self.setUIPage('modules',ID=module)
-
-	def goBatchAraldite(self,*args,**kwargs):
-		batch_araldite = self.page.sbBatchAraldite.value()
-		self.setUIPage('supplies',batch_araldite=batch_araldite)
 
 	def setCureStartNow(self, *args, **kwargs):
 		localtime = time.localtime()

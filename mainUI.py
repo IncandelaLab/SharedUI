@@ -150,8 +150,8 @@ PAGE_IDS = {
 	'1. Sensor - pre-assembly' : 9,
 	'2. Sensor - post-assembly': 10,
 	'3. PCB - pre-assembly'    : 11,
-	'4. PCB - pre-assembly'    : 12,
-	'5. Wirebonding & encapsulation' : 13,
+	'4. PCB - post-assembly'    : 12,
+	'5. Wirebonding & encapsulating' : 13,
 
 	#'shipments'               :12, # Disabled indefinitely
 }
@@ -195,16 +195,13 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		self.rig()
 		print("Finished rigging UI.")
 
-		# NOTE:  This has been temporarily changed!
-		self.setUIPage('baseplates')
-		#self.setUIPage('tooling')
-
-
-		#self.setUIPage('search for parts')
+		self.setUIPage('Baseplates')
+		print("Set UI page")
 
 		self.setWindowTitle("Module Assembly User Interface")
 	
 		self.timer_setup()
+		print("Setup timer")
 
 		# NEW:  Set up ssh tunnel for DB access!
 		# First, request username:
@@ -481,6 +478,7 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 class UserDialog(wdgt.QDialog):
 	def __init__(self, *args, **kwargs):
 		super(UserDialog, self).__init__(*args, **kwargs)
+		print("Initializing request box")
 
 		self.setWindowTitle("SSH tunnel:  username required")
 		
@@ -495,6 +493,7 @@ class UserDialog(wdgt.QDialog):
 		layout.addWidget(self.buttonCancel)
 
 		self.cancelled = False
+		print("Initialized request box")
 
 	def handleLogin(self):
 		self.username = self.textName.text()

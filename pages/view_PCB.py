@@ -19,20 +19,15 @@ INDEX_TYPE = {
 	'HGCROC dummy':6,
 }
 
-INDEX_RESOLUTION = {
-	'HD':0,
-	'LD':1,
-}
-
 INDEX_SHAPE = {
-	'Full',
-	'Top',
-	'Bottom',
-	'Left',
-	'Right',
-	'Five',
-	'Three',
-	'Full+Three'
+	'Full':0,
+	'Top':1,
+	'Bottom':2,
+	'Left':3,
+	'Right':4,
+	'Five':5,
+	'Three':6,
+	'Full+Three':7
 }
 
 INDEX_CHIRALITY = {
@@ -276,7 +271,6 @@ class func(object):
 		self.page.cbResolution.setEnabled(         mode_creating or mode_editing  )
 		self.page.cbShape.setEnabled(              mode_creating or mode_editing  )
 		self.page.cbGrade.setEnabled(              mode_creating or mode_editing  )
-		#self.page.cbChirality.setEnabled(          mode_creating or mode_editing  )
 		self.page.cbInstitution.setEnabled(        mode_creating or mode_editing  )
 		self.page.cbInsertUser.setEnabled(         mode_creating or mode_editing  )
 		self.page.sbNumRocs.setReadOnly(      not (mode_creating or mode_editing) )
