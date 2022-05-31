@@ -4,6 +4,8 @@ import datetime
 
 from filemanager import fm
 
+from PyQt5 import QFileDialog, QWidget
+
 NO_DATE = [2020,1,1]
 
 PAGE_NAME = "view_sensor_post"
@@ -42,6 +44,17 @@ I_INSTITUTION_NOT_SELECTED = "no institution selected"
 
 # Missing user
 I_USER_DNE = "no sensor step user selected"
+
+class Filewindow(QWidget):
+	def __init__(self):
+		super(Filewindow, self).__init__()
+
+	def getfile(self,*args,**kwargs):
+		fname, fmt = QFileDialog.getOpenFileName(self, 'Open file', '~',"(*.xml)")
+		#dname = str(QFileDialog.getExistingDirectory(self, "Select directory"))
+		print("File dialog:  got file", fname)
+		return fname
+
 
 class func(object):
 	def __init__(self,fm,page,setUIPage,setSwitchingEnabled):
@@ -187,13 +200,11 @@ class func(object):
 		self.page.pbSave.clicked.connect(self.saveEditing)
 		self.page.pbCancel.clicked.connect(self.cancelEditing)
 
-		self.page.pbCureStartNow    .clicked.connect(self.setCureStartNow)
-		self.page.pbCureStopNow     .clicked.connect(self.setCureStopNow)
+		self.page.pbCureStartNow.clicked.connect(self.setCureStartNow)
+		self.page.pbCureStopNow.clicked.connect(self.setCureStopNow)
 
-		#auth_users = fm.userManager.getAuthorizedUsers(PAGE_NAME)
-		#self.index_users = {auth_users[i]:i for i in range(len(auth_users))}
-		#for user in self.index_users.keys():
-		#	self.page.cbUserPerformed.addItem(user)
+		self.page.pbAddFile.clicked.connect(self.loadXMLFile)
+		self.fwnd = Filewindow()
 
 
 	@enforce_mode(['view','editing'])
@@ -225,27 +236,12 @@ class func(object):
 					localtime = list(time.localtime(st))
 					dt.setDate(QtCore.QDate(*localtime[0:3]))
 					dt.setTime(QtCore.QTime(*localtime[3:6]))
-			"""
-			run_start = self.step_sensor.run_start
-			run_stop  = self.step_sensor.run_stop
-			if run_start is None:
-				self.page.dtRunStart.setDate(QtCore.QDate(*NO_DATE))
-				self.page.dtRunStart.setTime(QtCore.QTime(0,0,0))
-			else:
-				localtime = list(time.localtime(run_start))
-				self.page.dtRunStart.setDate(QtCore.QDate(*localtime[0:3]))
-				self.page.dtRunStart.setTime(QtCore.QTime(*localtime[3:6]))
-			if run_stop is None:
-				self.page.dtRunStop.setDate(QtCore.QDate(*NO_DATE))
-				self.page.dtRunStop.setTime(QtCore.QTime(0,0,0))
-			else:
-				localtime = list(time.localtime(run_stop))
-				self.page.dtRunStop.setDate(QtCore.QDate(*localtime[0:3]))
-				self.page.dtRunStop.setTime(QtCore.QTime(*localtime[3:6]))
-			"""
+
 
 			self.page.dsbCureTemperature.setValue(self.step_sensor.cure_temperature if self.step_sensor.cure_temperature else 70)
 			self.page.sbCureHumidity    .setValue(self.step_sensor.cure_humidity    if self.step_sensor.cure_humidity    else 10)
+
+			self.page.leXML.setText(self.step_sensor.xml_data_file if self.step_sensor.xml_data_file else "")
 
 			if not (self.step_sensor.protomodules is None):
 				for i in range(6):
@@ -279,6 +275,8 @@ class func(object):
 
 			self.page.dsbCureTemperature.setValue(-1)
 			self.page.sbCureHumidity.setValue(-1)
+			self.page.leXML.setText("")
+
 			for i in range(6):
 				self.le_protomodules[i].setText("")
 				self.dsb_offsets_x[i].setValue(0)
@@ -311,6 +309,8 @@ class func(object):
 		self.page.dtCureStop       .setReadOnly(mode_view)
 		self.page.dsbCureTemperature.setReadOnly(mode_view)
 		self.page.sbCureHumidity   .setReadOnly(mode_view)
+
+		self.page.pbAddFile.setEnabled(mode_editing)
 
 		for i in range(6):
 			self.pb_go_protomodules[i].setEnabled(mode_view and protomodules_exist[i])
@@ -506,6 +506,15 @@ class func(object):
 			return []
 		else:
 			return self.step_sensor.filesToUpload()
+
+
+	def loadXMLFile(self, *args, **kwargs):
+		filename = self.fwnd.getfile()
+		self.step_sensor.xml_data_file = filename
+
+		print("\n\n\nloadXMLFile is WIP WIP WIP\n\n\n")
+		# TO DECIDE:  Upload all XML in a directory, or upload one file per module/etc?
+		# Assign measurement info to step here
 
 
 	@enforce_mode('view')

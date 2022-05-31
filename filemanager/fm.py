@@ -2308,6 +2308,8 @@ class step_sensor(fsobj_assembly):
 		'kind_of_part',
 
 		'check_tool_feet',
+
+		'xml_data_file',
 	]
 
 	ITEMLIST_LIST = ['comments', 'shipments', 'tools', 'sensors', 'baseplates', 'protomodules']
@@ -2577,6 +2579,8 @@ class step_pcb(fsobj_assembly):
 		'batch_araldite',     # ID of araldite batch used
 
 		'check_tool_feet',
+
+		'xml_data_file',
 	]
 
 
