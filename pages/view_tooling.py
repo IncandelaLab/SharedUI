@@ -51,18 +51,15 @@ class simple_fsobj_vc(object):
 		self.pbAddComment    = pbAddComment
 
 	def update_info(self,ID=None,institution=None,*args,**kwargs):
-		print("Calling update_info() in tooling page")
 		if ID is None:
 			ID = self.sbID.value()
 		else:
 			self.sbID.setValue(ID)
 		if institution is None:
-			print("Insittution is none:  calling update_info and saving institution!")
 			institution = self.cbInstitution.currentText()
 		else:
 			self.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(institution, -1))
 
-		print("Loading with institution ", institution)
 		self.fsobj_exists = self.fsobj_tool.load(ID, institution)
 
 		if self.fsobj_exists:
@@ -91,25 +88,17 @@ class simple_fsobj_vc(object):
 
 	def start_editing(self,*args,**kwargs):
 		if not self.fsobj_exists:
-			print("Creating new tool @ start_editing: ", self.cbInstitution.currentText())
 			self.fsobj_tool.new(self.sbID.value(), self.cbInstitution.currentText())
 
 	def cancel_editing(self,*args,**kwargs):
 		self.update_info()
 
 	def save_editing(self,*args,**kwargs):
-		print("SAVING TOOL")
-		print("CURRENT INST IS", self.fsobj_tool.institution)
 		comments = []
 		for i in range(self.listComments.count()):
 			comments.append(self.listComments.item(i).text())
 		self.fsobj_tool.comments = comments
-		#size = self.dsbSize.value()
-		#if size == 0.0:
-		#	size = None
-		#self.fsobj_tool.size = size
 		self.fsobj_tool.location = self.leLocation.text() if self.leLocation.text() != '' else 'n/a'  # New
-		print("Saving tool:  LOCATION IS", self.fsobj_tool.location)
 		self.fsobj_tool.save()
 		self.update_info()
 
@@ -419,12 +408,6 @@ class func(object):
 		self.page.pbPcbTrayCancel     .setEnabled(mode_editing_pcb_tray     )
 		self.page.pbAssemblyTrayCancel.setEnabled(mode_editing_assembly_tray)
 
-		"""self.page.dsbSensorToolSize  .setEnabled(mode_editing_sensor_tool  )
-		self.page.dsbPcbToolSize     .setEnabled(mode_editing_pcb_tool     )
-		self.page.dsbSensorTraySize  .setEnabled(mode_editing_sensor_tray  )
-		self.page.dsbPcbTraySize     .setEnabled(mode_editing_pcb_tray     )
-		self.page.dsbAssemblyTraySize.setEnabled(mode_editing_assembly_tray)
-		"""
 
 		self.page.leSensorToolLocation  .setEnabled(mode_editing_sensor_tool  )  # New
 		self.page.lePcbToolLocation     .setEnabled(mode_editing_pcb_tool     )

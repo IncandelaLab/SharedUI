@@ -105,8 +105,6 @@ class func(object):
 		self.page.pbSave.clicked.connect(self.saveEditing)
 		self.page.pbCancel.clicked.connect(self.cancelEditing)
 
-		self.page.pbGoShipment.clicked.connect(self.goShipment)
-
 		self.page.pbDeleteComment.clicked.connect(self.deleteComment)
 		self.page.pbAddComment.clicked.connect(self.addComment)
 
@@ -134,10 +132,6 @@ class func(object):
 		self.protomodule_exists = (ID == self.protomodule.ID)  #self.protomodule.load(ID)
 
 		#self.page.leID.setText(self.protomodule.ID)
-
-		self.page.listShipments.clear()
-		for shipment in self.protomodule.shipments:
-			self.page.listShipments.addItem(str(shipment))
 
 		#self.page.leInsertUser.setText(  "" if self.protomodule.insertion_user is None else   self.protomodule.insertion_user)
 		self.page.leLocation.setText(    "" if self.protomodule.location     is None else     self.protomodule.location    )
@@ -194,7 +188,6 @@ class func(object):
 			self.page.leStatus.setText(self.mode)
 
 		protomodule_exists = self.protomodule_exists
-		shipments_exist    = self.page.listShipments.count() > 0
 
 		step_sensor_exists = self.page.sbStepSensor.value() >=0
 		#sensor_exists      = self.page.sbSensor.value()     >=0
@@ -219,8 +212,6 @@ class func(object):
 		self.page.pbEdit.setEnabled(    mode_view and     protomodule_exists )
 		self.page.pbSave.setEnabled(    mode_editing or mode_creating )
 		self.page.pbCancel.setEnabled(  mode_editing or mode_creating )
-
-		self.page.pbGoShipment.setEnabled(mode_view and shipments_exist)
 
 		#self.page.leInsertUser.setReadOnly(not (mode_creating or mode_editing) )
 		self.page.leLocation.setReadOnly(  not (mode_creating or mode_editing) )
@@ -343,12 +334,6 @@ class func(object):
 			self.page.listComments.addItem(text)
 			self.page.pteWriteComment.clear()
 
-	@enforce_mode('view')
-	def goShipment(self,*args,**kwargs):
-		item = self.page.listShipments.currentItem()
-		if not (item is None):
-			self.setUIPage('shipments',ID=str(item.text()))
-	
 	@enforce_mode('view')
 	def goStepSensor(self,*args,**kwargs):
 		ID = self.page.sbStepSensor.value()

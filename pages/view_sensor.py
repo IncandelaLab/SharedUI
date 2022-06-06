@@ -129,8 +129,6 @@ class func(object):
 		self.page.pbSave.clicked.connect(self.saveEditing)
 		self.page.pbCancel.clicked.connect(self.cancelEditing)
 
-		self.page.pbGoShipment.clicked.connect(self.goShipment)
-
 		self.page.pbDeleteComment.clicked.connect(self.deleteComment)
 		self.page.pbAddComment.clicked.connect(self.addComment)
 
@@ -171,10 +169,6 @@ class func(object):
 
 		#self.page.leID.setText(self.sensor.ID)
 		self.sensor_exists = (ID == self.sensor.ID) #self.sensor.load(ID)
-
-		self.page.listShipments.clear()
-		for shipment in self.sensor.shipments:
-			self.page.listShipments.addItem(str(shipment))
 
 		self.page.leLocation.setText(    "" if self.sensor.location     is None else self.sensor.location    )
 		self.page.leBarcode.setText( "" if self.sensor.barcode          is None else self.sensor.barcode     )
@@ -242,7 +236,6 @@ class func(object):
 		mode_creating = self.mode == 'creating'
 		
 		sensor_exists      = self.sensor_exists
-		shipments_exist    = self.page.listShipments.count() > 0
 		step_sensor_exists = self.page.sbStepSensor.value()  >= 0
 		#protomodule_exists = self.page.sbProtomodule.value() >= 0
 		#module_exists      = self.page.sbModule.value() >= 0
@@ -260,7 +253,6 @@ class func(object):
 		self.page.pbSave.setEnabled(    mode_editing or mode_creating )
 		self.page.pbCancel.setEnabled(  mode_editing or mode_creating )
 
-		self.page.pbGoShipment.setEnabled(mode_view and shipments_exist)
 
 		#self.page.leInsertUser.setReadOnly(   not (mode_creating or mode_editing) )
 		self.page.leLocation.setReadOnly(     not (mode_creating or mode_editing) )
@@ -397,12 +389,6 @@ class func(object):
 		if text:
 			self.page.listComments.addItem(text)
 			self.page.pteWriteComment.clear()
-
-	@enforce_mode('view')
-	def goShipment(self,*args,**kwargs):
-		item = self.page.listShipments.currentItem()
-		if not (item is None):
-			self.setUIPage('shipments',ID=str(item.text()))
 
 	@enforce_mode('view')
 	def goStepSensor(self,*args,**kwargs):

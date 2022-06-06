@@ -1,10 +1,13 @@
 from PyQt5 import QtCore
 import time
 import datetime
+# for xml loading:
+import csv
+import xml.etree.ElementTree as ET
 
 from filemanager import fm
 
-from PyQt5 import QFileDialog, QWidget
+from PyQt5.QtWidgets import QFileDialog, QWidget
 
 NO_DATE = [2020,1,1]
 
@@ -241,6 +244,7 @@ class func(object):
 			self.page.dsbCureTemperature.setValue(self.step_sensor.cure_temperature if self.step_sensor.cure_temperature else 70)
 			self.page.sbCureHumidity    .setValue(self.step_sensor.cure_humidity    if self.step_sensor.cure_humidity    else 10)
 
+			print("xml_data_file is:", self.step_sensor.xml_data_file)
 			self.page.leXML.setText(self.step_sensor.xml_data_file if self.step_sensor.xml_data_file else "")
 
 			if not (self.step_sensor.protomodules is None):
@@ -510,11 +514,24 @@ class func(object):
 
 	def loadXMLFile(self, *args, **kwargs):
 		filename = self.fwnd.getfile()
-		self.step_sensor.xml_data_file = filename
+		# NOTE:  Only pass data to page fields.  DO NOT save to proto object
+		# Only assign data during explicit save() call, so cancellation works normally!
+		# (reminder: all data is stored in the PAGE ELEMENTS until save() is called.)
+		# (update_info is not called during editing until after save() is called.)
 
-		print("\n\n\nloadXMLFile is WIP WIP WIP\n\n\n")
-		# TO DECIDE:  Upload all XML in a directory, or upload one file per module/etc?
-		# Assign measurement info to step here
+		# FOR NOW:  Only load data into the first row.
+		xml_tree = parse(filename)  # elementtree object
+
+		
+		itemdata = xml_tree.find('.//FIDUCIAL1')
+		self.page.dsb_offsets_rot[0].setValue(float(itemdata.text))
+		itemdata = xml_tree.find('.//X')
+		self.page.dsb_offsets_x[0].setValue(float(itemdata.text))
+		itemdata = xml_tree.find('.//Y')
+		self.page.dsb_offsets_y[0].setValue(float(itemdata.text))
+		#itemdata = xml_tree.find('.//')
+
+		leXML.setText(filename)
 
 
 	@enforce_mode('view')

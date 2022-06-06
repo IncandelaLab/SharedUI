@@ -26,11 +26,10 @@ from pages.view_sensor_post import func as cls_func_view_sensor_post
 from pages.view_pcb_step    import func as cls_func_view_pcb_step
 from pages.view_pcb_post    import func as cls_func_view_pcb_post
 from pages.view_wirebonding import func as cls_func_view_wirebonding
+from pages.view_plots       import func as cls_func_view_plots
 
 from pages.view_tooling     import func as cls_func_view_tooling
 from pages.view_supplies    import func as cls_func_view_supplies
-
-#from pages.view_shipment    import func as cls_func_shipment
 
 
 
@@ -112,6 +111,11 @@ class widget_view_wirebonding(wdgt.QWidget, form_view_wirebonding):
 		super(widget_view_wirebonding,self).__init__(parent)
 		self.setupUi(self)
 
+from pages_ui.view_plots import Ui_Form as form_view_plots
+class widget_view_plots(wdgt.QWidget, form_view_plots):
+	def __init__(self,parent):
+		super(widget_view_plots,self).__init__(parent)
+		self.setupUi(self)
 
 from pages_ui.view_tooling import Ui_Form as form_view_tooling
 class widget_view_tooling(wdgt.QWidget, form_view_tooling):
@@ -124,13 +128,6 @@ class widget_view_supplies(wdgt.QWidget, form_view_supplies):
 	def __init__(self,parent):
 		super(widget_view_supplies,self).__init__(parent)
 		self.setupUi(self)
-
-
-#from pages_ui.view_shipment import Ui_Form as form_shipment
-#class widget_shipment(wdgt.QWidget, form_shipment):
-#	def __init__(self,parent):
-#		super(widget_shipment,self).__init__(parent)
-#		self.setupUi(self)
 
 
 
@@ -152,8 +149,8 @@ PAGE_IDS = {
 	'3. PCB - pre-assembly'    : 11,
 	'4. PCB - post-assembly'    : 12,
 	'5. Wirebonding & encapsulating' : 13,
+	'6. Module testing' : 14,
 
-	#'shipments'               :12, # Disabled indefinitely
 }
 
 # List of all pages where DB expects info to upload
@@ -161,10 +158,10 @@ UPLOAD_ENABLED_PAGES = [
 	#'Baseplates',  # In theory, should never have to upload these
 	#'Sensors',
 	#'PCBs',
-	'Protomodules',
-	'Modules',
+	#'Protomodules',
+	#'Modules',
 	'2. Sensor - post-assembly',
-	'4. PCB - pre-assembly'
+	'4. PCB - post-assembly'
 ]
 
 
@@ -200,16 +197,20 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 
 		self.setWindowTitle("Module Assembly User Interface")
 	
-		self.timer_setup()
-		print("Setup timer")
-
 		# NEW:  Set up ssh tunnel for DB access!
 		# First, request username:
 		ldlg = UserDialog(self)
 		loginResult = ldlg.exec_()
-		while loginResult != 1:  # was if
-			print("Username request cancelled!  Trying again...")
-			loginResult = ldlg.exec_()
+		if loginResult != 1:
+			print("Login cancelled")
+			exit()
+		#loginResult = 0
+		#attempts = 0
+		#while attempts < 3 and loginResult != 1:
+		#	print("Login request: attempt {}".format(attempts))
+		#	loginResult = ldlg.exec_()
+		#	if loginResult == 1:  break
+		#	attempts += 1
 		print("Got username:  ",  ldlg.getUsername())
 		username = ldlg.getUsername()
 		os.system('ssh -f -N -M -S temp_socket -L 10131:itrac1609-v.cern.ch:10121 -L 10132:itrac1601-v.cern.ch:10121 {}@lxplus.cern.ch'.format(username))
@@ -236,8 +237,8 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		self.page_view_pcb_step    = widget_view_pcb_step(None)    ; self.swPages.addWidget(self.page_view_pcb_step)
 		self.page_view_pcb_post    = widget_view_pcb_post(None)    ; self.swPages.addWidget(self.page_view_pcb_post)
 		self.page_view_wirebonding = widget_view_wirebonding(None) ; self.swPages.addWidget(self.page_view_wirebonding)
+		self.page_view_plots       = widget_view_plots(None)       ; self.swPages.addWidget(self.page_view_plots)
 
-		#self.page_shipment         = widget_shipment(None)         ; self.swPages.addWidget(self.page_shipment)
 
 
 	def initPages(self):
@@ -255,11 +256,11 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		self.func_view_pcb_step    = cls_func_view_pcb_step(         fm, self.page_view_pcb_step   , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_pcb_post    = cls_func_view_pcb_post(         fm, self.page_view_pcb_post   , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_wirebonding = cls_func_view_wirebonding(      fm, self.page_view_wirebonding, self.setUIPage, self.setSwitchingEnabled)
+		self.func_view_plots       = cls_func_view_plots(            fm, self.page_view_plots,       self.setUIPage, self.setSwitchingEnabled)
 
 		self.func_view_tooling     = cls_func_view_tooling(          fm, self.page_view_tooling    , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_supplies    = cls_func_view_supplies(         fm, self.page_view_supplies   , self.setUIPage, self.setSwitchingEnabled)
 
-		#self.func_shipment         = cls_func_shipment(              fm, self.page_shipment        , self.setUIPage, self.setSwitchingEnabled)
 
 		# This list must be in the same order that the pages are in in the stackedWidget in the main UI file.
 		# This is the same order as in the dict PAGE_IDS
@@ -280,8 +281,7 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 			self.func_view_pcb_step,
 			self.func_view_pcb_post,
 			self.func_view_wirebonding,
-
-			#self.func_shipment,  #WARNING:  Order has been switched.
+			self.func_view_plots,
 			]
 
 
@@ -294,70 +294,6 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 
 		self.pbUploadObject.clicked.connect(self.goUploadObject)
 		self.pbUploadDate.clicked.connect(self.goUploadDate)
-
-
-	def timer_setup(self):
-		self.timer_id_gen = id_generator() # unique ID generator for timers
-		self.timers = {} # dict of timers {ID:timer}
-
-	def timer_add(self,interval=None,cxn=None,start=False):
-		timer = core.QTimer(self)
-		ID    = next(self.timer_id_gen)
-		self.timers.update([ [ID, timer] ])
-
-		if not (interval is None):
-			self.timer_set_interval(ID,interval)
-
-		if not (cxn is None):
-			self.timer_connect(ID,cxn)
-
-		if start:
-			if interval is None:
-				print("Warning: cannot start timer without interval")
-			else:
-				self.timer_start(ID)
-
-		return ID
-
-	def timer_remove(self,ID):
-		if ID in self.timers.keys():
-			timer = self.timers.pop(ID)
-			timer.stop()
-			timer.timeout.disconnect()
-			del timer
-		else:
-			print("Warning: tried to remove nonexistent timer with ID {}".format(ID))
-
-	def timer_start(self,ID):
-		if ID in self.timers.keys():
-			self.timers[ID].start()
-		else:
-			print("Warning: tried to start nonexistent timer with ID {}".format(ID))
-
-	def timer_stop(self,ID):
-		if ID in self.timers.keys():
-			self.timers[ID].stop()
-		else:
-			print("Warning: tried to stop nonexistent timer with ID {}".format(ID))
-
-	def timer_connect(self,ID,cxn):
-		if ID in self.timers.keys():
-			self.timers[ID].timeout.connect(cxn)
-		else:
-			print("Warning: tried to connect {} to nonexistent timer with ID {}".format(cxn,ID))
-
-	def timer_disconnect(self,ID):
-		if ID in self.timers.keys():
-			self.timers[ID].timeout.disconnect()
-		else:
-			print("Warning: tried to disconnect nonexistent timer with ID {}".format(ID))
-
-	def timer_set_interval(self,ID,interval_ms):
-		if ID in self.timers.keys():
-			self.timers[ID].setInterval(interval_ms)
-		else:
-			print("Warning: tried to set interval of nonexistent timer with ID {} to {}".format(ID, interval_ms))
-
 
 	
 

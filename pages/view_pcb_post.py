@@ -224,24 +224,7 @@ class func(object):
 					localtime = list(time.localtime(st))
 					dt.setDate(QtCore.QDate(*localtime[0:3]))
 					dt.setTime(QtCore.QTime(*localtime[3:6]))
-			"""
-			run_start = self.step_pcb.run_start
-			run_stop  = self.step_pcb.run_stop
-			if run_start is None:
-				self.page.dtRunStart.setDate(QtCore.QDate(*NO_DATE))
-				self.page.dtRunStart.setTime(QtCore.QTime(0,0,0))
-			else:
-				localtime = list(time.localtime(run_start))
-				self.page.dtRunStart.setDate(QtCore.QDate(*localtime[0:3]))
-				self.page.dtRunStart.setTime(QtCore.QTime(*localtime[3:6]))
-			if run_stop is None:
-				self.page.dtRunStop.setDate(QtCore.QDate(*NO_DATE))
-				self.page.dtRunStop.setTime(QtCore.QTime(0,0,0))
-			else:
-				localtime = list(time.localtime(run_stop))
-				self.page.dtRunStop.setDate(QtCore.QDate(*localtime[0:3]))
-				self.page.dtRunStop.setTime(QtCore.QTime(*localtime[3:6]))
-			"""
+
 			self.page.dsbCureTemperature.setValue(self.step_pcb.cure_temperature if self.step_pcb.cure_temperature else 70)
 			self.page.sbCureHumidity    .setValue(self.step_pcb.cure_humidity    if self.step_pcb.cure_humidity    else 10)
 

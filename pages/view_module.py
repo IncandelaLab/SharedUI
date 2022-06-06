@@ -139,8 +139,6 @@ class func(object):
 		self.page.pbSave.clicked.connect(self.saveEditing)
 		self.page.pbCancel.clicked.connect(self.cancelEditing)
 
-		self.page.pbGoShipment.clicked.connect(self.goShipment)
-
 		self.page.pbGoStepSensor.clicked.connect(   self.goStepSensor   )
 		self.page.pbGoStepPcb.clicked.connect(      self.goStepPcb      )
 		self.page.pbGoBaseplate.clicked.connect(    self.goBaseplate    )
@@ -180,12 +178,7 @@ class func(object):
 		
 		self.module_exists = (ID == self.module.ID)
 		
-		# shipments and location
-		#self.page.leInsertUser.setText("" if self.module.insertion_user is None else self.module.insertion_user)
 		self.page.leLocation.setText("" if self.module.location is None else self.module.location)
-		self.page.listShipments.clear()
-		for shipment in self.module.shipments:
-			self.page.listShipments.addItem(str(shipment))
 
 		# characteristics
 		#self.page.sbChannels.setValue(  -1 if self.module.channels    is None else self.module.channels   )
@@ -248,7 +241,6 @@ class func(object):
 			self.page.leStatus.setText(self.mode)
 
 		module_exists   = self.module_exists
-		shipments_exist = self.page.listShipments.count() > 0
 
 		step_sensor_exists   = self.page.sbStepSensor.value()    >= 0
 		step_pcb_exists      = self.page.sbStepPcb.value()       >= 0
@@ -270,9 +262,6 @@ class func(object):
 		self.page.pbEdit  .setEnabled( mode_view and     module_exists )
 		self.page.pbSave  .setEnabled( mode_creating or mode_editing   )
 		self.page.pbCancel.setEnabled( mode_creating or mode_editing   )
-
-		# shipments and location
-		self.page.pbGoShipment.setEnabled(mode_view and shipments_exist)
 
 		# characteristics
 		#self.page.leInsertUser.setReadOnly( not (mode_creating or mode_editing) )
@@ -447,12 +436,6 @@ class func(object):
 		ID = self.page.leProtomodule.text()
 		if ID != "":
 			self.setUIPage('protomodules',ID=ID)
-
-	@enforce_mode('view')
-	def goShipment(self,*args,**kwargs):
-		item = self.page.listShipments.currentItem()
-		if not (item is None):
-			self.setUIPage('shipments',ID=str(item.text()))
 
 	@enforce_mode('view')
 	def goStepSensor(self,*args,**kwargs):

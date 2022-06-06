@@ -124,8 +124,6 @@ class func(object):
 		self.page.pbSave.clicked.connect(self.saveEditing)
 		self.page.pbCancel.clicked.connect(self.cancelEditing)
 
-		self.page.pbGoShipment.clicked.connect(self.goShipment)
-
 		self.page.pbDeleteComment.clicked.connect(self.deleteComment)
 		self.page.pbAddComment.clicked.connect(self.addComment)
 
@@ -166,10 +164,6 @@ class func(object):
 		self.baseplate_exists = (ID == self.baseplate.ID)  #self.baseplate.load(ID)
 
 		#self.page.leID.setText(self.baseplate.ID)
-
-		self.page.listShipments.clear()
-		for shipment in self.baseplate.shipments:
-			self.page.listShipments.addItem(str(shipment))
 
 		self.page.cbShape      .setCurrentIndex(INDEX_SHAPE.get(      self.baseplate.shape         , -1))
 		#self.page.cbChirality  .setCurrentIndex(INDEX_CHIRALITY.get(  self.baseplate.chirality     , -1))
@@ -236,7 +230,6 @@ class func(object):
 
 		exists = self.baseplate_exists
 		print("UPDATE ELEMENTS:  baseplate exists:", exists)
-		shipments_exist = self.page.listShipments.count() > 0
 
 		#step_kapton_exists   = self.page.sbStepKapton.value()   >=0
 		step_sensor_exists    = self.page.sbStepSensor.value()   >=0
@@ -260,8 +253,6 @@ class func(object):
 		self.page.pbEdit.setEnabled(   mode_view and     exists )
 		self.page.pbSave.setEnabled(   mode_creating or mode_editing )
 		self.page.pbCancel.setEnabled( mode_creating or mode_editing )
-
-		self.page.pbGoShipment.setEnabled(mode_view and shipments_exist)
 
 		self.page.cbShape.setEnabled(               mode_creating or mode_editing  )
 		#self.page.cbChirality.setEnabled(           mode_creating or mode_editing  )
@@ -415,12 +406,6 @@ class func(object):
 			self.page.listComments.addItem(text)
 			self.page.pteWriteComment.clear()
 	
-	@enforce_mode('view')
-	def goShipment(self,*args,**kwargs):
-		item = self.page.listShipments.currentItem()
-		if not (item is None):
-			self.setUIPage('shipments',ID=str(item.text()))
-
 	#@enforce_mode('view')
 	#def goStepKapton(self,*args,**kwargs):
 	#	ID = self.page.sbStepKapton.value()

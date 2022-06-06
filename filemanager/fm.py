@@ -358,7 +358,7 @@ class fsobj(object):
 				#print("_load_from_dict: ordinary XML item {} found!".format(item_name))
 				itemdata = xml_tree.find('.//'+item_name)  # NOTE:  itemdata is an Element, not text!
 				#print("Loaded item text is", itemdata.text, "; item is", item)
-				if itemdata.text is None:
+				if itemdata is None: #itemdata.text is None:
 					print("Found None search result in _load_from_dict(): {}".format(item_name))
 				elif itemdata.text.isdigit():  # If int:
 					idt = int(itemdata.text)

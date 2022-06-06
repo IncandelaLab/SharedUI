@@ -146,8 +146,6 @@ class func(object):
 		self.page.pbSave.clicked.connect(self.saveEditing)
 		self.page.pbCancel.clicked.connect(self.cancelEditing)
 
-		self.page.pbGoShipment.clicked.connect(self.goShipment)
-
 		self.page.pbDeleteComment.clicked.connect(self.deleteComment)
 		self.page.pbAddComment.clicked.connect(self.addComment)
 
@@ -178,10 +176,6 @@ class func(object):
 		self.pcb_exists = (ID == self.pcb.ID)
 		
 		#self.page.leID.setText(self.pcb.ID)
-
-		self.page.listShipments.clear()
-		for shipment in self.pcb.shipments:
-			self.page.listShipments.addItem(str(shipment))
 
 		#self.page.leInsertUser.setText(  "" if self.pcb.insertion_user is None else self.pcb.insertion_user)
 		self.page.leLocation.setText(    "" if self.pcb.location       is None else self.pcb.location    )
@@ -239,7 +233,6 @@ class func(object):
 			self.page.leStatus.setText(self.mode)
 
 		pcb_exists      = self.pcb_exists
-		shipments_exist = self.page.listShipments.count() > 0
 		#daq_data_exists = self.page.listDaqData.count()   > 0
 
 		step_pcb_exists = self.page.sbStepPcb.value() >=0
@@ -261,7 +254,6 @@ class func(object):
 		self.page.pbSave.setEnabled(   mode_editing or mode_creating )
 		self.page.pbCancel.setEnabled( mode_editing or mode_creating )
 
-		self.page.pbGoShipment.setEnabled(mode_view and shipments_exist)
 
 		#self.page.leInsertUser.setReadOnly(   not (mode_creating or mode_editing) )
 		self.page.leLocation.setReadOnly(     not (mode_creating or mode_editing) )
@@ -401,12 +393,6 @@ class func(object):
 		if text:
 			self.page.listComments.addItem(text)
 			self.page.pteWriteComment.clear()
-
-	@enforce_mode('view')
-	def goShipment(self,*args,**kwargs):
-		item = self.page.listShipments.currentItem()
-		if not (item is None):
-			self.setUIPage('shipments',ID=str(item.text()))
 
 	@enforce_mode('view')
 	def goModule(self,*args,**kwargs):
