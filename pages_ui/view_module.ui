@@ -81,7 +81,7 @@
    <property name="geometry">
     <rect>
      <x>250</x>
-     <y>379</y>
+     <y>360</y>
      <width>41</width>
      <height>21</height>
     </rect>
@@ -94,7 +94,7 @@
    <property name="geometry">
     <rect>
      <x>250</x>
-     <y>399</y>
+     <y>380</y>
      <width>41</width>
      <height>21</height>
     </rect>
@@ -107,7 +107,7 @@
    <property name="geometry">
     <rect>
      <x>250</x>
-     <y>419</y>
+     <y>400</y>
      <width>41</width>
      <height>21</height>
     </rect>
@@ -267,7 +267,7 @@
    <property name="geometry">
     <rect>
      <x>250</x>
-     <y>359</y>
+     <y>340</y>
      <width>41</width>
      <height>21</height>
     </rect>
@@ -276,11 +276,11 @@
     <string>Go to</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pbGoStepKapton">
+  <widget class="QPushButton" name="pbGoProtomodule">
    <property name="geometry">
     <rect>
      <x>250</x>
-     <y>319</y>
+     <y>420</y>
      <width>41</width>
      <height>21</height>
     </rect>
@@ -293,7 +293,7 @@
    <property name="geometry">
     <rect>
      <x>250</x>
-     <y>339</y>
+     <y>320</y>
      <width>41</width>
      <height>21</height>
     </rect>
@@ -471,19 +471,6 @@
    </property>
    <property name="readOnly">
     <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbGoProtomodule">
-   <property name="geometry">
-    <rect>
-     <x>250</x>
-     <y>439</y>
-     <width>41</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Go to</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="lineEdit_52">
@@ -1055,7 +1042,7 @@
     </property>
    </item>
   </widget>
-  <widget class="QDoubleSpinBox" name="dsbThickness_2">
+  <widget class="QDoubleSpinBox" name="dsbFlatness">
    <property name="geometry">
     <rect>
      <x>520</x>

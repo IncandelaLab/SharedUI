@@ -1,9 +1,9 @@
-import os
 import json
 import numpy
 import time
 import subprocess
 import glob
+import os
 
 #NEW for xml file generation:
 from PyQt5 import QtCore
@@ -1530,10 +1530,6 @@ class sensor(fsobj_part):
 		"step_sensor", # which step_sensor placed this sensor
 		"protomodule", # which protomodule this sensor is a part of
 
-		# NOTE:  kapton step has been moved to sensor!
-		"step_kapton",
-		"check_glue_spill",
-
 		# associations to other objects
 		"module", # which module this sensor is a part of
 
@@ -1838,7 +1834,6 @@ class protomodule(fsobj_part):
 		"step_sensor", # ID of sensor step
 		"baseplate",   # ID of baseplate
 		"sensor",      # ID of sensor
-		"step_kapton", # ID of kapton step (from SENSOR)
 
 		# protomodule qualification
 		"offset_translation_x", # translational offset of placement
@@ -2023,13 +2018,13 @@ class module(fsobj_part):
 		"grade",
 		#"chirality",   # from protomodule or pcb (identical)
 		# initial location is also filled from child parts
+		"inspection",  # may want to get rid of this / move it to the assembly page
 
 		# components and steps - filled upon creation
 		"baseplate",     # 
 		"sensor",        # 
 		"protomodule",   # 
 		"pcb",           # 
-		"step_kapton",   # 
 		"step_sensor",   # 
 		"step_pcb",      # 
 
