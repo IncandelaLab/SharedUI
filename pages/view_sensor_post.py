@@ -3,7 +3,7 @@ import time
 import datetime
 # for xml loading:
 import csv
-import xml.etree.ElementTree as ET
+from xml.etree.ElementTree import parse
 
 from filemanager import fm
 
@@ -28,6 +28,12 @@ INDEX_GRADE = {
 	'A':0,
 	'B':1,
 	'C':2,
+}
+
+INDEX_COLOR_GRADE = {
+	'GREEN':0,
+	'YELLOW':1,
+	'RED':2,
 }
 
 STATUS_NO_ISSUES = "valid (no issues)"
@@ -55,7 +61,6 @@ class Filewindow(QWidget):
 	def getfile(self,*args,**kwargs):
 		fname, fmt = QFileDialog.getOpenFileName(self, 'Open file', '~',"(*.xml)")
 		#dname = str(QFileDialog.getExistingDirectory(self, "Select directory"))
-		print("File dialog:  got file", fname)
 		return fname
 
 
@@ -244,7 +249,6 @@ class func(object):
 			self.page.dsbCureTemperature.setValue(self.step_sensor.cure_temperature if self.step_sensor.cure_temperature else 70)
 			self.page.sbCureHumidity    .setValue(self.step_sensor.cure_humidity    if self.step_sensor.cure_humidity    else 10)
 
-			print("xml_data_file is:", self.step_sensor.xml_data_file)
 			self.page.leXML.setText(self.step_sensor.xml_data_file if self.step_sensor.xml_data_file else "")
 
 			if not (self.step_sensor.protomodules is None):
@@ -307,8 +311,6 @@ class func(object):
 		self.page.pbCureStartNow     .setEnabled(mode_editing)
 		self.page.pbCureStopNow      .setEnabled(mode_editing)
 
-		#self.page.cbUserPerformed  .setEnabled(mode_editing)
-		#self.page.leLocation       .setReadOnly(mode_view)
 		self.page.dtCureStart      .setReadOnly(mode_view)
 		self.page.dtCureStop       .setReadOnly(mode_view)
 		self.page.dsbCureTemperature.setReadOnly(mode_view)
@@ -355,51 +357,6 @@ class func(object):
 
 		if self.step_sensor.institution is None:
 			issues.append(I_INSTITUTION_NOT_SELECTED)
-
-
-
-		# rows
-		rows_empty           = []
-		rows_full            = []
-		rows_incomplete      = []
-		
-		for i in range(6):
-			num_parts = 0
-
-			if num_parts == 0:
-				rows_empty.append(i)
-			elif num_parts == 3:
-				rows_full.append(i)
-			else:
-				rows_incomplete.append(i)
-		
-
-		if not (len(rows_full) or len(rows_incomplete)):
-			issues.append(I_NO_PARTS_SELECTED)
-
-		if rows_incomplete:
-			issues.append(I_ROWS_INCOMPLETE.format(', '.join(map(str,rows_incomplete))))
-
-
-		objects_8in = []
-		objects_not_here = []
-
-		for obj in objects:
-
-			size = getattr(obj, "size", None)
-			if size in [8.0, 8, '8']:
-				objects_8in.append(obj)
-
-			institution = getattr(obj, "institution", None)
-			if not (institution in [None, self.page.cbInstitution.currentText()]):
-				objects_not_here.append(obj)
-
-		if len(objects_8in):
-			issues.append(I_SIZE_MISMATCH)
-			issues.append(I_SIZE_MISMATCH_8.format(', '.join([str(_) for _ in objects_8in])))
-
-		if objects_not_here:
-			issues.append(I_INSTITUTION.format([str(_) for _ in objects_not_here]))
 
 
 		self.page.listIssues.clear()
@@ -452,6 +409,8 @@ class func(object):
 
 		self.step_sensor.cure_humidity = self.page.sbCureHumidity.value()
 		self.step_sensor.cure_temperature = self.page.dsbCureTemperature.value()
+
+		self.step_sensor.xml_data_file = self.page.leXML.text()
 
 		for i in range(6):
 			if self.step_sensor.protomodules[i] is None:  continue
@@ -519,19 +478,26 @@ class func(object):
 		# (reminder: all data is stored in the PAGE ELEMENTS until save() is called.)
 		# (update_info is not called during editing until after save() is called.)
 
+		if filename == '':  return
+
 		# FOR NOW:  Only load data into the first row.
 		xml_tree = parse(filename)  # elementtree object
-
 		
 		itemdata = xml_tree.find('.//FIDUCIAL1')
-		self.page.dsb_offsets_rot[0].setValue(float(itemdata.text))
+		print("Found rot value:", itemdata.text)
+		self.dsb_offsets_rot[0].setValue(float(itemdata.text))
 		itemdata = xml_tree.find('.//X')
-		self.page.dsb_offsets_x[0].setValue(float(itemdata.text))
+		print("Found X value:", itemdata.text)
+		self.dsb_offsets_x[0].setValue(float(itemdata.text))
 		itemdata = xml_tree.find('.//Y')
-		self.page.dsb_offsets_y[0].setValue(float(itemdata.text))
-		#itemdata = xml_tree.find('.//')
+		print("Found Y value:", itemdata.text)
+		self.dsb_offsets_y[0].setValue(float(itemdata.text))
+		itemdata = xml_tree.find('.//MEAN')
+		self.dsb_thickness[0].setValue(float(itemdata.text))
+		itemdata = xml_tree.find('.//GRADE')
+		self.cb_grades[0].setCurrentIndex(INDEX_COLOR_GRADE[itemdata.text])
 
-		leXML.setText(filename)
+		self.page.leXML.setText(filename)
 
 
 	@enforce_mode('view')

@@ -1,8 +1,13 @@
 from PyQt5 import QtCore
 import time
 import datetime
+# for xml loading:
+import csv
+from xml.etree.ElementTree import parse
 
 from filemanager import fm
+
+from PyQt5.QtWidgets import QFileDialog, QWidget
 
 NO_DATE = [2020,1,1]
 
@@ -25,6 +30,12 @@ INDEX_GRADE = {
 	'C':2,
 }
 
+INDEX_COLOR_GRADE = {
+	'GREEN':0,
+	'YELLOW':1,
+	'RED':2,
+}
+
 STATUS_NO_ISSUES = "valid (no issues)"
 STATUS_ISSUES    = "invalid (issues present)"
 
@@ -39,11 +50,13 @@ I_SIZE_MISMATCH_8 = "* list of 8-inch objects selected: {}"
 # institution
 I_INSTITUTION = "some selected objects are not at this institution: {}"
 
-# Missing user
-I_USER_DNE = "no kapton step user selected"
+class Filewindow(QWidget):
+    def __init__(self):
+        super(Filewindow, self).__init__()
 
-# NEW
-I_INSTITUTION_NOT_SELECTED = "no institution selected"
+    def getfile(self,*args,**kwargs):
+        fname, fmt = QFileDialog.getOpenFileName(self, 'Open file', '~',"(*.xml)")
+        return fname
 
 
 class func(object):
@@ -55,7 +68,7 @@ class func(object):
 		self.modules      = [fm.module()      for _ in range(6)]
 
 		self.step_pcb = fm.step_pcb()
-		self.step_pcb_exists = False
+		self.step_pcb_exists = None
 
 		self.mode = 'setup'
 
@@ -189,10 +202,8 @@ class func(object):
 		self.page.pbCureStartNow    .clicked.connect(self.setCureStartNow)
 		self.page.pbCureStopNow     .clicked.connect(self.setCureStopNow)
 
-		#auth_users = fm.userManager.getAuthorizedUsers(PAGE_NAME)
-		#self.index_users = {auth_users[i]:i for i in range(len(auth_users))}
-		#for user in self.index_users.keys():
-		#	self.page.cbUserPerformed.addItem(user)
+		self.page.pbAddFile.clicked.connect(self.loadXMLFile)
+		self.fwnd = Filewindow()
 
 
 	@enforce_mode(['view','editing'])
@@ -227,6 +238,7 @@ class func(object):
 
 			self.page.dsbCureTemperature.setValue(self.step_pcb.cure_temperature if self.step_pcb.cure_temperature else 70)
 			self.page.sbCureHumidity    .setValue(self.step_pcb.cure_humidity    if self.step_pcb.cure_humidity    else 10)
+			self.page.leXML.setText(self.step_pcb.xml_data_file if self.step_pcb.xml_data_file else "")
 
 			if not (self.step_pcb.modules is None):
 				for i in range(6):
@@ -238,6 +250,7 @@ class func(object):
 					self.dsb_offsets_rot[i].setValue(mod.offset_rotation     if not (mod.offset_rotation      is None) else 0)
 					self.dsb_thickness[i]  .setValue(mod.thickness            if not (mod.thickness            is None) else 0)
 					self.dsb_flatness[i]   .setValue(mod.flatness             if not (mod.flatness             is None) else 0)
+					self.cb_grades[i]      .setCurrentIndex(INDEX_GRADE.get(mod.grade, -1))
 
 			else:
 				for i  in range(6):
@@ -247,6 +260,7 @@ class func(object):
 					self.dsb_offsets_rot[i].setValue(0)
 					self.dsb_thickness[i].setValue(-1)
 					self.dsb_flatness[i].setValue(0)
+					self.cb_grades[i].setCurrentIndex(-1)
 
 		else:
 			self.page.cbInstitution.setCurrentIndex(-1)
@@ -257,6 +271,8 @@ class func(object):
 
 			self.page.dsbCureTemperature.setValue(-1)
 			self.page.sbCureHumidity.setValue(-1)
+			self.page.leXML.setText("")
+
 			for i in range(6):
 				self.le_modules[i].setText("")
 				self.dsb_offsets_x[i].setValue(0)
@@ -264,6 +280,7 @@ class func(object):
 				self.dsb_offsets_rot[i].setValue(0)
 				self.dsb_thickness[i].setValue(-1)
 				self.dsb_flatness[i].setValue(0)
+				self.cb_grades[i].setCurrentIndex(-1)
 
 		
 		self.updateElements()
@@ -283,12 +300,12 @@ class func(object):
 		self.page.pbCureStartNow     .setEnabled(mode_editing)
 		self.page.pbCureStopNow      .setEnabled(mode_editing)
 
-		#self.page.cbUserPerformed  .setEnabled(mode_editing)
 		self.page.dtCureStart      .setReadOnly(mode_view)
 		self.page.dtCureStop       .setReadOnly(mode_view)
-
 		self.page.dsbCureTemperature.setReadOnly(mode_view)
 		self.page.sbCureHumidity   .setReadOnly(mode_view)
+
+		self.page.pbAddFile.setEnabled(mode_editing)
 
 		for i in range(6):
 			self.pb_go_modules[i].setEnabled(     mode_view and modules_exist[i]     )
@@ -323,7 +340,6 @@ class func(object):
 		for i in range(6):
 			self.modules[i].clear()
 
-
 	#NEW:  Add updateIssues and modify conditions accordingly
 	@enforce_mode('editing')
 	def updateIssues(self,*args,**kwargs):
@@ -333,48 +349,6 @@ class func(object):
 		if self.step_pcb.institution is None:
 			issues.append(I_INSTITUTION_NOT_SELECTED)
 
-		#New
-		modules_selected      = [_.text() for _ in self.le_modules      ]
-
-		rows_empty           = []
-		rows_full            = []
-		rows_incomplete      = []
-
-		"""
-		for i in range(6):
-
-			# TO DO:  Add code to check for empty rows/fields here
-
-			num_parts = 0
-			#if num_parts == 0:
-			#	rows_empty.append(i)
-			#elif num_parts == 4: #2:
-			#	rows_full.append(i)
-			#else:
-			#	rows_incomplete.append(i)
-		"""
-
-		if not (len(rows_full) or len(rows_incomplete)):
-			issues.append(I_NO_PARTS_SELECTED)
-
-		if rows_incomplete:
-			issues.append(I_ROWS_INCOMPLETE.format(', '.join(map(str,rows_incomplete))))
-
-
-		objects_not_here = []
-
-		for obj in objects:
-
-			size = getattr(obj, "size", None)
-			if size in [8.0, 8, '8']:
-				objects_8in.append(obj)
-
-			institution = getattr(obj, "institution", None)
-			if not (institution in [None, self.page.cbInstitution.currentText()]):  #self.MAC]):
-				objects_not_here.append(obj)
-
-		if objects_not_here:
-			issues.append(I_INSTITUTION.format([str(_) for _ in objects_not_here]))
 
 		self.page.listIssues.clear()
 		for issue in issues:
@@ -428,7 +402,7 @@ class func(object):
 		self.step_pcb.cure_humidity = self.page.sbCureHumidity.value()
 		self.step_pcb.cure_temperature = self.page.dsbCureTemperature.value()
 
-
+		self.step_pcb.xml_data_file = self.page.leXML.text()
 
 		for i in range(6):
 			if self.step_pcb.modules[i] is None:  continue
@@ -479,6 +453,36 @@ class func(object):
 			return []
 		else:
 			return self.step_pcb.filesToUpload()
+
+
+	def loadXMLFile(self, *args, **kwargs):
+		filename = self.fwnd.getfile()
+		# NOTE:  Only pass data to page fields.  DO NOT save to proto object
+		# Only assign data during explicit save() call, so cancellation works normally!
+		# (reminder: all data is stored in the PAGE ELEMENTS until save() is called.)
+		# (update_info is not called during editing until after save() is called.)
+
+		if filename == '':  return
+
+		# FOR NOW:  Only load data into the first row.
+		xml_tree = parse(filename)  # elementtree object
+		
+		itemdata = xml_tree.find('.//FIDUCIAL1')
+		print("Found rot value:", itemdata.text)
+		self.dsb_offsets_rot[0].setValue(float(itemdata.text))
+		itemdata = xml_tree.find('.//X')
+		print("Found X value:", itemdata.text)
+		self.dsb_offsets_x[0].setValue(float(itemdata.text))
+		itemdata = xml_tree.find('.//Y')
+		print("Found Y value:", itemdata.text)
+		self.dsb_offsets_y[0].setValue(float(itemdata.text))
+		itemdata = xml_tree.find('.//MEAN')
+		self.dsb_thickness[0].setValue(float(itemdata.text))
+		itemdata = xml_tree.find('.//GRADE')
+		self.cb_grades[0].setCurrentIndex(INDEX_COLOR_GRADE[itemdata.text])
+
+		self.page.leXML.setText(filename)
+
 
 
 	@enforce_mode('view')
