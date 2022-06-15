@@ -1,7 +1,5 @@
 import json
-import numpy
 import time
-import subprocess
 import glob
 import os
 
@@ -169,7 +167,7 @@ class UserManager:
 
 	def removeUser(self, username):
 		if not username in self.getAllUsers():
-			print("WARNING:  Attempting to delete nonexistent user")
+			print("ERROR:  Attempted to delete nonexistent user")
 			return False
 		else:
 			userindex = list(self.getAllUsers()).index(username)
@@ -182,7 +180,6 @@ class UserManager:
 
 	def getAuthorizedUsers(self, pagename):
 		page_index = self.pageList.index(pagename)
-		print("GETTING AUTH USERS FOR {}.  page index={}.".format(pagename, page_index))
 		return [user['username'] for user in self.userList if user['permissions'][page_index]]
 
 	def getAdminUsers(self):
@@ -235,10 +232,7 @@ class fsobj(object):
 		'baseplate':'HGC Eight Inch Plate',  #COMPLICATION
 	}
 
-	# NEW:
-	#PARTS_LIST = ['baseplate':, 'sensor', 'pcb', 'protomodule', 'module']
-	# Similarly...
-	# Must be a dict, since need to access different tables for each one!
+	# MAYBE:
 	# First table is the basic table; second table is the cond info
 	#CONDS_DICT = {'step_sensor': ['c4220', 'c4260'],
 	#			  'step_pcb':    ['c4240', 'c4280']
@@ -248,6 +242,7 @@ class fsobj(object):
 	XML_STRUCT_DICT = None  # Should not use the base class!
 
 	# List of all class vars that are saved as a list--e.g. comments, shipment parts, etc.
+	# Will be handled differently from normal xml items
 	ITEMLIST_LIST = ['comments']
 
 	def __init__(self):
@@ -295,95 +290,64 @@ class fsobj(object):
 			json.dump(data, opfl)
 
 
-	# NOW OUTDATED; see below for new version
-	"""
-	def save(self, objname = 'fsobj'):  #NOTE:  objname param is new
-		# NOTE:  Can't check item existence via filepath existence, bc filepath isn't known until after item creation!
-		# Instead, go into partlist dict and check to see whether item exists:
-		part_name = self.__class__.__name__
-		self.partlistfile = os.sep.join([ DATADIR, 'partlist', part_name+'s.json' ])
-		with open(self.partlistfile, 'r') as opfl:
-			data = json.load(opfl)
-			if not self.ID in data.keys():
-				# Object does not exist, so can't get filedir from get_filedir_filename()
-				# ...until the date has been set via add_part_to_list.  Do that now.
-				self.add_part_to_list()				
-
-		filedir, filename = self.get_filedir_filename(self.ID)
-		file = os.sep.join([filedir, filename])
-		if not os.path.exists(filedir):
-			os.makedirs(filedir)
-
-
-		# OLD, FOR JSON:
-		with open(file, 'w') as opfl:
-			if hasattr(self, 'PROPERTIES_DO_NOT_SAVE'):
-				contents = vars(self)
-				filtered_contents = {_:contents[_] for _ in contents.keys() if _ not in self.PROPERTIES_DO_NOT_SAVE}
-				json.dump(filtered_contents, opfl, indent=4)
-			else:
-				json.dump(vars(self), opfl, indent=4)
-		"""
-
-	# USE XML_STRUCT_DICT to find vars in the XML tree and assign them to vars/properties
-	# Changes:
-	# - Don't need to worry about PROPERTIES_DO_NOT_SAVE; ignore them
-	# - ...can basically ignorne the below, because the new method is radically different
-
-	# Recursively look through dict.  For each element found, assign XML value to corresponding var/property.
-	# - If dict, recusive case.
-	# - If list, create multiple elements w/ same tag.
-	# - Else assign normally.
-	# Utility used for load():  Set vars of obj using struct_dict, xml_tree
-	def _load_from_dict(self, struct_dict, xml_tree):
-		#print("ITEMLIST LIST IS:")
-		#print("    ", self.ITEMLIST_LIST)
-		for item_name, item in struct_dict.items():
-			# item_name = XML tag name, item = name of var/prop to assign
-			if type(item) is dict:
-				self._load_from_dict(item, xml_tree)
-			# If item must be stored as a list in the class:
-			elif item in self.ITEMLIST_LIST:  #len(xml_tree.findall(item_name)) > 1:  # If multiple items found:
-				itemdata = xml_tree.findall('.//'+item_name)  # List of all contents of matching tags
-				# NOTE:  Items could be text or ints!  Convert accordingly.
-				itemdata = [self._convert_str(it.text) for it in itemdata]
-				#print("_load_from_dict:  list item {} found!  Contents: {}".format(item, itemdata))
-				if itemdata == []:
-					setattr(self, item, None)
-				elif itemdata == ['[]'] or itemdata == '[]':
-					setattr(self, item, [])
-				else:
-					setattr(self, item, itemdata)  # Should be a list containing contents; just assign it to the var
-			else:
-				#print("_load_from_dict: ordinary XML item {} found!".format(item_name))
-				itemdata = xml_tree.find('.//'+item_name)  # NOTE:  itemdata is an Element, not text!
-				#print("Loaded item text is", itemdata.text, "; item is", item)
-				if itemdata is None: #itemdata.text is None:
-					print("Found None search result in _load_from_dict(): {}".format(item_name))
-				elif itemdata.text.isdigit():  # If int:
-					idt = int(itemdata.text)
-				elif itemdata.text.replace('.','',1).isdigit():  # If float:
-					idt = float(itemdata.text)
-				elif itemdata.text == 'True':  idt = True
-				elif itemdata.text == 'False': idt = False
-				elif itemdata.text == 'None':  idt = None
-				else:  # If string
-					idt = itemdata.text
-				setattr(self, item, idt)
-
-	# Utility:  Take a string from an XML element and return a var w/ the correct type
+	# Utility for _load_...:  Take a string from an XML element and return a var w/ the correct type
 	# "True" -> bool, 100 -> int, etc.
 	def _convert_str(self, string):
 		if string.isdigit():
 			return int(string)
 		elif string.replace('.','',1).isdigit():
 			return float(string)
-		elif string == "True" or string == "False":
+		elif string in ["True", "False"]:
 			return bool(string)
 		elif string == "None":
 			return None
 		else:
 			return string
+
+
+	# USE XML_STRUCT_DICT to find vars in the XML tree and assign them to vars/properties
+	# Changes:
+	# - Don't need to worry about PROPERTIES_DO_NOT_SAVE; ignore them
+	# - ...can basically ignorne the below, because the new method is radically different
+
+	# Utility used for load():  Set vars of obj using struct_dict, xml_tree
+	# Recursively look through dict.  For each element found, assign XML value to corresponding var/property.
+	# - If dict, recusive case.
+	# - If list, create multiple elements w/ same tag.
+	# - Else assign normally.
+	def _load_from_dict(self, struct_dict, xml_tree):
+		for item_name, item in struct_dict.items():
+			# item_name = XML tag name, item = name of var/prop to assign
+			# If dict, recursive case.
+			if type(item) is dict:
+				self._load_from_dict(item, xml_tree)
+			# If list item, load all elements:
+			elif item in self.ITEMLIST_LIST:
+				itemdata = xml_tree.findall('.//'+item_name)  # List of all contents of matching tags
+				# NOTE:  Items could be text or ints!  Convert accordingly.
+				itemdata = [self._convert_str(it.text) for it in itemdata]
+				if itemdata == []:
+					setattr(self, item, None)
+				elif itemdata == ['[]'] or itemdata == '[]':
+					setattr(self, item, [])
+				else:
+					setattr(self, item, itemdata)  # Should be a list containing contents; just assign it to the var
+			# if ordinary item, convert from str and assign
+			else:
+				itemdata = xml_tree.find('.//'+item_name)  # NOTE:  itemdata is an Element, not text!
+				if itemdata is None: #itemdata.text is None:
+					print("ERROR:  Found None search result in _load_from_dict(): {}".format(item_name))
+				#elif itemdata.text.isdigit():  # If int:
+				#	idt = int(itemdata.text)
+				#elif itemdata.text.replace('.','',1).isdigit():  # If float:
+				#	idt = float(itemdata.text)
+				#elif itemdata.text == 'True':  idt = True
+				#elif itemdata.text == 'False': idt = False
+				#elif itemdata.text == 'None':  idt = None
+				#else:  # If string
+				#	idt = itemdata.text
+				idt = self._convert_str(itemdata.text)
+				setattr(self, item, idt)
 
 
 	def load(self, ID, on_property_missing = "warn"):
@@ -396,7 +360,6 @@ class fsobj(object):
 		with open(self.partlistfile, 'r') as opfl:
 			data = json.load(opfl)
 			if not str(ID) in data.keys():
-				# FOR NOW:
 				self.clear()
 				return False
 
@@ -408,7 +371,6 @@ class fsobj(object):
 			return False
 
 		xml_tree = parse(xml_file)
-
 		self._load_from_dict(self.XML_STRUCT_DICT, xml_tree)
 
 		self.ID = ID
@@ -423,17 +385,6 @@ class fsobj(object):
 		for prop in PROPERTIES:
 			setattr(self, prop, DEFAULTS[prop] if prop in DEFAULTS.keys() else None)
 
-		# REMOVED, moved to save().  Doesn't seem necessary?+interfered w/ cancelling steps
-		"""
-		part_name = self.__class__.__name__
-		self.partlistfile = os.sep.join([ DATADIR, 'partlist', part_name+'s.json' ])
-		with open(self.partlistfile, 'r') as opfl:
-			data = json.load(opfl)
-			if not self.ID in data.keys():
-				# Object does not exist, so can't get filedir from get_filedir_filename()
-				# ...until the date has been set via add_part_to_list.  Do that now.
-				self.add_part_to_list()
-		"""
 
 	def clear(self):
 		self.ID = None
@@ -446,8 +397,6 @@ class fsobj(object):
 		# Attempts to use an object when it has been cleared are meant to produce errors
 
 
-
-
 	def generate_xml(self, input_dict):
 		# Generate XML ElementTree from input_dictionary, and return the ElementTree.
 		# Note:  does not save XML file!
@@ -457,41 +406,10 @@ class fsobj(object):
 		root = Element('ROOT')
 		root.set('xmlns:xsi','http://www.w3.org/2001/XMLSchema-instance')
 		tree = ElementTree(root)
-		print("CALLING generate_xml().  Full dict is:")
-		print(input_dict)
 
 		for item_name, item in input_dict.items():
-			# Note:  Need to add a case if one of the items is a list.
-			# For files where multiple DATA_SETs w/ the same name are needed.
-			# ...problem:  Don't necessarily know how many DATA SETS in advance.
-			# (Note:  Might not actually want this)
-			"""
-			if type(item) == list:
-				print("  List found in generate_xml.  Calling dict to element...", item)
-				for item_ in item:
-					child = self.dict_to_element(item_, item_name)
-					root.append(child)
-			"""
 			if item_name == "DATA_SET":
 				self.make_dataset_element(root, item)
-				"""
-				# Special treatment.  First, find number of datasets to save, one for each module/protomodule:
-				num_parts = 0
-				protomodules = getattr(self, 'protomodules', None)
-				modules = getattr(self, 'modules', None)
-				if protomodules:
-					num_parts = sum([1 for p in protomodules if p])  # List with Nones if no protomodule
-				elif modules:
-					num_parts = sum([1 for p in modules if p])
-				else:  print("ERROR: failed to find protomodules, modules in generate_xml()!")
-				dataset_dict = getattr(self, item, None)
-				if not dataset_dict:  print("ERROR: failed to find dataset dict!")
-				print("Creating DATA_SET_DICT, num parts is", num_parts)
-				for i in range(num_parts):
-					# Create a DATA_SET for each part
-					child = self.dict_to_element(dataset_dict, item_name, data_set_index=i)
-					root.append(child)
-				"""
 			else:
 				print("  List not found in generate_xml.  Calling dict to element on...")
 				print(item, item_name)
@@ -512,7 +430,6 @@ class fsobj(object):
 		else:  print("ERROR: failed to find protomodules, modules in generate_xml()!")
 		dataset_dict = getattr(self, item, None)
 		if not dataset_dict:  print("ERROR: failed to find dataset dict!")
-		print("Creating DATA_SET_DICT, num parts is", num_parts)
 		for i in range(num_parts):
 			# Create a DATA_SET for each part
 			child = self.dict_to_element(dataset_dict, "DATA_SET", data_set_index=i)
@@ -520,19 +437,19 @@ class fsobj(object):
 
 
 	def dict_to_element(self, input_dict, element_name, data_set_index=None):
+		# Utility for save()
 		# Reads a dictionary, and returns an XML element 'element_name' filled with the contents of the current object
 		# structured according to that dictionary.
 		# NOTE:  This must be able to work recursively.  I.e. if one of the objs in the input_dict is a dict,
 		#    it reads *that* dictionary and creates an element for it, +appends it to current element.  Etc.
-		print("***dict_to_element:*** element {}, input dict is".format(element_name))
-		print(input_dict, type(input_dict))
-		print("data_set_index:", data_set_index)
+		#print("***dict_to_element:*** element {}, input dict is".format(element_name))
+		#print(input_dict, type(input_dict))
+		#print("data_set_index:", data_set_index)
 
 		# NEW:  Add special case for multi-item assembly steps.  Will always appear in DATA_SET dict.
-		# If in DATA_SET, data_set_index will NOT be None.  If not None, and a list is found, return element i instead of the usual list handling case.
-		# ALT (since need to append all 6 DSs in special case:
+		# If in DATA_SET, data_set_index will NOT be None.  If not None, and the requested item is a list, 
+		# 	return element i instead of the usual list handling case.
 
-		
 		parent = Element(element_name)
 		
 		for item_name, item in input_dict.items():
@@ -544,7 +461,6 @@ class fsobj(object):
 			if item_name == "DATA_SET":
 				self.make_dataset_element(parent, item)
 			elif type(item) == dict:
-				print("  **Dict found.  Calling recursive case...")
 				# Recursive case: Create an element from the child dictionary.
 				# "Remember" whether currently in a DATA_SET
 				child = self.dict_to_element(item, item_name, data_set_index=data_set_index)
@@ -555,20 +471,16 @@ class fsobj(object):
 			elif type(item) == list:
 				# Second recursive case:  for multiple parts, etc
 				print("    Found list of vals to store for", item_name, item)
-				# "PART":[{part_dict_1}, {part_dict_2}]; both have to be labeled w/ "PART"
 				for it in item:
 					# For each item, create elements recursively and append to parent
 					ch = self.dict_to_element(it, item_name, data_set_index=data_set_index)
 					if item_name == "PART":
 						ch.set('mode', 'auto')
 					parent.append(ch)
-			elif type(getattr(self, item, None)) == list:  #type(item) == list:
+			elif type(getattr(self, item, None)) == list:
 				# Base case 1:  List of comments.  Create an element for each one.
-				print("    Found list: ", getattr(self, item, None))
-
-				# If currently in a DATA_SET, need to treat differently!
+				# If currently in a DATA_SET, grab the ith element!
 				if data_set_index != None:
-					#print("\nFOUND DATA_SET LIST!  Adding item i:", data_set_index, str(getattr(self, item, None)[data_set_index]), '\n')
 					child = Element(item_name)
 					child.text = str(getattr(self, item, None)[data_set_index])
 					parent.append(child)
@@ -583,59 +495,42 @@ class fsobj(object):
 						child.text = str(comment)
 						parent.append(child)
 			else:
-				print("    INSERTING BASE ITEM", item_name, item)
 				# Base case 2:
 				child = Element(item_name)
 				child.text = str(getattr(self, item, None))  # item should be the var name!
 				# Fill attrs that don't exist w/ None
-				# This SHOULD work with properties!
-				print("    Creating element {} with contents {}".format(item_name, child.text))
 				parent.append(child)
 
 		return parent
 
 
-	# NEWLY REWORKED
 	# Should be fully general--all objects can use this if XML_STRUCT_DICT works.
 	# Need separate implementation for tools?
 	# NOTE:  Can pass new_struct_dict if multiple XML files must be saved for a part/assembly step.
-	def save(self):  #save_xml(self, xml_tree):
-		#if new_struct_dict is None and not new_fname is None:
-		#	print("ERROR IN SAVE():  Got a new struct dict, but not a corresponding filename!")
-
+	def save(self):
 		# NOTE:  Can't check item existence via filepath existence, bc filepath isn't known until after item creation!
 		# Instead, go into partlist dict and check to see whether item exists:
-		print("Calling fsobj save")
 		part_name = self.__class__.__name__
 		self.partlistfile = os.sep.join([ DATADIR, 'partlist', part_name+'s.json' ])
 		with open(self.partlistfile, 'r') as opfl:
 			data = json.load(opfl)
-			if not str(self.ID) in data.keys():  # Note:  str(self.ID) saved in add_part_to_list
-				# Object does not exist, so can't get filedir from get_filedir_filename()
+			if not str(self.ID) in data.keys():
+				# Object does not exist, so can't get filedir from get_filedir_filename()...
 				# ...until the date has been set via add_part_to_list.  Do that now.
 				self.add_part_to_list()
-		# Now redundant
-		#filedir, filename = self.get_filedir_filename(self.ID)
-		#file = os.sep.join([filedir, filename])
-		#if not os.path.exists(filedir):
-		#	os.makedirs(filedir)
 
 		# Generate XML tree:
 		struct_dict = self.XML_STRUCT_DICT
 
-		xml_tree = self.generate_xml(struct_dict)  #self.XML_STRUCT_DICT)
+		xml_tree = self.generate_xml(struct_dict)
 
 		# Save xml file:
-		# Store in same directory as .json files, w/ same name:
-		filedir, filename = self.get_filedir_filename()  # self.ID)  #This should be unnecessary...
-		print("Filedir, filename are:", filedir, filename)
-		#filename = filename.replace('.json', '.xml')
+		filedir, filename = self.get_filedir_filename()
 		if not os.path.exists(filedir):
 			os.makedirs(filedir)
-		print("Saving XML file to ", filedir+'/'+filename)
 		root = xml_tree.getroot()
-		xmlstr = minidom.parseString(tostring(root)).toprettyxml(indent = '    ')  #tostring imported from xml.etree.ElementTree
-		#xml_tree.write(open(filedir+'/'+filename), 'wb')  #.replace('.json', '.xml'), 'wb'))
+		#tostring imported from xml.etree.ElementTree
+		xmlstr = minidom.parseString(tostring(root)).toprettyxml(indent = '    ')
 		with open(filedir+'/'+filename, 'w') as f:
 			f.write(xmlstr)
 
@@ -644,7 +539,6 @@ class fsobj(object):
 	def filesToUpload(self):
 		fdir, fname = self.get_filedir_filename()
 		# Grab all files in that directory
-		print("Preparing to upload {}, files {}".format(self, glob.glob(fdir + "/*upload*")))
 		return glob.glob(fdir + "/*upload*")
 
 	# NEW:  All parts/assembly steps use this, bc can't write multiple XML tags w/ same name
@@ -652,11 +546,13 @@ class fsobj(object):
 	def comments_concat(self):
 		cmts = ';;'.join(self.comments)
 		# Impose len reqt of 4000 chars (for DB)
-		if len(cmts) > 4000:  cmts = cmts[:4000]
+		if len(cmts) > 4000:
+			print("WARNING:  comment length exceeds 4000 chars - excess chars removed")
+			cmts = cmts[:4000]
 		return cmts
 
 
-# NEW FOR TOOLING:
+# CLASS FOR TOOLS:
 # These need to be treated separately because they're saved based on ID+institution and not just institution
 # Mostly identical to fsobj, but with institution added as a primary key.
 
@@ -688,8 +584,7 @@ class fsobj_tool(fsobj):
 		filename = self.FILENAME.format(ID=ID, institution=institution)
 		return filedir, filename
 
-	# NEW:  For search page
-	# Added
+	# For search page
 	def add_part_to_list(self):
 		part_name = self.__class__.__name__
 		self.partlistfile = os.sep.join([ DATADIR, 'partlist', part_name+'s.json' ])
@@ -708,16 +603,11 @@ class fsobj_tool(fsobj):
 	def load(self, ID, institution, on_property_missing = "warn"):
 		part_name = self.__class__.__name__
 		self.partlistfile = os.sep.join([ DATADIR, 'partlist', part_name+'s.json' ])
-		print("LOADING TOOL")
 		with open(self.partlistfile, 'r') as opfl:
 			data = json.load(opfl)
 			if not "{}_{}".format(ID, institution) in data.keys():  # Key modification
-				print("TOOL LOAD FAILED, was looking for " + "{}_{}".format(ID, institution))
-				print("data.keys() =", data.keys())
 				self.clear()
 				return False
-		# (else:)
-		print("FOUND TOOL!")
 
 		if ID == -1:
 			self.clear()
@@ -729,18 +619,12 @@ class fsobj_tool(fsobj):
 		filedir, filename = self.get_filedir_filename(ID, institution)
 		xml_file = os.sep.join([filedir, filename])
 
-		print("Loading from file:", xml_file)
-
 		if not os.path.exists(xml_file):
 			self.clear()
 			return False
 
 		xml_tree = parse(xml_file)
-
 		self._load_from_dict(self.XML_STRUCT_DICT, xml_tree)
-
-		print("Finished loading, ID type is ", type(self.ID))
-		print("...and location is", self.location)
 
 		self.ID = ID
 		return True
@@ -764,7 +648,7 @@ class fsobj_tool(fsobj):
 			setattr(self, prop, DEFAULTS.get(prop, None))
 
 
-###### NEW:  PARENT CLASSES FOR PARTS AND ASSEMBLY STEPS #######
+###### PARENT CLASSES FOR PARTS AND ASSEMBLY STEPS #######
 
 class fsobj_part(fsobj):
 	# Var storing names of table to request XML files from
@@ -793,11 +677,11 @@ class fsobj_part(fsobj):
 
 
 	# save() must also create and save the XML file for uploading...
-
 	def save(self):
 		# Ordinary save; should take care of XML stuff normally.
 		super(fsobj_part, self).save()
 		
+		# Addtionally, create and save the upload XML file:
 		# Get upload XML struct from self.XML_UPLOAD_DICT
 		part_name = self.__class__.__name__
 		self.partlistfile = os.sep.join([ DATADIR, 'partlist', part_name+'s.json' ])
@@ -814,21 +698,19 @@ class fsobj_part(fsobj):
 		# Store in same directory as .json files, w/ same name:
 		filedir, filename = self.get_filedir_filename()  # self.ID)  #This should be unnecessary...
 		filename = filename.replace('.xml', '_upload.xml')
-		print("Saving UPLOAD XML file to ", filedir+'/'+filename)
 		root = xml_tree.getroot()
-		xmlstr = minidom.parseString(tostring(root)).toprettyxml(indent = '    ')  #tostring imported from xml.etree.ElementTree
+		#tostring imported from xml.etree.ElementTree
+		xmlstr = minidom.parseString(tostring(root)).toprettyxml(indent = '    ')
 		# Need to correct header...
 		xmlstr = xmlstr.replace("version=\"1.0\" ", "version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"")
 		with open(filedir+'/'+filename, 'w') as f:
-			#f.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>")
 			f.write(xmlstr)
 
 
 
 	# load() requires downloading ability, but is otherwise normal.
-
+	# query_db:  if false, will only check for part locally
 	def load(self, ID, on_property_missing = "warn", query_db=True):
-		print("LOADING PART {}".format(ID))
 		if ID == "" or ID == None:
 			self.clear()
 			return False
@@ -839,26 +721,17 @@ class fsobj_part(fsobj):
 			data = json.load(opfl)
 			if not str(ID) in data.keys():
 				if not query_db:
-					#print("Part not found, and no DB query requested.  Returning false...")
 					return False
-				#print("PART NOT FOUND.  REQUESTING FROM DB...")
 				search_conditions = {'SERIAL_NUMBER':'\''+ID+'\''}  # Only condition needed; ID must be surrounded by quotes
 				# For each XML file/table needed, make a request:
 				# Should automatically determine where file should be saved AND add part to list
 				self.ID = ID
 				part_request = self.request_XML(self.PART_TABLE, search_conditions)
-				#print("request_XML completed")
 				if not part_request:
-					print("Part not found.  Returning false...")
 					self.clear()
 					return False
-				#self.add_part_to_list()  # done in request_xml; also takes care of filename.
-				#dcreated = time.localtime()
-				#dt = '{}-{}-{}'.format(dcreated.tm_mon, dcreated.tm_mday, dcreated.tm_year)
-			else:
-				dt = data[str(ID)]  # date created
 
-		filedir, filename = self.get_filedir_filename(ID)  #, date=dt)
+		filedir, filename = self.get_filedir_filename(ID)
 		xml_file = os.sep.join([filedir, filename])
 
 		if not os.path.exists(xml_file):
@@ -878,15 +751,10 @@ class fsobj_part(fsobj):
 		print("CALLING request_XML")
 
 		if not ENABLE_DB_COMMUNICATION:
-			print("Warning:  DB communication is disabled!")
 			return False
 
-		# Same as the assembly version, EXCEPT TIME_START -> .
-
-		# NOTE NOTE NOTE:  Must save file in correct location AND add_part_to_list!
+		# NOTE:  Must save file in correct location AND add_part_to_list!
 		# suffix is added to the end of the filename (will be _cond)
-		#filedir, filename = self.get_filedir_filename(self.ID)
-		#condname = filename.replace('.xml', '_cond.xml')
 
 		sql_template = 'select * from hgc_int2r.{} p'
 		sql_request = sql_template.format(table_name)
@@ -899,8 +767,10 @@ class fsobj_part(fsobj):
 			api = rh.RhApi(url='https://cmsdca.cern.ch/hgc_rhapi', debug=True, sso='login')
 			data = api.xml(sql_request, verbose=True)
 		except rh.RhApiRowLimitError as e:
-			print("Error:  Could not download files from DB:")
+			print("ERROR:  Could not download files from DB:")
 			print(e)
+			print("SQL query was:")
+			print(sql_request)
 			return False
 
 		xml_string = minidom.parseString(data).toprettyxml(indent="    ")
@@ -913,20 +783,14 @@ class fsobj_part(fsobj):
 		xml_tree = fromstring(xml_string)
 		ID = xml_tree.find('.//SERIAL_NUMBER').text
 		dcreated = time.localtime()
-		date = '{}-{}-{}'.format(dcreated.tm_mon, dcreated.tm_mday, dcreated.tm_year)   #xml_tree.find('.//TIME_START')
-		# file date format = {}-{}-{}, mdy
-		# XML date format = 26-MAR-18
-		# https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior
-		#dt = datetime.datetime.strptime(date, '%d-%b-%y')
+		date = '{}-{}-{}'.format(dcreated.tm_mon, dcreated.tm_mday, dcreated.tm_year)
 
-		#print("TEST:  found date", date)
 		filedir, filename = self.get_filedir_filename(ID, date)
 
 		if suffix:  filename = filename.replace('.xml', suffix+'.xml')
 
 		if not os.path.exists(filedir):
 			os.makedirs(filedir)
-		#print("WRITING TO FILE:", os.path.join(filedir, filename))
 		with open(os.path.join(filedir, filename), 'w') as f:
 			f.write(xml_string)
 
@@ -943,14 +807,12 @@ class fsobj_assembly(fsobj):
 	
 	# Also requires XML_STRUCT_DICT (for gui storage only),
 	# ...XML_UPLOAD_DICT, XML_COND_DICT (BOTH for uploading, see child class definitions).
-	# NOTE that the protomodule creation file is created by the protomodule class, and must be uploaded before these.
+	# NOTE that the protomodule creation file is created by the protomodule class, and must be uploaded with these.
 
-	def __init__(self):  # Maybe this could be done OUTSIDE of init...but not sure I want to risk it.
+	def __init__(self):
 		super(fsobj, self).__init__()
 		# Add all other vars to XML_STRUCT_DICT
 		# (so they will be saved accordingly)
-		#print("\nINIT: ADDING PROPERTIES")
-		#print(self.PROPERTIES)
 		self.XML_STRUCT_DICT = {'data':{'row':{
 			# Fill below
 		}}}
@@ -959,8 +821,8 @@ class fsobj_assembly(fsobj):
 			self.XML_STRUCT_DICT['data']['row'][var] = var
 
 	def save(self):
-		super(fsobj_assembly, self).save()
 		# This one handles self.XML_STRUCT_DICT...
+		super(fsobj_assembly, self).save()
 
 		# NEXT, write the upload files!
 		# There's two:  One for Build_UCSB_ProtoModules_00.xml, one for ProtoModules_BuildCond_00.xml (base and cond).
@@ -978,7 +840,7 @@ class fsobj_assembly(fsobj):
 		# Cond file:
 		xml_tree = self.generate_xml(self.XML_COND_DICT)
 		root = xml_tree.getroot()
-		xmlstr = minidom.parseString(tostring(root)).toprettyxml(indent = '    ')  #tostring imported from xml.etree.ElementTree
+		xmlstr = minidom.parseString(tostring(root)).toprettyxml(indent = '    ')
 		xmlstr = xmlstr.replace("version=\"1.0\" ", "version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"")
 		with open(filedir+'/'+fname_cond, 'w') as f:
 			f.write(xmlstr)
@@ -1331,6 +1193,7 @@ class baseplate(fsobj_part):
 		"flatness",
 		"thickness",           # measure thickness of baseplate
 		"grade",   # A, B, or C
+		"channel_density", # NEW - needed for geometry information
 
 		"check_edges_firm", # None if not checked yet; True if passed; False if failed
 		"check_glue_spill", # None if not checked yet; True if passed; False if failed
@@ -1397,7 +1260,7 @@ class baseplate(fsobj_part):
 
 	@property
 	def kind_of_part(self):
-		return "{} {} Baseplate".format(self.material, self.shape)
+		return "{} Baseplate {}".format(self.material, self.shape)
 	@kind_of_part.setter
 	def kind_of_part(self, value):
 		# Parse and read in the baseplate size
@@ -1405,7 +1268,8 @@ class baseplate(fsobj_part):
 			self.material = None
 			self.shape = None
 		else:
-			self.material, self.shape = value.split()[:2]
+			self.material = value.split()[0]
+			self.shape = value.split()[2]
 
 	@property
 	def location_id(self):
@@ -1416,7 +1280,7 @@ class baseplate(fsobj_part):
 		return None
 	@location_id.setter
 	def location_id(self, value):
-		if not value in LOCATION_DICT.keys():
+		if not value in LOCATION_DICT.keys() and value != None:
 			print("Warning:  Found invalid location ID {}".format(value))
 		else:
 			self.location = LOCATION_DICT[value]
@@ -1590,15 +1454,18 @@ class sensor(fsobj_part):
 
 	@property
 	def kind_of_part(self):
-		return "{} {} {} Si sensor".format(self.resolution, self.type, self.shape)
+		return "{} Si Sensor {} {}".format(self.type, self.resolution, self.shape)
 	@kind_of_part.setter
 	def kind_of_part(self, value):
 		# Parse and read in the baseplate size
 		if value is None:
 			self.type = None
+			self.resolution = None
 			self.shape = None
 		else:
-			self.type, self.shape = value.split()[1:3]
+			self.type = value.split()[0]
+			self.resolution = value.split()[2]
+			self.shape = value.split()[3]
 
 	@property
 	def thickness(self):
@@ -1613,7 +1480,7 @@ class sensor(fsobj_part):
 		return None
 	@location_id.setter
 	def location_id(self, value):
-		if not value in LOCATION_DICT.keys():
+		if not value in LOCATION_DICT.keys() and value != None:
 			print("Warning:  Found invalid location ID {}".format(value))
 		else:
 			self.location = LOCATION_DICT[value]
@@ -1771,15 +1638,16 @@ class pcb(fsobj_part):
 	
 	@property
 	def kind_of_part(self): # Determined entirely by size
-		return "{} {} PCB".format(self.resolution, self.shape)
+		return "PCB {} {}".format(self.resolution, self.shape)
 	@kind_of_part.setter
 	def kind_of_part(self, value):
 		if value is None:
 			self.resolution = None
 			self.shape = None
 		else:
-			self.resolution, self.shape = value.split()[:2]
-	
+			self.resolution = value.split()[1]
+			self.shape = value.split()[2]
+
 	@property
 	def location_id(self):
 		# LOCATION_DICT maps ID -> name#
@@ -1789,7 +1657,7 @@ class pcb(fsobj_part):
 		return None
 	@location_id.setter
 	def location_id(self, value):
-		if not value in LOCATION_DICT.keys():
+		if not value in LOCATION_DICT.keys() and value != None:
 			print("Warning:  Found invalid location ID {}".format(value))
 		else:
 			self.location = LOCATION_DICT[value]
@@ -1883,21 +1751,31 @@ class protomodule(fsobj_part):
 		"THICKNESS":"thickness",
 		"FLATNESS":"flatness",
 		"GRADE":"grade",
-		#"PREDEFINED_ATTRIBUTES":{   # Ignore for now per Umesh
-		#	"ATTRIBUTE":{
-		#		"NAME":"AsmTrayPosn",
-		#		"VALUE":"assem_tray_posn",
-		#	}
-		#}
+		"PREDEFINED_ATTRIBUTES":{
+			"ATTRIBUTE":{
+				"NAME":"AsmTrayPosn",
+				"VALUE":"assem_tray_posn",
+			}
+		}
 		"COMMENTS":"comments_concat",
 		"CHILDREN":{
 			"PART":[{
 				"KIND_OF_PART":"baseplate_type",
 				"SERIAL_NUMBER":"baseplate",
+				"PREDEFINED_ATTRIBUTES":{
+					"ATTRIBUTE":{
+						"NAME":"AsmTrayPosn",
+						"VALUE":"assem_tray_posn",
+					}
+				}
 			},
 			{
 				"KIND_OF_PART":"sensor_type",
 				"SERIAL_NUMBER":"sensor",
+				"PREDEFINED_ATTRIBUTES":{
+					"NAME":"CmpTrayPosn",
+					"VALUE":"comp_tray_posn",
+				}
 			}]
 		}
 	}}}
@@ -1912,68 +1790,34 @@ class protomodule(fsobj_part):
 	@property
 	def kind_of_part(self):
 		if not self.sensor or not self.baseplate:  return None
-		return '{} {} {} {} Si Protomodule'.format('EM' if self.baseplate.material=='W/Cu' else 'HAD', 
-                                                   self.sensor.resolution, self.sensor.type, self.shape)
-
-	@kind_of_part.setter
-	def kind_of_part(self, value):
-		# Parse and read in the baseplate size
-		if value is None:
-			return None
-		else:
-			print("PLACEHOLDER:  Need to handle case:  downloaded module w/o corresponding pcb/protomod")
+		return '{} {} Si ProtoModule {} {}'.format('EM' if self.baseplate.material=='CuW' else 'HAD', 
+                                                  self.sensor.type, self.sensor.resolution, self.shape)
 
 	@property
-	def assm_tray_pos(self):
+	def assem_tray_pos(self):
+		return "TRPOSN_{}{}".format(self.tray_posn%2+1, tray_posn//3+1)
+
+	@property
+	def comp_tray_pos(self):
+		return "CMPOSN_{}{}".format(self.tray_posn%2+1, tray_posn//3+1)
+
+
+	@property
+	def tray_posn(self):
 		# If has a sensor step, grab the position of this sensor and return it here...
-		# "TRPOSN_11" in XML file makes no sense...temporarily using X_Y.
-		"""
 		if self.step_sensor is None:
 			print("assm_tray_posn:  no sensor step yet")
 			return "None"
 		temp_sensor_step = step_sensor()
 		found = temp_sensor_step.load(self.step_sensor)
 		if not found:
-			print("ERROR in assm_tray_pos:  protomodule has sensor step {}, but none found!".format(self.step_senosr))
+			print("ERROR in tray_posn:  protomodule has sensor step {}, but none found!".format(self.step_sensor))
 			return "None"
 		else:
+			#print("Temp sensor step found.  Sensors:", temp_sensor_step.sensors)
 			position = temp_sensor_step.sensors.index(self.ID)
-			return "{}_{}".format(position%2+1, position//3+1)
-		"""
-		return "{}_{}".format(self.assm_tray_row, assm_tray_col)
+			return position
 
-	@property
-	def assm_tray_row(self):
-		# If has a sensor step, grab the position of this sensor and return it here...
-		# "TRPOSN_11" in XML file makes no sense...temporarily using X_Y.
-		if self.step_sensor is None:
-			print("assm_tray_posn:  no sensor step yet")
-			return "None"
-		temp_sensor_step = step_sensor()
-		found = temp_sensor_step.load(self.step_sensor)
-		if not found:
-			print("ERROR in assm_tray_pos:  protomodule has sensor step {}, but none found!".format(self.step_senosr))
-			return "None"
-		else:
-			print("Temp sensor step found.  Sensors:", temp_sensor_step.sensors)
-			position = temp_sensor_step.sensors.index(self.ID)
-			return position%2+1	
-
-	@property
-	def assm_tray_col(self):
-		# If has a sensor step, grab the position of this sensor and return it here...
-		# "TRPOSN_11" in XML file makes no sense...temporarily using X_Y.
-		if self.step_sensor is None:
-			print("assm_tray_posn:  no sensor step yet")
-			return "None"
-		temp_sensor_step = step_sensor()
-		found = temp_sensor_step.load(self.step_sensor)
-		if not found:
-			print("ERROR in assm_tray_pos:  protomodule has sensor step {}, but none found!".format(self.step_senosr))
-			return "None"
-		else:
-			position = temp_sensor_step.sensors.index(self.ID)
-			return position//3+1
 
 	@property
 	def baseplate_type(self):
@@ -2106,23 +1950,6 @@ class module(fsobj_part):
 		"wirebonding_final_inspection_ok",
 
 
-		# module qualification (final)
-		#"hv_cables_attached",      # have HV cables been attached
-		#"hv_cables_attached_user", # who attached HV cables
-		#"unbiased_daq",      # name of dataset
-		#"unbiased_daq_user", # who took dataset
-		#"unbiased_daq_ok",   # whether result is ok
-		#"iv",      # name of dataset
-		#"iv_user", # who took dataset
-		#"iv_ok",   # whether result is ok
-		#"biased_daq",         # name of dataset
-		#"biased_daq_voltage", # voltage at which data was taken
-		#"biased_daq_ok",      # whether result is ok
-
-		# datasets
-		#"iv_data",  #
-		#"daq_data", #
-
 		# NEW:  Data to be read from base XML file
 		"id_number",
 		"part_parent_id",
@@ -2133,22 +1960,17 @@ class module(fsobj_part):
 	]
 	
 	PROPERTIES_DO_NOT_SAVE = [
-		#"iv_data",
-		#"daq_data",
 	]
 
 	DEFAULTS = {
 		"shipments":[],
 		'wirebonding_comments':[],
 		'encapsulation_comments':[],
-		#'iv_data':[],
-		#'daq_data':[],
 		"size":    '8',
 		"test_files":[],
 	}
 
 	ITEMLIST_LIST = ['comments', 'shipments', 'wirebonding_comments', 'encapsulation_comments', 'test_files',
-		#'wirebonding_unbonded_channels_back',
 		'wirebonding_unbonded_channels_front'
 	]
 
@@ -2172,10 +1994,10 @@ class module(fsobj_part):
 		"GRADE":"grade",
 		"COMMENTS":"comments_concat",
 		"PREDEFINED_ATTRIBUTES":{
-			#"ATTRIBUTE":{  # ignore for now per Umesh
-			#	"NAME":"AsmTrayPosn",
-			#	"VALUE":"assem_tray_posn",
-			#},
+			"ATTRIBUTE":{  # ignore for now per Umesh
+				"NAME":"AsmTrayPosn",
+				"VALUE":"assem_tray_posn",
+			},
 			"ATTRIBUTE":{
 				"NAME":"WireBonded",
 				"VALUE":"wirebonding_completed",
@@ -2185,20 +2007,25 @@ class module(fsobj_part):
 			"PART":[{
 				"KIND_OF_PART":"protomodule_type",
 				"SERIAL_NUMBER":"protomodule",
+				"PREDEFINED_ATTRIBUTES":{
+					"ATTRIBUTE":{
+						"NAME":"AsmTrayPosn",
+						"VALUE":"assem_tray_posn",
+					}
+				}
 			},
 			{
 				"KIND_OF_PART":"pcb_type",
 				"SERIAL_NUMBER":"pcb",
+				"PREDEFINED_ATTRIBUTES":{
+					"ATTRIBUTE":{
+						"NAME":"CmpTrayPosn",
+						"VALUE":"comp_tray_posn",
+					}
+				}
 			}]
 		}
 	}}}
-
-	#IV_DATADIR      = 'iv'
-	#IV_BINS_DATADIR = 'bins'
-	#DAQ_DATADIR     = 'daq'
-
-	#BA_FILENAME = 'ba {which}'
-	#BD_FILENAME = 'bd {which}'
 
 	XML_CONSTS = [
 		#'ID',  # does NOT count
@@ -2209,8 +2036,8 @@ class module(fsobj_part):
 	@property
 	def kind_of_part(self):
 		if not self.sensor or not self.baseplate:  return None
-		return '{} {} {} {} Si Module'.format('EM' if self.baseplate.material=='W/Cu' else 'HAD', 
-                                                   self.sensor.resolution, self.sensor.type, self.shape)
+		return '{} {} Si Module {} {}'.format('EM' if self.baseplate.material=='CuW' else 'HAD', 
+                                                   self.sensor.type, self.sensor.resolution, self.shape)
 
 	@kind_of_part.setter
 	def kind_of_part(self, value):
@@ -2220,26 +2047,37 @@ class module(fsobj_part):
 		else:
 			print("PLACEHOLDER:  Need to handle case:  downloaded module w/o corresponding pcb/protomod")
 
-	# TEMPORARY:  May want to fix this...
+	# TEMPORARY:  NOTE:  Must fix this...
 	@property
-	def wirebonded(self):
-		return False
+	def wirebonding_completed(self):
+		return wirebonding_final_inspection_ok == 'pass'
+
 
 	@property
-	def assm_tray_pos(self):
-		# If has a sensor step, grab the position of this sensor and return it here...
-		# "TRPOSN_11" in XML file makes no sense...temporarily using X_Y.
-		if self.step_sensor is None:
+	def assem_tray_pos(self):
+		return "TRPOSN_{}{}".format(self.tray_posn%2+1, tray_posn//3+1)
+
+	@property
+	def comp_tray_pos(self):
+		return "CMPOSN_{}{}".format(self.tray_posn%2+1, tray_posn//3+1)
+
+
+	@property
+	def tray_posn(self):
+		# If has a pcb step, grab the position of this PCB and return it here...
+		if self.step_pcb is None:
 			print("assm_tray_posn:  no sensor step yet")
 			return "None"
-		temp_sensor_step = step_sensor()
-		found = temp_sensor_step.load(self.step_sensor)
+		temp_pcb_step = step_pcb()
+		found = temp_pcb_step.load(self.step_pcb)
 		if not found:
-			print("ERROR in assm_tray_pos:  protomodule has sensor step {}, but none found!".format(self.step_senosr))
+			print("ERROR in tray_posn:  module has sensor step {}, but none found!".format(self.step_pcb))
 			return "None"
 		else:
+			#print("Temp sensor step found.  Sensors:", temp_sensor_step.sensors)
 			position = temp_sensor_step.sensors.index(self.ID)
-			return "{}_{}".format(position%2, position//3)
+			return position
+
 
 	@property
 	def protomodule_type(self):

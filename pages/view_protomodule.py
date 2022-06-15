@@ -11,8 +11,7 @@ INDEX_SHAPE = {
 	'Left':3,
 	'Right':4,
 	'Five':5,
-	'Three':6,
-	'Full+Three':7
+	'Full+Three':6
 }
 
 INDEX_GRADE = {

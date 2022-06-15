@@ -23,7 +23,7 @@ INDEX_SHAPE = {
 	'Right':4,
 	'Five':5,
 	'Three':6,
-	'Full+Three':7,
+	'Halfmoon':7,
 }
 
 INDEX_INSPECTION = {

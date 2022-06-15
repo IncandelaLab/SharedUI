@@ -7,7 +7,7 @@ DEBUG = False
 DISPLAY_PRECISION = 4
 
 INDEX_MATERIAL = {
-	'W/Cu':0,
+	'CuW':0,
 	'PCB':1,
 }
 
@@ -18,15 +18,13 @@ INDEX_SHAPE = {
 	'Left':3,
 	'Right':4,
 	'Five':5,
-	'Three':6,
-	'Full+Three':7,
+	'Full+Three':6,
 }
 
-#INDEX_CHIRALITY = {
-#	'achiral':0,
-#	'left':1,
-#	'right':2,
-#}
+INDEX_CHANNEL = {
+	'HD':0,
+	'LD':1,
+}
 
 INDEX_GRADE = {
 	'A':0,
@@ -165,19 +163,17 @@ class func(object):
 
 		#self.page.leID.setText(self.baseplate.ID)
 
-		self.page.cbShape      .setCurrentIndex(INDEX_SHAPE.get(      self.baseplate.shape         , -1))
-		#self.page.cbChirality  .setCurrentIndex(INDEX_CHIRALITY.get(  self.baseplate.chirality     , -1))
-		self.page.cbMaterial   .setCurrentIndex(INDEX_MATERIAL.get(   self.baseplate.material      , -1))
-		self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.baseplate.institution   , -1))
-		self.page.cbGrade      .setCurrentIndex(INDEX_GRADE.get(      self.baseplate.grade         , -1))
-		#self.page.leInsertUser   .setText("" if self.baseplate.insertion_user  is None else self.baseplate.insertion_user  )
+		self.page.cbShape         .setCurrentIndex(INDEX_SHAPE.get(      self.baseplate.shape          , -1))
+		self.page.cbMaterial      .setCurrentIndex(INDEX_MATERIAL.get(   self.baseplate.material       , -1))
+		self.page.cbInstitution   .setCurrentIndex(INDEX_INSTITUTION.get(self.baseplate.institution    , -1))
+		self.page.cbGrade         .setCurrentIndex(INDEX_GRADE.get(      self.baseplate.grade          , -1))
+		self.page.cbChannelDensity.setCurrentIndex(INDEX_CHANNEL.get(    self.baseplate.channel_density, -1))
 		if not self.baseplate.insertion_user in self.index_users.keys() and not self.baseplate.insertion_user is None:
 			# Insertion user was deleted from user page...just add user to the dropdown
 			self.index_users[self.baseplate.insertion_user] = max(self.index_users.values()) + 1
 			self.page.cbInsertUser.addItem(self.baseplate.insertion_user)
 		self.page.cbInsertUser.setCurrentIndex(self.index_users.get(self.baseplate.insertion_user, -1))
 		self.page.leBarcode      .setText("" if self.baseplate.barcode         is None else self.baseplate.barcode         )
-		self.page.leLocation     .setText("" if self.baseplate.location        is None else self.baseplate.location        )
 		#self.page.leManufacturer .setText("" if self.baseplate.manufacturer    is None else self.baseplate.manufacturer    )
 		self.page.dsbThickness.setValue(-1 if self.baseplate.thickness   is None else self.baseplate.thickness    )
 		if self.page.dsbThickness.value() == -1: self.page.dsbThickness.clear()
@@ -187,37 +183,13 @@ class func(object):
 			self.page.listComments.addItem(comment)
 		self.page.pteWriteComment.clear()
 
-		#if self.baseplate.corner_heights is None:
-		#	for corner in self.corners:
-		#		corner.setValue(-1)
-		#		corner.clear()
-		#else:
-		#	for i,corner in enumerate(self.corners):
-		#		corner.setValue(-1 if self.baseplate.corner_heights[i] is None else self.baseplate.corner_heights[i])
-		#		if corner.value() == -1: corner.clear()
-
-		#self.page.leFlatness.setText("" if self.baseplate.flatness is None else str(round(self.baseplate.flatness,DISPLAY_PRECISION)))
 		self.page.dsbFlatness.setValue(-1 if self.baseplate.flatness is None else self.baseplate.flatness )
 		if self.page.dsbThickness.value() == -1: self.page.dsbThickness.clear()
-		#self.page.dsbThickness.setValue(-1 if self.baseplate.thickness is None else self.baseplate.thickness)
-		#if self.page.dsbThickness.value() == -1: self.page.dsbThickness.clear()
-
-		#self.page.sbStepKapton.setValue(-1 if self.baseplate.step_kapton is None else self.baseplate.step_kapton)
-		#if self.page.sbStepKapton.value() == -1: self.page.sbStepKapton.clear()
-
-		#self.page.cbCheckEdgesFirm.setCurrentIndex(INDEX_CHECK.get(self.baseplate.check_edges_firm, -1))
-		#self.page.cbCheckGlueSpill.setCurrentIndex(INDEX_CHECK.get(self.baseplate.check_glue_spill, -1))
-		#self.page.dsbKaptonFlatness.setValue(-1 if self.baseplate.kapton_flatness is None else self.baseplate.kapton_flatness)
-		#if self.page.dsbKaptonFlatness.value() == -1: self.page.dsbKaptonFlatness.clear()
 
 		self.page.sbStepSensor.setValue( -1 if self.baseplate.step_sensor is None else self.baseplate.step_sensor)
-		#self.page.sbProtomodule.setValue(-1 if self.baseplate.protomodule is None else self.baseplate.protomodule)
-		#self.page.sbModule.setValue(     -1 if self.baseplate.module      is None else self.baseplate.module     )
 		self.page.leProtomodule.setText("" if self.baseplate.protomodule is None else self.baseplate.protomodule)
 		self.page.leModule.setText(     "" if self.baseplate.module      is None else self.baseplate.module)
 		if self.page.sbStepSensor.value()  == -1: self.page.sbStepSensor.clear()
-		#if self.page.sbProtomodule.value() == -1: self.page.sbProtomodule.clear()
-		#if self.page.sbModule.value()      == -1: self.page.sbModule.clear()
 
 		self.updateElements()
 
@@ -229,12 +201,8 @@ class func(object):
 			self.page.leStatus.setText(self.mode)
 
 		exists = self.baseplate_exists
-		print("UPDATE ELEMENTS:  baseplate exists:", exists)
 
-		#step_kapton_exists   = self.page.sbStepKapton.value()   >=0
 		step_sensor_exists    = self.page.sbStepSensor.value()   >=0
-		#protomodule_exists   = self.page.sbProtomodule.value()  >=0
-		#module_exists        = self.page.sbModule.value()       >=0
 		protomodule_exists   = self.page.leProtomodule.text() != ""
 		module_exists        = self.page.leModule.text()      != ""
 
@@ -264,6 +232,7 @@ class func(object):
 		self.page.leLocation.setReadOnly(      not (mode_creating or mode_editing) )
 		self.page.dsbThickness.setReadOnly( not (mode_creating or mode_editing) )
 		self.page.cbGrade.setEnabled(               mode_creating or mode_editing  )
+		self.page.cbChannelDensity.setEnabled(      mode_creating or mode_editing  )
 		self.page.dsbFlatness.setEnabled(           mode_creating or mode_editing  )
 
 		self.page.pbDeleteComment.setEnabled(mode_creating or mode_editing)
@@ -364,6 +333,7 @@ class func(object):
 		self.baseplate.barcode        = str(self.page.leBarcode.text())            if str(self.page.leBarcode.text())            else None
 		self.baseplate.thickness   =     self.page.dsbThickness.value()      if self.page.dsbThickness.value() >=0      else None
 		self.baseplate.flatness       =     self.page.dsbFlatness.value()          if self.page.dsbFlatness.value() >= 0         else None
+		self.pcb.channel_density      = str(self.page.cbChannelDensity.currentText())  if str(self.page.cbChannelDensity.currentText())  else None
 		self.baseplate.grade          = str(self.page.cbGrade.currentText())       if str(self.page.cbGrade.currentText())       else None
 
 		num_comments = self.page.listComments.count()

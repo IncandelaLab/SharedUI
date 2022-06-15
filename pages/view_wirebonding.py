@@ -156,11 +156,9 @@ class func(object):
 			ID = self.page.leID.text()
 		else:
 			self.page.leID.setText(ID)
-		print("module ID is", ID)
 
 		#self.module_exists = self.module.load(ID)
 		self.module_exists = False
-		print("obj mod id", self.module.ID)
 		if getattr(self.module, 'ID', None) != None:
 			self.module_exists = (ID == self.module.ID)
 
@@ -420,15 +418,6 @@ class func(object):
 
 
 	@enforce_mode('view')
-	def startCreating(self,*args,**kwargs):
-		print("ERROR:  This is outdated and should not be used.")
-		if not self.module_exists:
-			ID = self.page.sbID.value()
-			self.mode = 'creating'
-			self.module.new(ID)
-			self.updateElements()
-
-	@enforce_mode('view')
 	def startEditing(self,*args,**kwargs):
 		tmp_module = fm.module()
 		tmp_ID = self.page.leID.text()
@@ -436,17 +425,20 @@ class func(object):
 		if not tmp_exists:
 			self.page.leStatus.setText("does not exist")
 		else:
+			self.page.leStatus.setText("editing")
 			self.module = tmp_module
 			self.mode = 'editing'
 			self.update_info()
 
 	@enforce_mode(['editing','creating'])
 	def cancelEditing(self,*args,**kwargs):
+		self.page.leStatus.setText("")
 		self.mode = 'view'
 		self.update_info()
 
 	@enforce_mode(['editing','creating'])
 	def saveEditing(self,*args,**kwargs):
+		self.page.leStatus.setText("saved")
 		# First, check text boxes for errors; do nothing if found
 		self.page.leErrors.clear()
 		pteList = {#"unbonded_back":self.page.pteUnbondedChannelsBack,

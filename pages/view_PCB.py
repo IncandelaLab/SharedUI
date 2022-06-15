@@ -26,14 +26,7 @@ INDEX_SHAPE = {
 	'Left':3,
 	'Right':4,
 	'Five':5,
-	'Three':6,
-	'Full+Three':7
-}
-
-INDEX_CHIRALITY = {
-	'achiral':0,
-	'left':1,
-	'right':2,
+	'Full+Three':6
 }
 
 INDEX_CHECK = {
@@ -184,7 +177,6 @@ class func(object):
 		self.page.cbType.setCurrentIndex(          INDEX_TYPE.get(           self.pcb.type,-1)           )
 		self.page.cbResolution.setCurrentIndex(INDEX_RESOLUTION.get(self.pcb.resolution,-1))
 		self.page.cbShape.setCurrentIndex(         INDEX_SHAPE.get(          self.pcb.shape,-1)          )
-		#self.page.cbChirality.setCurrentIndex(     INDEX_CHIRALITY.get(      self.pcb.chirality,-1)      )
 		self.page.cbGrade.setCurrentIndex(         INDEX_GRADE.get(          self.pcb.grade, -1)         )
 		self.page.cbInstitution.setCurrentIndex(   INDEX_INSTITUTION.get(    self.pcb.institution, -1)   )
 		if not self.pcb.insertion_user in self.index_users.keys() and not self.pcb.insertion_user is None:

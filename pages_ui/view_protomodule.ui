@@ -340,42 +340,37 @@
     </property>
     <item>
      <property name="text">
-      <string>full</string>
+      <string>Full</string>
      </property>
     </item>
     <item>
      <property name="text">
-      <string>top</string>
+      <string>Top</string>
      </property>
     </item>
     <item>
      <property name="text">
-      <string>bottom</string>
+      <string>Bottom</string>
      </property>
     </item>
     <item>
      <property name="text">
-      <string>left</string>
+      <string>Left</string>
      </property>
     </item>
     <item>
      <property name="text">
-      <string>right</string>
+      <string>Right</string>
      </property>
     </item>
     <item>
      <property name="text">
-      <string>five</string>
+      <string>Five</string>
      </property>
     </item>
     <item>
      <property name="text">
-      <string>three</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>full+three</string>
+      <string>Full+Three</string>
      </property>
     </item>
    </widget>

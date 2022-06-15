@@ -1240,7 +1240,7 @@ before assembly</string>
     </rect>
    </property>
    <property name="text">
-    <string>Check:  correct feet are installed on pickup tool</string>
+    <string>Check:  correct feet are installed on pickup tools</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="lineEdit_10">
