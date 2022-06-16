@@ -4,8 +4,6 @@ PAGE_NAME = "view_baseplate"
 OBJECTTYPE = "baseplate"
 DEBUG = False
 
-DISPLAY_PRECISION = 4
-
 INDEX_MATERIAL = {
 	'CuW':0,
 	'PCB':1,
@@ -19,17 +17,6 @@ INDEX_SHAPE = {
 	'Right':4,
 	'Five':5,
 	'Full+Three':6,
-}
-
-INDEX_CHANNEL = {
-	'HD':0,
-	'LD':1,
-}
-
-INDEX_GRADE = {
-	'A':0,
-	'B':1,
-	'C':2,
 }
 
 INDEX_CHECK = {
@@ -48,10 +35,20 @@ INDEX_INSTITUTION = {
 	'HPK':5,
 }
 
+INDEX_CHANNEL = {
+	'HD':0,
+	'LD':1,
+}
+
+INDEX_GRADE = {
+	'A':0,
+	'B':1,
+	'C':2,
+}
+
 
 class func(object):
 	def __init__(self,fm,page,setUIPage,setSwitchingEnabled):
-
 		self.page      = page
 		self.setUIPage = setUIPage
 		self.setMainSwitchingEnabled = setSwitchingEnabled
@@ -109,39 +106,19 @@ class func(object):
 
 	@enforce_mode('setup')
 	def rig(self):
-		#self.page.sbID.valueChanged.connect(self.update_info)
-		# Experimental:
-		#self.page.leID.textChanged.connect( self.update_info )
-		# REMOVED, replaced by...
-
-		# NEW:  Don't want to automatically search the DB every time someone types in a character
 		self.page.pbLoad.clicked.connect(self.loadPart)
-
 		self.page.pbNew.clicked.connect(self.startCreating)
 		self.page.pbEdit.clicked.connect(self.startEditing)
 		self.page.pbSave.clicked.connect(self.saveEditing)
 		self.page.pbCancel.clicked.connect(self.cancelEditing)
 
+		self.page.pbGoStepSensor.clicked.connect(self.goStepSensor)
+		self.page.pbGoProtomodule.clicked.connect(self.goProtomodule)
+		self.page.pbGoModule.clicked.connect(self.goModule)
+
 		self.page.pbDeleteComment.clicked.connect(self.deleteComment)
 		self.page.pbAddComment.clicked.connect(self.addComment)
 
-		#self.page.pbGoStepKapton.clicked.connect(self.goStepKapton)
-
-		self.page.pbGoStepSensor.clicked.connect(self.goStepSensor)
-		self.page.pbGoProtomodule.clicked.connect(self.goProtomodule)
-
-		self.page.pbGoModule.clicked.connect(self.goModule)
-
-		#self.corners = [
-		#	self.page.dsbC0,
-		#	self.page.dsbC1,
-		#	self.page.dsbC2,
-		#	self.page.dsbC3,
-		#	self.page.dsbC4,
-		#	self.page.dsbC5
-		#	]
-
-		# NEW:
 		auth_users = fm.userManager.getAuthorizedUsers(PAGE_NAME)
 		self.index_users = {auth_users[i]:i for i in range(len(auth_users))}
 		for user in self.index_users.keys():
@@ -151,57 +128,53 @@ class func(object):
 	@enforce_mode(['view', 'editing', 'creating']) # NEW:  Now allowed in editing, creating mode
 	def update_info(self,do_load=True,ID=None):
 		"""Loads info on the selected baseplate ID and updates UI elements accordingly"""
-		# IMPORTANT CHANGE:  Baseplate load and existence check have been moved to startCreating/Editing()!
-		# Probably can't remove the following
 		if ID is None:
 			ID = self.page.leID.text()
 		else:
-			#self.page.sbID.setValue(ID)
 			self.page.leID.setText(ID)
 
-		self.baseplate_exists = (ID == self.baseplate.ID)  #self.baseplate.load(ID)
+		self.baseplate_exists = (ID == self.baseplate.ID)
 
-		#self.page.leID.setText(self.baseplate.ID)
-
-		self.page.cbShape         .setCurrentIndex(INDEX_SHAPE.get(      self.baseplate.shape          , -1))
-		self.page.cbMaterial      .setCurrentIndex(INDEX_MATERIAL.get(   self.baseplate.material       , -1))
-		self.page.cbInstitution   .setCurrentIndex(INDEX_INSTITUTION.get(self.baseplate.institution    , -1))
-		self.page.cbGrade         .setCurrentIndex(INDEX_GRADE.get(      self.baseplate.grade          , -1))
-		self.page.cbChannelDensity.setCurrentIndex(INDEX_CHANNEL.get(    self.baseplate.channel_density, -1))
 		if not self.baseplate.insertion_user in self.index_users.keys() and not self.baseplate.insertion_user is None:
 			# Insertion user was deleted from user page...just add user to the dropdown
 			self.index_users[self.baseplate.insertion_user] = max(self.index_users.values()) + 1
 			self.page.cbInsertUser.addItem(self.baseplate.insertion_user)
 		self.page.cbInsertUser.setCurrentIndex(self.index_users.get(self.baseplate.insertion_user, -1))
-		self.page.leBarcode      .setText("" if self.baseplate.barcode         is None else self.baseplate.barcode         )
-		#self.page.leManufacturer .setText("" if self.baseplate.manufacturer    is None else self.baseplate.manufacturer    )
-		self.page.dsbThickness.setValue(-1 if self.baseplate.thickness   is None else self.baseplate.thickness    )
-		if self.page.dsbThickness.value() == -1: self.page.dsbThickness.clear()
+
+		self.page.cbInstitution   .setCurrentIndex(INDEX_INSTITUTION.get(self.baseplate.institution    , -1))
+		self.page.leLocation      .setText("" if self.baseplate.location is None else self.baseplate.location)
+
+		self.page.leBarcode       .setText("" if self.baseplate.barcode  is None else self.baseplate.barcode )
+		self.page.cbMaterial      .setCurrentIndex(INDEX_MATERIAL   .get(self.baseplate.material       , -1))
+		self.page.cbShape         .setCurrentIndex(INDEX_SHAPE      .get(self.baseplate.shape          , -1))
+		self.page.cbChannelDensity.setCurrentIndex(INDEX_CHANNEL    .get(self.baseplate.channel_density, -1))
 
 		self.page.listComments.clear()
 		for comment in self.baseplate.comments:
 			self.page.listComments.addItem(comment)
 		self.page.pteWriteComment.clear()
 
-		self.page.dsbFlatness.setValue(-1 if self.baseplate.flatness is None else self.baseplate.flatness )
+
+		self.page.dsbThickness.setValue(-1 if self.baseplate.thickness is None else self.baseplate.thickness)
 		if self.page.dsbThickness.value() == -1: self.page.dsbThickness.clear()
+		self.page.dsbFlatness .setValue(-1 if self.baseplate.flatness  is None else self.baseplate.flatness )
+		if self.page.dsbFlatness.value() == -1: self.page.dsbFlatness.clear()
+		self.page.cbGrade         .setCurrentIndex(INDEX_GRADE      .get(self.baseplate.grade          , -1))
 
 		self.page.sbStepSensor.setValue( -1 if self.baseplate.step_sensor is None else self.baseplate.step_sensor)
+		if self.page.sbStepSensor.value()  == -1: self.page.sbStepSensor.clear()
 		self.page.leProtomodule.setText("" if self.baseplate.protomodule is None else self.baseplate.protomodule)
 		self.page.leModule.setText(     "" if self.baseplate.module      is None else self.baseplate.module)
-		if self.page.sbStepSensor.value()  == -1: self.page.sbStepSensor.clear()
 
 		self.updateElements()
 
 
 	@enforce_mode(['view','editing','creating'])
 	def updateElements(self):
-		# NEW:
 		if not self.mode == "view":
 			self.page.leStatus.setText(self.mode)
 
-		exists = self.baseplate_exists
-
+		baseplate_exists = self.baseplate_exists
 		step_sensor_exists    = self.page.sbStepSensor.value()   >=0
 		protomodule_exists   = self.page.leProtomodule.text() != ""
 		module_exists        = self.page.leModule.text()      != ""
@@ -211,53 +184,41 @@ class func(object):
 		mode_creating = self.mode == 'creating'
 
 		self.setMainSwitchingEnabled(mode_view)
-		#self.page.sbID.setEnabled(mode_view)
 		self.page.leID.setReadOnly(not mode_view)
 
-		# MODIFIED:
 		self.page.pbLoad.setEnabled(   mode_view )
-
-		self.page.pbNew.setEnabled(    mode_view and not exists )
-		self.page.pbEdit.setEnabled(   mode_view and     exists )
+		self.page.pbNew.setEnabled(    mode_view and not baseplate_exists )
+		self.page.pbEdit.setEnabled(   mode_view and     baseplate_exists )
 		self.page.pbSave.setEnabled(   mode_creating or mode_editing )
 		self.page.pbCancel.setEnabled( mode_creating or mode_editing )
 
-		self.page.cbShape.setEnabled(               mode_creating or mode_editing  )
-		#self.page.cbChirality.setEnabled(           mode_creating or mode_editing  )
-		self.page.cbInstitution.setEnabled(         mode_creating or mode_editing  )
-		self.page.cbInsertUser.setEnabled(          mode_creating or mode_editing  )
-		self.page.leBarcode.setReadOnly(       not (mode_creating or mode_editing) )
-		#self.page.leManufacturer.setReadOnly(  not (mode_creating or mode_editing) )
-		self.page.cbMaterial.setEnabled(            mode_creating or mode_editing  )
-		self.page.leLocation.setReadOnly(      not (mode_creating or mode_editing) )
-		self.page.dsbThickness.setReadOnly( not (mode_creating or mode_editing) )
-		self.page.cbGrade.setEnabled(               mode_creating or mode_editing  )
-		self.page.cbChannelDensity.setEnabled(      mode_creating or mode_editing  )
-		self.page.dsbFlatness.setEnabled(           mode_creating or mode_editing  )
 
-		self.page.pbDeleteComment.setEnabled(mode_creating or mode_editing)
-		self.page.pbAddComment.setEnabled(   mode_creating or mode_editing)
-		self.page.pteWriteComment.setEnabled(mode_creating or mode_editing)
+		self.page.cbInsertUser.setEnabled(      mode_creating or mode_editing  )
+		self.page.cbInstitution.setEnabled(     mode_creating or mode_editing  )
+		self.page.leLocation.setReadOnly(  not (mode_creating or mode_editing) )
 
-		#for corner in self.corners:
-		#	corner.setReadOnly(not (mode_creating or mode_editing))
-		#self.page.dsbThickness.setReadOnly(not (mode_creating or mode_editing))
+		self.page.leBarcode.setReadOnly(   not (mode_creating or mode_editing) )
+		self.page.cbMaterial.setEnabled(        mode_creating or mode_editing  )
+		self.page.cbShape.setEnabled(           mode_creating or mode_editing  )
+		self.page.cbChannelDensity.setEnabled(  mode_creating or mode_editing  )
 
-		#self.page.pbGoStepKapton.setEnabled(mode_view and step_kapton_exists)
-		#self.page.cbCheckEdgesFirm.setEnabled(mode_creating or mode_editing)
-		#self.page.cbCheckGlueSpill.setEnabled(mode_creating or mode_editing)
-		#self.page.dsbKaptonFlatness.setReadOnly(not (mode_creating or mode_editing))
+		self.page.dsbThickness.setReadOnly(not (mode_creating or mode_editing) )
+		self.page.dsbFlatness.setEnabled(       mode_creating or mode_editing  )
+		self.page.cbGrade.setEnabled(           mode_creating or mode_editing  )
 
-		self.page.pbGoStepSensor.setEnabled(mode_view and step_sensor_exists)
-		self.page.pbGoProtomodule.setEnabled(mode_view and protomodule_exists)
-		self.page.pbGoModule.setEnabled(mode_view and module_exists)
+		self.page.pbDeleteComment.setEnabled(   mode_creating or mode_editing  )
+		self.page.pbAddComment.setEnabled(      mode_creating or mode_editing  )
+		self.page.pteWriteComment.setEnabled(   mode_creating or mode_editing  )
+
+		self.page.pbGoStepSensor.setEnabled(    mode_view and step_sensor_exists)
+		self.page.pbGoProtomodule.setEnabled(   mode_view and protomodule_exists)
+		self.page.pbGoModule.setEnabled(        mode_view and module_exists)
 
 
 
 	# NEW:
 	@enforce_mode('view')
 	def loadPart(self,*args,**kwargs):
-		print("Baseplate:  loadPart()")
 		if self.page.leID.text == "":
 			self.page.leStatus.setText("input an ID")
 			return
@@ -265,16 +226,9 @@ class func(object):
 		tmp_baseplate = fm.baseplate()
 		tmp_ID = self.page.leID.text()
 		tmp_exists = tmp_baseplate.load(tmp_ID)
-		print("tmp_exists:", tmp_exists)
-		#if not self.baseplate_exists:
 		if not tmp_exists:  # DNE; good to create
-			#ID = self.page.leID.text()
-			#self.baseplate.new(ID)
-			#self.mode = 'creating'  # update_info needs mode==view
 			self.page.leStatus.setText("baseplate DNE")
-			self.update_info()
 		else:
-			# pass
 			self.baseplate = tmp_baseplate
 			self.page.leStatus.setText("baseplate exists")
 			self.update_info()
@@ -289,14 +243,12 @@ class func(object):
 		tmp_baseplate = fm.baseplate()
 		tmp_ID = self.page.leID.text()
 		tmp_exists = tmp_baseplate.load(tmp_ID)
-		#if not self.baseplate_exists:
 		if not tmp_exists:  # DNE; good to create
 			ID = self.page.leID.text()
 			self.baseplate.new(ID)
 			self.mode = 'creating'  # update_info needs mode==view
 			self.updateElements()
 		else:
-			# pass
 			self.page.leStatus.setText("already exists")
 
 	@enforce_mode('view')
@@ -304,9 +256,7 @@ class func(object):
 		tmp_baseplate = fm.baseplate()
 		tmp_ID = self.page.leID.text()
 		tmp_exists = tmp_baseplate.load(tmp_ID)
-		#if not self.baseplate_exists:
 		if not tmp_exists:
-			#pass
 			self.page.leStatus.setText("does not exist")
 		else:
 			self.baseplate = tmp_baseplate
@@ -320,33 +270,23 @@ class func(object):
 
 	@enforce_mode(['editing','creating'])
 	def saveEditing(self,*args,**kwargs):
-		print("SAVING, ID=", self.baseplate.ID)
 
-		self.baseplate.shape          = str(self.page.cbShape.currentText())       if str(self.page.cbShape.currentText())       else None
-		#self.baseplate.chirality      = str(self.page.cbChirality.currentText())   if str(self.page.cbChirality.currentText())   else None
-		self.baseplate.material       = str(self.page.cbMaterial.currentText())    if str(self.page.cbMaterial.currentText())    else None
-		self.baseplate.institution    = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
-		#self.baseplate.insertion_user = str(self.page.leInsertUser.text())         if str(self.page.leInsertUser.text())         else None
-		self.baseplate.insertion_user = str(self.page.cbInsertUser.currentText())  if str(self.page.cbInsertUser.currentText())  else None
-		#self.baseplate.manufacturer   = str(self.page.leManufacturer.text())       if str(self.page.leManufacturer.text())       else None
-		self.baseplate.location       = str(self.page.leLocation.text())           if str(self.page.leLocation.text())           else None
-		self.baseplate.barcode        = str(self.page.leBarcode.text())            if str(self.page.leBarcode.text())            else None
-		self.baseplate.thickness   =     self.page.dsbThickness.value()      if self.page.dsbThickness.value() >=0      else None
-		self.baseplate.flatness       =     self.page.dsbFlatness.value()          if self.page.dsbFlatness.value() >= 0         else None
-		self.pcb.channel_density      = str(self.page.cbChannelDensity.currentText())  if str(self.page.cbChannelDensity.currentText())  else None
-		self.baseplate.grade          = str(self.page.cbGrade.currentText())       if str(self.page.cbGrade.currentText())       else None
+		self.baseplate.insertion_user  = str(self.page.cbInsertUser.currentText())  if str(self.page.cbInsertUser.currentText())  else None
+		self.baseplate.institution     = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
+		self.baseplate.location        = str(self.page.leLocation.text())           if str(self.page.leLocation.text())           else None
+
+		self.baseplate.barcode         = str(self.page.leBarcode.text())            if str(self.page.leBarcode.text())            else None
+		self.baseplate.material        = str(self.page.cbMaterial.currentText())    if str(self.page.cbMaterial.currentText())    else None
+		self.baseplate.shape           = str(self.page.cbShape.currentText())       if str(self.page.cbShape.currentText())       else None
+		self.baseplate.thickness       =     self.page.dsbThickness.value()         if self.page.dsbThickness.value() >=0         else None
+		self.baseplate.flatness        =     self.page.dsbFlatness.value()          if self.page.dsbFlatness.value() >= 0         else None
+		self.baseplate.channel_density = str(self.page.cbChannelDensity.currentText()) if str(self.page.cbChannelDensity.currentText())  else None
+		self.baseplate.grade           = str(self.page.cbGrade.currentText())       if str(self.page.cbGrade.currentText())       else None
 
 		num_comments = self.page.listComments.count()
 		self.baseplate.comments = []
 		for i in range(num_comments):
 			self.baseplate.comments.append(str(self.page.listComments.item(i).text()))
-
-		#self.baseplate.corner_heights = [_.value() if _.value()>=0 else None for _ in self.corners]
-		#self.baseplate.thickness = self.page.dsbThickness.value() if self.page.dsbThickness.value()>=0 else None
-
-		#self.baseplate.check_edges_firm = str(self.page.cbCheckEdgesFirm.currentText()) if str(self.page.cbCheckEdgesFirm.currentText()) else None
-		#self.baseplate.check_glue_spill = str(self.page.cbCheckGlueSpill.currentText()) if str(self.page.cbCheckGlueSpill.currentText()) else None
-		#self.baseplate.kapton_flatness  =     self.page.dsbKaptonFlatness.value()       if self.page.dsbKaptonFlatness.value() >=0       else None
 
 		self.baseplate.save()
 		self.mode = 'view'
@@ -362,7 +302,6 @@ class func(object):
 		self.xmlModList = []
 
 
-
 	@enforce_mode(['editing','creating'])
 	def deleteComment(self,*args,**kwargs):
 		row = self.page.listComments.currentRow()
@@ -375,35 +314,24 @@ class func(object):
 		if text:
 			self.page.listComments.addItem(text)
 			self.page.pteWriteComment.clear()
-	
-	#@enforce_mode('view')
-	#def goStepKapton(self,*args,**kwargs):
-	#	ID = self.page.sbStepKapton.value()
-	#	if ID >= 0:
-	#		self.setUIPage('kapton placement steps',ID=ID)
-
 
 	@enforce_mode('view')
 	def goStepSensor(self,*args,**kwargs):
 		ID = self.page.sbStepSensor.value()
 		if ID >= 0:
-			self.setUIPage('sensor placement steps',ID=ID)
+			self.setUIPage('1. Sensor - pre-assembly',ID=ID)
 	
 	@enforce_mode('view')
 	def goProtomodule(self,*args,**kwargs):
-		#ID = self.page.sbProtomodule.value()
-		#if ID >= 0:
 		ID = self.page.leProtomodule.text()
 		if ID != "":
-			self.setUIPage('protomodules',ID=ID)
+			self.setUIPage('Protomodules',ID=ID)
 
 	@enforce_mode('view')
 	def goModule(self,*args,**kwargs):
-		#ID = self.page.sbModule.value()
-		#if ID >= 0:
 		ID = self.page.leModule.text()
 		if ID != "":
-			self.setUIPage('modules',ID=ID)
+			self.setUIPage('Modules',ID=ID)
 
 
 	def filesToUpload(self):
@@ -418,12 +346,8 @@ class func(object):
 	def load_kwargs(self,kwargs):
 		if 'ID' in kwargs.keys():
 			ID = kwargs['ID']
-			#if not (type(ID) is int):
-			#	raise TypeError("Expected type <int> for ID; got <{}>".format(type(ID)))
 			if not (type(ID) is str):
 				raise TypeError("Expected type <str> for ID; got <{}>".format(type(ID)))
-			#if ID < 0:
-			#	raise ValueError("ID cannot be negative")
 			self.page.leID.setText(ID)
 			self.loadPart()
 

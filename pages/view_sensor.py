@@ -1,8 +1,4 @@
 from filemanager import fm
-import os
-import shutil
-
-from PyQt5.QtWidgets import QFileDialog, QWidget
 
 PAGE_NAME = "view_sensor"
 OBJECTTYPE = "sensor"
@@ -12,7 +8,6 @@ INDEX_TYPE = {
 	'120um':0,
 	'200um':1,
 	'300um':2,
-	#'500 um':3,
 }
 
 INDEX_SHAPE = {
@@ -120,34 +115,18 @@ class func(object):
 
 	@enforce_mode('setup')
 	def rig(self):
-		#self.page.sbID.valueChanged.connect(self.update_info)
-		#self.page.leID.textChanged.connect(self.update_info)
 		self.page.pbLoad.clicked.connect(self.loadPart)
-
 		self.page.pbNew.clicked.connect(self.startCreating)
 		self.page.pbEdit.clicked.connect(self.startEditing)
 		self.page.pbSave.clicked.connect(self.saveEditing)
 		self.page.pbCancel.clicked.connect(self.cancelEditing)
 
-		self.page.pbDeleteComment.clicked.connect(self.deleteComment)
-		self.page.pbAddComment.clicked.connect(self.addComment)
-
 		self.page.pbGoStepSensor.clicked.connect(self.goStepSensor)
 		self.page.pbGoProtomodule.clicked.connect(self.goProtomodule)
 		self.page.pbGoModule.clicked.connect(self.goModule)
 
-		#self.corners = [
-		#	self.page.dsbC0,
-		#	self.page.dsbC1,
-		#	self.page.dsbC2,
-		#	self.page.dsbC3,
-		#	self.page.dsbC4,
-		#	self.page.dsbC5
-		#]
-
-		#self.fwnd = Filewindow()
-		#self.page.pbAddFiles.clicked.connect(self.getFile)
-		#self.page.pbDeleteFile.clicked.connect(self.deleteFile)
+		self.page.pbDeleteComment.clicked.connect(self.deleteComment)
+		self.page.pbAddComment.clicked.connect(self.addComment)
 
 		auth_users = fm.userManager.getAuthorizedUsers(PAGE_NAME)
 		self.index_users = {auth_users[i]:i for i in range(len(auth_users))}
@@ -157,71 +136,39 @@ class func(object):
 	@enforce_mode(['view', 'editing', 'creating'])
 	def update_info(self,ID=None,do_load=True,*args,**kwargs):
 		if ID is None:
-			#ID = self.page.sbID.value()
 			ID = self.page.leID.text()
 		else:
-			#self.page.sbID.setValue(ID)
 			self.page.leID.setText(ID)
-		#if do_load:
-		#	self.sensor_exists = self.sensor.load(ID)
-		#else:
-		#	self.sensor_exists = False
 
-		#self.page.leID.setText(self.sensor.ID)
-		self.sensor_exists = (ID == self.sensor.ID) #self.sensor.load(ID)
+		self.sensor_exists = (ID == self.sensor.ID)
 
-		self.page.leLocation.setText(    "" if self.sensor.location     is None else self.sensor.location    )
-		self.page.leBarcode.setText( "" if self.sensor.barcode          is None else self.sensor.barcode     )
-		self.page.cbType.setCurrentIndex(       INDEX_TYPE.get(       self.sensor.type,  -1)      )
-		self.page.cbShape.setCurrentIndex(      INDEX_SHAPE.get(      self.sensor.shape, -1)      )
-		#self.page.leInsertUser.setText("" if self.sensor.insertion_user is None else self.sensor.insertion_user)
-		self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.sensor.institution, -1))
 		if not self.sensor.insertion_user in self.index_users.keys() and not self.sensor.insertion_user is None:
-			# Insertion user was deleted from user page...just add user to the dropdown
 			self.index_users[self.sensor.insertion_user] = max(self.index_users.values()) + 1
-			# WIP...
 			self.page.cbInsertUser.addItem(self.sensor.insertion_user)
 		self.page.cbInsertUser.setCurrentIndex(self.index_users.get(self.sensor.insertion_user, -1))
-		#self.page.sbChannels.setValue(-1 if self.sensor.channels        is None else self.sensor.channels)
-		#if self.page.sbChannels.value() == -1:  self.page.sbChannels.clear()
-		self.page.cbChannelDensity.setCurrentIndex(INDEX_CHANNEL.get(self.sensor.channel_density, -1))
-		self.page.cbGrade.setCurrentIndex(INDEX_GRADE.get(self.sensor.grade, -1))
 
+		self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.sensor.institution, -1))
+		self.page.leLocation.setText(    "" if self.sensor.location     is None else self.sensor.location    )
+
+		self.page.leBarcode.setText( "" if self.sensor.barcode          is None else self.sensor.barcode     )
+		self.page.cbType.setCurrentIndex(       INDEX_TYPE.get(       self.sensor.type,            -1))
+		self.page.cbShape.setCurrentIndex(      INDEX_SHAPE.get(      self.sensor.shape,           -1))
+		self.page.cbChannelDensity.setCurrentIndex(INDEX_CHANNEL.get( self.sensor.channel_density, -1))
+		self.page.dsbFlatnesssetValue(-1 if self.baseplate.flatness  is None else self.baseplate.flatness )
+		if self.page.dsbFlatness.value() == -1: self.page.dsbFlatness.clear()
+		self.page.cbInspection.setCurrentIndex( INDEX_INSPECTION.get( self.sensor.inspection,      -1))
 
 		self.page.listComments.clear()
 		for comment in self.sensor.comments:
 			self.page.listComments.addItem(comment)
 		self.page.pteWriteComment.clear()
 
-		#if self.sensor.corner_heights is None: 
-		#	for corner in self.corners: 
-		#		corner.setValue(-1) 
-		#		corner.clear() 
-		#else: 
-		#	for i,corner in enumerate(self.corners): 
-		#		corner.setValue(-1 if self.sensor.corner_heights[i] is None else self.sensor.corner_heights[i]) 
-		#		if corner.value() == -1: corner.clear() 
- 
-		#self.page.leFlatness.setText("" if self.sensor.flatness is None else str(round(self.sensor.flatness,DISPLAY_PRECISION)))
-		#self.page.dsbThickness.setValue(-1 if self.sensor.thickness is None else self.sensor.thickness) 
-		#if self.page.dsbThickness.value() == -1: self.page.dsbThickness.clear() 
- 
 
-		self.page.cbInspection.setCurrentIndex(INDEX_INSPECTION.get(self.sensor.inspection,-1))
 
 		self.page.sbStepSensor.setValue( -1 if self.sensor.step_sensor is None else self.sensor.step_sensor)
-		#self.page.sbProtomodule.setValue(-1 if self.sensor.protomodule is None else self.sensor.protomodule)
-		#self.page.sbModule.setValue(     -1 if self.sensor.module      is None else self.sensor.module     )
 		self.page.leProtomodule.setText("" if self.sensor.protomodule is None else self.sensor.protomodule)
 		self.page.leModule.setText(     "" if self.sensor.module      is None else self.sensor.module)
 		if self.page.sbStepSensor.value()  == -1: self.page.sbStepSensor.clear()
-		#if self.page.sbProtomodule.value() == -1: self.page.sbProtomodule.clear()
-		#if self.page.sbModule.value()      == -1: self.page.sbModule.clear()
-
-		#self.page.listFiles.clear()
-		#for f in self.sensor.test_files:
-		#	name = os.path.split(f)[1]
-		#	self.page.listFiles.addItem(name)
 
 		self.updateElements()
 
@@ -231,55 +178,47 @@ class func(object):
 		if not self.mode == "view":
 			self.page.leStatus.setText(self.mode)
 
+		sensor_exists      = self.sensor_exists
+		step_sensor_exists = self.page.sbStepSensor.value()  >= 0
+		protomodule_exists = self.page.leProtomodule.text()  != ""
+		module_exists      = self.page.leModule.text()       != ""
+
 		mode_view     = self.mode == 'view'
 		mode_editing  = self.mode == 'editing'
 		mode_creating = self.mode == 'creating'
 		
-		sensor_exists      = self.sensor_exists
-		step_sensor_exists = self.page.sbStepSensor.value()  >= 0
-		#protomodule_exists = self.page.sbProtomodule.value() >= 0
-		#module_exists      = self.page.sbModule.value() >= 0
-		protomodule_exists = self.page.leProtomodule.text()  != ""
-		module_exists      = self.page.leModule.text()       != ""
-
 		self.setMainSwitchingEnabled(mode_view)
-		#self.page.sbID.setEnabled(mode_view)
 		self.page.leID.setReadOnly(not mode_view)
 
 		self.page.pbLoad.setEnabled(mode_view)
-
 		self.page.pbNew.setEnabled(     mode_view and not sensor_exists )
 		self.page.pbEdit.setEnabled(    mode_view and     sensor_exists )
 		self.page.pbSave.setEnabled(    mode_editing or mode_creating )
 		self.page.pbCancel.setEnabled(  mode_editing or mode_creating )
 
 
-		#self.page.leInsertUser.setReadOnly(   not (mode_creating or mode_editing) )
+		self.page.cbInsertUser.setEnabled(         mode_creating or mode_editing  )
+		self.page.cbInstitution.setEnabled(        mode_creating or mode_editing  )
 		self.page.leLocation.setReadOnly(     not (mode_creating or mode_editing) )
+
 		self.page.leBarcode.setReadOnly(      not (mode_creating or mode_editing) )
 		self.page.cbType.setEnabled(               mode_creating or mode_editing  )
 		self.page.cbShape.setEnabled(              mode_creating or mode_editing  )
-		self.page.cbInstitution.setEnabled(        mode_creating or mode_editing  )
-		self.page.cbInsertUser.setEnabled(         mode_creating or mode_editing  )
-		#self.page.sbChannels.setReadOnly(     not (mode_creating or mode_editing) )
 		self.page.cbChannelDensity.setEnabled(     mode_creating or mode_editing  )
+
+		self.page.cbInspection.setEnabled(   mode_creating or mode_editing   )
+		self.page.dsbFlatness.setEnabled(       mode_creating or mode_editing  )
 		self.page.cbGrade.setEnabled(              mode_creating or mode_editing  )
+
 
 		self.page.pbDeleteComment.setEnabled(mode_creating or mode_editing)
 		self.page.pbAddComment.setEnabled(   mode_creating or mode_editing)
 		self.page.pteWriteComment.setEnabled(mode_creating or mode_editing)
 
-		#for corner in self.corners:
-		#	corner.setReadOnly(not (mode_creating or mode_editing))
-		#self.page.dsbThickness.setReadOnly(not (mode_creating or mode_editing))
-
-		self.page.cbInspection.setEnabled(   mode_creating or mode_editing   )
 		self.page.pbGoStepSensor.setEnabled( mode_view and step_sensor_exists)
 		self.page.pbGoProtomodule.setEnabled(mode_view and protomodule_exists)
 		self.page.pbGoModule.setEnabled(     mode_view and module_exists     )
 
-		#self.page.pbAddFiles.setEnabled(mode_creating or mode_editing)
-		#self.page.pbDeleteFile.setEnabled(mode_creating or mode_editing)
 
 
 	# NEW:
