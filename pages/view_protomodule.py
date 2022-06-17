@@ -287,6 +287,7 @@ class func(object):
 
 	@enforce_mode(['editing','creating'])
 	def cancelEditing(self,*args,**kwargs):
+		if self.mode == 'creating':  self.protomodule.clear()
 		self.mode = 'view'
 		self.update_info()
 
@@ -308,12 +309,6 @@ class func(object):
 		for i in range(num_comments):
 			self.protomodule.comments.append(str(self.page.listComments.item(i).text()))
 
-		#self.protomodule.offset_translation_x = self.page.dsbOffsetTranslationX.value() if self.page.dsbOffsetTranslationX.value() >=0 else None
-		#self.protomodule.offset_translation_y = self.page.dsbOffsetTranslationY.value() if self.page.dsbOffsetTranslationY.value() >=0 else None
-		#self.protomodule.offset_rotation	  = self.page.dsbOffsetRotation.value()    if self.page.dsbOffsetRotation.value()    >=0 else None
-		#self.protomodule.flatness	          = self.page.dsbFlatness.value()          if self.page.dsbFlatness.value()          >=0 else None
-		#self.protomodule.check_cracks	    = str(self.page.cbCheckCracks.currentText()   ) if str(self.page.cbCheckCracks.currentText()   ) else None
-		#self.protomodule.check_glue_spill	= str(self.page.cbCheckGlueSpill.currentText()) if str(self.page.cbCheckGlueSpill.currentText()) else None
 
 		self.protomodule.save()
 		self.mode = 'view'
@@ -337,37 +332,31 @@ class func(object):
 	def goStepSensor(self,*args,**kwargs):
 		ID = self.page.sbStepSensor.value()
 		if ID >= 0:
-			self.setUIPage('sensor placement steps',ID=ID)
+			self.setUIPage('1. Sensor - pre-assembly',ID=ID)
 	
 	@enforce_mode('view')
 	def goSensor(self,*args,**kwargs):
-		#ID = self.page.sbSensor.value()
 		ID = self.page.leSensor.text()
-		#if ID >= 0:
 		if ID != "":
-			self.setUIPage('sensors',ID=ID)
+			self.setUIPage('Sensors',ID=ID)
 
 	@enforce_mode('view')
 	def goBaseplate(self,*args,**kwargs):
-		#ID = self.page.sbBaseplate.value()
 		ID = self.page.leBaseplate.text()
-		#if ID >= 0:
 		if ID != "":
-			self.setUIPage('baseplates',ID=ID)
+			self.setUIPage('Baseplates',ID=ID)
 
 	@enforce_mode('view')
 	def goStepPcb(self,*args,**kwargs):
 		ID = self.page.sbStepPcb.value()
 		if ID >=0:
-			self.setUIPage('PCB placement steps',ID=ID)
+			self.setUIPage('3. PCB - pre-assembly',ID=ID)
 
 	@enforce_mode('view')
 	def goModule(self,*args,**kwargs):
-		#ID = self.page.sbModule.value()
 		ID = self.page.leModule.text()
-		#if ID >= 0:
 		if ID != "":
-			self.setUIPage('modules',ID=ID)
+			self.setUIPage('Modules',ID=ID)
 		else:
 			return
 

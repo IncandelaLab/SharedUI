@@ -134,6 +134,7 @@ class func(object):
 			self.page.leID.setText(ID)
 
 		self.baseplate_exists = (ID == self.baseplate.ID)
+		print("update_info: baseplate_exists=", self.baseplate_exists, ", ID is", ID)
 
 		if not self.baseplate.insertion_user in self.index_users.keys() and not self.baseplate.insertion_user is None:
 			# Insertion user was deleted from user page...just add user to the dropdown
@@ -171,8 +172,8 @@ class func(object):
 
 	@enforce_mode(['view','editing','creating'])
 	def updateElements(self):
-		if not self.mode == "view":
-			self.page.leStatus.setText(self.mode)
+		#if not self.mode == "view":
+		self.page.leStatus.setText(self.mode)
 
 		baseplate_exists = self.baseplate_exists
 		step_sensor_exists    = self.page.sbStepSensor.value()   >=0
@@ -228,6 +229,7 @@ class func(object):
 		tmp_exists = tmp_baseplate.load(tmp_ID)
 		if not tmp_exists:  # DNE; good to create
 			self.page.leStatus.setText("baseplate DNE")
+			self.update_info()
 		else:
 			self.baseplate = tmp_baseplate
 			self.page.leStatus.setText("baseplate exists")
@@ -247,7 +249,7 @@ class func(object):
 			ID = self.page.leID.text()
 			self.baseplate.new(ID)
 			self.mode = 'creating'  # update_info needs mode==view
-			self.updateElements()
+			self.update_info()
 		else:
 			self.page.leStatus.setText("already exists")
 
@@ -266,6 +268,7 @@ class func(object):
 	@enforce_mode(['editing','creating'])
 	def cancelEditing(self,*args,**kwargs):
 		self.mode = 'view'
+		self.baseplate.clear()
 		self.update_info()
 
 	@enforce_mode(['editing','creating'])

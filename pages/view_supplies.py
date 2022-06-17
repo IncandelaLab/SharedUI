@@ -62,6 +62,7 @@ class simple_fsobj_vc(object):
 				self.dExpires .setDate(QtCore.QDate(int(ydm[2]), int(ydm[0]), int(ydm[1])))   #*self.fsobj.date_expires))
 				print("DATE SET TO:", self.dExpires.date())
 
+			print("is_empty:", self.fsobj.is_empty, ", fsobj is", self.fsobj.ID)
 			self.ckIsEmpty.setChecked(self.fsobj.is_empty)
 
 			if not self.leCuring is None:
@@ -111,6 +112,7 @@ class simple_fsobj_vc(object):
 			self.fsobj.date_expires  = "{}-{}-{}".format(dateE.month(), dateE.day(), dateE.year())
 			#   dateE.year(), dateE.month(), dateE.day())  #self.dExpires.date().getDate()
 
+		print("Setting is_empty")
 		self.fsobj.is_empty = self.ckIsEmpty.isChecked()
 		if not self.leCuring is None:
 			print("\n\nLE CURING EXIST\n\n")

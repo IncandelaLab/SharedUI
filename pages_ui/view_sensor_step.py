@@ -454,7 +454,7 @@ class Ui_Form(object):
         self.pbClear4.setText(_translate("Form", "clear"))
         self.pbClear5.setText(_translate("Form", "clear"))
         self.pbClear6.setText(_translate("Form", "clear"))
-        self.ckCheckFeet.setText(_translate("Form", "Check:  correct feet are installed on pickup tool"))
+        self.ckCheckFeet.setText(_translate("Form", "Check:  correct feet are installed on pickup tools"))
         self.lineEdit_10.setText(_translate("Form", "run start"))
         self.pbRunStopNow.setText(_translate("Form", "set to now"))
         self.lineEdit_28.setText(_translate("Form", "run stop"))

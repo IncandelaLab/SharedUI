@@ -622,7 +622,6 @@ class func(object):
 
 	@enforce_mode('view')
 	def loadStep(self,*args,**kwargs):
-		print("\nin loadStep\n")
 		if self.page.sbID.value() == -1:  return
 		tmp_step = fm.step_sensor()
 		tmp_ID = self.page.sbID.value()
@@ -632,7 +631,6 @@ class func(object):
 		else:
 			self.step_sensor = tmp_step
 			self.update_info()
-		print("\nLoaded step\n")
 
 	@enforce_mode('view')
 	def startCreating(self,*args,**kwargs):
@@ -660,6 +658,7 @@ class func(object):
 	@enforce_mode(['editing','creating'])
 	def cancelEditing(self,*args,**kwargs):
 		self.unloadAllObjects()
+		if self.mode == 'creating':  self.step_sensor.clear()
 		self.mode = 'view'
 		self.update_info()
 
@@ -741,7 +740,6 @@ class func(object):
 
 		self.step_sensor.check_tool_feet = self.page.ckCheckFeet.isChecked()
 
-		print("\n\n\nSAVING STEP SENSOR\n\n\n")
 		self.step_sensor.save()
 		self.unloadAllObjects()
 		self.mode = 'view'

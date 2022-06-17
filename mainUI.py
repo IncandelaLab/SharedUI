@@ -289,7 +289,7 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		self.listUsers.itemActivated.connect(self.changeUIPage)
 		self.listInformation.itemActivated.connect(self.changeUIPage)
 		self.listAssembly.itemActivated.connect(self.changeUIPage)
-		self.listShippingAndReceiving.itemActivated.connect(self.changeUIPage)
+		#self.listShippingAndReceiving.itemActivated.connect(self.changeUIPage)
 		self.swPages.currentChanged.connect(self.pageChanged)
 
 		self.pbUploadObject.clicked.connect(self.goUploadObject)
@@ -332,7 +332,7 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		self.listUsers.setEnabled(enabled)
 		self.listInformation.setEnabled(enabled)
 		self.listAssembly.setEnabled(enabled)
-		self.listShippingAndReceiving.setEnabled(enabled)
+		#self.listShippingAndReceiving.setEnabled(enabled)
 
 
 	# New, sort of experimental

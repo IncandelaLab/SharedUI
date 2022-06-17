@@ -288,9 +288,6 @@ class func(object):
 		tmp_ID = self.page.leID.text()
 		tmp_exists = tmp_pcb.load(tmp_ID)
 		if not tmp_exists:  # DNE; good to create
-			#ID = self.page.leID.text()
-			#self.sensor.new(ID)
-			#self.mode = 'creating'  # update_info needs mode==view
 			self.page.leStatus.setText("PCB DNE")
 			self.update_info(do_load=False)
 		else:
@@ -310,7 +307,7 @@ class func(object):
 			ID = self.page.leID.text()
 			self.pcb.new(ID)
 			self.mode = 'creating'
-			self.updateElements()
+			self.update_info()
 		else:
 			self.page.leStatus.setText("already exists")
 
@@ -329,6 +326,7 @@ class func(object):
 	@enforce_mode(['editing','creating'])
 	def cancelEditing(self,*args,**kwargs):
 		self.mode = 'view'
+		self.pcb.clear()
 		self.update_info()
 
 	@enforce_mode(['editing','creating'])
@@ -392,13 +390,13 @@ class func(object):
 		#if ID >= 0:
 		ID = self.page.leModule.text()
 		if ID != "":
-			self.setUIPage('modules',ID=ID)
+			self.setUIPage('Modules',ID=ID)
 	
 	@enforce_mode('view')
 	def goStepPcb(self,*args,**kwargs):
 		ID = self.page.sbStepPcb.value()
 		if ID >= 0:
-			self.setUIPage('PCBs',ID=ID)
+			self.setUIPage('3. PCB - pre-assembly',ID=ID)
 
 	@enforce_mode('view')
 	def addToPlotter(self,*args,**kwargs):

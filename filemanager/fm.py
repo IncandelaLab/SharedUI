@@ -297,8 +297,10 @@ class fsobj(object):
 			return int(string)
 		elif string.replace('.','',1).isdigit():
 			return float(string)
-		elif string in ["True", "False"]:
-			return bool(string)
+		elif string == "True":  # direct bool conversion fails...
+			return True
+		elif string == "False":
+			return False
 		elif string == "None":
 			return None
 		else:
@@ -411,8 +413,6 @@ class fsobj(object):
 			if item_name == "DATA_SET":
 				self.make_dataset_element(root, item)
 			else:
-				print("  List not found in generate_xml.  Calling dict to element on...")
-				print(item, item_name)
 				child = self.dict_to_element(item, item_name)
 				root.append(child)
 		return tree
@@ -456,7 +456,7 @@ class fsobj(object):
 			# CHANGE FOR NEW XML SYSTEM:
 			# item is a list (comments), dict (another XML layer), or string (var)
 			# If string, use getattr()
-			print("    dict_to_element:  name, dict are:", item_name, item)
+			#print("    dict_to_element:  name, dict are:", item_name, item)
 
 			if item_name == "DATA_SET":
 				self.make_dataset_element(parent, item)
@@ -857,7 +857,7 @@ class fsobj_assembly(fsobj):
 		with open(self.partlistfile, 'r') as opfl:
 			data = json.load(opfl)
 			if not str(ID) in data.keys():
-				print("ASSEMBLY STEP NOT FOUND.  REQUESTED CONDITION TABLES:")
+				#print("ASSEMBLY STEP NOT FOUND.  REQUESTED CONDITION TABLES:")
 				print("**TEMPORARY:  Part downloading disabled for testing!**")
 				return False
 				"""
@@ -1280,7 +1280,7 @@ class baseplate(fsobj_part):
 		return None
 	@location_id.setter
 	def location_id(self, value):
-		if not value in LOCATION_DICT.keys() and value != None:
+		if not value in LOCATION_DICT.keys() or value == None:
 			print("Warning:  Found invalid location ID {}".format(value))
 		else:
 			self.location = LOCATION_DICT[value]
@@ -1385,7 +1385,7 @@ class sensor(fsobj_part):
 		"channel_density",  # HD or LD
 		"shape",        # 
 		"grade",
-		#"rotation",     # 
+		"flatness",     # 
 
 		# sensor qualification
 		"inspection", # None if not inspected yet; True if passed; False if failed
@@ -1450,7 +1450,10 @@ class sensor(fsobj_part):
 
 	@property
 	def resolution(self):
-		return 'HD' if self.type=='120um' else 'LD'
+		return self.channel_density   #'HD' if self.type=='120um' else 'LD'
+	@resolution.setter
+	def resolution(self, value):
+		self.channel_density = value
 
 	@property
 	def kind_of_part(self):
@@ -1480,7 +1483,7 @@ class sensor(fsobj_part):
 		return None
 	@location_id.setter
 	def location_id(self, value):
-		if not value in LOCATION_DICT.keys() and value != None:
+		if not value in LOCATION_DICT.keys() or value == None:
 			print("Warning:  Found invalid location ID {}".format(value))
 		else:
 			self.location = LOCATION_DICT[value]
@@ -1657,7 +1660,7 @@ class pcb(fsobj_part):
 		return None
 	@location_id.setter
 	def location_id(self, value):
-		if not value in LOCATION_DICT.keys() and value != None:
+		if not value in LOCATION_DICT.keys() or value == None:
 			print("Warning:  Found invalid location ID {}".format(value))
 		else:
 			self.location = LOCATION_DICT[value]
@@ -1756,7 +1759,7 @@ class protomodule(fsobj_part):
 				"NAME":"AsmTrayPosn",
 				"VALUE":"assem_tray_posn",
 			}
-		}
+		},
 		"COMMENTS":"comments_concat",
 		"CHILDREN":{
 			"PART":[{
@@ -1792,6 +1795,12 @@ class protomodule(fsobj_part):
 		if not self.sensor or not self.baseplate:  return None
 		return '{} {} Si ProtoModule {} {}'.format('EM' if self.baseplate.material=='CuW' else 'HAD', 
                                                   self.sensor.type, self.sensor.resolution, self.shape)
+
+	@kind_of_part.setter
+	def kind_of_part(self, value):
+		pass
+		#print("TODO:  protomod kind_of_part:  implement when DB enabled")
+
 
 	@property
 	def assem_tray_pos(self):
@@ -1841,6 +1850,19 @@ class protomodule(fsobj_part):
 			return None
 		return temp_sensor.description
 
+	@property
+	def resolution(self):
+		if self.sensor is None:
+			print("ERROR in module resolution:  sensor is None!")
+			return None
+		temp_sensor = sensor()
+		if not temp_sensor.load(self.sensor):
+			print("ERROR:  Could not find child sensor {}!".format(self.sensor))
+			return None
+		return temp_sensor.resolution
+
+
+
 
 class module(fsobj_part):
 	OBJECTNAME = "module"
@@ -1881,7 +1903,7 @@ class module(fsobj_part):
 
 		# wirebonding
 		# NEW: NOTE:  This info is filled out using the wirebonding page exclusively!
-		"wirebonding_completed",
+		#"wirebonding_completed",
 		"wirebonding_comments",  # Comments from wirebonding page only
 		"wirebonding_date_back",
 		"wirebonding_date_front",
@@ -2038,6 +2060,9 @@ class module(fsobj_part):
 		if not self.sensor or not self.baseplate:  return None
 		return '{} {} Si Module {} {}'.format('EM' if self.baseplate.material=='CuW' else 'HAD', 
                                                    self.sensor.type, self.sensor.resolution, self.shape)
+	@kind_of_part.setter
+	def kind_of_part(self, value):
+		print("TODO:  mod kind_of_part:  implement when DB enabled")
 
 	@kind_of_part.setter
 	def kind_of_part(self, value):
@@ -2050,7 +2075,7 @@ class module(fsobj_part):
 	# TEMPORARY:  NOTE:  Must fix this...
 	@property
 	def wirebonding_completed(self):
-		return wirebonding_final_inspection_ok == 'pass'
+		return self.wirebonding_final_inspection_ok == 'pass'
 
 
 	@property
@@ -2100,6 +2125,17 @@ class module(fsobj_part):
 			print("ERROR:  Could not find child PCB {}!".format(self.pcb))
 			return None
 		return temp_pcb.kind_of_part
+
+	@property
+	def resolution(self):
+		if self.sensor is None:
+			print("ERROR in module resolution:  sensor is None!")
+			return None
+		temp_sensor = sensor()
+		if not temp_sensor.load(self.sensor):
+			print("ERROR:  Could not find child sensor {}!".format(self.sensor))
+			return None
+		return temp_sensor.resolution
 
 
 

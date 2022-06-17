@@ -663,6 +663,7 @@ class func(object):
 	@enforce_mode(['editing','creating'])
 	def cancelEditing(self,*args,**kwargs):
 		self.unloadAllObjects()
+		if self.mode == 'creating':  self.step_pcb.clear()
 		self.mode = 'view'
 		self.update_info()
 

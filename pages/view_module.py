@@ -342,6 +342,7 @@ class func(object):
 
 	@enforce_mode(['editing','creating'])
 	def cancelEditing(self,*args,**kwargs):
+		if self.mode == 'creating':  self.module.clear()
 		self.mode = 'view'
 		self.update_info()
 
@@ -404,7 +405,7 @@ class func(object):
 		#if ID>=0:
 		ID = self.page.leBaseplate.text()
 		if ID != "":
-			self.setUIPage('baseplates',ID=ID)
+			self.setUIPage('Baseplates',ID=ID)
 
 	@enforce_mode('view')
 	def goSensor(self,*args,**kwargs):
@@ -412,7 +413,7 @@ class func(object):
 		#if ID>=0:
 		ID = self.page.leSensor.text()
 		if ID != "":
-			self.setUIPage('sensors',ID=ID)
+			self.setUIPage('Sensors',ID=ID)
 
 	@enforce_mode('view')
 	def goPcb(self,*args,**kwargs):
@@ -428,35 +429,19 @@ class func(object):
 		#if ID>=0:
 		ID = self.page.leProtomodule.text()
 		if ID != "":
-			self.setUIPage('protomodules',ID=ID)
+			self.setUIPage('Protomodules',ID=ID)
 
 	@enforce_mode('view')
 	def goStepSensor(self,*args,**kwargs):
 		ID = self.page.sbStepSensor.value()
 		if ID>=0:
-			self.setUIPage('sensor placement steps',ID=ID)
+			self.setUIPage('1. Sensor - pre-assembly',ID=ID)
 
 	@enforce_mode('view')
 	def goStepPcb(self,*args,**kwargs):
 		ID = self.page.sbStepPcb.value()
 		if ID>=0:
-			self.setUIPage('PCB placement steps',ID=ID)
-
-	@enforce_mode('view')
-	def ivAddToPlotter(self,*args,**kwargs):
-		print("not implemented yet - waiting for plotter page to be implemented")
-
-	@enforce_mode('view')
-	def ivGoPlotter(self,*args,**kwargs):
-		self.setUIPage('plotter',which='iv')
-
-	@enforce_mode('view')
-	def daqAddToPlotter(self,*args,**kwargs):
-		print("not implemented yet - waiting for plotter page to be implemented")
-
-	@enforce_mode('view')
-	def daqGoPlotter(self,*args,**kwargs):
-		self.setUIPage('plotter',which='daq')
+			self.setUIPage('3. PCB - pre-assembly',ID=ID)
 
 
 	@enforce_mode(['editing', 'creating'])

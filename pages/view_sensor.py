@@ -150,11 +150,11 @@ class func(object):
 		self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.sensor.institution, -1))
 		self.page.leLocation.setText(    "" if self.sensor.location     is None else self.sensor.location    )
 
-		self.page.leBarcode.setText( "" if self.sensor.barcode          is None else self.sensor.barcode     )
+		self.page.leBarcode.setText(   "" if self.sensor.barcode     is None else self.sensor.barcode     )
 		self.page.cbType.setCurrentIndex(       INDEX_TYPE.get(       self.sensor.type,            -1))
 		self.page.cbShape.setCurrentIndex(      INDEX_SHAPE.get(      self.sensor.shape,           -1))
 		self.page.cbChannelDensity.setCurrentIndex(INDEX_CHANNEL.get( self.sensor.channel_density, -1))
-		self.page.dsbFlatnesssetValue(-1 if self.baseplate.flatness  is None else self.baseplate.flatness )
+		self.page.dsbFlatness.setValue(-1 if self.sensor.flatness is None else self.sensor.flatness )
 		if self.page.dsbFlatness.value() == -1: self.page.dsbFlatness.clear()
 		self.page.cbInspection.setCurrentIndex( INDEX_INSPECTION.get( self.sensor.inspection,      -1))
 
@@ -232,9 +232,6 @@ class func(object):
 		tmp_ID = self.page.leID.text()
 		tmp_exists = tmp_sensor.load(tmp_ID)
 		if not tmp_exists:  # DNE; good to create
-			#ID = self.page.leID.text()
-			#self.sensor.new(ID)
-			#self.mode = 'creating'  # update_info needs mode==view
 			self.page.leStatus.setText("sensor DNE")
 			self.update_info()
 		else:
@@ -257,7 +254,7 @@ class func(object):
 			ID = self.page.leID.text()
 			self.sensor.new(ID)
 			self.mode = 'creating'
-			self.updateElements()
+			self.update_info()
 		else:
 			self.page.leStatus.setText("already exists")
 
@@ -276,6 +273,7 @@ class func(object):
 	@enforce_mode(['editing','creating'])
 	def cancelEditing(self,*args,**kwargs):
 		self.mode = 'view'
+		self.sensor.clear()
 		self.update_info()
 
 	@enforce_mode(['editing','creating'])
@@ -333,7 +331,7 @@ class func(object):
 	def goStepSensor(self,*args,**kwargs):
 		ID = self.page.sbStepSensor.value()
 		if ID >= 0:
-			self.setUIPage('sensor placement steps',ID=ID)
+			self.setUIPage('1. Sensor - pre-assembly',ID=ID)
 	
 	@enforce_mode('view')
 	def goProtomodule(self,*args,**kwargs):
@@ -341,7 +339,7 @@ class func(object):
 		#if ID >= 0:
 		ID = self.page.leProtomodule.text()
 		if ID != "":
-			self.setUIPage('protomodules',ID=ID)
+			self.setUIPage('Protomodules',ID=ID)
 
 	@enforce_mode('view')
 	def goModule(self,*args,**kwargs):
@@ -349,7 +347,7 @@ class func(object):
 		#if ID >= 0:
 		ID = self.page.leModule.text()
 		if ID != "":
-			self.setUIPage('modules',ID=ID)
+			self.setUIPage('Modules',ID=ID)
 
 
 	def filesToUpload(self):
