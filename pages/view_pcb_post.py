@@ -423,7 +423,6 @@ class func(object):
 			module.save()
 
 
-		print("\n\n\nSAVING STEP PCB\n\n\n")
 		self.step_pcb.save()
 		self.unloadAllObjects()
 		self.mode = 'view'
@@ -468,13 +467,10 @@ class func(object):
 		xml_tree = parse(filename)  # elementtree object
 		
 		itemdata = xml_tree.find('.//FIDUCIAL1')
-		print("Found rot value:", itemdata.text)
 		self.dsb_offsets_rot[0].setValue(float(itemdata.text))
 		itemdata = xml_tree.find('.//X')
-		print("Found X value:", itemdata.text)
 		self.dsb_offsets_x[0].setValue(float(itemdata.text))
 		itemdata = xml_tree.find('.//Y')
-		print("Found Y value:", itemdata.text)
 		self.dsb_offsets_y[0].setValue(float(itemdata.text))
 		itemdata = xml_tree.find('.//MEAN')
 		self.dsb_thickness[0].setValue(float(itemdata.text))

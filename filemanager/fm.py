@@ -2075,7 +2075,13 @@ class module(fsobj_part):
 	# TEMPORARY:  NOTE:  Must fix this...
 	@property
 	def wirebonding_completed(self):
-		return self.wirebonding_final_inspection_ok == 'pass'
+		return self.wirebonding_back and \
+		       self.wirebonds_inspected_back and \
+		       self.wirebonding_front and \
+		       self.wirebonds_inspected_front and \
+		       self.encapsulation_inspection_back and \
+               self.encapsulation_inspection_front and \
+		       self.wirebonding_final_inspection_ok == 'pass'
 
 
 	@property

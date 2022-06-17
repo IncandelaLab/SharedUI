@@ -38,6 +38,7 @@ def separate_sites(sites_string):
 
 def site_format_check(sites_string):
 	# Input should be a comma-separated list or a space-separated list (of numbers).
+	if sites_string == "" or sites_string == "None":  return True
 	for char in sites_string:
 		if not (char.isdigit() or char==" " or char==","):
 			return False
@@ -444,7 +445,7 @@ class func(object):
 		pteList = {#"unbonded_back":self.page.pteUnbondedChannelsBack,
 				   # "damaged_back":self.page.pteWirebondsDamagedBack,
 				   # "repaired_back":self.page.pteWirebondsRepairedListBack,
-				   "skip_front":self.page.pteWirebondingChannelsSkipFront,
+				   #"skip_front":self.page.pteWirebondingChannelsSkipFront,
 				   "unbonded_front":self.page.pteUnbondedChannelsFront
 				   # "damaged_front":self.page.pteWirebondsDamagedFront,
 				   # "repaired_front":self.page.pteWirebondsRepairedListFront
@@ -472,6 +473,7 @@ class func(object):
 				if QtCore.QDate.currentDate() > expires:  pteErrs.append("Sylgard expired")
 			if tmp_sylgard.is_empty:  pteErrs.append("Sylgard empty")
 		tmp_bond_wire = fm.batch_bond_wire()
+		print("Loading bond wire {}:".format(self.page.sbBatchBondWire.value()))
 		if not tmp_bond_wire.load(self.page.sbBatchBondWire.value()):
 			pteErrs.append("Bond wire DNE")
 		else:
@@ -494,13 +496,6 @@ class func(object):
 			self.page.leErrors.setText("Error:  {}".format(', '.join(pteErrs)))
 			return
 
-		# NEW:  Check to ensure all steps are completed, set in module page if done
-		self.module.wirebonding_completed = self.page.ckWirebondingBack.isChecked() and self.page.ckWirebondsInspectedBack.isChecked() and \
-                                            self.page.ckWirebondingFront.isChecked() and self.page.ckWirebondsInspectedFront.isChecked() and \
-                                            self.page.ckEncapsulationBack.isChecked() and self.page.cbEncapsulationInspectionBack.currentText() != '' and \
-                                            self.page.ckEncapsulationFront.isChecked() and self.page.cbEncapsulationInspectionFront.currentText() != '' and \
-                                            self.page.cbFinalInspectionOK.currentText() != ''
-                                            
 
 		# characteristics
 
