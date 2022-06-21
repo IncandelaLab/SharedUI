@@ -18,7 +18,7 @@ class simple_fsobj_vc(object):
 		pteWriteComment,
 		pbDeleteComment,
 		pbAddComment,
-		leCuring=None  # NEW
+		leCuring=None
 		):
 
 		self.fsobj_exists    = None
@@ -38,7 +38,6 @@ class simple_fsobj_vc(object):
 
 	def update_info(self,ID=None,*args,**kwargs):
 		if ID is None:
-			#print("** SB TYPE IS **", type(self.sbID).__name__)
 			if type(self.sbID).__name__ == 'QLineEdit':
 				ID = self.sbID.text()
 			else:
@@ -60,14 +59,10 @@ class simple_fsobj_vc(object):
 				self.dReceived.setDate(QtCore.QDate(int(ydm[2]), int(ydm[0]), int(ydm[1])))  #*self.fsobj.date_received))
 				ydm = self.fsobj.date_expires.split('-')
 				self.dExpires .setDate(QtCore.QDate(int(ydm[2]), int(ydm[0]), int(ydm[1])))   #*self.fsobj.date_expires))
-				print("DATE SET TO:", self.dExpires.date())
 
-			print("is_empty:", self.fsobj.is_empty, ", fsobj is", self.fsobj.ID)
 			self.ckIsEmpty.setChecked(self.fsobj.is_empty)
 
 			if not self.leCuring is None:
-				print("FOUND LE CURING")
-				print("SETTING TO:", self.fsobj.curing_agent)
 				self.leCuring.setText(self.fsobj.curing_agent)
 
 			self.listComments.clear()
@@ -107,15 +102,11 @@ class simple_fsobj_vc(object):
 		if self.dReceived != None:
 			dateR = self.dReceived.date()
 			self.fsobj.date_received = "{}-{}-{}".format(dateR.month(), dateR.day(), dateR.year())
-			#   dateR.year(), dateR.month(), dateR.day())  #self.dReceived.date().getDate()
 			dateE = self.dExpires.date()
 			self.fsobj.date_expires  = "{}-{}-{}".format(dateE.month(), dateE.day(), dateE.year())
-			#   dateE.year(), dateE.month(), dateE.day())  #self.dExpires.date().getDate()
 
-		print("Setting is_empty")
 		self.fsobj.is_empty = self.ckIsEmpty.isChecked()
 		if not self.leCuring is None:
-			print("\n\nLE CURING EXIST\n\n")
 			if self.leCuring.text() != '':  self.fsobj.curing_agent = self.leCuring.text()
 			else:  self.fsobj.curing_agent = None
 
@@ -143,7 +134,7 @@ class func(object):
 
 		self.batch_araldite = simple_fsobj_vc(
 			fm.batch_araldite(),
-			self.page.leAralditeID, #self.page.sbAralditeID,
+			self.page.leAralditeID,
 			self.page.dAralditeReceived,
 			self.page.dAralditeExpires,
 			self.page.ckIsAralditeEmpty,
@@ -186,22 +177,7 @@ class func(object):
 			self.page.pbSylgardAddComment,
 			self.page.leSylgardCuring,
 			)
-		"""
-		self.batch_sylgard_thin = simple_fsobj_vc(
-			fm.batch_sylgard_thin(),
-			self.page.sbSylgardThinID,
-			self.page.dSylgardThinReceived,
-			self.page.dSylgardThinExpires,
-			self.page.ckIsSylgardThinEmpty,
-			self.page.pbSylgardThinEditNew,
-			self.page.pbSylgardThinSave,
-			self.page.pbSylgardThinCancel,
-			self.page.listSylgardThinComments,
-			self.page.pteSylgardThinWriteComment,
-			self.page.pbSylgardThinDeleteComment,
-			self.page.pbSylgardThinAddComment,
-			)
-		"""
+
 		self.batch_bond_wire = simple_fsobj_vc(
 			fm.batch_bond_wire(),
 			self.page.sbBondWireID,
@@ -263,41 +239,34 @@ class func(object):
 
 	@enforce_mode('setup')
 	def rig(self):
-		#self.page.sbAralditeID.valueChanged.connect(self.update_info_batch_araldite)
 		self.page.leAralditeID.textChanged.connect(self.update_info_batch_araldite)
 		self.page.sbWedgeID.valueChanged.connect(self.update_info_batch_wedge)
 		self.page.sbSylgardID.valueChanged.connect(self.update_info_batch_sylgard)
-		#self.page.sbSylgardThinID.valueChanged.connect(self.update_info_batch_sylgard_thin)
 		self.page.sbBondWireID.valueChanged.connect(self.update_info_batch_bond_wire)
 
 		self.page.pbAralditeEditNew.clicked.connect(self.start_editing_batch_araldite)
 		self.page.pbWedgeEditNew.clicked.connect(self.start_editing_batch_wedge)
 		self.page.pbSylgardEditNew.clicked.connect(self.start_editing_batch_sylgard)
-		#self.page.pbSylgardThinEditNew.clicked.connect(self.start_editing_batch_sylgard_thin)
 		self.page.pbBondWireEditNew.clicked.connect(self.start_editing_batch_bond_wire)
 
 		self.page.pbAralditeSave.clicked.connect(self.save_editing_batch_araldite)
 		self.page.pbWedgeSave.clicked.connect(self.save_editing_batch_wedge)
 		self.page.pbSylgardSave.clicked.connect(self.save_editing_batch_sylgard)
-		#self.page.pbSylgardThinSave.clicked.connect(self.save_editing_batch_sylgard_thin)
 		self.page.pbBondWireSave.clicked.connect(self.save_editing_batch_bond_wire)
 		
 		self.page.pbAralditeCancel.clicked.connect(self.cancel_editing_batch_araldite)
 		self.page.pbWedgeCancel.clicked.connect(self.cancel_editing_batch_wedge)
 		self.page.pbSylgardCancel.clicked.connect(self.cancel_editing_batch_sylgard)
-		#self.page.pbSylgardThinCancel.clicked.connect(self.cancel_editing_batch_sylgard_thin)
 		self.page.pbBondWireCancel.clicked.connect(self.cancel_editing_batch_bond_wire)
 
 		self.page.pbAralditeDeleteComment.clicked.connect(self.delete_comment_batch_araldite)
 		self.page.pbWedgeDeleteComment.clicked.connect(self.delete_comment_batch_wedge)
 		self.page.pbSylgardDeleteComment.clicked.connect(self.delete_comment_batch_sylgard)
-		#self.page.pbSylgardThinDeleteComment.clicked.connect(self.delete_comment_batch_sylgard_thin)
 		self.page.pbBondWireDeleteComment.clicked.connect(self.delete_comment_batch_bond_wire)
 
 		self.page.pbAralditeAddComment.clicked.connect(self.add_comment_batch_araldite)
 		self.page.pbWedgeAddComment.clicked.connect(self.add_comment_batch_wedge)
 		self.page.pbSylgardAddComment.clicked.connect(self.add_comment_batch_sylgard)
-		#self.page.pbSylgardThinAddComment.clicked.connect(self.add_comment_batch_sylgard_thin)
 		self.page.pbBondWireAddComment.clicked.connect(self.add_comment_batch_bond_wire)
 
 
@@ -313,11 +282,7 @@ class func(object):
 	@enforce_mode(['view','editing_batch_araldite','editing_batch_wedge','editing_batch_bond_wire'])
 	def update_info_batch_sylgard(self,ID=None,*args,**kwargs):
 		self.batch_sylgard.update_info(ID)
-	"""
-	@enforce_mode(['view','editing_batch_araldite','editing_batch_loctite','editing_batch_sylgard_thick','editing_batch_bond_wire'])
-	def update_info_batch_sylgard_thin(self,ID=None,*args,**kwargs):
-		self.batch_sylgard_thin.update_info(ID)
-	"""
+
 	@enforce_mode(['view','editing_batch_araldite','editing_batch_wedge','editing_batch_sylgard'])
 	def update_info_batch_bond_wire(self,ID=None,*args,**kwargs):
 		self.batch_bond_wire.update_info(ID)
@@ -328,7 +293,6 @@ class func(object):
 		self.update_info_batch_araldite()
 		self.update_info_batch_wedge()
 		self.update_info_batch_sylgard()
-		#self.update_info_batch_sylgard_thin()
 		self.update_info_batch_bond_wire()
 
 
@@ -339,52 +303,43 @@ class func(object):
 		mode_editing_batch_araldite      = self.mode == 'editing_batch_araldite'
 		mode_editing_batch_wedge         = self.mode == 'editing_batch_wedge'
 		mode_editing_batch_sylgard       = self.mode == 'editing_batch_sylgard'
-		#mode_editing_batch_sylgard_thin  = self.mode == 'editing_batch_sylgard_thin'
 		mode_editing_batch_bond_wire     = self.mode == 'editing_batch_bond_wire'
 
 		self.setMainSwitchingEnabled(mode_view)
 
-		#self.page.sbAralditeID.setEnabled(not mode_editing_batch_araldite)
 		self.page.leAralditeID.setEnabled(not mode_editing_batch_araldite)
 		self.page.sbWedgeID.setEnabled(not mode_editing_batch_wedge)
 		self.page.sbSylgardID.setEnabled(not mode_editing_batch_sylgard)
-		#self.page.sbSylgardThinID.setEnabled(not mode_editing_batch_sylgard_thin)
 		self.page.sbBondWireID.setEnabled(not mode_editing_batch_bond_wire)
 
 		self.page.pbAralditeEditNew.setEnabled(mode_view)
 		self.page.pbWedgeEditNew.setEnabled(mode_view)
 		self.page.pbSylgardEditNew.setEnabled(mode_view)
-		#self.page.pbSylgardThinEditNew.setEnabled(mode_view)
 		self.page.pbBondWireEditNew.setEnabled(mode_view)
 
 		self.page.pbAralditeSave.setEnabled(mode_editing_batch_araldite)
 		self.page.pbWedgeSave.setEnabled(mode_editing_batch_wedge)
 		self.page.pbSylgardSave.setEnabled(mode_editing_batch_sylgard)
-		#self.page.pbSylgardThinSave.setEnabled(mode_editing_batch_sylgard_thin)
 		self.page.pbBondWireSave.setEnabled(mode_editing_batch_bond_wire)
 
 		self.page.pbAralditeCancel.setEnabled(mode_editing_batch_araldite)
 		self.page.pbWedgeCancel.setEnabled(mode_editing_batch_wedge)
 		self.page.pbSylgardCancel.setEnabled(mode_editing_batch_sylgard)
-		#self.page.pbSylgardThinCancel.setEnabled(mode_editing_batch_sylgard_thin)
 		self.page.pbBondWireCancel.setEnabled(mode_editing_batch_bond_wire)
 
 		self.page.dAralditeReceived.setEnabled(mode_editing_batch_araldite)
 		self.page.dWedgeReceived.setEnabled(mode_editing_batch_wedge)
 		self.page.dSylgardReceived.setEnabled(mode_editing_batch_sylgard)
-		#self.page.dSylgardThinReceived.setEnabled(mode_editing_batch_sylgard_thin)
 		self.page.dBondWireReceived.setEnabled(mode_editing_batch_bond_wire)
 
 		self.page.dAralditeExpires.setEnabled(mode_editing_batch_araldite)
 		self.page.dWedgeExpires.setEnabled(mode_editing_batch_wedge)
 		self.page.dSylgardExpires.setEnabled(mode_editing_batch_sylgard)
-		#self.page.dSylgardThinExpires.setEnabled(mode_editing_batch_sylgard_thin)
 		self.page.dBondWireExpires.setEnabled(mode_editing_batch_bond_wire)
 
 		self.page.ckIsAralditeEmpty.setEnabled(mode_editing_batch_araldite)
 		self.page.ckIsWedgeEmpty.setEnabled(mode_editing_batch_wedge)
 		self.page.ckIsSylgardEmpty.setEnabled(mode_editing_batch_sylgard)
-		#self.page.ckIsSylgardThinEmpty.setEnabled(mode_editing_batch_sylgard_thin)
 		self.page.ckIsBondWireEmpty.setEnabled(mode_editing_batch_bond_wire)
 
 		self.page.leSylgardCuring.setEnabled(mode_editing_batch_sylgard)
@@ -392,19 +347,16 @@ class func(object):
 		self.page.pbAralditeDeleteComment.setEnabled(mode_editing_batch_araldite)
 		self.page.pbWedgeDeleteComment.setEnabled(mode_editing_batch_wedge)
 		self.page.pbSylgardDeleteComment.setEnabled(mode_editing_batch_sylgard)
-		#self.page.pbSylgardThinDeleteComment.setEnabled(mode_editing_batch_sylgard_thin)
 		self.page.pbBondWireDeleteComment.setEnabled(mode_editing_batch_bond_wire)
 
 		self.page.pbAralditeAddComment.setEnabled(mode_editing_batch_araldite)
 		self.page.pbWedgeAddComment.setEnabled(mode_editing_batch_wedge)
 		self.page.pbSylgardAddComment.setEnabled(mode_editing_batch_sylgard)
-		#self.page.pbSylgardThinAddComment.setEnabled(mode_editing_batch_sylgard_thin)
 		self.page.pbBondWireAddComment.setEnabled(mode_editing_batch_bond_wire)
 
 		self.page.pteAralditeWriteComment.setEnabled(mode_editing_batch_araldite)
 		self.page.pteWedgeWriteComment.setEnabled(mode_editing_batch_wedge)
 		self.page.pteSylgardWriteComment.setEnabled(mode_editing_batch_sylgard)
-		#self.page.pteSylgardThinWriteComment.setEnabled(mode_editing_batch_sylgard_thin)
 		self.page.pteBondWireWriteComment.setEnabled(mode_editing_batch_bond_wire)
 
 
@@ -489,34 +441,6 @@ class func(object):
 	def delete_comment_batch_sylgard(self,*args,**kwargs):
 		self.batch_sylgard.delete_comment()
 
-	"""
-	@enforce_mode('view')
-	def start_editing_batch_sylgard_thin(self,*args,**kwargs):
-		self.mode = 'editing_batch_sylgard_thin'
-		self.batch_sylgard_thin.start_editing()
-		self.update_elements()
-
-	@enforce_mode('editing_batch_sylgard_thin')
-	def cancel_editing_batch_sylgard_thin(self,*args,**kwargs):
-		self.mode='view'
-		self.update_elements()
-		self.batch_sylgard_thin.update_info()
-
-	@enforce_mode('editing_batch_sylgard_thin')
-	def save_editing_batch_sylgard_thin(self,*args,**kwargs):
-		self.batch_sylgard_thin.save_editing()
-		self.mode='view'
-		self.update_elements()
-
-	@enforce_mode('editing_batch_sylgard_thin')
-	def add_comment_batch_sylgard_thin(self,*args,**kwargs):
-		self.batch_sylgard_thin.add_comment()
-
-	@enforce_mode('editing_batch_sylgard_thin')
-	def delete_comment_batch_sylgard_thin(self,*args,**kwargs):
-		self.batch_sylgard_thin.delete_comment()
-	"""
-
 	@enforce_mode('view')
 	def start_editing_batch_bond_wire(self,*args,**kwargs):
 		self.mode = 'editing_batch_bond_wire'
@@ -556,8 +480,6 @@ class func(object):
 			self.update_info_batch_wedge(kwargs['batch_wedge'])
 		if "batch_sylgard" in keys:
 			self.update_info_batch_sylgard(kwargs['batch_sylgard'])
-		#if "batch_sylgard_thin" in keys:
-		#	self.update_info_batch_sylgard_thin(kwargs['batch_sylgard_thin'])
 		if "batch_bond_wire" in keys:
 			self.update_info_batch_bond_wire(kwargs['batch_bond_wire'])
 

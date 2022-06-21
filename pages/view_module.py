@@ -386,7 +386,7 @@ class func(object):
 		if files != []:
 			# Need to call this to ensure that necessary dirs for storing item are created
 			print("Got files.  Saving to ensure creation of filemanager location...")
-            self.module.save()
+			self.module.save()
 			for f in files:
 				fname = os.path.split(f)[1]  # Name of file
 				fdir, fname_ = self.module.get_filedir_filename()

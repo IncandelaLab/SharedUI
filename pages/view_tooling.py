@@ -11,6 +11,8 @@ INDEX_INSTITUTION = {
 	'HPK':5,
 }
 
+
+
 INSTITUTION_INDEX = {  # Can probably be replaced w/ list
 	0:'CERN',
 	1:'FNAL',
@@ -64,11 +66,6 @@ class simple_fsobj_vc(object):
 
 		if self.fsobj_exists:
 			self.pbEditNew.setText("edit")
-			#if self.fsobj_tool.size is None:
-			#	self.dsbSize.setValue(0)
-			#	self.dsbSize.clear()
-			#else:
-			#	self.dsbSize.setValue(self.fsobj_tool.size)
 			if self.fsobj_tool.location is None:
 				self.leLocation.setText("")
 			else:
@@ -81,7 +78,6 @@ class simple_fsobj_vc(object):
 
 		else:
 			self.pbEditNew.setText("new")
-			#self.dsbSize.setValue(0)
 			self.leLocation.setText("")
 			self.listComments.clear()
 			self.pteWriteComment.clear()
@@ -125,7 +121,6 @@ class func(object):
 			self.fm.tool_sensor(),
 			self.page.sbSensorToolID,
 			self.page.cbSensorToolInstitution,
-			#self.page.dsbSensorToolSize,
 			self.page.leSensorToolLocation,
 			self.page.pbSensorToolEditNew,
 			self.page.pbSensorToolSave,
@@ -140,7 +135,6 @@ class func(object):
 			self.fm.tool_pcb(),
 			self.page.sbPcbToolID,
 			self.page.cbPcbToolInstitution,
-			#self.page.dsbPcbToolSize,
 			self.page.lePcbToolLocation,
 			self.page.pbPcbToolEditNew,
 			self.page.pbPcbToolSave,
@@ -155,7 +149,6 @@ class func(object):
 			self.fm.tray_component_sensor(),
 			self.page.sbSensorTrayID,
 			self.page.cbSensorTrayInstitution,
-			#self.page.dsbSensorTraySize,
 			self.page.leSensorTrayLocation,
 			self.page.pbSensorTrayEditNew,
 			self.page.pbSensorTraySave,
@@ -170,7 +163,6 @@ class func(object):
 			self.fm.tray_component_pcb(),
 			self.page.sbPcbTrayID,
 			self.page.cbPcbTrayInstitution,
-			#self.page.dsbPcbTraySize,
 			self.page.lePcbTrayLocation,
 			self.page.pbPcbTrayEditNew,
 			self.page.pbPcbTraySave,
@@ -185,7 +177,6 @@ class func(object):
 			self.fm.tray_assembly(),
 			self.page.sbAssemblyTrayID,
 			self.page.cbAssemblyTrayInstitution,
-			#self.page.dsbAssemblyTraySize,
 			self.page.leAssemblyTrayLocation,
 			self.page.pbAssemblyTrayEditNew,
 			self.page.pbAssemblyTraySave,
@@ -584,8 +575,6 @@ class func(object):
 	@enforce_mode('view')
 	def load_kwargs(self,kwargs):
 		keys = kwargs.keys()
-		#print("LOADING KWARGS")
-		#print(kwargs)
 		if "tool_sensor" in keys:
 			self.update_info_sensor_tool_ID(kwargs['tool_sensor'])
 		if "tool_pcb" in keys:
