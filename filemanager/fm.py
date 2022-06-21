@@ -1804,11 +1804,11 @@ class protomodule(fsobj_part):
 
 	@property
 	def assem_tray_pos(self):
-		return "TRPOSN_{}{}".format(self.tray_posn%2+1, tray_posn//3+1)
+		return "TRPOSN_{}{}".format(self.tray_row, tray_col)
 
 	@property
 	def comp_tray_pos(self):
-		return "CMPOSN_{}{}".format(self.tray_posn%2+1, tray_posn//3+1)
+		return "CMPOSN_{}{}".format(self.tray_row, tray_col)
 
 
 	@property
@@ -1827,6 +1827,17 @@ class protomodule(fsobj_part):
 			position = temp_sensor_step.sensors.index(self.ID)
 			return position
 
+	@property
+	def tray_row(self):
+		posn = self.tray_posn()
+		if posn == "None":  return posn
+		else:  return posn%2+1
+
+	@property
+	def tray_col(self):
+		posn = self.tray_posn()
+		if posn == "None": return posn
+		else:  return posn//3+1
 
 	@property
 	def baseplate_type(self):
@@ -2108,6 +2119,18 @@ class module(fsobj_part):
 			#print("Temp sensor step found.  Sensors:", temp_sensor_step.sensors)
 			position = temp_sensor_step.sensors.index(self.ID)
 			return position
+
+	@property
+	def tray_row(self):
+		posn = self.tray_posn()
+		if posn == "None":  return posn
+		else:  return posn%2+1
+
+	@property
+	def tray_col(self):
+		posn = self.tray_posn()
+		if posn == "None": return posn
+		else:  return posn//3+1
 
 
 	@property

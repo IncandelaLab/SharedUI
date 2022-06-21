@@ -4,6 +4,15 @@ PAGE_NAME = "view_sensor"
 OBJECTTYPE = "sensor"
 DEBUG = False
 
+INDEX_INSTITUTION = {
+	'CERN':0,
+	'FNAL':1,
+	'UCSB':2,
+	'UMN':3,
+	'HEPHY':4,
+	'HPK':5,
+}
+
 INDEX_TYPE = {
 	'120um':0,
 	'200um':1,
@@ -26,22 +35,6 @@ INDEX_INSPECTION = {
 	True:0,
 	'fail':1,
 	False:1,
-}
-
-INDEX_CHECK = {
-	'pass':0,
-	True:0,
-	'fail':1,
-	False:1,
-}
-
-INDEX_INSTITUTION = {
-	'CERN':0,
-	'FNAL':1,
-	'UCSB':2,
-	'UMN':3,
-	'HEPHY':4,
-	'HPK':5,
 }
 
 INDEX_CHANNEL = {
@@ -164,7 +157,6 @@ class func(object):
 		self.page.pteWriteComment.clear()
 
 
-
 		self.page.sbStepSensor.setValue( -1 if self.sensor.step_sensor is None else self.sensor.step_sensor)
 		self.page.leProtomodule.setText("" if self.sensor.protomodule is None else self.sensor.protomodule)
 		self.page.leModule.setText(     "" if self.sensor.module      is None else self.sensor.module)
@@ -279,24 +271,19 @@ class func(object):
 	@enforce_mode(['editing','creating'])
 	def saveEditing(self,*args,**kwargs):
 
-		#self.sensor.insertion_user = str(self.page.leInsertUser.text()      ) if str(self.page.leInsertUser.text()  )       else None
-		self.sensor.location     = str(self.page.leLocation.text()          ) if str(self.page.leLocation.text()    )       else None
-		self.sensor.barcode      = str(self.page.leBarcode.text()           ) if str(self.page.leBarcode.text()     )       else None
-		self.sensor.type         = str(self.page.cbType.currentText()       ) if str(self.page.cbType.currentText() )       else None
-		self.sensor.shape        = str(self.page.cbShape.currentText()      ) if str(self.page.cbShape.currentText())       else None
-		self.sensor.institution  = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
-		self.sensor.insertion_user = str(self.page.cbInsertUser.currentText())  if str(self.page.cbInsertUser.currentText())  else None
-		#self.sensor.channels     =     self.page.sbChannels.value()           if     self.page.sbChannels.value() >=0       else None
-		self.sensor.channel_density = str(self.page.cbChannelDensity.currentText())  if str(self.page.cbChannelDensity.currentText())  else None
-		self.sensor.grade        = str(self.page.cbGrade.currentText())  if str(self.page.cbGrade.currentText())  else None
+		self.sensor.location        = str(self.page.leLocation.text()          )    if str(self.page.leLocation.text()    )       else None
+		self.sensor.barcode         = str(self.page.leBarcode.text()           )    if str(self.page.leBarcode.text()     )       else None
+		self.sensor.type            = str(self.page.cbType.currentText()       )    if str(self.page.cbType.currentText() )       else None
+		self.sensor.shape           = str(self.page.cbShape.currentText()      )    if str(self.page.cbShape.currentText())       else None
+		self.sensor.institution     = str(self.page.cbInstitution.currentText())    if str(self.page.cbInstitution.currentText()) else None
+		self.sensor.insertion_user  = str(self.page.cbInsertUser.currentText())     if str(self.page.cbInsertUser.currentText())  else None
+		self.sensor.channel_density = str(self.page.cbChannelDensity.currentText()) if str(self.page.cbChannelDensity.currentText()) else None
+		self.sensor.grade           = str(self.page.cbGrade.currentText())          if str(self.page.cbGrade.currentText())       else None
 
 		num_comments = self.page.listComments.count()
 		self.sensor.comments = []
 		for i in range(num_comments):
 			self.sensor.comments.append(str(self.page.listComments.item(i).text()))
-
-		#self.sensor.corner_heights = [_.value() if _.value()>=0 else None for _ in self.corners]
-		#self.sensor.thickness = self.page.dsbThickness.value() if self.page.dsbThickness.value()>=0 else None
 
 		self.sensor.inspection = str(self.page.cbInspection.currentText()) if str(self.page.cbInspection.currentText()) else None
 
@@ -335,16 +322,12 @@ class func(object):
 	
 	@enforce_mode('view')
 	def goProtomodule(self,*args,**kwargs):
-		#ID = self.page.sbProtomodule.value()
-		#if ID >= 0:
 		ID = self.page.leProtomodule.text()
 		if ID != "":
 			self.setUIPage('Protomodules',ID=ID)
 
 	@enforce_mode('view')
 	def goModule(self,*args,**kwargs):
-		#ID = self.page.sbModule.value()
-		#if ID >= 0:
 		ID = self.page.leModule.text()
 		if ID != "":
 			self.setUIPage('Modules',ID=ID)
@@ -357,49 +340,10 @@ class func(object):
 		else:
 			return self.sensor.filesToUpload()
 
-
-	"""
-	@enforce_mode(['editing', 'creating'])
-	def getFile(self,*args,**kwargs):
-		f = self.fwnd.getfile()
-		if f:
-			# Need to call this to ensure that necessary dirs for storing item are created
-			print("Got file.  Saving to ensure creation of filemanager location...")
-			self.sensor.save()
-
-			fname = os.path.split(f)[1]  # Name of file
-			fdir, fname_ = self.sensor.get_filedir_filename()
-			new_filepath = fdir + '/' + fname
-			print("GETFILE:  Copying file", f, "to", new_filepath)
-			shutil.copyfile(f, new_filepath)
-			self.page.listComments.addItem(new_filepath)
-			self.sensor.test_files.append(new_filepath)
-			self.update_info()
-
-	@enforce_mode(['editing', 'creating'])
-	def deleteFile(self,*args,**kwargs):
-		row = self.page.listFiles.currentRow()
-		if row >= 0:
-			fname = self.page.listFiles.item(row).text()
-			self.page.listFiles.takeItem(row)
-			# Now need to remove the file...
-			fdir, fname_ = self.sensor.get_filedir_filename()
-			new_filepath = fdir + '/' + fname
-			print("REMOVING FILE", new_filepath)
-			os.remove(new_filepath)
-			self.sensor.test_files.remove(new_filepath)
-			self.update_info()
-	"""
-
 	@enforce_mode('view')
 	def load_kwargs(self,kwargs):
 		if 'ID' in kwargs.keys():
 			ID = kwargs['ID']
-			#if not (type(ID) is int):
-			#	raise TypeError("Expected type <int> for ID; got <{}>".format(type(ID)))
-			#if ID < 0:
-			#	raise ValueError("ID cannot be negative")
-			#self.page.sbID.setValue(ID)
 			if not (type(ID) is str):
 				raise TypeError("Expected type <str> for ID; got <{}>".format(type(ID)))
 			self.page.leID.setText(ID)

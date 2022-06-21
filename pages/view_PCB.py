@@ -6,7 +6,6 @@ import glob
 from PyQt5.QtWidgets import QFileDialog, QWidget
 
 PAGE_NAME = "view_pcb"
-PARTTYPE = "PCB"
 DEBUG = False
 
 INDEX_TYPE = {
@@ -65,9 +64,7 @@ class Filewindow(QWidget):
 	def getdir(self,*args,**kwargs):
 		#fname, fmt = QFileDialog.getOpenFileName(self, 'Open file', '~',"(*.root)")
 		dname = str(QFileDialog.getExistingDirectory(self, "Select directory"))
-		print("File dialog:  got directory", fname)
 		return dname
-
 
 
 class func(object):
@@ -78,7 +75,6 @@ class func(object):
 
 		self.pcb = fm.pcb()
 		self.pcb_exists = False
-
 		self.mode = 'setup'
 
 		# NEW:
@@ -129,24 +125,17 @@ class func(object):
 
 	@enforce_mode('setup')
 	def rig(self):
-		#self.page.sbID.valueChanged.connect(self.update_info)
-		#self.page.leID.textChanged.connect(self.update_info)
-
 		self.page.pbLoad.clicked.connect(self.loadPart)
-
 		self.page.pbNew.clicked.connect(self.startCreating)
 		self.page.pbEdit.clicked.connect(self.startEditing)
 		self.page.pbSave.clicked.connect(self.saveEditing)
 		self.page.pbCancel.clicked.connect(self.cancelEditing)
 
-		self.page.pbDeleteComment.clicked.connect(self.deleteComment)
-		self.page.pbAddComment.clicked.connect(self.addComment)
-
 		self.page.pbGoStepPcb.clicked.connect(self.goStepPcb)
 		self.page.pbGoModule.clicked.connect(self.goModule)
 
-		#self.page.pbAddToPlotter.clicked.connect(self.addToPlotter)
-		#self.page.pbGoPlotter.clicked.connect(self.goPlotter)
+		self.page.pbDeleteComment.clicked.connect(self.deleteComment)
+		self.page.pbAddComment.clicked.connect(self.addComment)
 
 		self.fwnd = Filewindow()
 		self.page.pbAddFiles.clicked.connect(self.getFile)
@@ -161,55 +150,44 @@ class func(object):
 	@enforce_mode(['view', 'editing', 'creating'])
 	def update_info(self,ID=None,do_load=True,*args,**kwargs):
 		if ID is None:
-			#ID = self.page.sbID.value()
 			ID = self.page.leID.text()
 		else:
-			#self.page.sbID.setValue(ID)
 			self.page.leID.setText(ID)
+
 		self.pcb_exists = (ID == self.pcb.ID)
 		
-		#self.page.leID.setText(self.pcb.ID)
-
-		#self.page.leInsertUser.setText(  "" if self.pcb.insertion_user is None else self.pcb.insertion_user)
-		self.page.leLocation.setText(    "" if self.pcb.location       is None else self.pcb.location    )
-		self.page.leBarcode.setText(     "" if self.pcb.barcode        is None else self.pcb.barcode     )
-		self.page.leManufacturer.setText("" if self.pcb.manufacturer   is None else self.pcb.manufacturer)
-		self.page.cbType.setCurrentIndex(          INDEX_TYPE.get(           self.pcb.type,-1)           )
-		self.page.cbResolution.setCurrentIndex(INDEX_RESOLUTION.get(self.pcb.resolution,-1))
-		self.page.cbShape.setCurrentIndex(         INDEX_SHAPE.get(          self.pcb.shape,-1)          )
-		self.page.cbGrade.setCurrentIndex(         INDEX_GRADE.get(          self.pcb.grade, -1)         )
-		self.page.cbInstitution.setCurrentIndex(   INDEX_INSTITUTION.get(    self.pcb.institution, -1)   )
 		if not self.pcb.insertion_user in self.index_users.keys() and not self.pcb.insertion_user is None:
 			# Insertion user was deleted from user page...just add user to the dropdown
 			self.index_users[self.pcb.insertion_user] = max(self.index_users.values()) + 1
 			self.page.cbInsertUser.addItem(self.pcb.insertion_user)
 		self.page.cbInsertUser.setCurrentIndex(self.index_users.get(self.pcb.insertion_user, -1))
-		self.page.sbChannels.setValue(-1 if self.pcb.channels is None else self.pcb.channels)
+
+		self.page.cbInstitution.setCurrentIndex(   INDEX_INSTITUTION.get(    self.pcb.institution, -1)   )
+		self.page.leLocation.setText(    "" if self.pcb.location       is None else self.pcb.location    )
+
+		self.page.leBarcode.setText(     "" if self.pcb.barcode        is None else self.pcb.barcode     )
+		self.page.leManufacturer.setText("" if self.pcb.manufacturer   is None else self.pcb.manufacturer)
+		self.page.cbType.setCurrentIndex(          INDEX_TYPE.get(           self.pcb.type,-1)           )
+		self.page.cbResolution.setCurrentIndex(INDEX_RESOLUTION.get(self.pcb.resolution,-1))
 		self.page.sbNumRocs.setValue( -1 if self.pcb.num_rocs is None else self.pcb.num_rocs)
+		self.page.sbChannels.setValue(-1 if self.pcb.channels is None else self.pcb.channels)
 		if self.page.sbChannels.value() == -1: self.page.sbChannels.clear()
+		self.page.cbShape.setCurrentIndex(         INDEX_SHAPE.get(          self.pcb.shape,-1)          )
 
 		self.page.listComments.clear()
 		for comment in self.pcb.comments:
 			self.page.listComments.addItem(comment)
 		self.page.pteWriteComment.clear()
 
-		#self.page.leDaq.setText("" if self.pcb.daq is None else self.pcb.daq)
-		self.page.cbGrade.setCurrentIndex(INDEX_GRADE.get(self.pcb.grade, -1))
-		#self.page.cbDaqOK.setCurrentIndex(     INDEX_CHECK.get(self.pcb.daq_ok    , -1))
 		self.page.dsbFlatness.setValue( -1 if self.pcb.flatness  is None else self.pcb.flatness )
 		self.page.dsbThickness.setValue(-1 if self.pcb.thickness is None else self.pcb.thickness)
 		if self.page.dsbFlatness.value()  == -1: self.page.dsbFlatness.clear()
 		if self.page.dsbThickness.value() == -1: self.page.dsbThickness.clear()
+		self.page.cbGrade.setCurrentIndex(         INDEX_GRADE.get(          self.pcb.grade, -1)         )
 
 		self.page.sbStepPcb.setValue(-1 if self.pcb.step_pcb is None else self.pcb.step_pcb)
-		#self.page.sbModule.setValue( -1 if self.pcb.module   is None else self.pcb.module  )
-		self.page.leModule.setText(  "" if self.pcb.module   is None else self.pcb.module)
 		if self.page.sbStepPcb.value() == -1: self.page.sbStepPcb.clear()
-		#if self.page.sbModule.value()  == -1: self.page.sbModule.clear()
-
-		#self.page.listDaqData.clear()
-		#for daq in self.pcb.daq_data:
-		#	self.page.listDaqData.addItem(daq)
+		self.page.leModule.setText(  "" if self.pcb.module   is None else self.pcb.module)
 
 		self.page.listFiles.clear()
 		for f in self.pcb.test_files:
@@ -225,10 +203,8 @@ class func(object):
 			self.page.leStatus.setText(self.mode)
 
 		pcb_exists      = self.pcb_exists
-		#daq_data_exists = self.page.listDaqData.count()   > 0
 
 		step_pcb_exists = self.page.sbStepPcb.value() >=0
-		#module_exists   = self.page.sbModule.value()  >=0
 		module_exists   = self.page.leModule.text()  != ""
 
 		mode_view     = self.mode == 'view'
@@ -236,27 +212,24 @@ class func(object):
 		mode_creating = self.mode == 'creating'
 
 		self.setMainSwitchingEnabled(mode_view)
-		#self.page.sbID.setEnabled(mode_view)
 		self.page.leID.setReadOnly(not mode_view)
 		
 		self.page.pbLoad.setEnabled(mode_view)
-
 		self.page.pbNew.setEnabled(    mode_view and not pcb_exists  )
 		self.page.pbEdit.setEnabled(   mode_view and     pcb_exists  )
 		self.page.pbSave.setEnabled(   mode_editing or mode_creating )
 		self.page.pbCancel.setEnabled( mode_editing or mode_creating )
 
-
-		#self.page.leInsertUser.setReadOnly(   not (mode_creating or mode_editing) )
+		self.page.cbInsertUser.setEnabled(         mode_creating or mode_editing  )
+		self.page.cbInstitution.setEnabled(        mode_creating or mode_editing  )
 		self.page.leLocation.setReadOnly(     not (mode_creating or mode_editing) )
+
 		self.page.leBarcode.setReadOnly(      not (mode_creating or mode_editing) )
 		self.page.leManufacturer.setReadOnly( not (mode_creating or mode_editing) )
 		self.page.cbType.setEnabled(               mode_creating or mode_editing  )
 		self.page.cbResolution.setEnabled(         mode_creating or mode_editing  )
 		self.page.cbShape.setEnabled(              mode_creating or mode_editing  )
 		self.page.cbGrade.setEnabled(              mode_creating or mode_editing  )
-		self.page.cbInstitution.setEnabled(        mode_creating or mode_editing  )
-		self.page.cbInsertUser.setEnabled(         mode_creating or mode_editing  )
 		self.page.sbNumRocs.setReadOnly(      not (mode_creating or mode_editing) )
 		self.page.sbChannels.setReadOnly(     not (mode_creating or mode_editing) )
 
@@ -264,14 +237,9 @@ class func(object):
 		self.page.pbAddComment.setEnabled(   mode_creating or mode_editing)
 		self.page.pteWriteComment.setEnabled(mode_creating or mode_editing)
 
-		#self.page.leDaq.setReadOnly(        not (mode_creating or mode_editing) )
-		self.page.cbGrade.setEnabled(            mode_creating or mode_editing  )
-		#self.page.cbDaqOK.setEnabled(            mode_creating or mode_editing  )
 		self.page.dsbFlatness.setReadOnly(  not (mode_creating or mode_editing) )
 		self.page.dsbThickness.setReadOnly( not (mode_creating or mode_editing) )
-
-		#self.page.pbAddToPlotter.setEnabled(mode_view and daq_data_exists)
-		#self.page.pbGoPlotter.setEnabled(   mode_view and daq_data_exists)
+		self.page.cbGrade.setEnabled(            mode_creating or mode_editing  )
 
 		self.page.pbAddFiles.setEnabled(mode_creating or mode_editing)
 		self.page.pbDeleteFile.setEnabled(mode_creating or mode_editing)
@@ -289,7 +257,7 @@ class func(object):
 		tmp_exists = tmp_pcb.load(tmp_ID)
 		if not tmp_exists:  # DNE; good to create
 			self.page.leStatus.setText("PCB DNE")
-			self.update_info(do_load=False)
+			self.update_info()
 		else:
 			self.pcb = tmp_pcb
 			self.page.leStatus.setText("PCB exists")
@@ -332,30 +300,26 @@ class func(object):
 	@enforce_mode(['editing','creating'])
 	def saveEditing(self,*args,**kwargs):
 
-		#self.pcb.insertion_user  = str(self.page.leInsertUser.text()      )   if str(self.page.leInsertUser.text()        ) else None
+		self.pcb.insertion_user  = str(self.page.cbInsertUser.currentText())  if str(self.page.cbInsertUser.currentText())  else None
+		self.pcb.institution     = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
 		self.pcb.location        = str(self.page.leLocation.text()         )  if str(self.page.leLocation.text()          ) else None
+
 		self.pcb.barcode         = str(self.page.leBarcode.text()          )  if str(self.page.leBarcode.text()           ) else None
 		self.pcb.manufacturer    = str(self.page.leManufacturer.text()     )  if str(self.page.leManufacturer.text()      ) else None
-		self.pcb.type            = str(self.page.cbType.currentText()      )  if str(self.page.cbType.currentText()       ) else None
 		self.pcb.resolution      = str(self.page.cbResolution.currentText())  if str(self.page.cbType.currentText()       ) else None
-		self.pcb.shape           = str(self.page.cbShape.currentText()     )  if str(self.page.cbShape.currentText()      ) else None
-		self.pcb.grade           = str(self.page.cbGrade.currentText()     )  if str(self.page.cbGrade.currentText()      ) else None
-		#self.pcb.chirality       = str(self.page.cbChirality.currentText())   if str(self.page.cbChirality.currentText()  ) else None
-		self.pcb.institution     = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
-		self.pcb.insertion_user  = str(self.page.cbInsertUser.currentText())  if str(self.page.cbInsertUser.currentText())  else None
+		self.pcb.type            = str(self.page.cbType.currentText()      )  if str(self.page.cbType.currentText()       ) else None
 		self.pcb.num_rocs        = self.page.sbNumRocs.value()  if self.page.sbNumRocs.value()  >=0 else None
 		self.pcb.channels        = self.page.sbChannels.value() if self.page.sbChannels.value() >=0 else None
+		self.pcb.shape           = str(self.page.cbShape.currentText()     )  if str(self.page.cbShape.currentText()      ) else None
 
 		num_comments = self.page.listComments.count()
 		self.pcb.comments = []
 		for i in range(num_comments):
 			self.pcb.comments.append(str(self.page.listComments.item(i).text()))
 
-		#self.pcb.daq        = str(self.page.leDaq.text()              ) if str(self.page.leDaq.text()              ) else None
-		self.pcb.grade      = str(self.page.cbGrade.currentText())      if str(self.page.cbGrade.currentText())      else None
-		#self.pcb.daq_ok     = str(self.page.cbDaqOK.currentText()     ) if str(self.page.cbDaqOK.currentText()     ) else None
 		self.pcb.flatness   =     self.page.dsbFlatness.value()         if     self.page.dsbFlatness.value()  >=0    else None
 		self.pcb.thickness  =     self.page.dsbThickness.value()        if     self.page.dsbThickness.value() >=0    else None
+		self.pcb.grade      = str(self.page.cbGrade.currentText())      if str(self.page.cbGrade.currentText())      else None
 
 		self.pcb.save()
 		self.mode = 'view'
@@ -363,12 +327,12 @@ class func(object):
 
 		self.xmlModList.append(self.pcb.ID)
 
+
 	def xmlModified(self):
 		return self.xmlModList
 
 	def xmlModifiedReset(self):
 		self.xmlModList = []
-
 
 
 	@enforce_mode(['editing','creating'])
@@ -386,8 +350,6 @@ class func(object):
 
 	@enforce_mode('view')
 	def goModule(self,*args,**kwargs):
-		#ID = self.page.sbModule.value()
-		#if ID >= 0:
 		ID = self.page.leModule.text()
 		if ID != "":
 			self.setUIPage('Modules',ID=ID)
@@ -397,14 +359,6 @@ class func(object):
 		ID = self.page.sbStepPcb.value()
 		if ID >= 0:
 			self.setUIPage('3. PCB - pre-assembly',ID=ID)
-
-	@enforce_mode('view')
-	def addToPlotter(self,*args,**kwargs):
-		print("not implemented yet - waiting for plotter page to be implemented")
-
-	@enforce_mode('view')
-	def goPlotter(self,*args,**kwargs):
-		self.setUIPage('plotter',which='daq')
 
 
 	@enforce_mode(['editing', 'creating'])

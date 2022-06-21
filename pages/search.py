@@ -11,21 +11,19 @@ DEBUG = False
 #NEW, WIP
 
 PAGE_NAME_DICT = {
-	'baseplate':   'baseplates',
-	'sensor':      'sensors',
-	'pcb':         'PCBs',
-	'protomodule': 'protomodules',
-	'module':      'modules',
-	#'shipment':    'shipments',
+	'Baseplate':   'Baseplates',
+	'Sensor':      'Sensors',
+	'PCB':         'PCBs',
+	'Protomodule': 'Protomodules',
+	'Module':      'Modules',
 }
 
 PART_DICT = {
-	'baseplate':   fm.baseplate,
-	'sensor':      fm.sensor,
-	'pcb':         fm.pcb,
-	'protomodule': fm.protomodule,
-	'module':      fm.module,
-	#'shipment':    fm.shipment,
+	'Baseplate':   fm.baseplate,
+	'Sensor':      fm.sensor,
+	'PCB':         fm.pcb,
+	'Protomodule': fm.protomodule,
+	'Module':      fm.module,
 }
 
 INDEX_INSTITUTION = {
@@ -38,70 +36,6 @@ INDEX_INSTITUTION = {
 	'HPK':6,
 }
 
-INDEX_MATERIAL = {
-	'':0,
-	'CuW':1,
-	'PCB':2,
-}
-
-INDEX_TYPE = {
-	'':0,
-	'120 um':1,
-	'200 um':2,
-	'300 um':3,
-}
-
-INDEX_TYPE = {
-	'':0,
-	'HGCROCV1':1,
-	'HGCROCV2':2,
-	'HGCROCV3':3,
-	'SKIROCV1':4,
-	'SKIROCV2':5,
-	'SKIROCV3':6,
-	'HGCROC dummy':7,
-}
-
-INDEX_CHANNEL = {
-	'':0,
-	'HD':1,
-	'LD':2,
-}
-
-INDEX_ROW = {
-	'':0,
-	'1':1,
-	'2':2,
-	'3':3,
-}
-
-INDEX_COL = {
-	'':0,
-	'1':1,
-	'2':2,
-}
-
-
-
-#assorted useful vars
-
-STATUS_NO_ISSUES = "valid (no issues)"
-STATUS_ISSUES    = "invalid (issues present)"
-
-I_DATE_CONFLICT = "date sent must be earlier than date received"
-I_PART_DNE = "part(s) do not exist: {}"  #'PCB 10', etc
-I_PART_DUP = "part(s) have duplicates: {}"
-I_SENDER_DNE = "sender name is empty"
-I_RECEIVER_DNE = "receiver name is empty"
-
-
-"""INDEX_PART_TYPES = {
-	'Module':fm.module(),
-	'Baseplate':fm.baseplate(),
-	'Sensor':fm.sensor(),
-	'PCB':fm.pcb(),
-	'Protomodule':fm.protomodule(),
-}"""
 
 
 class func(object):
@@ -112,11 +46,6 @@ class func(object):
 
 		self.mode = 'setup'
 
-	# This fn is so search page can access the part lists of the other relevant pages...
-	# outdated
-	#def setPageList(self, pageList):
-	#	self.pageList = pageList
-
 
 	def setup(self):
 		self.rig()
@@ -125,36 +54,31 @@ class func(object):
 		#self.update_info()
 
 	def rig(self):
-		"""
-		self.page.pbSearchInstitution.clicked.connect(self.searchInstitution)
-		self.page.pbSearchRecDate.clicked.connect(    self.searchRecDate)
-		self.page.pbSearchBType.clicked.connect(      self.searchBType)
-		self.page.pbSearchSType.clicked.connect(      self.searchSType)
-		self.page.pbSearchPType.clicked.connect(      self.searchPType)
-		"""
 		self.page.pbSearch.clicked.connect(self.search)
 
 		self.page.cbPartType.currentIndexChanged.connect( self.updateElements )
 		self.page.ckUseDate.stateChanged.connect( self.updateElements )
 
-		self.page.pbClearResults.clicked.connect(     self.clearResults)
-		self.page.pbGoToPart.clicked.connect(         self.goToPart)
+		self.page.pbClearParams.clicked.connect( self.clearParams )
 
-		self.page.lwPartList.setEnabled(True)
+		self.page.pbClearResults.clicked.connect( self.clearResults )
+		self.page.pbGoToPart.clicked.connect( self.goToPart )
+
+		#self.page.lwPartList.setEnabled(True)
 		self.updateElements()
 
 	def search(self, *args, **kwargs):
 		self.clearResults()
 		part_type = self.page.cbPartType.currentText()
 		part_temp = PART_DICT[part_type]()  # Constructs instance of searched-for class
-		part_file_name = os.sep.join([ fm.DATADIR, 'partlist', part_type+'s.json' ])
+		part_file_name = os.sep.join([ fm.DATADIR, 'partlist', part_type.lower()+'s.json' ])
 		with open(part_file_name, 'r') as opfl:
 			part_list = json.load(opfl)
 
 		search_dict = { self.page.cbInstitution:'institution', self.page.cbShape:'shape',
 						self.page.cbMaterial:'material', self.page.cbThickness:'type',
 						self.page.cbChannelDensity:'resolution_type', self.page.cbPCBType:'type',
-						self.page.cbAssmRow:'assm_tray_row', self.page.cbAssmCol:'assm_tray_col' }
+						self.page.cbAssmRow:'tray_row', self.page.cbAssmCol:'tray_col' }
 		# Treat dCreated separately
 		# Search criteria will be a dict:  'var_name':'value'
 		search_criteria = {}
@@ -190,16 +114,24 @@ class func(object):
 		part_type = self.page.cbPartType.currentText()
 		self.page.cbInstitution   .setEnabled(part_type != '')
 		self.page.cbShape         .setEnabled(part_type != '')
-		self.page.cbMaterial      .setEnabled(part_type == 'baseplate')
-		self.page.cbThickness     .setEnabled(part_type == 'sensor')
-		self.page.cbChannelDensity.setEnabled(part_type == 'sensor')
+		self.page.cbMaterial      .setEnabled(part_type == 'Baseplate')
+		self.page.cbThickness     .setEnabled(part_type == 'Sensor')
+		self.page.cbChannelDensity.setEnabled(True)
 		self.page.cbPCBType       .setEnabled(part_type == 'PCB')
-		self.page.ckUseDate       .setEnabled(part_type == 'protomodule' or part_type == 'module')
+		self.page.ckUseDate       .setEnabled(part_type == 'Protomodule' or part_type == 'Module')
 		useDate = self.page.ckUseDate.isChecked()
 		print("useDate is", useDate, ", total is...")
-		self.page.dCreated        .setReadOnly(not useDate or not (part_type == 'protomodule' or part_type == 'module'))
-		self.page.cbAssmRow       .setEnabled(part_type == 'protomodule' or part_type == 'module')
-		self.page.cbAssmCol       .setEnabled(part_type == 'protomodule' or part_type == 'module')
+		self.page.dCreated        .setReadOnly(not useDate or not (part_type == 'Protomodule' or part_type == 'Module'))
+		self.page.cbAssmRow       .setEnabled(part_type == 'Protomodule' or part_type == 'Module')
+		self.page.cbAssmCol       .setEnabled(part_type == 'Protomodule' or part_type == 'Module')
+
+	def clearParams(self,*args,**kwargs):
+		for wdgt in [self.page.cbInstituion,     self.page.cbShape,
+					 self.page.cbMaterial,       self.page.cbThickness,
+					 self.page.cbChannelDensity, self.page.cbPCBType,
+					 self.page.cbAssmRow,        self.page.cbAssmCol
+					]:
+			wdgt.setCurrentIndex(0)
 
 	def clearResults(self,*args,**kwargs):
 		# empty lwPartList

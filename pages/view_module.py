@@ -1,17 +1,13 @@
 from filemanager import fm
-from PyQt5 import QtCore
-import time
 import os
 import shutil
+import glob
 
-# NEW, experimental
 from PyQt5.QtWidgets import QFileDialog, QWidget
 
 
 PAGE_NAME = "view_module"
 DEBUG = False
-SITE_SEP = ', '
-NO_DATE = [2000,1,1]
 
 INDEX_SHAPE = {
 	'Full':0,
@@ -21,12 +17,6 @@ INDEX_SHAPE = {
 	'Right':4,
 	'Five':5,
 	'Full+Three':6
-}
-
-INDEX_GRADE = {
-	'A':0,
-	'B':1,
-	'C':2,
 }
 
 INDEX_INSPECTION = {
@@ -43,25 +33,21 @@ INDEX_INSTITUTION = {
 	'HPK':5,
 }
 
+INDEX_GRADE = {
+	'A':0,
+	'B':1,
+	'C':2,
+}
 
-def separate_sites(sites_string):
-	s = sites_string
-	for char in SITE_SEP:
-		s=s.replace(char, '\n')
-	sites = [_ for _ in s.splitlines() if _]
-	return sites
-
-
-# EXPERIMENTAL
 
 class Filewindow(QWidget):
 	def __init__(self):
 		super(Filewindow, self).__init__()
 
-	def getfile(self,*args,**kwargs):
-		fname, fmt = QFileDialog.getOpenFileName(self, 'Open file', '~',"(*.jpg *.png *.xml)")
-		print("File dialog:  got file", fname)
-		return fname
+	def getdir(self,*args,**kwargs):
+		#fname, fmt = QFileDialog.getOpenFileName(self, 'Open file', '~',"(*.jpg *.png *.xml)")
+		dname = str(QFileDialog.getExistingDirectory(self, "Select directory"))
+		return dname
 
 
 class func(object):
@@ -122,12 +108,7 @@ class func(object):
 
 	@enforce_mode('setup')
 	def rig(self):
-		#self.page.sbID.valueChanged.connect(self.update_info)
-		#self.page.leID.textChanged.connect(self.update_info)
-
 		self.page.pbLoad.clicked.connect(self.loadPart)
-
-		#self.page.pbNew.clicked.connect(self.startCreating)
 		self.page.pbEdit.clicked.connect(self.startEditing)
 		self.page.pbSave.clicked.connect(self.saveEditing)
 		self.page.pbCancel.clicked.connect(self.cancelEditing)
@@ -142,12 +123,6 @@ class func(object):
 		self.page.pbDeleteComment.clicked.connect(self.deleteComment)
 		self.page.pbAddComment.clicked.connect(self.addComment)
 
-		#self.page.pbIvAddToPlotter.clicked.connect( self.ivAddToPlotter )
-		#self.page.pbIvGoPlotter.clicked.connect(    self.ivGoPlotter    )
-		#self.page.pbDaqAddToPlotter.clicked.connect(self.daqAddToPlotter)
-		#self.page.pbDaqGoPlotter.clicked.connect(   self.daqGoPlotter   )
-
-		# NEW, experimental
 		self.fwnd = Filewindow()
 		self.page.pbAddFiles.clicked.connect(self.getFile)
 		self.page.pbDeleteFile.clicked.connect(self.deleteFile)
@@ -164,31 +139,21 @@ class func(object):
 			ID = self.page.leID.text()
 		else:
 			self.page.leID.setText(ID)
-		if do_load:
-			self.module_exists = self.module.load(ID)
-		else:
-			self.module_exists = False
 		
 		self.module_exists = (ID == self.module.ID)
 		
-		self.page.leLocation.setText("" if self.module.location is None else self.module.location)
-
-		# characteristics
-		#self.page.sbChannels.setValue(  -1 if self.module.channels    is None else self.module.channels   )
-		self.page.dsbThickness.setValue(-1 if self.module.thickness   is None else self.module.thickness  )
-		self.page.dsbFlatness.setValue( -1 if self.module.flatness    is None else self.module.flatness   )
-		self.page.cbShape.setCurrentIndex(      INDEX_SHAPE.get(      self.module.shape    , -1)  )
-		self.page.cbGrade.setCurrentIndex(      INDEX_GRADE.get(      self.module.grade    , -1)  )
-		self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.module.institution, -1))
-		self.page.cbInspection.setCurrentIndex( INDEX_INSPECTION.get( self.module.inspection,  -1))
 		if not self.module.insertion_user in self.index_users.keys() and not self.module.insertion_user is None:
 			# Insertion user was deleted from user page...just add user to the dropdown
 			self.index_users[self.module.insertion_user] = max(self.index_users.values()) + 1
 			self.page.cbInsertUser.addItem(self.module.insertion_user)
 		self.page.cbInsertUser.setCurrentIndex(self.index_users.get(self.module.insertion_user, -1))
-		#if self.page.sbChannels.value()   == -1: self.page.sbChannels.clear()
-		if self.page.dsbThickness.value() == -1: self.page.dsbThickness.clear()
-		if self.page.dsbFlatness.value()  == -1: self.page.dsbFlatness.clear()
+		self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.module.institution, -1))
+		self.page.leLocation.setText("" if self.module.location is None else self.module.location)
+
+		# characteristics
+		self.page.cbShape.setCurrentIndex(      INDEX_SHAPE.get(      self.module.shape    , -1)  )
+		self.page.cbGrade.setCurrentIndex(      INDEX_GRADE.get(      self.module.grade    , -1)  )
+		self.page.cbInspection.setCurrentIndex( INDEX_INSPECTION.get( self.module.inspection,  -1))
 
 		# parts and steps
 		self.page.sbStepSensor.setValue(   -1 if self.module.step_sensor   is None else self.module.step_sensor   )
@@ -197,8 +162,8 @@ class func(object):
 		self.page.leSensor.setText(       "" if self.module.sensor        is None else self.module.sensor        )
 		self.page.lePcb.setText(          "" if self.module.pcb           is None else self.module.pcb           )
 		self.page.leProtomodule.setText(  "" if self.module.protomodule   is None else self.module.protomodule   )
-		if self.page.sbStepSensor.value()   == -1:  self.page.sbStepSensor.clear()
-		if self.page.sbStepPcb.value()      == -1:  self.page.sbStepPcb.clear()
+		if self.page.sbStepSensor.value()  == -1:  self.page.sbStepSensor.clear()
+		if self.page.sbStepPcb.value()     == -1:  self.page.sbStepPcb.clear()
 		if self.page.leBaseplate.text()    == -1:  self.page.leBaseplate.clear()
 		if self.page.leSensor.text()       == -1:  self.page.leSensor.clear()
 		if self.page.lePcb.text()          == -1:  self.page.lePcb.clear()
@@ -222,11 +187,16 @@ class func(object):
 		self.page.dsbOffsetTranslationX.setValue( -1 if self.module.offset_translation_x is None else self.module.offset_translation_x )
 		self.page.dsbOffsetTranslationY.setValue( -1 if self.module.offset_translation_y is None else self.module.offset_translation_y )
 		self.page.dsbOffsetRotation.setValue(    -1 if self.module.offset_rotation    is None else self.module.offset_rotation    )
+		self.page.dsbThickness.setValue(-1 if self.module.thickness   is None else self.module.thickness  )
+		self.page.dsbFlatness.setValue( -1 if self.module.flatness    is None else self.module.flatness   )
 		if self.page.dsbOffsetTranslationX.value() == -1: self.page.dsbOffsetTranslationX.clear()
 		if self.page.dsbOffsetTranslationY.value() == -1: self.page.dsbOffsetTranslationY.clear()
 		if self.page.dsbOffsetRotation.value() == -1: self.page.dsbOffsetRotation.clear()
+		if self.page.dsbThickness.value() == -1: self.page.dsbThickness.clear()
+		if self.page.dsbFlatness.value()  == -1: self.page.dsbFlatness.clear()
 
 		self.updateElements()
+
 
 	@enforce_mode(['view','editing','creating'])
 	def updateElements(self):
@@ -251,20 +221,13 @@ class func(object):
 		self.page.leID.setReadOnly(not mode_view)
 
 		self.page.pbLoad.setEnabled(mode_view)
-
 		self.page.pbEdit  .setEnabled( mode_view and     module_exists )
 		self.page.pbSave  .setEnabled( mode_creating or mode_editing   )
 		self.page.pbCancel.setEnabled( mode_creating or mode_editing   )
 
 		# characteristics
-		#self.page.leInsertUser.setReadOnly( not (mode_creating or mode_editing) )
+		# Note: most non-editable b/c either fixed or filled in w/ assembly pages
 		self.page.leLocation.setReadOnly(   not (mode_creating or mode_editing) )
-		#self.page.sbChannels.setReadOnly(   not (mode_creating or mode_editing) )
-		#self.page.dsbFlatness.setReadOnly(  not (mode_creating or mode_editing) )
-		#self.page.dsbThickness.setReadOnly( not (mode_creating or mode_editing) )
-		#self.page.cbShape.setEnabled(            mode_creating or mode_editing  )
-		#self.page.cbChirality.setEnabled(        mode_creating or mode_editing  )
-		#self.page.cbGrade.setEnabled(            mode_creating or mode_editing  )
 		self.page.cbInstitution.setEnabled(      mode_creating or mode_editing  )
 		self.page.cbInsertUser.setEnabled(       mode_creating or mode_editing  )
 		self.page.cbInspection.setEnabled(       mode_creating or mode_editing  )
@@ -285,16 +248,6 @@ class func(object):
 		self.page.pbAddFiles.setEnabled(mode_creating or mode_editing)
 		self.page.pbDeleteFile.setEnabled(mode_creating or mode_editing)
 
-		#self.page.dsbOffsetTranslationX.setReadOnly( not (mode_creating or mode_editing) )
-		#self.page.dsbOffsetTranslationY.setReadOnly( not (mode_creating or mode_editing) )
-		#self.page.dsbOffsetRotation.setReadOnly(    not (mode_creating or mode_editing) )
-
-#	# NEW, experimental
-#	@enforce_mode(['creating', 'editing'])
-#	def addFiles(self,*args,**kwargs):
-#		# Open up dialogue box, take note of selected file name
-#		getfile()  # VERY experimental...
-
 
 	# NEW:
 	@enforce_mode('view')
@@ -307,9 +260,6 @@ class func(object):
 		tmp_ID = self.page.leID.text()
 		tmp_exists = tmp_module.load(tmp_ID)
 		if not tmp_exists:  # DNE; good to create
-			#ID = self.page.leID.text()
-			#self.sensor.new(ID)
-			#self.mode = 'creating'  # update_info needs mode==view
 			self.page.leStatus.setText("module DNE")
 			self.update_info(do_load=False)
 		else:
@@ -349,16 +299,9 @@ class func(object):
 	@enforce_mode(['editing','creating'])
 	def saveEditing(self,*args,**kwargs):
 		# characteristics
-		#self.module.insertion_user = str(self.page.leInsertUser.text()   ) if str(self.page.leInsertUser.text())         else None
-		self.module.location        = str(self.page.leLocation.text()        ) if str(self.page.leLocation.text())             else None
-		#self.module.channels        =     self.page.sbChannels.value()         if self.page.sbChannels.value()   >= 0          else None
-		self.module.flatness        =     self.page.dsbFlatness.value()        if self.page.dsbFlatness.value()  >= 0          else None
-		self.module.thickness       =     self.page.dsbThickness.value()       if self.page.dsbThickness.value() >= 0          else None
-		#self.module.shape           = str(self.page.cbShape.currentText()    ) if str(self.page.cbShape.currentText()        ) else None
-		#self.module.chirality       = str(self.page.cbChirality.currentText()) if str(self.page.cbChirality.currentText()    ) else None
-		self.module.institution     = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
 		self.module.insertion_user  = str(self.page.cbInsertUser.currentText())  if str(self.page.cbInsertUser.currentText())  else None
-		#self.module.grade           = str(self.page.cbGrade.currentText())       if str(self.page.cbGrade.currentText())       else None
+		self.module.location        = str(self.page.leLocation.text()        ) if str(self.page.leLocation.text())             else None
+		self.module.institution     = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
 		self.module.inspection      = str(self.page.cbInspection.currentText())  if str(self.page.cbInspection.currentText())  else None
 
 		# comments
@@ -401,32 +344,24 @@ class func(object):
 
 	@enforce_mode('view')
 	def goBaseplate(self,*args,**kwargs):
-		#ID = self.page.sbBaseplate.value()
-		#if ID>=0:
 		ID = self.page.leBaseplate.text()
 		if ID != "":
 			self.setUIPage('Baseplates',ID=ID)
 
 	@enforce_mode('view')
 	def goSensor(self,*args,**kwargs):
-		#ID = self.page.sbSensor.value()
-		#if ID>=0:
 		ID = self.page.leSensor.text()
 		if ID != "":
 			self.setUIPage('Sensors',ID=ID)
 
 	@enforce_mode('view')
 	def goPcb(self,*args,**kwargs):
-		#ID = self.page.sbPcb.value()
-		#if ID>=0:
 		ID = self.page.lePcb.text()
 		if ID != "":
 			self.setUIPage('PCBs',ID=ID)
 
 	@enforce_mode('view')
 	def goProtomodule(self,*args,**kwargs):
-		#ID = self.page.sbProtomodule.value()
-		#if ID>=0:
 		ID = self.page.leProtomodule.text()
 		if ID != "":
 			self.setUIPage('Protomodules',ID=ID)
@@ -446,22 +381,24 @@ class func(object):
 
 	@enforce_mode(['editing', 'creating'])
 	def getFile(self,*args,**kwargs):
-		f = self.fwnd.getfile()
-		if f:
+		f = self.fwnd.getdir()
+		files = glob.glob(f + '/**/*.png', recursive=True) + glob.glob(f + '/**/*.jpg', recursive=True)
+		if files != []:
 			# Need to call this to ensure that necessary dirs for storing item are created
-			print("Got file.  Saving to ensure creation of filemanager location...")
-			self.module.save()
-
-			fname = os.path.split(f)[1]  # Name of file
-			fdir, fname_ = self.module.get_filedir_filename()
-			#new_filepath = fdir + '/' + fname
-			tmp_filepath = (fdir + '/' + fname).rsplit('.', 1)  # Only want the last . to get replaced...
-			new_filepath = "_upload.".join(tmp_filepath)
-			print("GETFILE:  Copying file", f, "to", new_filepath)
-			shutil.copyfile(f, new_filepath)
-			self.page.listComments.addItem(new_filepath)
-			self.module.test_files.append(new_filepath)
+			print("Got files.  Saving to ensure creation of filemanager location...")
+            self.module.save()
+			for f in files:
+				fname = os.path.split(f)[1]  # Name of file
+				fdir, fname_ = self.module.get_filedir_filename()
+				tmp_filepath = (fdir + '/' + fname).rsplit('.', 1)  # Only want the last . to get replaced...
+				new_filepath = "_upload.".join(tmp_filepath)
+				print("GETFILE:  Copying file", f, "to", new_filepath)
+				shutil.copyfile(f, new_filepath)
+				self.page.listComments.addItem(new_filepath)
+				self.module.test_files.append(new_filepath)
 			self.update_info()
+		else:
+			print("WARNING:  Failed to find PNG files in chosen directory!")
 
 	@enforce_mode(['editing', 'creating'])
 	def deleteFile(self,*args,**kwargs):
@@ -491,8 +428,6 @@ class func(object):
 			ID = kwargs['ID']
 			if not (type(ID) is str):
 				raise TypeError("Expected type <str> for ID; got <{}>".format(type(ID)))
-			#if ID < 0:
-			#	raise ValueError("ID cannot be negative")
 			self.page.leID.setText(ID)
 			self.loadPart()
 
