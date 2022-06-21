@@ -293,6 +293,7 @@ class fsobj(object):
 	# Utility for _load_...:  Take a string from an XML element and return a var w/ the correct type
 	# "True" -> bool, 100 -> int, etc.
 	def _convert_str(self, string):
+		if not string:  return None
 		if string.isdigit():
 			return int(string)
 		elif string.replace('.','',1).isdigit():

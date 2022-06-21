@@ -382,6 +382,7 @@ class func(object):
 	@enforce_mode(['editing', 'creating'])
 	def getFile(self,*args,**kwargs):
 		f = self.fwnd.getdir()
+		if f == '':  return
 		files = glob.glob(f + '/**/*.png', recursive=True) + glob.glob(f + '/**/*.jpg', recursive=True)
 		if files != []:
 			# Need to call this to ensure that necessary dirs for storing item are created

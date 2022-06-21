@@ -364,6 +364,7 @@ class func(object):
 	@enforce_mode(['editing', 'creating'])
 	def getFile(self,*args,**kwargs):
 		f = self.fwnd.getdir()
+		if f == '':  return
 		# Directory containing root files.  Search recursively for roots:
 		files = glob.glob(f + '/**/*.root', recursive=True)
 		if files != []:
