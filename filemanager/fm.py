@@ -35,7 +35,7 @@ MAC_ID_RANGES = {
 }
 
 # NEW
-LOCATION_DICT = {  # For loading from/to LOCATION_ID XML tag
+INSTITUTION_DICT = {  # For loading from/to LOCATION_ID XML tag
 	1780: "FNAL",
 	1781: "UMN",
 	1782: "UCSB",
@@ -90,7 +90,7 @@ def loadconfig(file=None):
 	# Class names MUST match actual class names or stuff will break
 	# Note:  Only the first 6 are searchable at the moment; the rest are in case they're needed later.
 	# (And because save() now calls add_part_to_list for all objects except tools)
-	obj_list = ['baseplate', 'sensor', 'pcb', 'protomodule', 'module', 'shipment',
+	obj_list = ['baseplate', 'sensor', 'pcb', 'protomodule', 'module',
 				'batch_araldite', 'batch_wedge', 'batch_sylgard',
 				'batch_bond_wire',
 				'tool_sensor', 'tool_pcb', 'tray_assembly', 'tray_component_sensor', 'tray_component_pcb',
@@ -151,7 +151,7 @@ class UserManager:
 
 	def updateUser(self, username, permList, isAdmin=False):
 		if not username in self.getAllUsers():
-			print("ERROR:  Attempted to update nonexistent user!")
+			print("ERROR:  Attempted to update nonexistent user {}!".format(username))
 			return
 		if len(permList) != len(self.pageList):
 			print("ERROR:  permissions list length does not equal page list length!")
@@ -241,7 +241,7 @@ class fsobj(object):
 	# NEW
 	XML_STRUCT_DICT = None  # Should not use the base class!
 
-	# List of all class vars that are saved as a list--e.g. comments, shipment parts, etc.
+	# List of all class vars that are saved as a list--e.g. comments, parts, etc.
 	# Will be handled differently from normal xml items
 	ITEMLIST_LIST = ['comments']
 
@@ -340,16 +340,9 @@ class fsobj(object):
 				itemdata = xml_tree.find('.//'+item_name)  # NOTE:  itemdata is an Element, not text!
 				if itemdata is None: #itemdata.text is None:
 					print("ERROR:  Found None search result in _load_from_dict(): {}".format(item_name))
-				#elif itemdata.text.isdigit():  # If int:
-				#	idt = int(itemdata.text)
-				#elif itemdata.text.replace('.','',1).isdigit():  # If float:
-				#	idt = float(itemdata.text)
-				#elif itemdata.text == 'True':  idt = True
-				#elif itemdata.text == 'False': idt = False
-				#elif itemdata.text == 'None':  idt = None
-				#else:  # If string
-				#	idt = itemdata.text
-				idt = self._convert_str(itemdata.text)
+					idt = None
+				else:
+					idt = self._convert_str(itemdata.text)
 				setattr(self, item, idt)
 
 
@@ -443,9 +436,6 @@ class fsobj(object):
 		# structured according to that dictionary.
 		# NOTE:  This must be able to work recursively.  I.e. if one of the objs in the input_dict is a dict,
 		#    it reads *that* dictionary and creates an element for it, +appends it to current element.  Etc.
-		#print("***dict_to_element:*** element {}, input dict is".format(element_name))
-		#print(input_dict, type(input_dict))
-		#print("data_set_index:", data_set_index)
 
 		# NEW:  Add special case for multi-item assembly steps.  Will always appear in DATA_SET dict.
 		# If in DATA_SET, data_set_index will NOT be None.  If not None, and the requested item is a list, 
@@ -471,7 +461,6 @@ class fsobj(object):
 				parent.append(child)
 			elif type(item) == list:
 				# Second recursive case:  for multiple parts, etc
-				print("    Found list of vals to store for", item_name, item)
 				for it in item:
 					# For each item, create elements recursively and append to parent
 					ch = self.dict_to_element(it, item_name, data_set_index=data_set_index)
@@ -574,9 +563,6 @@ class fsobj_tool(fsobj):
 
 	# NEW--used only for tooling parts.
 	def get_filedir_filename(self, ID = None, institution = None):
-		#if self.institution is None:
-		#	print("ERROR:  Object needs a location before it can be saved!")
-		#	return None, None
 		if ID is None:
 			ID = self.ID
 		if institution is None:
@@ -593,8 +579,12 @@ class fsobj_tool(fsobj):
 			data = json.load(opfl)
 			if not self.ID in data.keys():
 				dcreated = time.localtime()
-				if self.ID == None:  print("ERROR:  self.ID in add_part_to_list (tool) is None!")
-				if self.institution == None:  print("ERROR:  self.institution in add_part_to_list (tool) is None!")
+				if self.ID == None:
+					print("ERROR:  self.ID in add_part_to_list (tool) is None!")
+					assert(False)
+				if self.institution == None:
+					print("ERROR:  self.institution in add_part_to_list (tool) is None!")
+					assert(False)
 				# Key difference here:  Key is (ID, institution)
 				data["{}_{}".format(self.ID, self.institution)] = '{}-{}-{}'.format(dcreated.tm_mon, dcreated.tm_mday, dcreated.tm_year)
 		with open(self.partlistfile, 'w') as opfl:
@@ -648,8 +638,9 @@ class fsobj_tool(fsobj):
 		for prop in PROPERTIES:
 			setattr(self, prop, DEFAULTS.get(prop, None))
 
-
+##########################################################
 ###### PARENT CLASSES FOR PARTS AND ASSEMBLY STEPS #######
+##########################################################
 
 class fsobj_part(fsobj):
 	# Var storing names of table to request XML files from
@@ -664,17 +655,13 @@ class fsobj_part(fsobj):
 	XML_UPLOAD_DICT = None
 	XML_CONSTS = None
 
-	# NEW:  Want to ....
 	def __init__(self):  # Maybe this could be done OUTSIDE of init...but not sure I want to risk it.
 		super(fsobj_part, self).__init__()
 		# Add all other vars to XML_STRUCT_DICT
 		# (so they will be saved accordingly)
-		#print("\nINIT: ADDING PROPERTIES")
-		#print(self.PROPERTIES)
 		for var in self.PROPERTIES + self.PROPERTIES_COMMON:
 			# WARNING:  XML_STRUCT_DICT is {'data':{'row': and THEN the useful vars
 			if var not in self.XML_CONSTS:  self.XML_STRUCT_DICT['data']['row'][var] = var
-
 
 
 	# save() must also create and save the XML file for uploading...
@@ -736,7 +723,7 @@ class fsobj_part(fsobj):
 		xml_file = os.sep.join([filedir, filename])
 
 		if not os.path.exists(xml_file):
-			print("ERROR:  Step is present in partlistfile OR downloaded, but XML file {} does not exist!".format(xml_file))
+			print("ERROR: load() (part):  Step is present in partlistfile OR downloaded, but XML file {} does not exist!".format(xml_file))
 			self.clear()
 			return False
 
@@ -749,7 +736,6 @@ class fsobj_part(fsobj):
 
 	# NEW: Must save to correct location!
 	def request_XML(self, table_name, search_conditions, suffix=None):
-		print("CALLING request_XML")
 
 		if not ENABLE_DB_COMMUNICATION:
 			return False
@@ -798,6 +784,28 @@ class fsobj_part(fsobj):
 		self.add_part_to_list(date=date)
 
 		return True
+
+
+	# Universal properties
+
+	@property
+	def institution_id(self):
+		# INSTITUTION_DICT maps ID -> name#
+		for instID, instname in INSTITUTION_DICT.items():
+			if self.institution == instname:  return instID
+		print("ERROR:  location not found in INSTITUTION_DICT")
+		return None
+	@institution_id.setter
+	def institution_id(self, value):
+		if value is None:
+			self.institution = None
+		elif not value in INSTITUTION_DICT.keys():
+			print("Warning:  institution_id:  Found invalid location ID {}".format(value))
+		else:
+			self.institution = INSTITUTION_DICT[value]
+
+
+
 
 
 
@@ -892,10 +900,8 @@ class fsobj_assembly(fsobj):
 
 
 		filedir, filename = self.get_filedir_filename(ID)  #, date=dt)
-		print("Searching for xml file ", filedir, filename)
 		condname = filename.replace('.xml', '_cond.xml')
 		xml_file      = os.sep.join([filedir, filename])
-		#xml_file_cond = os.sep.join([filedir, condname])
 
 		if not os.path.exists(xml_file):
 			print("ERROR:  Step is present in partlistfile OR downloaded, but XML file {} does not exist!".format(xml_file))
@@ -906,20 +912,6 @@ class fsobj_assembly(fsobj):
 		self._load_from_dict(self.XML_STRUCT_DICT, xml_tree)
 
 		# NOTE:  Now saving cond file ONLY as an upload file.  Load all info from standard file.
-		"""
-		xml_tree = parse(xml_file_cond)
-		
-		cond_vars = {'TIME_START':'cure_start', 'TIME_STOP':'cure_stop',
-					 'TEMP_DEGC':'cure_temperature', 'HUMIDITY_PRCNT':'cure_humidity'}
-		for tag, var in cond_vars.items():
-			itemdata = xml_tree.find('.//'+tag)
-			if itemdata.text.replace('.','',1).isdigit():
-				idt = float(itemdata.text)
-			else:
-				idt = itemdata.text
-			setattr(self, var, idt)
-		"""
-
 		self.ID = ID
 		return True
 
@@ -992,10 +984,8 @@ class fsobj_assembly(fsobj):
 class tool_sensor(fsobj_tool):
 	OBJECTNAME = "sensor tool"
 	FILEDIR = os.sep.join(['tooling','tool_sensor'])
-	#FILENAME = 'tool_sensor_{ID:0>5}.json'
 	FILENAME = 'tool_sensor_{institution}_{ID:0>5}.xml'
 	PROPERTIES = [
-		#'size',
 		'location',
 	]
 
@@ -1007,10 +997,8 @@ class tool_sensor(fsobj_tool):
 class tool_pcb(fsobj_tool):
 	OBJECTNAME = "PCB tool"
 	FILEDIR = os.sep.join(['tooling','tool_pcb'])
-	#FILENAME = 'tool_pcb_{ID:0>5}.json'
 	FILENAME = 'tool_pcb_{institution}_{ID:0>5}.xml'
 	PROPERTIES = [
-		#'size',  # Removed; everything should be 8 in
 		'location',
 	]
 
@@ -1018,10 +1006,8 @@ class tool_pcb(fsobj_tool):
 class tray_assembly(fsobj_tool):
 	OBJECTNAME = "assembly tray"
 	FILEDIR = os.sep.join(['tooling','tray_assembly'])
-	#FILENAME = 'tray_assembly_{ID:0>5}.json'
 	FILENAME = 'tray_assembly_{institution}_{ID:0>5}.xml'
 	PROPERTIES = [
-		#'size',
 		'location',
 	]
 
@@ -1029,10 +1015,8 @@ class tray_assembly(fsobj_tool):
 class tray_component_sensor(fsobj_tool):
 	OBJECTNAME = "sensor tray"
 	FILEDIR = os.sep.join(['tooling','tray_component_sensor'])
-	#FILENAME = 'tray_component_sensor_{ID:0>5}.json'
 	FILENAME = 'tray_component_sensor_{institution}_{ID:0>5}.xml'
 	PROPERTIES = [
-		#'size',
 		'location',
 	]
 
@@ -1040,127 +1024,10 @@ class tray_component_sensor(fsobj_tool):
 class tray_component_pcb(fsobj_tool):
 	OBJECTNAME = "pcb tray"
 	FILEDIR = os.sep.join(['tooling','tray_component_pcb'])
-	#FILENAME = 'tray_component_pcb_{ID:0>5}.json'
 	FILENAME = 'tray_component_pcb_{institution}_{ID:0>5}.xml'
 	PROPERTIES = [
-		#'size',
 		'location',
 	]
-
-
-
-###############################################
-###########  shipment and reception  ##########
-###############################################
-
-class shipment(fsobj):
-	OBJECTNAME = "shipment"
-	FILEDIR = os.sep.join(['shipments'])
-	FILENAME = "shipment_{ID:0>5}.json"
-	PROPERTIES = [
-		"sender",
-		"receiver",
-		"date_sent",
-		"date_received",
-
-		"sendOrReceive",  #NEW, may be unnecessary
-		#= "send" or "receive"
-		"fedex_id", # NEW
-
-		"kaptons",
-		"baseplates",
-		"sensors",
-		"pcbs",
-		"protomodules",
-		"modules",
-	]
-
-
-	def save(self):
-		super(shipment,self).save()
-
-		if not (self.kaptons is None):
-			pass
-			# kaptons are not given ID or tracked as objects
-
-		if not (self.baseplates is None):
-			inst_baseplate = baseplate()
-			for ID in self.baseplates:
-				success = inst_baseplate.load(ID)
-				if success:
-					if inst_baseplate.shipments is None:
-						inst_baseplate.shipments = []
-					if not (self.ID in inst_baseplate.shipments):
-						inst_baseplate.shipments.append(self.ID)
-						inst_baseplate.save()
-					inst_baseplate.clear()
-				else:
-					print("Baseplate not initialized.  DANGER:  This message indicates a bug is present (see fm.py).")
-					# create objects?
-					# IN THEORY, this should never be necessary.  If the object doesn't exist, an error message 
-					# should pop up in the shipment step, and save() should not be callable...
-			del inst_baseplate
-
-		if not (self.sensors is None):
-			inst_sensor = sensor()
-			for ID in self.sensors:
-				success = inst_sensor.load(ID)
-				if success:
-					if inst_sensor.shipments is None:
-						inst_sensor.shipments = []
-					if not (self.ID in inst_sensor.shipments):
-						inst_sensor.shipments.append(self.ID)
-						inst_sensor.save()
-					inst_sensor.clear()
-				else:
-					... # create objects?
-			del inst_sensor
-
-		if not (self.pcbs is None):
-			inst_pcb = pcb()
-			for ID in self.pcbs:
-				success = inst_pcb.load(ID)
-				if success:
-					if inst_pcb.shipments is None:
-						inst_pcb.shipments = []
-					if not (self.ID in inst_pcb.shipments):
-						inst_pcb.shipments.append(self.ID)
-						inst_pcb.save()
-					inst_pcb.clear()
-				else:
-					... # create objects?
-			del inst_pcb
-
-		if not (self.protomodules is None):
-			inst_protomodule = protomodule()
-			for ID in self.protomodules:
-				success = inst_protomodule.load(ID)
-				if success:
-					if inst_protomodule.shipments is None:
-						inst_protomodule.shipments = []
-					if not (self.ID in inst_protomodule.shipments):
-						inst_protomodule.shipments.append(self.ID)
-						inst_protomodule.save()
-					inst_protomodule.clear()
-				else:
-					... # create objects?
-			del inst_protomodule
-
-		if not (self.modules is None):
-			inst_module = module()
-			for ID in self.modules:
-				success = inst_module.load(ID)
-				if success:
-					if inst_module.shipments is None:
-						inst_module.shipments = []
-					if not (self.ID in inst_module.shipments):
-						inst_module.shipments.append(self.ID)
-						inst_module.save()
-					inst_module.clear()
-				else:
-					... # create objects?
-			del inst_module
-
 
 
 
@@ -1174,23 +1041,17 @@ class baseplate(fsobj_part):
 	FILENAME = "baseplate_{ID}.xml"
 
 	PROPERTIES = [
-		# shipments and location
+		# location
 		"institution",
 		"location",  # physical location of part
-		"shipments", # list of shipments that this part has been in
 
 		# characteristics (defined upon reception)
-		#"serial",   # serial given by manufacturer or distributor.
 		"barcode",
-		#"manufacturer", # name of company that manufactured this part
 		"material",     # physical material
-		#"nomthickness", # nominal thickness
 		"size",         # hexagon width, numerical. 6 or 8 (integers) for 6-inch or 8-inch
 		"shape",        # 
-		#"rotation",     # 
 
 		# baseplate qualification 
-		#"corner_heights",      # list of corner heights
 		"flatness",
 		"thickness",           # measure thickness of baseplate
 		"grade",   # A, B, or C
@@ -1213,12 +1074,10 @@ class baseplate(fsobj_part):
 		# Will be given straight to the upload file, or held onto
 		"id_number",
 		"parent_ID",
-		#"location_id",
 		"description",
 	]
 
 	DEFAULTS = {
-		"shipments":[],
 		"size":     '8', # This should not be changed!
 	}
 
@@ -1228,7 +1087,7 @@ class baseplate(fsobj_part):
 		"PART_PARENT_ID":'parent_id',  #Don't care about this (not needed for upload)
 		"KIND_OF_PART_ID":"kind_of_part_id",
 		"KIND_OF_PART":"kind_of_part",
-		"LOCATION_ID":"location_id",
+		"LOCATION_ID":"institution_id",
 		"SERIAL_NUMBER":"ID",
 		"DESCRIPTION":"description",
 	}}}
@@ -1250,13 +1109,12 @@ class baseplate(fsobj_part):
 	# List of vars that should NOT be edited in the GUI and are only loaded from DB
 	# (And some info would be redundant w/ other constants, eg KIND_OF_PART and self.size)
 	XML_CONSTS = [
-		#'ID',  # does NOT count
 		'size',
 	]
 
 	# List of vars that are stored as lists.
 	# Need to be treated separately @ loading from XML
-	ITEMLIST_LIST = ['comments', 'shipments'] # 'corner_heights'
+	ITEMLIST_LIST = ['comments'] # 'corner_heights'
 
 
 	@property
@@ -1272,100 +1130,11 @@ class baseplate(fsobj_part):
 			self.material = value.split()[0]
 			self.shape = value.split()[2]
 
-	@property
-	def location_id(self):
-		# LOCATION_DICT maps ID -> name#
-		for locID, locname in LOCATION_DICT.items():
-			if self.name == locname:  return locID
-		print("ERROR:  location not found in LOCATION_DICT")
-		return None
-	@location_id.setter
-	def location_id(self, value):
-		if not value in LOCATION_DICT.keys() or value == None:
-			print("Warning:  Found invalid location ID {}".format(value))
-		else:
-			self.location = LOCATION_DICT[value]
-
 
 	def ready_step_sensor(self, step_sensor = None, max_flatness = None):
-		if step_sensor == self.step_sensor:
-			return True, "already part associated with this sensor step"
-	
-		#if self.num_sensors == 0:  #num_sensors doesn't exist...so just ignore this?
-		#	return False, "no sensors found"
-
-		checks = []
-		#checks = [
-		#	self.check_edges_firm == "pass",
-		#	self.check_glue_spill == "pass",
-		#	]
-		"""
-		if self.kapton_flatness is None:
-			print("No kapton flatness")  #Currently not set...
-			checks.append(False)
-		elif not (max_flatness is None):
-			if self.kapton_flatness < max_flatness:  print("kapton flat")
-			else:  print("kapton not flat")
-			checks.append(self.kapton_flatness < max_flatness)
-		"""
-		#if not self.thickness:
-		#	print("thickness false")
-		#	checks.append(False)
-		if self.flatness is None:  #This one seems a little iffy...
-			print("flatness is None (are corner heights missing?)")
-			checks.append(False)
-
-		if not all(checks):
-			return False, "kaptonized baseplate qualification failed or incomplete"
-		else:
-			return True, ""
-
-
-	#CURRENTLY WIP
-
-	def ready_step_pcb(self, step_pcb = None, max_flatness = None):
-		if step_pcb == self.step_pcb:
-			return True, "already part associated with this pcb step"
-
-		if not (self.step_pcb is None):
-			return False, "already part of a protomodule"
-
-		"""if self.num_kaptons == 1:
-			checks = [
-				self.check_leakage    == "pass",
-				self.check_surface    == "pass",
-				self.check_edges_firm == "pass",
-				self.check_glue_spill == "pass",
-			]
-			if self.kapton_flatness is None:
-				checks.append(False)
-			elif not (max_flatness is None):
-				checks.append(self.kapton_flatness < max_flatness)
-
-			if not all(checks):
-				return False, "kaptonized baseplate qualification failed or incomplete"
-			else:
-				return True, ""
-		"""
-
-		"""if self.num_kaptons == 0:
-			checks = []
-			if not self.kapton_tape_applied:
-				checks.append(False)
-			if not self.thickness:
-				checks.append(False)
-			if self.flatness is None:
-				checks.append(False)
-			if not (max_flatness is None):
-				checks.append(max_flatness > self.flatness)
-
-			if not all(checks):
-				return False, "baseplate qualification failed or incomplete"
-			else:
-				return True, ""
-		"""
+		if self.step_sensor and self.step_sensor != step_sensor:
+			return False, "already assigned to protomodule {}".format(self.protomodule)
 		return True, ""
-
 
 
 class sensor(fsobj_part):
@@ -1373,10 +1142,9 @@ class sensor(fsobj_part):
 	FILEDIR = os.sep.join(['sensors','{date}'])
 	FILENAME = "sensor_{ID}.xml"
 	PROPERTIES = [
-		# shipments and location
+		# location
 		"institution",
 		"location",  # physical location of part
-		"shipments", # list of shipments that this part has been in
 
 		# characteristics (defined upon reception)
 		"barcode",
@@ -1402,21 +1170,18 @@ class sensor(fsobj_part):
 		"insertion_user",
 		# NEW:  Data to be read from base XML file
 		"id_number",
-		"location_id",
 		"description",
 
 	]
 
 	DEFAULTS = {
-		"shipments":[],
 		"size":    '8',  # DO NOT MODIFY
 	}
 
 	XML_STRUCT_DICT = { "data":{"row":{
-		#"ID":"id_number",
 		"KIND_OF_PART_ID":"kind_of_part_id",
 		"KIND_OF_PART":"kind_of_part", #TBD:  Property
-		"LOCATION_ID":"location_id", # same...
+		"LOCATION_ID":"institution_id", # same...
 		"MANUFACTURER":"manufacturer",
 		"SERIAL_NUMBER":"ID",
 		"DESCRIPTION":"description",  # Can probably leave this blank...
@@ -1428,7 +1193,6 @@ class sensor(fsobj_part):
 		"SERIAL_NUMBER":"ID",
 		"COMMENT_DESCRIPTION":"description",
 		"LOCATION":"institution",
-		#"MANUFACTURER":"manufacturer",
 		# NEW:
 		"THICKNESS":"thickness",
 		"VISUAL_INSPECTION":"inspection",
@@ -1443,15 +1207,14 @@ class sensor(fsobj_part):
 	}}}
 
 	XML_CONSTS = [
-		#'ID',  # does NOT count
 		'size',
 	]
 
-	ITEMLIST_LIST = ['comments', 'shipments']
+	ITEMLIST_LIST = ['comments']
 
 	@property
 	def resolution(self):
-		return self.channel_density   #'HD' if self.type=='120um' else 'LD'
+		return self.channel_density
 	@resolution.setter
 	def resolution(self, value):
 		self.channel_density = value
@@ -1475,65 +1238,26 @@ class sensor(fsobj_part):
 	def thickness(self):
 		return float(self.type.split('um')[0])/1000
 
-	@property
-	def location_id(self):
-		# LOCATION_DICT maps ID -> name#
-		for locID, locname in LOCATION_DICT.items():
-			if self.name == locname:  return locID
-		print("ERROR:  location not found in LOCATION_DICT")
-		return None
-	@location_id.setter
-	def location_id(self, value):
-		if not value in LOCATION_DICT.keys() or value == None:
-			print("Warning:  Found invalid location ID {}".format(value))
-		else:
-			self.location = LOCATION_DICT[value]
 
 
-
-
-
-	# NEWLY MOVED FROM BASEPLATE!!!
 	# Should not be passing any of these params yet
-	def ready_step_kapton(self, step_kapton = None, max_flatness = None, max_kapton_flatness = None):
-		#if step_kapton == self.step_kapton:
-		#	return True, "already part associated with this kapton step"
+	def ready_step_sensor(self, step_sensor = None, max_flatness = None):
+		if self.step_sensor and self.step_sensor != step_sensor:
+			return False, "already assigned to protomodule {}".format(self.protomodule)
 
-		if not (self.step_sensor is None):
-			return False, "already part of a protomodule (has a sensor step)"
-
-		#if not self.step_kapton is None:
-		#	# step_kapton has already been assigned, and it isn't the one that's currently being added!
-		#	return False, "baseplate already has an assigned kapton step!"
-		
 		# Kapton qualification checks:
 		errstr = ""
 		checks = [
-			#self.check_edges_firm == "pass",
-			self.check_glue_spill == "pass",
-			#self.kapton_flatness  != None,
+			self.inspection == "pass",
 		]
 		#if self.kapton_flatness is None:
-		#	errstr+=" kapton flatness doesn't exist."
-		#	checks.append(False)
-		#elif not (max_kapton_flatness is None) and (self.kapton_flatness > max_kapton_flatness):
-		#	errstr.append(" kapton flatness {} exceeds max of {}.".format(self.kapton_flatness, max_kapton_flatness))
-		#	checks.append(False)
-
-		# Baseplate qualification+preparation checks:
-		#if not self.kapton_tape_applied:
-		#	errstr+=" kapton tape not applied."
-		#	checks.append(False)
-		if not self.thickness:
-			errstr+=" thickness doesn't exist."
+		if self.flatness is None:
+			errstr+=" flatness doesn't exist."
 			checks.append(False)
-		#if self.flatness is None:
-		#	errstr+=" flatness doesn't exist."
-		#	checks.append(False)
-		#elif not (max_flatness is None):
-		#	if max_flatness<self.flatness:
-		#		errstr+="kapton flatness "+str(self.flatness)+" exceeds max "+str(max_flatness)+"."
-		#		checks.append(False)
+		elif not (max_flatness is None):
+			if max_flatness<self.flatness:
+				errstr+="kapton flatness "+str(self.flatness)+" exceeds max "+str(max_flatness)+"."
+				checks.append(False)
 
 		if not all(checks):
 			return False, "sensor qualification failed or incomplete. "+errstr
@@ -1544,13 +1268,12 @@ class sensor(fsobj_part):
 
 class pcb(fsobj_part):
 	OBJECTNAME = "PCB"
-	FILEDIR = os.sep.join(['pcbs','{date}'])  #,'pcb_{ID}'])
+	FILEDIR = os.sep.join(['pcbs','{date}'])
 	FILENAME = "pcb_{ID}.xml"
 	PROPERTIES = [
-		# shipments and location
+		# location
 		"institution",
 		"location",  # physical location of part
-		"shipments", # list of shipments that this part has been in
 
 		# details / measurements / characteristics
 		"insertion_user",
@@ -1562,12 +1285,8 @@ class pcb(fsobj_part):
 		"size",         # 
 		"channels",     # 
 		"shape",        # 
-		#"chirality",    # 
 
 		# pcb qualification
-		#"daq",        # name of dataset
-		#"daq_ok",     # None if no DAQ yet; True if DAQ is good; False if it's bad
-		#"inspection", # Check for exposed gold on backside. None if not inspected yet; True if passed; False if failed
 		"grade",
 		"thickness",  # 
 		"flatness",   # 
@@ -1576,14 +1295,10 @@ class pcb(fsobj_part):
 		"step_pcb", # which step_pcb placed this pcb
 		"module",   # which module this pcb is a part of
 
-		# Associations to datasets
-		#"daq_data", # list of all DAQ datasets
-
 		# NEW:  Data to be read from base XML file
 		"id_number",
 		"kind_of_part_id",
 		"kind_of_part",
-		"location_id",
 		"description",
 
 		"manufacturer",  # for output XML
@@ -1593,13 +1308,7 @@ class pcb(fsobj_part):
 		"test_files",
 	]
 
-	#PROPERTIES_DO_NOT_SAVE = [
-	#	"daq_data",
-	#]
-
 	DEFAULTS = {
-		"shipments":[],
-		#"daq_data":[],
 		"size":     '8',
 		"comment_description":  "TEST",
 		"test_files":[],
@@ -1609,7 +1318,7 @@ class pcb(fsobj_part):
 		"ID":"id_number",
 		"KIND_OF_PART_ID":"kind_of_part_id",
 		"KIND_OF_PART":"kind_of_part", #TBD:  Property
-		"LOCATION_ID":"location_id", # same...
+		"LOCATION_ID":"institution_id", # same...
 		"MANUFACTURER":"manufacturer",
 		"SERIAL_NUMBER":"ID",
 		"VERSION":"version",
@@ -1636,7 +1345,7 @@ class pcb(fsobj_part):
 		'resolution_type',
 	]
 
-	ITEMLIST_LIST = ['comments', 'shipments', 'test_files']
+	ITEMLIST_LIST = ['comments', 'test_files']
 
 	# WIP, go back and fix!
 	
@@ -1652,32 +1361,10 @@ class pcb(fsobj_part):
 			self.resolution = value.split()[1]
 			self.shape = value.split()[2]
 
-	@property
-	def location_id(self):
-		# LOCATION_DICT maps ID -> name#
-		for locID, locname in LOCATION_DICT.items():
-			if self.name == locname:  return locID
-		print("ERROR:  location not found in LOCATION_DICT")
-		return None
-	@location_id.setter
-	def location_id(self, value):
-		if not value in LOCATION_DICT.keys() or value == None:
-			print("Warning:  Found invalid location ID {}".format(value))
-		else:
-			self.location = LOCATION_DICT[value]
-
-
-	def fetch_datasets(self):
-		if self.ID is None:
-			err = "no pcb loaded; cannot fetch datasets"
-			raise ValueError(err)
-		filedir, filename = self.get_filedir_filename(self.ID)
-		daq_datadir = os.sep.join([filedir, self.DAQ_DATADIR])
-		if os.path.exists(daq_datadir):
-			self.daq_data = [_ for _ in os.listdir(daq_datadir) if os.path.isfile(os.sep.join([daq_datadir,_]))]
-		else:
-			self.daq_data = []
-
+	def ready_step_pcb(self, step_pcb = None):
+		if self.step_pcb and self.step_pcb != self_pcb:
+			return False, "already assigned to module {}".format(self.module)
+		return True, ""
 
 
 class protomodule(fsobj_part):
@@ -1685,21 +1372,17 @@ class protomodule(fsobj_part):
 	FILEDIR = os.sep.join(['protomodules','{date}'])
 	FILENAME = 'protomodule_{ID}.xml'
 	PROPERTIES = [
-		# shipments and location
+		# location
 		"institution",
 		"location",  # physical location of part
-		"shipments", # list of shipments that this part has been in
 
 		# characteristics - taken from child parts upon creation of protomodule
 		"insertion_user",
 		"thickness",   # sum of baseplate and sensor, plus glue gap
-		#"num_kaptons", # from baseplate  # OLD
 		"channels",    # from sensor
 		"size",        # from baseplate or sensor (identical)
 		"shape",       # from baseplate or sensor (identical)
 		"grade",
-		#"chirality",   # from baseplate
-		#"rotation",    # from baseplate or sensor (identical)
 		# initial location is also filled from child parts
 
 		# sensor step - filled upon creation
@@ -1712,8 +1395,6 @@ class protomodule(fsobj_part):
 		"offset_translation_y",
 		"offset_rotation",    # rotation offset of placement
 		"flatness",           # flatness of sensor surface after curing
-		#"check_cracks",       # None if not yet checked; True if passed; False if failed
-		#"check_glue_spill",   # None if not yet checked; True if passed; False if failed
 
 		# pcb step
 		"step_pcb", # ID of pcb step
@@ -1724,14 +1405,10 @@ class protomodule(fsobj_part):
 		"part_parent_id",
 		"kind_of_part_id",
 		"kind_of_part",
-		"location_id",
 		"comment_description",
-
-		"wirebonded",  # Maybe not needed here??
 	]
 
 	DEFAULTS = {
-		"shipments":[],
 		"size":     '8',
 		"comment_description":"top layer: pcb",  # SUBJECT TO CHANGE
 	}
@@ -1742,7 +1419,7 @@ class protomodule(fsobj_part):
 		"PART_PARENT_ID":"part_parent_id",
 		"KIND_OF_PART_ID":"kind_of_part_id",
 		"KIND_OF_PART":"kind_of_part",
-		"LOCATION_ID":"location_id",
+		"LOCATION_ID":"institution_id",
 		"SERIAL_NUMBER":"ID",
 	}}}
 
@@ -1789,7 +1466,7 @@ class protomodule(fsobj_part):
 		'resolution_type',
 	]
 
-	ITEMLIST_LIST = ['comments', 'shipments']
+	ITEMLIST_LIST = ['comments']
 
 	@property
 	def kind_of_part(self):
@@ -1800,7 +1477,7 @@ class protomodule(fsobj_part):
 	@kind_of_part.setter
 	def kind_of_part(self, value):
 		pass
-		#print("TODO:  protomod kind_of_part:  implement when DB enabled")
+		#print("TODO:  protomod kind_of_part.setter:  implement when DB enabled")
 
 
 	@property
@@ -1816,7 +1493,7 @@ class protomodule(fsobj_part):
 	def tray_posn(self):
 		# If has a sensor step, grab the position of this sensor and return it here...
 		if self.step_sensor is None:
-			print("assm_tray_posn:  no sensor step yet")
+			print("Warning:  assm_tray_posn:  no sensor step yet")
 			return "None"
 		temp_sensor_step = step_sensor()
 		found = temp_sensor_step.load(self.step_sensor)
@@ -1824,7 +1501,6 @@ class protomodule(fsobj_part):
 			print("ERROR in tray_posn:  protomodule has sensor step {}, but none found!".format(self.step_sensor))
 			return "None"
 		else:
-			#print("Temp sensor step found.  Sensors:", temp_sensor_step.sensors)
 			position = temp_sensor_step.sensors.index(self.ID)
 			return position
 
@@ -1873,6 +1549,12 @@ class protomodule(fsobj_part):
 			return None
 		return temp_sensor.resolution
 
+	def ready_step_pcb(self, step_pcb = None):
+		if self.step_pcb and self.step_pcb != step_pcb:
+			return False, "already assigned to module {}".format(self.module)
+		return True, ""
+
+		
 
 
 
@@ -1881,10 +1563,9 @@ class module(fsobj_part):
 	FILEDIR    = os.sep.join(['modules','{date}','module_{ID}'])
 	FILENAME   = 'module_{ID}.xml'
 	PROPERTIES = [
-		# shipments and location
+		# location
 		"institution",
 		"location",  # physical location of part
-		"shipments", # list of shipments that this part has been in
 
 		# characteristics - taken from child parts upon creation of module
 		"insertion_user",
@@ -1894,7 +1575,6 @@ class module(fsobj_part):
 		"size",        # from protomodule or pcb (identical)
 		"shape",       # from protomodule or pcb (identical)
 		"grade",
-		#"chirality",   # from protomodule or pcb (identical)
 		# initial location is also filled from child parts
 		"inspection",  # may want to get rid of this / move it to the assembly page
 
@@ -1907,7 +1587,6 @@ class module(fsobj_part):
 		"step_pcb",      # 
 
 		# module qualification
-		#"check_glue_spill",        # None if not yet checked; True if passed; False if failed
 		"preinspection",
 		"offset_translation_x",
 		"offset_translation_y",
@@ -1915,7 +1594,6 @@ class module(fsobj_part):
 
 		# wirebonding
 		# NEW: NOTE:  This info is filled out using the wirebonding page exclusively!
-		#"wirebonding_completed",
 		"wirebonding_comments",  # Comments from wirebonding page only
 		"wirebonding_date_back",
 		"wirebonding_date_front",
@@ -1929,11 +1607,7 @@ class module(fsobj_part):
 		"wirebonding_unbonded_channels_back", # list of sites that were not wirebonded
 		"wirebonding_user_back",           # who performed wirebonding
 		"wirebonds_inspected_back",     # whether inspection has happened
-		#"wirebonds_damaged_back",       # list of damaged bonds found during inspection
-		#"wirebonds_repaired_back",      # have wirebonds been repaired
-		#"wirebonds_repaired_list_back", # list of wirebonds succesfully repaired
 		"wirebonds_repaired_user_back", # who repaired bonds
-
 
 		# front wirebonding
 		"wirebonding_front",                # has wirebonding been done
@@ -1941,14 +1615,7 @@ class module(fsobj_part):
 		"wirebonding_unbonded_channels_front", # list of sites that were not wirebonded
 		"wirebonding_user_front",           # who performed wirebonding
 		"wirebonds_inspected_front",     # whether inspection has happened
-		#"wirebonds_damaged_front",       # list of damaged bonds found during inspection
-		#"wirebonds_repaired_front",      # have wirebonds been repaired
-		#"wirebonds_repaired_list_front", # list of wirebonds succesfully repaired
 		"wirebonds_repaired_user_front", # who repaired bonds
-
-		#"wirebonding_shield",
-		#"wirebonding_guard",
-
 
 		# back encapsulation
 		"encapsulation_back",             # has encapsulation been done
@@ -1968,18 +1635,10 @@ class module(fsobj_part):
 
 		# test bonds
 		"test_bonds",             # is this a module for which test bonds will be done?
-		#"test_bonds_pulled",      # have test bonds been pulled
 		"test_bonds_pulled_user", # who pulled test bonds
 		"test_bonds_pull_avg",    # average pull strength
 		"test_bonds_pull_std",    # stddev of pull strength
-		#"test_bonds_pulled_ok",   # is result of test bond pulling ok
-		#"test_bonds_rebonded",      # have test bonds been rebonded
-		#"test_bonds_rebonded_user", # who rebonded test bonds
-		#"test_bonds_rebonded_ok",   # is result of rebonding test bonds ok
 
-
-		# wirebonding qualification
-		#"wirebonding_final_inspection",
 		"wirebonding_final_inspection_user",
 		"wirebonding_final_inspection_ok",
 
@@ -1987,7 +1646,6 @@ class module(fsobj_part):
 		# NEW:  Data to be read from base XML file
 		"id_number",
 		"part_parent_id",
-		"location_id",
 		"description",
 
 		"test_files",
@@ -1997,14 +1655,13 @@ class module(fsobj_part):
 	]
 
 	DEFAULTS = {
-		"shipments":[],
-		'wirebonding_comments':[],
-		'encapsulation_comments':[],
+		"wirebonding_comments":[],
+		"encapsulation_comments":[],
 		"size":    '8',
 		"test_files":[],
 	}
 
-	ITEMLIST_LIST = ['comments', 'shipments', 'wirebonding_comments', 'encapsulation_comments', 'test_files',
+	ITEMLIST_LIST = ['comments', 'wirebonding_comments', 'encapsulation_comments', 'test_files',
 		'wirebonding_unbonded_channels_front'
 	]
 
@@ -2013,7 +1670,7 @@ class module(fsobj_part):
 		"PART_PARENT_ID":"part_parent_id",
 		"KIND_OF_PART_ID":"kind_of_part_id",
 		"KIND_OF_PART":"kind_of_part",
-		"LOCATION_ID":"location_id",
+		"LOCATION_ID":"institution_id",
 		"SERIAL_NUMBER":"ID",
 		"DESCRIPTION":"description",
 	}}}
@@ -2200,7 +1857,6 @@ class step_sensor(fsobj_assembly):
 		'tray_component_sensor', # ID of component tray used
 		'tray_assembly',         # ID of assembly  tray used
 		'batch_araldite',        # ID of araldite batch used
-		#'batch_loctite',         # ID of loctite  batch used
 
 		# TEMP:
 		'kind_of_part_id',
@@ -2211,7 +1867,7 @@ class step_sensor(fsobj_assembly):
 		'xml_data_file',
 	]
 
-	ITEMLIST_LIST = ['comments', 'shipments', 'tools', 'sensors', 'baseplates', 'protomodules']
+	ITEMLIST_LIST = ['comments', 'tools', 'sensors', 'baseplates', 'protomodules']
 
 	"""@property
 	def cure_duration(self):
@@ -2262,9 +1918,9 @@ class step_sensor(fsobj_assembly):
                                              qtime.hour(), qtime.minute(), qtime.second())
 		return datestr
 
-	#@property
-	#def xml_location(self):
-	#	return "{}, {}".format(self.institution, self.location)
+	@property
+	def xml_location(self):
+		return "{}, {}".format(self.institution, self.location)
 
 	@property
 	def xml_comment_data(self):
@@ -2353,8 +2009,6 @@ class step_sensor(fsobj_assembly):
 	GLUE_TYPE = 'Araldite'
 	SLVR_EPXY_TYPE = None
 
-	# List of new vars to add:  cond_id, kind_of_condition, cond_data_set_id, part_id, protomodule_id, 
-
 	# For assembly steps, XML_STRUCT_DICT is automatically defined in the class init().
 	# Dicts for uploading:  XML_UPLOAD_DICT, XML_COND_DICT
 
@@ -2433,7 +2087,7 @@ class step_sensor(fsobj_assembly):
 		'COMMENT_DESCRIPTION':'xml_comment_data', # Property; involves serial
 		'VERSION':'VNUM',
 		'PART':{
-			'KIND_OF_PART':'temp_property',  # TBD
+			'KIND_OF_PART':'protomodule_type',  # TBD
 			'SERIAL_NUMBER':'protomodules'
 		},
 		'DATA':{
@@ -2445,6 +2099,17 @@ class step_sensor(fsobj_assembly):
 		}
 	}
 
+	@property
+	def protomodule_type(self):
+		# Grab a protomod--can be in any posn
+		if self.protomodules is None:  return None
+		prt = None
+		for i in range(6):
+			if self.protomodules[i] != None:  prt = self.protomodules[i]
+		if not prt:  return None
+		tmp_prtomod = protomodule()
+		tmp_prtomod.load(prt)
+		return tmp_prtomod.kind_of_part
 
 
 
@@ -2454,17 +2119,14 @@ class step_pcb(fsobj_assembly):
 	FILENAME = 'pcb_assembly_step_{ID:0>5}.xml'
 	PROPERTIES = [
 		'user_performed', # name of user who performed step
-		#'date_performed', # date step was performed
 		'institution',
 		'location', #Institution where step was performed
 		
 		'run_start',  # unix time @ start of run
 		'run_stop',   # unix time @ start of run
-		'cure_start',
-		'cure_stop',
 		
-		#'cure_start',       # unix time @ start of curing
-		#'cure_stop',        # unix time @ end of curing
+		'cure_start',       # unix time @ start of curing
+		'cure_stop',        # unix time @ end of curing
 		'cure_temperature', # Average temperature during curing (centigrade)
 		'cure_humidity',    # Average humidity during curing (percent)
 
@@ -2484,15 +2146,7 @@ class step_pcb(fsobj_assembly):
 
 
 	# PASTED RECENTLY, needs revision
-	ITEMLIST_LIST = ['comments', 'shipments', 'tools', 'pcbs', 'protomodules', 'modules']
-
-	"""@property
-	def cure_duration(self):
-		if (self.cure_stop is None) or (self.cure_start is None):
-			return None
-		else:
-			return self.cure_stop - self.cure_start
-	"""
+	ITEMLIST_LIST = ['comments', 'tools', 'pcbs', 'protomodules', 'modules']
 
 	# NOTE WARNING:  Commenting all WIP changes for now
 
@@ -2535,9 +2189,9 @@ class step_pcb(fsobj_assembly):
                                              qtime.hour(), qtime.minute(), qtime.second())
 		return datestr
 
-	#@property
-	#def xml_location(self):
-	#	return "{}, {}".format(self.institution, self.location)
+	@property
+	def xml_location(self):
+		return "{}, {}".format(self.institution, self.location)
 
 	@property
 	def xml_comment_data(self):
@@ -2663,7 +2317,7 @@ class step_pcb(fsobj_assembly):
 		'COMMENT_DESCRIPTION':'xml_comment_data', # Property; involves serial
 		'VERSION':'VNUM',
 		'PART':{
-			'KIND_OF_PART':'temp_property',  # TBD
+			'KIND_OF_PART':'module_type',  # TBD
 			'SERIAL_NUMBER':'modules'
 		},
 		'DATA':{
@@ -2674,6 +2328,19 @@ class step_pcb(fsobj_assembly):
 			'HUMIDITY_PRCNT':'cure_humidity'
 		}
 	}
+
+
+	@property
+	def module_type(self):
+		# Grab a mod--can be in any posn
+		if self.modules is None:  return None
+		mod = None
+		for i in range(6):
+			if self.modules[i] != None:  mod = self.modules[i]
+		if not mod:  return None
+		tmp_mod = module()
+		tmp_mod.load(mod)
+		return tmp_mod.kind_of_part
 
 
 
@@ -2700,32 +2367,11 @@ class batch_araldite(fsobj):
 	}}
 	# Dates should have the format "{}-{}-{} {}:{}:{}".  NOT a property; the UI pages handle the loading.
 
-"""
-class batch_loctite(fsobj):
-	OBJECTNAME = "loctite batch"
-	FILEDIR = os.sep.join(['supplies','batch_loctite','{date}'])
-	FILENAME = 'batch_loctite_{ID:0>5}.xml'
-	PROPERTIES = [
-		'date_received',
-		'date_expires',
-		'is_empty',
-	]
-	XML_STRUCT_DICT = {'BATCH':{
-		'ID':'ID',
-		'RECEIVE_DATE':'date_received',
-		'EXPIRE_DATE':'date_expires',
-		'IS_EMPTY':'is_empty',
-		'COMMENTS':'comments'
-	}}
-"""
-
 class batch_wedge(fsobj):
 	OBJECTNAME = "wedge batch"
 	FILEDIR = os.sep.join(['supplies','batch_wedge','{date}'])
 	FILENAME = 'batch_wedge_{ID:0>5}.xml'
 	PROPERTIES = [
-		#'date_received',
-		#'date_expires',
 		'is_empty',
 	]
 	XML_STRUCT_DICT = {'BATCH':{
@@ -2755,24 +2401,6 @@ class batch_sylgard(fsobj):  # was sylgar_thick
 		'COMMENTS':'comments'
 	}}
 
-"""
-class batch_sylgard_thin(fsobj):
-	OBJECTNAME = "sylgard (thin) batch"
-	FILEDIR = os.sep.join(['supplies','batch_sylgard_thin','{date}'])
-	FILENAME = 'batch_sylgard_thin_{ID:0>5}.xml'
-	PROPERTIES = [
-		'date_received',
-		'date_expires',
-		'is_empty',
-	]
-	XML_STRUCT_DICT = {'BATCH':{
-		'ID':'ID',
-		'RECEIVE_DATE':'date_received',
-		'EXPIRE_DATE':'date_expires',
-		'IS_EMPTY':'is_empty',
-		'COMMENTS':'comments'
-	}}
-"""
 
 class batch_bond_wire(fsobj):
 	OBJECTNAME = "bond wire batch"
@@ -2798,4 +2426,5 @@ class batch_bond_wire(fsobj):
 
 if __name__ == '__main__':
 	# test features without UI here
+	# currently unused
 	...

@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import QFileDialog, QWidget
 PAGE_NAME = "view_plots"
 DEBUG = False
 SITE_SEP = ', '
-NO_DATE = [2000,1,1]
+NO_DATE = [2022,1,1]
 
 
 def separate_sites(sites_string):
@@ -89,7 +89,6 @@ class simple_fsobj_pt(object):  # from tools
 
 
 		self.listFiles.clear()
-		print("UPDATE INFO: test_files is", self.fsobj_pt.test_files)
 		for f in self.fsobj_pt.test_files:
 			name = os.path.split(f)[1]
 			self.listFiles.addItem(name)

@@ -16,7 +16,7 @@ class Ui_Form(object):
         Form.setObjectName("Form")
         Form.resize(1097, 726)
         self.frame_2 = QtWidgets.QFrame(Form)
-        self.frame_2.setGeometry(QtCore.QRect(20, 130, 261, 501))
+        self.frame_2.setGeometry(QtCore.QRect(20, 160, 261, 501))
         self.frame_2.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_2.setFrameShadow(QtWidgets.QFrame.Plain)
         self.frame_2.setLineWidth(2)
@@ -232,6 +232,9 @@ class Ui_Form(object):
         self.lineEdit_8.setGeometry(QtCore.QRect(0, 0, 121, 21))
         self.lineEdit_8.setReadOnly(True)
         self.lineEdit_8.setObjectName("lineEdit_8")
+        self.label_6 = QtWidgets.QLabel(Form)
+        self.label_6.setGeometry(QtCore.QRect(20, 140, 151, 16))
+        self.label_6.setObjectName("label_6")
 
         self.retranslateUi(Form)
         self.cbType.setCurrentIndex(-1)
@@ -299,3 +302,4 @@ class Ui_Form(object):
         self.lineEdit_12.setText(_translate("Form", "On protomodule"))
         self.pbGoModule.setText(_translate("Form", "Go to"))
         self.lineEdit_8.setText(_translate("Form", "On module"))
+        self.label_6.setText(_translate("Form", "Standard information"))

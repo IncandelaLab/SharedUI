@@ -16,7 +16,7 @@
   <widget class="QListWidget" name="lwPartList">
    <property name="geometry">
     <rect>
-     <x>440</x>
+     <x>490</x>
      <y>60</y>
      <width>281</width>
      <height>201</height>
@@ -26,7 +26,7 @@
   <widget class="QPushButton" name="pbGoToPart">
    <property name="geometry">
     <rect>
-     <x>550</x>
+     <x>600</x>
      <y>290</y>
      <width>171</width>
      <height>21</height>
@@ -39,7 +39,7 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>440</x>
+     <x>490</x>
      <y>40</y>
      <width>191</width>
      <height>16</height>
@@ -52,8 +52,8 @@
   <widget class="QPushButton" name="pbSearch">
    <property name="geometry">
     <rect>
-     <x>80</x>
-     <y>310</y>
+     <x>110</x>
+     <y>300</y>
      <width>81</width>
      <height>41</height>
     </rect>
@@ -65,7 +65,7 @@
   <widget class="QLineEdit" name="leStatus">
    <property name="geometry">
     <rect>
-     <x>500</x>
+     <x>550</x>
      <y>260</y>
      <width>221</width>
      <height>20</height>
@@ -81,7 +81,7 @@
   <widget class="QLineEdit" name="lineEdit_26">
    <property name="geometry">
     <rect>
-     <x>440</x>
+     <x>490</x>
      <y>260</y>
      <width>61</width>
      <height>20</height>
@@ -97,7 +97,7 @@
   <widget class="QPushButton" name="pbClearResults">
    <property name="geometry">
     <rect>
-     <x>440</x>
+     <x>490</x>
      <y>290</y>
      <width>101</width>
      <height>21</height>
@@ -110,115 +110,570 @@
   <widget class="QLabel" name="label_6">
    <property name="geometry">
     <rect>
-     <x>80</x>
-     <y>370</y>
+     <x>60</x>
+     <y>360</y>
      <width>351</width>
      <height>16</height>
     </rect>
    </property>
    <property name="text">
-    <string>NOTE:  Currently works for locally stored parts only</string>
+    <string>NOTE:  DB search is currently disabled</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_3">
+  <widget class="QPushButton" name="pbClearParams">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>110</y>
+     <x>220</x>
+     <y>310</y>
      <width>111</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Part attributes:</string>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="cbInstitution">
-   <property name="geometry">
-    <rect>
-     <x>250</x>
-     <y>130</y>
-     <width>131</width>
      <height>21</height>
     </rect>
    </property>
-   <property name="currentIndex">
-    <number>0</number>
+   <property name="text">
+    <string>Clear params</string>
    </property>
-   <item>
+  </widget>
+  <widget class="QFrame" name="frame">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>120</y>
+     <width>381</width>
+     <height>161</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <widget class="QCheckBox" name="ckUseDate">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>120</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
     <property name="text">
+     <string>Enable</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="cbChannelDensity">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>80</y>
+      <width>161</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
+    <item>
+     <property name="text">
+      <string/>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>HD</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>LD</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QComboBox" name="cbInstitution">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>0</y>
+      <width>161</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
+    <item>
+     <property name="text">
+      <string/>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>CERN</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>FNAL</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>UCSB</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>UMN</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>HEPHY</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>HPK</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QDateEdit" name="dCreated">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>120</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="calendarPopup">
+     <bool>true</bool>
+    </property>
+    <property name="date">
+     <date>
+      <year>2021</year>
+      <month>1</month>
+      <day>1</day>
+     </date>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_17">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>80</y>
+      <width>221</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Resolution type</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_13">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>221</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Institution</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_15">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>40</y>
+      <width>221</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Baseplate material</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_16">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>60</y>
+      <width>221</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Sensor thickness</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="cbAssmCol">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>140</y>
+      <width>51</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="currentText">
      <string/>
     </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>CERN</string>
+    <property name="currentIndex">
+     <number>0</number>
     </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>FNAL</string>
+    <item>
+     <property name="text">
+      <string/>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>1</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>2</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_18">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>120</y>
+      <width>221</width>
+      <height>20</height>
+     </rect>
     </property>
-   </item>
-   <item>
     <property name="text">
-     <string>UCSB</string>
+     <string>Creation date (proto/module)</string>
     </property>
-   </item>
-   <item>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="cbPCBType">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>100</y>
+      <width>161</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="currentText">
+     <string/>
+    </property>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
+    <item>
+     <property name="text">
+      <string/>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>HGCROCV1</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>HGCROCV2</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>HGCROCV3</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>SKIROCV1</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>SKIROCV2</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>SKIROCV3</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>HGCROC dummy</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QComboBox" name="cbShape">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>20</y>
+      <width>161</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
+    <item>
+     <property name="text">
+      <string/>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Full</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Top</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Bottom</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Left</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Right</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Five</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Three</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Halfmoon</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Full+Three</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QComboBox" name="cbAssmRow">
+    <property name="geometry">
+     <rect>
+      <x>250</x>
+      <y>140</y>
+      <width>51</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="currentText">
+     <string/>
+    </property>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
+    <item>
+     <property name="text">
+      <string/>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>1</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>2</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>3</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_22">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>140</y>
+      <width>31</width>
+      <height>20</height>
+     </rect>
+    </property>
     <property name="text">
-     <string>UMN</string>
+     <string>col</string>
     </property>
-   </item>
-   <item>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="cbThickness">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>60</y>
+      <width>161</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
+    <item>
+     <property name="text">
+      <string/>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>120 um</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>200 um</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>300 um</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_14">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>20</y>
+      <width>221</width>
+      <height>20</height>
+     </rect>
+    </property>
     <property name="text">
-     <string>HEPHY</string>
+     <string>Geometry</string>
     </property>
-   </item>
-   <item>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_19">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>100</y>
+      <width>221</width>
+      <height>20</height>
+     </rect>
+    </property>
     <property name="text">
-     <string>HPK</string>
+     <string>PCB ROC type</string>
     </property>
-   </item>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_13">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>130</y>
-     <width>221</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Institution</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_14">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>150</y>
-     <width>221</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Geometry</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_20">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>140</y>
+      <width>221</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Assembly posn (proto/module)</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_21">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>140</y>
+      <width>31</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>row</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="cbMaterial">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>40</y>
+      <width>161</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
+    <item>
+     <property name="text">
+      <string/>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>CuW</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>PCB</string>
+     </property>
+    </item>
+   </widget>
   </widget>
   <widget class="QLabel" name="label_7">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>50</y>
-     <width>111</width>
+     <x>40</x>
+     <y>40</y>
+     <width>71</width>
      <height>16</height>
     </rect>
    </property>
@@ -229,8 +684,8 @@
   <widget class="QComboBox" name="cbPartType">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>70</y>
+     <x>40</x>
+     <y>60</y>
      <width>121</width>
      <height>21</height>
     </rect>
@@ -264,450 +719,17 @@
     </property>
    </item>
   </widget>
-  <widget class="QComboBox" name="cbMaterial">
+  <widget class="QLabel" name="label_3">
    <property name="geometry">
     <rect>
-     <x>250</x>
-     <y>170</y>
-     <width>131</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="currentIndex">
-    <number>0</number>
-   </property>
-   <item>
-    <property name="text">
-     <string/>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>CuW</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>PCB</string>
-    </property>
-   </item>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_15">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>170</y>
-     <width>221</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Baseplate material</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="cbChannelDensity">
-   <property name="geometry">
-    <rect>
-     <x>250</x>
-     <y>210</y>
-     <width>131</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="currentIndex">
-    <number>0</number>
-   </property>
-   <item>
-    <property name="text">
-     <string/>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>HD</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>LD</string>
-    </property>
-   </item>
-  </widget>
-  <widget class="QComboBox" name="cbThickness">
-   <property name="geometry">
-    <rect>
-     <x>250</x>
-     <y>190</y>
-     <width>131</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="currentIndex">
-    <number>0</number>
-   </property>
-   <item>
-    <property name="text">
-     <string/>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>120 um</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>200 um</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>300 um</string>
-    </property>
-   </item>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_16">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>190</y>
-     <width>221</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Sensor thickness</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_17">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>210</y>
-     <width>221</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Resolution type</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QDateEdit" name="dCreated">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>250</x>
-     <y>250</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="calendarPopup">
-    <bool>true</bool>
-   </property>
-   <property name="date">
-    <date>
-     <year>2021</year>
-     <month>1</month>
-     <day>1</day>
-    </date>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_18">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>250</y>
-     <width>221</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Creation date (proto/module)</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="cbPCBType">
-   <property name="geometry">
-    <rect>
-     <x>250</x>
-     <y>230</y>
-     <width>131</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="currentText">
-    <string/>
-   </property>
-   <property name="currentIndex">
-    <number>0</number>
-   </property>
-   <item>
-    <property name="text">
-     <string/>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>HGCROCV1</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>HGCROCV2</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>HGCROCV3</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>SKIROCV1</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>SKIROCV2</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>SKIROCV3</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>HGCROC dummy</string>
-    </property>
-   </item>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_19">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>230</y>
-     <width>221</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>PCB ROC type</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QCheckBox" name="ckUseDate">
-   <property name="geometry">
-    <rect>
-     <x>340</x>
-     <y>250</y>
-     <width>71</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Enable</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_20">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>270</y>
-     <width>221</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Assembly posn (proto/module)</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_2">
-   <property name="geometry">
-    <rect>
-     <x>260</x>
-     <y>290</y>
-     <width>31</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>row</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_4">
-   <property name="geometry">
-    <rect>
-     <x>310</x>
-     <y>290</y>
-     <width>21</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>col</string>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="cbAssmRow">
-   <property name="geometry">
-    <rect>
-     <x>250</x>
-     <y>270</y>
-     <width>51</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="currentText">
-    <string/>
-   </property>
-   <property name="currentIndex">
-    <number>0</number>
-   </property>
-   <item>
-    <property name="text">
-     <string/>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>1</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>2</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>3</string>
-    </property>
-   </item>
-  </widget>
-  <widget class="QComboBox" name="cbAssmCol">
-   <property name="geometry">
-    <rect>
-     <x>300</x>
-     <y>270</y>
-     <width>51</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="currentText">
-    <string/>
-   </property>
-   <property name="currentIndex">
-    <number>0</number>
-   </property>
-   <item>
-    <property name="text">
-     <string/>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>1</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>2</string>
-    </property>
-   </item>
-  </widget>
-  <widget class="QComboBox" name="cbShape">
-   <property name="geometry">
-    <rect>
-     <x>250</x>
-     <y>150</y>
-     <width>131</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="currentIndex">
-    <number>0</number>
-   </property>
-   <item>
-    <property name="text">
-     <string/>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Full</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Top</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Bottom</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Left</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Right</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Five</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Three</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Halfmoon</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Full+Three</string>
-    </property>
-   </item>
-  </widget>
-  <widget class="QPushButton" name="pbClearParams">
-   <property name="geometry">
-    <rect>
-     <x>190</x>
-     <y>320</y>
+     <x>40</x>
+     <y>100</y>
      <width>111</width>
-     <height>21</height>
+     <height>16</height>
     </rect>
    </property>
    <property name="text">
-    <string>Clear params</string>
+    <string>Part attributes:</string>
    </property>
   </widget>
  </widget>

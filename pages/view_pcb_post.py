@@ -9,7 +9,7 @@ from filemanager import fm
 
 from PyQt5.QtWidgets import QFileDialog, QWidget
 
-NO_DATE = [2020,1,1]
+NO_DATE = [2022,1,1]
 
 PAGE_NAME = "view_pcb_post"
 OBJECTTYPE = "PCB_step"
@@ -57,6 +57,10 @@ class Filewindow(QWidget):
     def getfile(self,*args,**kwargs):
         fname, fmt = QFileDialog.getOpenFileName(self, 'Open file', '~',"(*.xml)")
         return fname
+
+    def getdir(self,*args,**kwargs):
+        dname = QFileDialog.getExistingDirectory(self, "select directory")
+        return dname
 
 
 class func(object):
@@ -191,7 +195,8 @@ class func(object):
 		for i in range(6):
 			self.pb_go_modules[i].clicked.connect(     self.goModule     )
 
-		self.page.cbInstitution.currentIndexChanged.connect( self.loadAllTools )
+		#self.page.cbInstitution.currentIndexChanged.connect( self.loadAllTools )
+		self.page.cbInstitution.activated.connect( self.loadAllTools )
 
 		self.page.sbID.valueChanged.connect(self.loadStep)
 
@@ -316,7 +321,6 @@ class func(object):
 			self.dsb_flatness[i]   .setReadOnly(not (mode_editing and modules_exist[i]))
 			self.cb_grades[i]      .setEnabled(      mode_editing and modules_exist[i])
 
-
 		self.page.pbEdit.setEnabled(   mode_view and     step_pcb_exists )
 		self.page.pbSave.setEnabled(mode_editing     )
 		self.page.pbCancel.setEnabled(mode_editing     )
@@ -326,7 +330,6 @@ class func(object):
 	def loadAllObjects(self,*args,**kwargs):
 		for i in range(6):
 			self.modules[i].load(     self.le_modules[i].text()     )
-
 		self.updateIssues()
 
 	@enforce_mode('editing')
@@ -348,7 +351,6 @@ class func(object):
 
 		if self.step_pcb.institution is None:
 			issues.append(I_INSTITUTION_NOT_SELECTED)
-
 
 		self.page.listIssues.clear()
 		for issue in issues:
@@ -398,7 +400,6 @@ class func(object):
 		self.step_pcb.cure_start = self.page.dtCureStart.dateTime().toTime_t()
 		self.step_pcb.cure_stop  = self.page.dtCureStop.dateTime().toTime_t()
 
-
 		self.step_pcb.cure_humidity = self.page.sbCureHumidity.value()
 		self.step_pcb.cure_temperature = self.page.dsbCureTemperature.value()
 
@@ -422,7 +423,6 @@ class func(object):
 
 			module.save()
 
-
 		self.step_pcb.save()
 		self.unloadAllObjects()
 		self.mode = 'view'
@@ -432,7 +432,6 @@ class func(object):
 	def goModule(self,*args,**kwargs):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
-		#module = self.sb_modules[which].value()
 		module = self.le_modules[which].text()
 		self.setUIPage('modules',ID=module)
 
@@ -456,12 +455,22 @@ class func(object):
 
 	def loadXMLFile(self, *args, **kwargs):
 		filename = self.fwnd.getfile()
+		#dirname = self.fwnd.getdir()
 		# NOTE:  Only pass data to page fields.  DO NOT save to proto object
 		# Only assign data during explicit save() call, so cancellation works normally!
 		# (reminder: all data is stored in the PAGE ELEMENTS until save() is called.)
 		# (update_info is not called during editing until after save() is called.)
 
 		if filename == '':  return
+		#if dirname == '':  return
+        #if len(glob.glob(dirname+'/*.xml')) > 6:
+		#	print("WARNING:  Attempted to load from directory containing >6 .xml files!")
+		#for f in glob.glob(dirname+'/*.xml'):
+		#	# parse filename, then link to corresp part
+		#	i = ...  # TBD, will depend on jupyter notebook+file format
+		#	xml_tree = parse(f)
+		#	# (paste below code here--can't generalize, need to process elements differently)
+		#self.page.leXML.setText(dirname)
 
 		# FOR NOW:  Only load data into the first row.
 		xml_tree = parse(filename)  # elementtree object

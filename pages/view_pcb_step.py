@@ -4,7 +4,7 @@ import datetime
 
 from filemanager import fm
 
-NO_DATE = [2020,1,1]
+NO_DATE = [2022,1,1]
 
 PAGE_NAME = "view_pcb_step"
 OBJECTTYPE = "PCB_step"
@@ -28,8 +28,8 @@ I_TRAY_ASSEMBLY_DNE  = "assembly tray does not exist or is not selected"
 I_BATCH_ARALDITE_DNE     = "araldite batch does not exist or is not selected"
 I_BATCH_ARALDITE_EXPIRED = "araldite batch has expired"
 
-# baseplates
-I_BASEPLATE_NOT_READY    = "baseplate(s) in position(s) {} is not ready for sensor application. reason: {}"
+# parts
+I_PART_NOT_READY    = "{}(s) in position(s) {} is not ready for pcb application. reason: {}"
 
 # rows / positions
 I_NO_PARTS_SELECTED     = "no parts have been selected"
@@ -39,13 +39,11 @@ I_BASEPLATE_DNE         = "baseplate(s) in position(s) {} do not exist"
 I_SENSOR_DNE            = "sensor(s) in position(s) {} do not exist"
 I_PCB_DNE               = "pcb(s) in position(s) {} do not exist"
 I_PROTO_DNE             = "protomodule(s) in position(s) {} do not exist"
-#I_MODULE_DNE            = "module(s) in position(s) {} do not exist"
 I_TOOL_PCB_DUPLICATE    = "same PCB tool is selected on multiple positions: {}"
 I_BASEPLATE_DUPLICATE   = "same baseplate is selected on multiple positions: {}"
 I_SENSOR_DUPLICATE      = "same sensor is selected on multiple positions: {}"
 I_PCB_DUPLICATE         = "same PCB is selected on multiple positions: {}"
 I_PROTO_DUPLICATE       = "same protomodule is selected on multiple positions: {}"
-I_MODULE_DUPLICATE      = "same module is selected on multiple positions: {}"
 
 # compatibility
 I_SIZE_MISMATCH   = "size mismatch between some selected objects"
@@ -55,7 +53,7 @@ I_SIZE_MISMATCH_8 = "* list of 8-inch objects selected: {}"
 I_INSTITUTION = "some selected objects are not at this institution: {}"
 
 # Missing user
-I_USER_DNE = "no kapton step user selected"
+I_USER_DNE = "no pcb step user selected"
 
 # supply batch empty
 I_BATCH_ARALDITE_EMPTY = "araldite batch is empty"
@@ -77,14 +75,12 @@ class func(object):
 		self.pcbs         = [fm.pcb()         for _ in range(6)]
 		self.protomodules = [fm.protomodule() for _ in range(6)]
 		self.modules      = [fm.module()      for _ in range(6)]
-		self.tray_component_sensor = fm.tray_component_sensor()
-		self.tray_assembly         = fm.tray_assembly()
-		self.batch_araldite        = fm.batch_araldite()
+		self.tray_component_pcb = fm.tray_component_pcb()
+		self.tray_assembly      = fm.tray_assembly()
+		self.batch_araldite     = fm.batch_araldite()
 
 		self.step_pcb = fm.step_pcb()
 		self.step_pcb_exists = False
-
-		#self.MAC = fm.MAC
 
 		self.mode = 'setup'
 
@@ -222,7 +218,7 @@ class func(object):
 
 		self.page.cbInstitution.currentIndexChanged.connect( self.loadAllTools )
 
-		self.page.sbTrayComponent.editingFinished.connect( self.loadTrayComponentSensor )
+		self.page.sbTrayComponent.editingFinished.connect( self.loadTrayComponentPCB )
 		self.page.sbTrayAssembly.editingFinished.connect(  self.loadTrayAssembly        )
 		self.page.leBatchAraldite.textEdited.connect(self.loadBatchAraldite)
 
@@ -407,7 +403,7 @@ class func(object):
 			self.protomodules[i].load(self.le_protomodules[i].text())
 			self.modules[i].load(     self.le_modules[i].text()     )
 
-		self.tray_component_sensor.load(self.page.sbTrayComponent.value(), self.page.cbInstitution.currentText())
+		self.tray_component_pcb.load(self.page.sbTrayComponent.value(), self.page.cbInstitution.currentText())
 		self.tray_assembly.load(        self.page.sbTrayAssembly.value(),  self.page.cbInstitution.currentText())
 		#self.batch_araldite.load(       self.page.sbBatchAraldite.value())
 		self.batch_araldite.load(       self.page.leBatchAraldite.text())
@@ -418,7 +414,7 @@ class func(object):
 		self.step_pcb.institution = self.page.cbInstitution.currentText()
 		for i in range(6):
 			self.tools_pcb[i].load(self.sb_tools[i].value(),       self.page.cbInstitution.currentText())
-		self.tray_component_sensor.load(self.page.sbTrayComponent.value(), self.page.cbInstitution.currentText())
+		self.tray_component_pcb.load(self.page.sbTrayComponent.value(), self.page.cbInstitution.currentText())
 		self.tray_assembly.load(        self.page.sbTrayAssembly.value(),  self.page.cbInstitution.currentText())
 		#self.batch_araldite.load(       self.page.sbBatchAraldite.value())
 		self.batch_araldite.load(       self.page.leBatchAraldite.text())
@@ -433,7 +429,7 @@ class func(object):
 			self.protomodules[i].clear()
 			self.modules[i].clear()
 
-		self.tray_component_sensor.clear()
+		self.tray_component_pcb.clear()
 		self.tray_assembly.clear()
 		self.batch_araldite.clear()
 
@@ -475,8 +471,8 @@ class func(object):
 
 
 	@enforce_mode(['editing','creating'])
-	def loadTrayComponentSensor(self, *args, **kwargs):
-		self.tray_component_sensor.load(self.page.sbTrayComponent.value(), self.page.cbInstitution.currentText())
+	def loadTrayComponentPCB(self, *args, **kwargs):
+		self.tray_component_pcb.load(self.page.sbTrayComponent.value(), self.page.cbInstitution.currentText())
 		self.updateIssues()
 
 	@enforce_mode(['editing','creating'])
@@ -486,7 +482,6 @@ class func(object):
 
 	@enforce_mode(['editing','creating'])
 	def loadBatchAraldite(self, *args, **kwargs):
-		#self.batch_araldite.load(self.page.sbBatchAraldite.value())
 		self.batch_araldite.load(self.page.leBatchAraldite.text())
 		self.updateIssues()
 
@@ -500,14 +495,14 @@ class func(object):
 		if self.step_pcb.institution is None:
 			issues.append(I_INSTITUTION_NOT_SELECTED)
 
-		#if self.step_pcb.user_performed is None:
-		#	issues.append(I_USER_DNE)
+		if self.step_pcb.user_performed is None:
+			issues.append(I_USER_DNE)
 
 		# tooling and supplies--copied over
-		if self.tray_component_sensor.ID is None:
+		if self.tray_component_pcb.ID is None:
 			issues.append(I_TRAY_COMPONENT_DNE)
 		else:
-			objects.append(self.tray_component_sensor)
+			objects.append(self.tray_component_pcb)
 
 		if self.tray_assembly.ID is None:
 			issues.append(I_TRAY_ASSEMBLY_DNE)
@@ -569,19 +564,27 @@ class func(object):
 				objects.append(self.pcbs[i])
 				if self.pcbs[i].ID is None:
 					rows_pcb_dne.append(i)
+				else:
+					ready, reason = self.pcbs[i].ready_step_pcb(self.page.sbID.value())
+					if not ready:
+						issues.append(I_PART_NOT_READY.format('pcb',i,reason))
 
 			if protomodules_selected[i] != "":
 				num_parts += 1
 				objects.append(self.protomodules[i])
 				if self.protomodules[i].ID is None:
 					rows_protomodule_dne.append(i)
+				else:
+					ready, reason = self.protomodules[i].ready_step_pcb(self.page.sbID.value())
+					if not ready:
+						issues.append(I_PART_NOT_READY.format('protomodule',i,reason))
 
 			if modules_selected[i] != "":
 				num_parts += 1
 
 			if num_parts == 0:
 				rows_empty.append(i)
-			elif num_parts == 4: #2:
+			elif num_parts == 4:
 				rows_full.append(i)
 			else:
 				rows_incomplete.append(i)
@@ -603,7 +606,7 @@ class func(object):
 		for obj in objects:
 
 			institution = getattr(obj, "institution", None)
-			if not (institution in [None, self.page.cbInstitution.currentText()]):  #self.MAC]):
+			if not (institution in [None, self.page.cbInstitution.currentText()]):
 				objects_not_here.append(obj)
 
 		if objects_not_here:

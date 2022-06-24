@@ -4,12 +4,13 @@ import datetime
 # for xml loading:
 import csv
 from xml.etree.ElementTree import parse
+import glob
 
 from filemanager import fm
 
 from PyQt5.QtWidgets import QFileDialog, QWidget
 
-NO_DATE = [2020,1,1]
+NO_DATE = [2022,1,1]
 
 PAGE_NAME = "view_sensor_post"
 OBJECTTYPE = "sensor_step"
@@ -60,8 +61,11 @@ class Filewindow(QWidget):
 
 	def getfile(self,*args,**kwargs):
 		fname, fmt = QFileDialog.getOpenFileName(self, 'Open file', '~',"(*.xml)")
-		#dname = str(QFileDialog.getExistingDirectory(self, "Select directory"))
 		return fname
+
+	def getdir(self,*args,**kwargs):
+		dname = str(QFileDialog.getExistingDirectory(self, "select directory"))
+		return dname
 
 
 class func(object):
@@ -196,11 +200,11 @@ class func(object):
 			self.page.cbGrade6,
 		]
 
-
 		for i in range(6):
 			self.pb_go_protomodules[i].clicked.connect(self.goProtomodule)
 
-		self.page.cbInstitution.currentIndexChanged.connect( self.loadAllTools )
+		#self.page.cbInstitution.currentIndexChanged.connect( self.loadAllTools )
+		self.page.cbInstituion.activated.connect( self.loadAllTools )
 
 		self.page.sbID.valueChanged.connect(self.loadStep)
 
@@ -244,7 +248,6 @@ class func(object):
 					localtime = list(time.localtime(st))
 					dt.setDate(QtCore.QDate(*localtime[0:3]))
 					dt.setTime(QtCore.QTime(*localtime[3:6]))
-
 
 			self.page.dsbCureTemperature.setValue(self.step_sensor.cure_temperature if self.step_sensor.cure_temperature else 70)
 			self.page.sbCureHumidity    .setValue(self.step_sensor.cure_humidity    if self.step_sensor.cure_humidity    else 10)
@@ -357,7 +360,6 @@ class func(object):
 
 		if self.step_sensor.institution is None:
 			issues.append(I_INSTITUTION_NOT_SELECTED)
-
 
 		self.page.listIssues.clear()
 		for issue in issues:
@@ -473,29 +475,36 @@ class func(object):
 
 	def loadXMLFile(self, *args, **kwargs):
 		filename = self.fwnd.getfile()
+		# dirname = self.fwnd.getdir()
 		# NOTE:  Only pass data to page fields.  DO NOT save to proto object
 		# Only assign data during explicit save() call, so cancellation works normally!
 		# (reminder: all data is stored in the PAGE ELEMENTS until save() is called.)
 		# (update_info is not called during editing until after save() is called.)
 
 		if filename == '':  return
+		#if dirname == '':  return
+		#if len(glob.glob(dirname+'/*.xml')) > 6:
+		#	print("WARNING:  Attempted to load from directory containing >6 .xml files!")
+		#for f in glob.glob(dirname+'/*.xml'):
+		#	# parse filename, then link to corresp part
+		#	i = ...  # TBD, will depend on jupyter notebook+file format
+		#	xml_tree = parse(f)
+		#	# (paste below code here--can't generalize, need to process elements differently)
+		#self.page.leXML.setText(dirname)
 
 		# FOR NOW:  Only load data into the first row.
 		xml_tree = parse(filename)  # elementtree object
 		
 		itemdata = xml_tree.find('.//FIDUCIAL1')
-		print("Found rot value:", itemdata.text)
 		self.dsb_offsets_rot[0].setValue(float(itemdata.text))
 		itemdata = xml_tree.find('.//X')
-		print("Found X value:", itemdata.text)
 		self.dsb_offsets_x[0].setValue(float(itemdata.text))
 		itemdata = xml_tree.find('.//Y')
-		print("Found Y value:", itemdata.text)
 		self.dsb_offsets_y[0].setValue(float(itemdata.text))
 		itemdata = xml_tree.find('.//MEAN')
 		self.dsb_thickness[0].setValue(float(itemdata.text))
 		itemdata = xml_tree.find('.//GRADE')
-		self.cb_grades[0].setCurrentIndex(INDEX_COLOR_GRADE[itemdata.text])
+		self.cb_grades[0].setCurrentIndex(INDEX_GRADE[itemdata.text])
 
 		self.page.leXML.setText(filename)
 

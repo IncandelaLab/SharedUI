@@ -286,6 +286,7 @@ class func(object):
 			self.sensor.comments.append(str(self.page.listComments.item(i).text()))
 
 		self.sensor.inspection = str(self.page.cbInspection.currentText()) if str(self.page.cbInspection.currentText()) else None
+		self.sensor.inspection = self.page.dsbFlatness.value() if self.page.dsbFlatness.value() else None
 
 		self.sensor.save()
 		self.mode = 'view'

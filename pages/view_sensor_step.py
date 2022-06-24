@@ -4,7 +4,7 @@ import datetime
 
 from filemanager import fm
 
-NO_DATE = [2020,1,1]
+NO_DATE = [2022,1,1]
 
 PAGE_NAME = "view_sensor_step"
 OBJECTTYPE = "sensor_step"
@@ -30,25 +30,20 @@ I_BATCH_ARALDITE_DNE     = "araldite batch does not exist or is not selected"
 I_BATCH_ARALDITE_EXPIRED = "araldite batch has expired"
 
 # baseplates
-I_BASEPLATE_NOT_READY  = "baseplate(s) in position(s) {} is not ready for sensor application. reason: {}"
+I_PART_NOT_READY  = "{}(s) in position(s) {} is not ready for sensor application. reason: {}"
 
 # baseplate-sensor incompatibility
 I_BASEPLATE_SENSOR_SHAPE = "baseplate {} has shape {} but sensor {} has shape {}"
 
-# kapton inspection
-#I_KAPTON_INSPECTION_NOT_DONE = "kapton inspection not done for position(s) {}"
-#I_KAPTON_INSPECTION_ON_EMPTY = "kapton inspection checked for empty position(s) {}"
-
 # rows / positions
-I_NO_PARTS_SELECTED = "no parts have been selected"
-I_ROWS_INCOMPLETE   = "positions {} are partially filled"
-I_TOOL_SENSOR_DNE      = "sensor tool(s) in position(s) {} do not exist"
-I_BASEPLATE_DNE        = "baseplate(s) in position(s) {} do not exist"
-I_SENSOR_DNE           = "sensor(s) in position(s) {} do not exist"
+I_NO_PARTS_SELECTED     = "no parts have been selected"
+I_ROWS_INCOMPLETE       = "positions {} are partially filled"
+I_TOOL_SENSOR_DNE       = "sensor tool(s) in position(s) {} do not exist"
+I_BASEPLATE_DNE         = "baseplate(s) in position(s) {} do not exist"
+I_SENSOR_DNE            = "sensor(s) in position(s) {} do not exist"
 I_TOOL_SENSOR_DUPLICATE = "same sensor tool is selected on multiple positions: {}"
 I_BASEPLATE_DUPLICATE   = "same baseplate is selected on multiple positions: {}"
 I_SENSOR_DUPLICATE      = "same sensor is selected on multiple positions: {}"
-I_PROTOMODULE_DUPLICATE = "same protomodule serial is selected on multiple positions: {}"
 I_PROTOMODULE_COPY      = "protomodule has already been created: {}"
 
 # compatibility
@@ -60,7 +55,7 @@ I_INSTITUTION = "some selected objects are not at this institution: {}"
 I_INSTITUTION_NOT_SELECTED = "no institution selected"
 
 # Missing user
-#I_USER_DNE = "no sensor step user selected"
+I_USER_DNE = "no sensor step user selected"
 
 # supply batch empty
 I_BATCH_ARALDITE_EMPTY = "araldite batch is empty"
@@ -472,7 +467,6 @@ class func(object):
 
 	@enforce_mode(['editing','creating'])
 	def loadBatchAraldite(self, *args, **kwargs):
-		#self.batch_araldite.load(self.page.sbBatchAraldite.value())
 		self.batch_araldite.load(self.page.leBatchAraldite.text())
 		self.updateIssues()
 
@@ -486,9 +480,8 @@ class func(object):
 		if self.step_sensor.institution is None:
 			issues.append(I_INSTITUTION_NOT_SELECTED)
 
-		# Commenting for now--other info on far right doesn't have error messages either
-		#if self.step_sensor.user_performed is None:
-		#	issues.append(I_USER_DNE)
+		if self.step_sensor.user_performed is None:
+			issues.append(I_USER_DNE)
 
 		# tooling and supplies--copied over
 		if self.tray_component_sensor.ID is None:
@@ -510,7 +503,6 @@ class func(object):
 				expires = QtCore.QDate(int(ydm[2]), int(ydm[0]), int(ydm[1]))   # ymd format for constructor
 				if QtCore.QDate.currentDate() > expires:  #today > expires:
 					issues.append(I_BATCH_ARALDITE_EXPIRED)
-					#print("**WARNING:** Araldite batch is expired!")
 			if self.batch_araldite.is_empty:
 				issues.append(I_BATCH_ARALDITE_EMPTY)
 
@@ -555,13 +547,17 @@ class func(object):
 				else:
 					ready, reason = self.baseplates[i].ready_step_sensor(self.page.sbID.value())
 					if not ready:
-						issues.append(I_BASEPLATE_NOT_READY.format(i,reason))
+						issues.append(I_PART_NOT_READY.format('baseplate',i,reason))
 
 			if sensors_selected[i] != "":
 				num_parts += 1
 				objects.append(self.sensors[i])
 				if self.sensors[i].ID is None:
 					rows_sensor_dne.append(i)
+				else:
+					ready, reason = self.sensors[i].ready_step_sensor(self.page.sbID.value())
+					if not ready:
+						issues.append(I_PART_NOT_READY.format('sensor',i,reason))
 
 			if baseplates_selected[i] != "" and sensors_selected[i] != "" \
 					and not self.baseplates[i].ID is None and not self.sensors[i].ID is None:
