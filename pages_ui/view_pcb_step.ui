@@ -223,7 +223,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>60</y>
+     <y>80</y>
      <width>71</width>
      <height>21</height>
     </rect>
@@ -236,7 +236,7 @@
    <property name="geometry">
     <rect>
      <x>90</x>
-     <y>40</y>
+     <y>60</y>
      <width>71</width>
      <height>21</height>
     </rect>
@@ -249,7 +249,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>40</y>
+     <y>60</y>
      <width>71</width>
      <height>21</height>
     </rect>
@@ -278,7 +278,7 @@
    <property name="geometry">
     <rect>
      <x>170</x>
-     <y>40</y>
+     <y>60</y>
      <width>71</width>
      <height>21</height>
     </rect>
@@ -833,13 +833,13 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>100</y>
-     <width>151</width>
+     <y>30</y>
+     <width>91</width>
      <height>20</height>
     </rect>
    </property>
    <property name="text">
-    <string>Institution (for tools)</string>
+    <string>Institution</string>
    </property>
    <property name="readOnly">
     <bool>true</bool>
@@ -1030,7 +1030,7 @@
     <rect>
      <x>100</x>
      <y>10</y>
-     <width>61</width>
+     <width>91</width>
      <height>21</height>
     </rect>
    </property>
@@ -1038,8 +1038,8 @@
   <widget class="QComboBox" name="cbInstitution">
    <property name="geometry">
     <rect>
-     <x>160</x>
-     <y>100</y>
+     <x>100</x>
+     <y>30</y>
      <width>91</width>
      <height>21</height>
     </rect>
@@ -1095,8 +1095,8 @@ before assembly</string>
   <widget class="QCheckBox" name="ckCheckFeet">
    <property name="geometry">
     <rect>
-     <x>280</x>
-     <y>95</y>
+     <x>350</x>
+     <y>300</y>
      <width>341</width>
      <height>31</height>
     </rect>

@@ -162,8 +162,15 @@ class func(object):
 		if self.page.dsbFlatness.value() == -1: self.page.dsbFlatness.clear()
 		self.page.cbGrade         .setCurrentIndex(INDEX_GRADE      .get(self.baseplate.grade          , -1))
 
+		if self.baseplate.step_sensor:
+			tmp_inst, tmp_id = self.baseplate.step_sensor.split("_")
+			self.page.sbStepSensor.setValue(int(tmp_id))
+			self.page.cbInstitutionStep.setCurrentIndex(INDEX_INSTITUTION.get(tmp_inst, -1))
+		else:
+			self.page.sbStepSensor.clear()
+			self.page.cbInstitutionStep.setCurrentIndex(-1)
 		self.page.sbStepSensor.setValue( -1 if self.baseplate.step_sensor is None else self.baseplate.step_sensor)
-		if self.page.sbStepSensor.value()  == -1: self.page.sbStepSensor.clear()
+		if self.page.sbStepSensor.value() == -1: self.page.sbStepSensor.clear()
 		self.page.leProtomodule.setText("" if self.baseplate.protomodule is None else self.baseplate.protomodule)
 		self.page.leModule.setText(     "" if self.baseplate.module      is None else self.baseplate.module)
 
@@ -172,11 +179,11 @@ class func(object):
 
 	@enforce_mode(['view','editing','creating'])
 	def updateElements(self):
-		#if not self.mode == "view":
 		self.page.leStatus.setText(self.mode)
 
 		baseplate_exists = self.baseplate_exists
-		step_sensor_exists    = self.page.sbStepSensor.value()   >=0
+		step_sensor_exists   = self.page.sbStepSensor.value() >= 0 and \
+		                       self.page.cbInstitutionStep.currentText() != ""
 		protomodule_exists   = self.page.leProtomodule.text() != ""
 		module_exists        = self.page.leModule.text()      != ""
 
@@ -320,9 +327,10 @@ class func(object):
 
 	@enforce_mode('view')
 	def goStepSensor(self,*args,**kwargs):
-		ID = self.page.sbStepSensor.value()
-		if ID >= 0:
-			self.setUIPage('1. Sensor - pre-assembly',ID=ID)
+		tmp_id = self.page.sbStepSensor.value()
+		tmp_inst = self.page.cbInstitutionStep.currentText()
+		if ID >= 0 and tmp_inst != "":
+			self.setUIPage('1. Sensor - pre-assembly',ID="{}_{}".format(tmp_id, tmp_inst))
 	
 	@enforce_mode('view')
 	def goProtomodule(self,*args,**kwargs):

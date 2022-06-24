@@ -135,10 +135,16 @@ class func(object):
 			self.page.listComments.addItem(comment)
 		self.page.pteWriteComment.clear()
 
-		self.page.sbStepSensor.setValue(-1 if self.protomodule.step_sensor is None else self.protomodule.step_sensor)
+		if self.protomodule.step_sensor:
+			tmp_inst, tmp_id = self.protomodule.step_sensor.split("_")
+			self.page.sbStepSensor.setValue(int(tmp_id))
+			self.page.cbInstitutionStepSensor.setCurrentIndex(INDEX_INSTITUTION.get(tmp_inst, -1))
+		else:
+			self.page.sbStepSensor.clear()
+			self.page.cbInstitutionStepSensor.setCurrentIndex(-1)
+
 		self.page.leSensor.setText(     "" if self.protomodule.sensor      is None else str(self.protomodule.sensor)     )
 		self.page.leBaseplate.setText(  "" if self.protomodule.baseplate   is None else str(self.protomodule.baseplate)  )
-		if self.page.sbStepSensor.value() == -1: self.page.sbStepSensor.clear()
 
 		self.page.dsbOffsetTranslationX.setValue( -1 if self.protomodule.offset_translation_x is None else self.protomodule.offset_translation_x )
 		self.page.dsbOffsetTranslationY.setValue( -1 if self.protomodule.offset_translation_y is None else self.protomodule.offset_translation_y )
@@ -151,9 +157,15 @@ class func(object):
 		if self.page.dsbFlatness.value() == -1: self.page.dsbFlatness.clear()
 		if self.page.dsbThickness.value() == -1: self.page.dsbThickness.clear()
 
-		self.page.sbStepPcb.setValue(-1 if self.protomodule.step_pcb is None else self.protomodule.step_pcb)
+		if self.protomodule.step_pcb:
+			tmp_inst, tmp_id = self.protomodule.step_pcb.split("_")
+			self.page.sbStepPcb.setValue(int(tmp_id))
+			self.page.cbInstitutionStepPcb.setCurrentIndex(INDEX_INSTITUTION.get(tmp_inst, -1))
+		else:
+			self.page.sbStepPcb.clear()
+			self.page.cbInstitutionStepPcb.setCurrentIndex(-1)
+
 		self.page.leModule.setText("" if self.protomodule.module is None else self.protomodule.module)
-		if self.page.sbStepPcb.value() == -1: self.page.sbStepPcb.clear()
 
 		self.updateElements()
 
@@ -164,10 +176,12 @@ class func(object):
 
 		protomodule_exists = self.protomodule_exists
 
-		step_sensor_exists = self.page.sbStepSensor.value() >=0
+		step_sensor_exists = self.page.sbStepSensor.value() >=0 and \
+		                     self.page.cbInstitutionStepSensor.currentText() != ""
 		sensor_exists      = self.page.leSensor.text()      !=""
 		baseplate_exists   = self.page.leBaseplate.text()   !=""
-		step_pcb_exists    = self.page.sbStepPcb.value()    >=0
+		step_pcb_exists    = self.page.sbStepPcb.value()    >=0 and \
+		                     self.page.cbInstitutionStepPcb.currentText() != ""
 		module_exists      = self.page.leModule.text()      !=""
 
 		mode_view     = self.mode == 'view'
@@ -219,9 +233,6 @@ class func(object):
 		tmp_ID = self.page.leID.text()
 		tmp_exists = tmp_protomodule.load(tmp_ID)
 		if not tmp_exists:  # DNE; good to create
-			#ID = self.page.leID.text()
-			#self.sensor.new(ID)
-			#self.mode = 'creating'  # update_info needs mode==view
 			self.page.leStatus.setText("protomodule DNE")
 			self.update_info()
 		else:
@@ -235,7 +246,6 @@ class func(object):
 	def startCreating(self,*args,**kwargs):
 		print("THIS IS OLD AND BROKEN; has not been updated.  Do not use this.")
 		if not self.protomodule_exists:
-		#	ID = self.page.sbID.value()
 			ID = self.page.leID.value()
 			self.mode = 'creating'
 			self.protomodule.new(ID)
@@ -296,10 +306,11 @@ class func(object):
 
 	@enforce_mode('view')
 	def goStepSensor(self,*args,**kwargs):
-		ID = self.page.sbStepSensor.value()
-		if ID >= 0:
-			self.setUIPage('1. Sensor - pre-assembly',ID=ID)
-	
+		tmp_id = self.page.sbStepSensor.value()
+		tmp_inst = self.page.cbInstitutionStepSensor.currentText()
+		if ID >= 0 and tmp_inst != "":
+			self.setUIPage('1. Sensor - pre-assembly',ID="{}_{}".format(tmp_id, tmp_inst))
+
 	@enforce_mode('view')
 	def goSensor(self,*args,**kwargs):
 		ID = self.page.leSensor.text()
@@ -314,9 +325,10 @@ class func(object):
 
 	@enforce_mode('view')
 	def goStepPcb(self,*args,**kwargs):
-		ID = self.page.sbStepPcb.value()
-		if ID >=0:
-			self.setUIPage('3. PCB - pre-assembly',ID=ID)
+		tmp_id = self.page.sbStepPcb.value()
+		tmp_inst = self.page.cbInstitutionStepPcb.currentText()
+		if ID >= 0 and tmp_inst != "":
+			self.setUIPage('3. PCB - pre-assembly',ID="{}_{}".format(tmp_id, tmp_inst))
 
 	@enforce_mode('view')
 	def goModule(self,*args,**kwargs):

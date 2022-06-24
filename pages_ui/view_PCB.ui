@@ -788,7 +788,7 @@
      <x>320</x>
      <y>240</y>
      <width>261</width>
-     <height>41</height>
+     <height>61</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -801,7 +801,7 @@
     <property name="geometry">
      <rect>
       <x>130</x>
-      <y>20</y>
+      <y>40</y>
       <width>81</width>
       <height>20</height>
      </rect>
@@ -833,7 +833,7 @@
     <property name="geometry">
      <rect>
       <x>210</x>
-      <y>20</y>
+      <y>40</y>
       <width>51</width>
       <height>21</height>
      </rect>
@@ -878,7 +878,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>20</y>
+      <y>40</y>
       <width>131</width>
       <height>21</height>
      </rect>
@@ -889,6 +889,52 @@
     <property name="readOnly">
      <bool>true</bool>
     </property>
+   </widget>
+   <widget class="QComboBox" name="cbInstitutionStep">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>20</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>-1</number>
+    </property>
+    <item>
+     <property name="text">
+      <string>CERN</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>FNAL</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>UCSB</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>UMN</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>HEPHY</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>HPK</string>
+     </property>
+    </item>
    </widget>
   </widget>
   <widget class="QFrame" name="frame_5">

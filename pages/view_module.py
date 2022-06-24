@@ -156,8 +156,21 @@ class func(object):
 		self.page.cbInspection.setCurrentIndex( INDEX_INSPECTION.get( self.module.inspection,  -1))
 
 		# parts and steps
-		self.page.sbStepSensor.setValue(   -1 if self.module.step_sensor   is None else self.module.step_sensor   )
-		self.page.sbStepPcb.setValue(      -1 if self.module.step_pcb      is None else self.module.step_pcb      )
+		if self.module.step_sensor:
+			tmp_inst, tmp_id = self.module.step_sensor.split("_")
+			self.page.sbStepSensor.setValue(int(tmp_id))
+			self.page.cbInstitutionStepSensor.setCurrentIndex(INDEX_INSTITUTION.get(tmp_inst, -1))
+		else:
+			self.page.sbStepSensor.clear()
+			self.page.cbInstitutionStepSensor.setCurrentIndex(-1)
+		if self.module.step_pcb:
+			tmp_inst, tmp_id = self.module.step_pcb.split("_")
+			self.page.sbStepPcb.setValue(int(tmp_id))
+			self.page.cbInstitutionStepPcb.setCurrentIndex(INDEX_INSTITUTION.get(tmp_inst, -1))
+		else:
+			self.page.sbStepPcb.clear()
+			self.page.cbInstitutionStepPcb.setCurrentIndex(-1)
+
 		self.page.leBaseplate.setText(    "" if self.module.baseplate     is None else self.module.baseplate     )
 		self.page.leSensor.setText(       "" if self.module.sensor        is None else self.module.sensor        )
 		self.page.lePcb.setText(          "" if self.module.pcb           is None else self.module.pcb           )
@@ -205,8 +218,10 @@ class func(object):
 
 		module_exists   = self.module_exists
 
-		step_sensor_exists   = self.page.sbStepSensor.value()    >= 0
-		step_pcb_exists      = self.page.sbStepPcb.value()       >= 0
+		step_sensor_exists   = self.page.sbStepSensor.value() >= 0 and \
+		                       self.page.cbInstitutionStepSensor.currentText() != ""
+		step_pcb_exists      = self.page.sbStepPcb.value()    >= 0 and \
+		                       self.page.cbInstitutionStepPcb.currentText() != ""
 		baseplate_exists   = self.page.leBaseplate.text()   != ""
 		sensor_exists      = self.page.leSensor.text()      != ""
 		pcb_exists         = self.page.lePcb.text()         != ""
@@ -368,15 +383,17 @@ class func(object):
 
 	@enforce_mode('view')
 	def goStepSensor(self,*args,**kwargs):
-		ID = self.page.sbStepSensor.value()
-		if ID>=0:
-			self.setUIPage('1. Sensor - pre-assembly',ID=ID)
+		tmp_id = self.page.sbStepSensor.value()
+		tmp_inst = self.page.cbInstitutionStepSensor.currentText()
+		if ID >= 0 and tmp_inst != "":
+			self.setUIPage('1. Sensor - pre-assembly',ID="{}_{}".format(tmp_id, tmp_inst))
 
 	@enforce_mode('view')
 	def goStepPcb(self,*args,**kwargs):
-		ID = self.page.sbStepPcb.value()
-		if ID>=0:
-			self.setUIPage('3. PCB - pre-assembly',ID=ID)
+		tmp_id = self.page.sbStepPcb.value()
+		tmp_inst = self.page.cbInstitutionStepPcb.currentText()
+		if ID >= 0 and tmp_inst != "":
+			self.setUIPage('3. PCB - pre-assembly',ID="{}_{}".format(tmp_id, tmp_inst))
 
 
 	@enforce_mode(['editing', 'creating'])

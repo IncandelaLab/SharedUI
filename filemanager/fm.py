@@ -810,6 +810,7 @@ class fsobj_part(fsobj):
 
 
 class fsobj_assembly(fsobj):
+	# NOTE:  primary key ID is now a STRING, almost always INSTITUTION_ID.
 	# Vars storing names of tables to request XML files from
 	ASSM_TABLE = None
 	COND_TABLE = None
@@ -857,7 +858,7 @@ class fsobj_assembly(fsobj):
 
 
 	def load(self, ID, on_property_missing = "warn"):
-		if ID == -1 or ID == None:
+		if ID == "" or ID == None:
 			self.clear()
 			return False
 

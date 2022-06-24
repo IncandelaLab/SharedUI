@@ -157,10 +157,15 @@ class func(object):
 		self.page.pteWriteComment.clear()
 
 
-		self.page.sbStepSensor.setValue( -1 if self.sensor.step_sensor is None else self.sensor.step_sensor)
+		if self.sensor.step_sensor:
+			tmp_inst, tmp_id = self.sensor.step_sensor.split("_")
+			self.page.sbStepSensor.setValue(int(tmp_id))
+			self.page.cbInstitutionStep.setCurrentIndex(INDEX_INSTITUTION.get(tmp_inst, -1))
+		else:
+			self.page.sbStepSensor.clear()
+			self.page.cbInstitutionStep.setCurrentIndex(-1)
 		self.page.leProtomodule.setText("" if self.sensor.protomodule is None else self.sensor.protomodule)
 		self.page.leModule.setText(     "" if self.sensor.module      is None else self.sensor.module)
-		if self.page.sbStepSensor.value()  == -1: self.page.sbStepSensor.clear()
 
 		self.updateElements()
 
@@ -171,7 +176,8 @@ class func(object):
 			self.page.leStatus.setText(self.mode)
 
 		sensor_exists      = self.sensor_exists
-		step_sensor_exists = self.page.sbStepSensor.value()  >= 0
+		step_sensor_exists = self.page.sbStepSensor.value()  >= 0 and \
+		                     self.page.cbInstitutionStep.currentText() != ""
 		protomodule_exists = self.page.leProtomodule.text()  != ""
 		module_exists      = self.page.leModule.text()       != ""
 
@@ -286,7 +292,7 @@ class func(object):
 			self.sensor.comments.append(str(self.page.listComments.item(i).text()))
 
 		self.sensor.inspection = str(self.page.cbInspection.currentText()) if str(self.page.cbInspection.currentText()) else None
-		self.sensor.inspection = self.page.dsbFlatness.value() if self.page.dsbFlatness.value() else None
+		self.sensor.flatness = self.page.dsbFlatness.value() if self.page.dsbFlatness.value() else None
 
 		self.sensor.save()
 		self.mode = 'view'
@@ -317,10 +323,11 @@ class func(object):
 
 	@enforce_mode('view')
 	def goStepSensor(self,*args,**kwargs):
-		ID = self.page.sbStepSensor.value()
-		if ID >= 0:
-			self.setUIPage('1. Sensor - pre-assembly',ID=ID)
-	
+		tmp_id = self.page.sbStepSensor.value()
+		tmp_inst = self.page.cbInstitutionStep.currentText()
+		if ID >= 0 and tmp_inst != "":
+			self.setUIPage('1. Sensor - pre-assembly',ID="{}_{}".format(tmp_id, tmp_inst))
+
 	@enforce_mode('view')
 	def goProtomodule(self,*args,**kwargs):
 		ID = self.page.leProtomodule.text()

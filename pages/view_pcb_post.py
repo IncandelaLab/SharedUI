@@ -195,10 +195,8 @@ class func(object):
 		for i in range(6):
 			self.pb_go_modules[i].clicked.connect(     self.goModule     )
 
-		#self.page.cbInstitution.currentIndexChanged.connect( self.loadAllTools )
-		self.page.cbInstitution.activated.connect( self.loadAllTools )
-
 		self.page.sbID.valueChanged.connect(self.loadStep)
+		self.page.cbInstitution.activated.connect( self.loadStep )
 
 		self.page.pbEdit.clicked.connect(self.startEditing)
 		self.page.pbSave.clicked.connect(self.saveEditing)
@@ -214,9 +212,13 @@ class func(object):
 	@enforce_mode(['view','editing'])
 	def update_info(self,ID=None,*args,**kwargs):
 		if ID is None:
-			ID = self.page.sbID.value()
+			tmp_id = self.page.sbID.value()
+			tmp_inst = self.page.cbInstitution.currentText()
+			ID = "{}_{}".format(tmp_inst, tmp_id)
 		else:
-			self.page.sbID.setValue(ID)
+			tmp_id, tmp_inst = ID.split("_")
+			self.page.sbID.setValue(int(tmp_id))
+			self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(tmp_inst, -1))
 
 		self.step_pcb_exists = False
 		if getattr(self.step_pcb, 'ID', None) != None:
@@ -227,9 +229,6 @@ class func(object):
 
 		if self.step_pcb_exists:
 
-			self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.step_pcb.institution, -1))
-
-			# New
 			times_to_set = [(self.step_pcb.cure_start, self.page.dtCureStart),
 			                (self.step_pcb.cure_stop,  self.page.dtCureStop)]
 			for st, dt in times_to_set:
@@ -299,8 +298,7 @@ class func(object):
 
 		self.setMainSwitchingEnabled(mode_view)
 		self.page.sbID.setEnabled(mode_view)
-
-		self.page.cbInstitution.setEnabled(mode_editing)
+		self.page.cbInstitution.setEnabled(mode_view)
 
 		self.page.pbCureStartNow     .setEnabled(mode_editing)
 		self.page.pbCureStopNow      .setEnabled(mode_editing)
@@ -368,9 +366,11 @@ class func(object):
 	@enforce_mode('view')
 	def loadStep(self,*args,**kwargs):
 		if self.page.sbID.value() == -1:  return
+		if self.page.cbInstitution.currentText() == "":  return
 		tmp_step = fm.step_pcb()
 		tmp_ID = self.page.sbID.value()
-		tmp_exists = tmp_step.load(tmp_ID)
+		tmp_inst = self.page.cbInstitution.currentText()
+		tmp_exists = tmp_step.load("{}_{}".format(tmp_inst, tmp_ID))
 		if not tmp_exists:
 			self.update_info()
 		else:
@@ -381,7 +381,8 @@ class func(object):
 	def startEditing(self,*args,**kwargs):
 		tmp_step = fm.step_pcb()
 		tmp_ID = self.page.sbID.value()
-		tmp_exists = tmp_step.load(tmp_ID)
+		tmp_inst = self.page.cbInstitution.currentText()
+		tmp_exists = tmp_step.load("{}_{}".format(tmp_inst, tmp_ID))
 		if tmp_exists:
 			self.step_pcb = tmp_step
 			self.mode = 'editing'
@@ -495,10 +496,12 @@ class func(object):
 		if 'ID' in kwargs.keys():
 			ID = kwargs['ID']
 			if not (type(ID) is int):
-				raise TypeError("Expected type <int> for ID; got <{}>".format(type(ID)))
-			if ID < 0:
-				raise ValueError("ID cannot be negative")
-			self.page.sbID.setValue(ID)
+				raise TypeError("Expected type <int> str ID; got <{}>".format(type(ID)))
+			if ID != "":
+				raise ValueError("ID cannot be empty")
+			tmp_inst, tmp_id = ID.split("_")
+			self.page.sbID.setValue(int(tmp_id))
+			self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(tmp_inst, -1))
 			self.loadStep()
 
 	@enforce_mode('view')

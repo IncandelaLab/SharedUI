@@ -203,10 +203,8 @@ class func(object):
 		for i in range(6):
 			self.pb_go_protomodules[i].clicked.connect(self.goProtomodule)
 
-		#self.page.cbInstitution.currentIndexChanged.connect( self.loadAllTools )
-		self.page.cbInstituion.activated.connect( self.loadAllTools )
-
 		self.page.sbID.valueChanged.connect(self.loadStep)
+		self.page.cbInstitution.activated.connect( self.loadStep )
 
 		self.page.pbEdit.clicked.connect(self.startEditing)
 		self.page.pbSave.clicked.connect(self.saveEditing)
@@ -222,9 +220,13 @@ class func(object):
 	@enforce_mode(['view','editing'])
 	def update_info(self,ID=None,*args,**kwargs):
 		if ID is None:
-			ID = self.page.sbID.value()
+			tmp_id = self.page.sbID.value()
+			tmp_inst = self.page.cbInstitution.currentText()
+			ID = "{}_{}".format(tmp_inst, tmp_id)
 		else:
-			self.page.sbID.setValue(ID)
+			tmp_id, tmp_inst = ID.split("_")
+			self.page.sbID.setValue(int(tmp_id))
+			self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(tmp_inst, -1))
 
 		self.step_sensor_exists = False
 		if getattr(self.step_sensor, 'ID', None) != None:
@@ -235,9 +237,6 @@ class func(object):
 
 		if self.step_sensor_exists:
 
-			self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.step_sensor.institution, -1))
-
-			# New
 			times_to_set = [(self.step_sensor.cure_start, self.page.dtCureStart),
 							(self.step_sensor.cure_stop,  self.page.dtCureStop)]
 			for st, dt in times_to_set:
@@ -278,7 +277,6 @@ class func(object):
 					self.cb_grades[i].setCurrentIndex(-1)
 
 		else:
-			self.page.cbInstitution.setCurrentIndex(-1)
 			self.page.dtCureStart.setDate(QtCore.QDate(*NO_DATE))
 			self.page.dtCureStart.setTime(QtCore.QTime(0,0,0))
 			self.page.dtCureStop.setDate(QtCore.QDate(*NO_DATE))
@@ -308,8 +306,7 @@ class func(object):
 
 		self.setMainSwitchingEnabled(mode_view)
 		self.page.sbID.setEnabled(mode_view)
-
-		self.page.cbInstitution.setEnabled(mode_editing)
+		self.page.cbInstitution.setEnabled(mode_view)
 
 		self.page.pbCureStartNow     .setEnabled(mode_editing)
 		self.page.pbCureStopNow      .setEnabled(mode_editing)
@@ -352,7 +349,6 @@ class func(object):
 		for i in range(6):
 			self.protomodules[i].clear()
 
-	#NEW:  Add updateIssues and modify conditions accordingly
 	@enforce_mode('editing')
 	def updateIssues(self,*args,**kwargs):
 		issues = []
@@ -377,9 +373,11 @@ class func(object):
 	@enforce_mode('view')
 	def loadStep(self,*args,**kwargs):
 		if self.page.sbID.value() == -1:  return
+		if self.page.cbInstitution.currentText() == "":  return
 		tmp_step = fm.step_sensor()
 		tmp_ID = self.page.sbID.value()
-		tmp_exists = tmp_step.load(tmp_ID)
+		tmp_inst = self.page.cbInstitution.currentText()
+		tmp_exists = tmp_step.load("{}_{}".format(tmp_inst, tmp_ID))
 		if not tmp_exists:
 			self.update_info()
 		else:
@@ -390,7 +388,8 @@ class func(object):
 	def startEditing(self,*args,**kwargs):
 		tmp_step = fm.step_sensor()
 		tmp_ID = self.page.sbID.value()
-		tmp_exists = tmp_step.load(tmp_ID)
+		tmp_inst = self.page.cbInstitution.currentText()
+		tmp_exists = tmp_step.load("{}_{}".format(tmp_inst, tmp_ID))
 		if tmp_exists:
 			self.step_sensor = tmp_step
 			self.mode = 'editing'
@@ -513,11 +512,13 @@ class func(object):
 	def load_kwargs(self,kwargs):
 		if 'ID' in kwargs.keys():
 			ID = kwargs['ID']
-			if not (type(ID) is int):
-				raise TypeError("Expected type <int> for ID; got <{}>".format(type(ID)))
-			if ID < 0:
-				raise ValueError("ID cannot be negative")
-			self.page.sbID.setValue(ID)
+			if not (type(ID) is str):
+				raise TypeError("Expected type <str> for ID; got <{}>".format(type(ID)))
+			if ID == "":
+				raise ValueError("ID cannot be empty")
+			tmp_inst, tmp_id = ID.split("_")
+			self.page.sbID.setValue(int(tmp_id))
+			self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(tmp_inst, -1))
 			self.loadStep()
 
 	@enforce_mode('view')

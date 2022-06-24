@@ -185,8 +185,15 @@ class func(object):
 		if self.page.dsbThickness.value() == -1: self.page.dsbThickness.clear()
 		self.page.cbGrade.setCurrentIndex(         INDEX_GRADE.get(          self.pcb.grade, -1)         )
 
-		self.page.sbStepPcb.setValue(-1 if self.pcb.step_pcb is None else self.pcb.step_pcb)
-		if self.page.sbStepPcb.value() == -1: self.page.sbStepPcb.clear()
+
+		if self.pcb.step_pcb:
+			tmp_inst, tmp_id = self.pcb.step_pcb.split("_")
+			self.page.sbStepPcb.setValue(int(tmp_id))
+			self.page.cbInstitutionStep.setCurrentIndex(INDEX_INSTITUTION.get(tmp_inst, -1))
+		else:
+			self.page.sbStepPcb.clear()
+			self.page.cbInstitutionStep.setCurrentIndex(-1)
+
 		self.page.leModule.setText(  "" if self.pcb.module   is None else self.pcb.module)
 
 		self.page.listFiles.clear()
@@ -204,7 +211,8 @@ class func(object):
 
 		pcb_exists      = self.pcb_exists
 
-		step_pcb_exists = self.page.sbStepPcb.value() >=0
+		step_pcb_exists = self.page.sbStepPcb.value() >=0 and \
+		                  self.page.cbInstitutionStep.currentText() != ""
 		module_exists   = self.page.leModule.text()  != ""
 
 		mode_view     = self.mode == 'view'
@@ -356,9 +364,10 @@ class func(object):
 	
 	@enforce_mode('view')
 	def goStepPcb(self,*args,**kwargs):
-		ID = self.page.sbStepPcb.value()
-		if ID >= 0:
-			self.setUIPage('3. PCB - pre-assembly',ID=ID)
+		tmp_id = self.page.sbStepPcb.value()
+		tmp_inst = self.page.cbInstitutionStep.currentText()
+		if tmp_id >= 0 and tmp_inst != "":
+			self.setUIPage('3. PCB - pre-assembly',ID="{}_{}".format(tmp_inst, tmp_id))
 
 
 	@enforce_mode(['editing', 'creating'])

@@ -215,14 +215,14 @@ class func(object):
 			self.le_modules[i].textChanged.connect(     self.loadModule     )
 
 		self.page.ckCheckFeet.stateChanged.connect(self.updateIssues)
+		self.page.cbUserPerformed.activated.connect(self.updateIssues)
 
-		self.page.cbInstitution.currentIndexChanged.connect( self.loadAllTools )
+		self.page.sbID.valueChanged.connect(self.loadStep)
+		self.page.cbInstitution.currentIndexChanged.connect(self.loadStep)
 
 		self.page.sbTrayComponent.editingFinished.connect( self.loadTrayComponentPCB )
 		self.page.sbTrayAssembly.editingFinished.connect(  self.loadTrayAssembly        )
 		self.page.leBatchAraldite.textEdited.connect(self.loadBatchAraldite)
-
-		self.page.sbID.valueChanged.connect(self.loadStep)
 
 		self.page.pbNew.clicked.connect(self.startCreating)
 		self.page.pbEdit.clicked.connect(self.startEditing)
@@ -245,9 +245,13 @@ class func(object):
 	@enforce_mode(['view','editing'])
 	def update_info(self,ID=None,*args,**kwargs):
 		if ID is None:
-			ID = self.page.sbID.value()
+			tmp_id = self.page.sbID.value()
+			tmp_inst = self.page.cbInstitution.currentText()
+			ID = "{}_{}".format(tmp_inst, tmp_id)
 		else:
-			self.page.sbID.setValue(ID)
+			tmp_id, tmp_inst = ID.split("_")
+			self.page.sbID.setValue(tmp_id)
+			self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(tmp_inst, -1))
 
 		self.step_pcb_exists = False
 		if getattr(self.step_pcb, 'ID', None) != None:
@@ -257,9 +261,7 @@ class func(object):
 		self.page.leStatus.clear()
 
 		if self.step_pcb_exists:
-			self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.step_pcb.institution, -1))
 
-			#self.page.leUserPerformed.setText(self.step_pcb.user_performed)
 			if not self.step_pcb.user_performed in self.index_users.keys() and not self.step_pcb.user_performed is None:
 				# Insertion user was deleted from user page...just add user to the dropdown
 				self.index_users[self.step_pcb.user_performed] = max(self.index_users.values()) + 1
@@ -279,7 +281,6 @@ class func(object):
 					dt.setTime(QtCore.QTime(*localtime[3:6]))
 
 
-			#self.page.sbBatchAraldite.setValue(self.step_pcb.batch_araldite if not (self.step_pcb.batch_araldite is None) else -1)
 			self.page.leBatchAraldite.setText(self.step_pcb.batch_araldite if not (self.step_pcb.batch_araldite is None) else -1)
 			self.page.sbTrayAssembly.setValue( self.step_pcb.tray_assembly  if not (self.step_pcb.tray_assembly  is None) else -1)
 			self.page.sbTrayComponent.setValue(self.step_pcb.tray_component_pcb if not (self.step_pcb.tray_component_pcb is None) else -1)
@@ -316,7 +317,6 @@ class func(object):
 			self.page.ckCheckFeet.setChecked(self.step_pcb.check_tool_feet if not (self.step_pcb.check_tool_feet is None) else False)
 
 		else:
-			self.page.cbInstitution.setCurrentIndex(-1)
 			self.page.cbUserPerformed.setCurrentIndex(-1)
 			self.page.leLocation.setText("")
 			self.page.dtRunStart.setDate(QtCore.QDate(*NO_DATE))
@@ -338,7 +338,6 @@ class func(object):
 		for i in range(6):
 			if self.sb_tools[i].value()        == -1:  self.sb_tools[i].clear()
 		
-		#if self.page.sbBatchAraldite.value() == -1:  self.page.sbBatchAraldite.clear()
 		if self.page.sbTrayComponent.value() == -1:  self.page.sbTrayComponent.clear()
 		if self.page.sbTrayAssembly.value()  == -1:  self.page.sbTrayAssembly.clear()	
 		
@@ -357,8 +356,7 @@ class func(object):
 
 		self.setMainSwitchingEnabled(mode_view)
 		self.page.sbID.setEnabled(mode_view)
-
-		self.page.cbInstitution.setEnabled(mode_creating or mode_editing)
+		self.page.cbInstitution.setEnabled(mode_view)  # mode_creating or mode_editing)
 
 		self.page.pbRunStartNow     .setEnabled(mode_creating or mode_editing)
 		self.page.pbRunStopNow      .setEnabled(mode_creating or mode_editing)
@@ -367,12 +365,10 @@ class func(object):
 		self.page.leLocation       .setReadOnly(mode_view)
 		self.page.sbTrayComponent  .setReadOnly(mode_view)
 		self.page.sbTrayAssembly   .setReadOnly(mode_view)
-		#self.page.sbBatchAraldite  .setReadOnly(mode_view)
 		self.page.leBatchAraldite  .setReadOnly(mode_view)
 
 		self.page.pbGoTrayComponent.setEnabled(mode_view and self.page.sbTrayComponent.value() >= 0)
 		self.page.pbGoTrayAssembly .setEnabled(mode_view and self.page.sbTrayAssembly .value() >= 0)
-		#self.page.pbGoBatchAraldite.setEnabled(mode_view and self.page.sbBatchAraldite.value() >= 0)
 		self.page.pbGoBatchAraldite.setEnabled(mode_view and self.page.leBatchAraldite.text() != "")
 
 		for i in range(6):
@@ -405,7 +401,6 @@ class func(object):
 
 		self.tray_component_pcb.load(self.page.sbTrayComponent.value(), self.page.cbInstitution.currentText())
 		self.tray_assembly.load(        self.page.sbTrayAssembly.value(),  self.page.cbInstitution.currentText())
-		#self.batch_araldite.load(       self.page.sbBatchAraldite.value())
 		self.batch_araldite.load(       self.page.leBatchAraldite.text())
 		self.updateIssues()
 
@@ -416,7 +411,6 @@ class func(object):
 			self.tools_pcb[i].load(self.sb_tools[i].value(),       self.page.cbInstitution.currentText())
 		self.tray_component_pcb.load(self.page.sbTrayComponent.value(), self.page.cbInstitution.currentText())
 		self.tray_assembly.load(        self.page.sbTrayAssembly.value(),  self.page.cbInstitution.currentText())
-		#self.batch_araldite.load(       self.page.sbBatchAraldite.value())
 		self.batch_araldite.load(       self.page.leBatchAraldite.text())
 		self.updateIssues()
 
@@ -492,10 +486,7 @@ class func(object):
 		issues = []
 		objects = []
 
-		if self.step_pcb.institution is None:
-			issues.append(I_INSTITUTION_NOT_SELECTED)
-
-		if self.step_pcb.user_performed is None:
+		if self.page.cbUserPerformed.currentText() == "":
 			issues.append(I_USER_DNE)
 
 		# tooling and supplies--copied over
@@ -552,6 +543,7 @@ class func(object):
 
 		for i in range(6):
 			num_parts = 0
+			tmp_id = "{}_{}".format(self.page.cbInstitution.currentText(), self.page.sbID.value())
 
 			if pcb_tools_selected[i] >= 0:
 				num_parts += 1
@@ -565,7 +557,7 @@ class func(object):
 				if self.pcbs[i].ID is None:
 					rows_pcb_dne.append(i)
 				else:
-					ready, reason = self.pcbs[i].ready_step_pcb(self.page.sbID.value())
+					ready, reason = self.pcbs[i].ready_step_pcb(tmp_id)
 					if not ready:
 						issues.append(I_PART_NOT_READY.format('pcb',i,reason))
 
@@ -575,7 +567,7 @@ class func(object):
 				if self.protomodules[i].ID is None:
 					rows_protomodule_dne.append(i)
 				else:
-					ready, reason = self.protomodules[i].ready_step_pcb(self.page.sbID.value())
+					ready, reason = self.protomodules[i].ready_step_pcb(tmp_id)
 					if not ready:
 						issues.append(I_PART_NOT_READY.format('protomodule',i,reason))
 
@@ -631,24 +623,30 @@ class func(object):
 	@enforce_mode('view')
 	def loadStep(self,*args,**kwargs):
 		if self.page.sbID.value() == -1:  return
+		if self.page.cbInstitution.currentText() == "":  return
 		tmp_step = fm.step_pcb()
 		tmp_ID = self.page.sbID.value()
-		tmp_exists = tmp_step.load(tmp_ID)
+		tmp_inst = self.page.cbInstitution.currentText()
+		tmp_exists = tmp_step.load("{}_{}".format(tmp_inst, tmp_ID))
 		if not tmp_exists:
+			print("STEP NOW FOUND")
 			self.update_info()
 		else:
+			print("STEP FOUND")
 			self.step_pcb = tmp_step
 			self.update_info()
 
 	@enforce_mode('view')
 	def startCreating(self,*args,**kwargs):
 		if self.page.sbID.value() == -1:  return
+		if self.page.cbInstitution.currentText() == "":  return
 		tmp_step = fm.step_pcb()
 		tmp_ID = self.page.sbID.value()
-		tmp_exists = tmp_step.load(tmp_ID)
+		tmp_inst = self.page.cbInstitution.currentText()
+		tmp_exists = tmp_step.load("{}_{}".format(tmp_inst, tmp_ID))
 		if not tmp_exists:
 			ID = self.page.sbID.value()
-			self.step_pcb.new(ID)
+			self.step_pcb.new("{}_{}".format(tmp_inst, tmp_ID))
 			self.mode = 'creating'
 			self.updateElements()
 
@@ -656,7 +654,8 @@ class func(object):
 	def startEditing(self,*args,**kwargs):
 		tmp_step = fm.step_pcb()
 		tmp_ID = self.page.sbID.value()
-		tmp_exists = tmp_step.load(tmp_ID)
+		tmp_inst = self.page.cbInstitution.currentText()
+		tmp_exists = tmp_step.load("{}_{}".format(tmp_inst, tmp_ID))
 		if tmp_exists:
 			self.step_pcb = tmp_step
 			self.mode = 'editing'
@@ -672,6 +671,7 @@ class func(object):
 
 	@enforce_mode(['editing','creating'])
 	def saveEditing(self,*args,**kwargs):
+		print("SAVING PCB STEP")
 		self.step_pcb.institution = self.page.cbInstitution.currentText()
 
 		self.step_pcb.user_performed = str(self.page.cbUserPerformed.currentText()) if str(self.page.cbUserPerformed.currentText()) else None
@@ -697,7 +697,6 @@ class func(object):
 
 		self.step_pcb.tray_component_pcb    = self.page.sbTrayComponent.value() if self.page.sbTrayComponent.value() >= 0 else None
 		self.step_pcb.tray_assembly         = self.page.sbTrayAssembly.value()  if self.page.sbTrayAssembly.value()  >= 0 else None
-		#self.step_pcb.batch_araldite        = self.page.sbBatchAraldite.value() if self.page.sbBatchAraldite.value() >= 0 else None
 		self.step_pcb.batch_araldite        = self.page.leBatchAraldite.text() if self.page.leBatchAraldite.text() != "" else None
 
 
@@ -738,6 +737,7 @@ class func(object):
 
 		self.step_pcb.check_tool_feet = self.page.ckCheckFeet.isChecked()
 
+		print("SAVING STEP PCB OBJECT")
 		self.step_pcb.save()
 		self.unloadAllObjects()
 		self.mode = 'view'
@@ -812,11 +812,13 @@ class func(object):
 	def load_kwargs(self,kwargs):
 		if 'ID' in kwargs.keys():
 			ID = kwargs['ID']
-			if not (type(ID) is int):
-				raise TypeError("Expected type <int> for ID; got <{}>".format(type(ID)))
-			if ID < 0:
-				raise ValueError("ID cannot be negative")
+			if not (type(ID) is str):
+				raise TypeError("Expected type <str> for ID; got <{}>".format(type(ID)))
+			if ID == "":
+				raise ValueError("ID cannot be empty")
+			tmp_inst, tmp_id = ID.split("_")
 			self.page.sbID.setValue(ID)
+			self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(tmp_inst, -1))
 			self.loadStep()
 
 	@enforce_mode('view')
