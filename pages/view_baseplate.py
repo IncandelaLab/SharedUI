@@ -169,7 +169,6 @@ class func(object):
 		else:
 			self.page.sbStepSensor.clear()
 			self.page.cbInstitutionStep.setCurrentIndex(-1)
-		self.page.sbStepSensor.setValue( -1 if self.baseplate.step_sensor is None else self.baseplate.step_sensor)
 		if self.page.sbStepSensor.value() == -1: self.page.sbStepSensor.clear()
 		self.page.leProtomodule.setText("" if self.baseplate.protomodule is None else self.baseplate.protomodule)
 		self.page.leModule.setText(     "" if self.baseplate.module      is None else self.baseplate.module)
@@ -329,8 +328,8 @@ class func(object):
 	def goStepSensor(self,*args,**kwargs):
 		tmp_id = self.page.sbStepSensor.value()
 		tmp_inst = self.page.cbInstitutionStep.currentText()
-		if ID >= 0 and tmp_inst != "":
-			self.setUIPage('1. Sensor - pre-assembly',ID="{}_{}".format(tmp_id, tmp_inst))
+		if tmp_id >= 0 and tmp_inst != "":
+			self.setUIPage('1. Sensor - pre-assembly',ID="{}_{}".format(tmp_inst, tmp_id))
 	
 	@enforce_mode('view')
 	def goProtomodule(self,*args,**kwargs):

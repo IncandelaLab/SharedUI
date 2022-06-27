@@ -45,8 +45,8 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>610</x>
-     <y>110</y>
+     <x>320</x>
+     <y>340</y>
      <width>241</width>
      <height>16</height>
     </rect>
@@ -714,8 +714,8 @@
   <widget class="QFrame" name="frame_3">
    <property name="geometry">
     <rect>
-     <x>610</x>
-     <y>130</y>
+     <x>320</x>
+     <y>360</y>
      <width>351</width>
      <height>161</height>
     </rect>
@@ -787,8 +787,8 @@
     <rect>
      <x>320</x>
      <y>240</y>
-     <width>261</width>
-     <height>61</height>
+     <width>311</width>
+     <height>41</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -801,8 +801,8 @@
     <property name="geometry">
      <rect>
       <x>130</x>
-      <y>40</y>
-      <width>81</width>
+      <y>20</y>
+      <width>131</width>
       <height>20</height>
      </rect>
     </property>
@@ -832,8 +832,8 @@
    <widget class="QPushButton" name="pbGoModule">
     <property name="geometry">
      <rect>
-      <x>210</x>
-      <y>40</y>
+      <x>260</x>
+      <y>20</y>
       <width>51</width>
       <height>21</height>
      </rect>
@@ -845,9 +845,9 @@
    <widget class="QSpinBox" name="sbStepPcb">
     <property name="geometry">
      <rect>
-      <x>130</x>
+      <x>210</x>
       <y>0</y>
-      <width>81</width>
+      <width>51</width>
       <height>21</height>
      </rect>
     </property>
@@ -864,7 +864,7 @@
    <widget class="QPushButton" name="pbGoStepPcb">
     <property name="geometry">
      <rect>
-      <x>210</x>
+      <x>260</x>
       <y>0</y>
       <width>51</width>
       <height>21</height>
@@ -878,7 +878,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>40</y>
+      <y>20</y>
       <width>131</width>
       <height>21</height>
      </rect>
@@ -897,7 +897,7 @@
     <property name="geometry">
      <rect>
       <x>130</x>
-      <y>20</y>
+      <y>0</y>
       <width>81</width>
       <height>21</height>
      </rect>

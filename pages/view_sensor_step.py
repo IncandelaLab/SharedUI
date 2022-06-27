@@ -755,38 +755,38 @@ class func(object):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1 # last character of sender name is integer 1 through 6; subtract one for zero index
 		tool = self.sb_tools[which].value()
-		self.setUIPage('tooling',tool_sensor=tool)
+		self.setUIPage('Tooling',tool_sensor=tool)
 
 	def goSensor(self,*args,**kwargs):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
 		sensor = self.le_sensors[which].text()
-		self.setUIPage('sensors',ID=sensor)
+		self.setUIPage('Sensors',ID=sensor)
 
 	def goBaseplate(self,*args,**kwargs):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
 		baseplate = self.le_baseplates[which].text()
-		self.setUIPage('baseplates',ID=baseplate)
+		self.setUIPage('Baseplates',ID=baseplate)
 
 	def goProtomodule(self,*args,**kwargs):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
 		protomodule = self.le_protomodules[which].text()
-		self.setUIPage('protomodules',ID=protomodule)
+		self.setUIPage('Protomodules',ID=protomodule)
 
 	def goBatchAraldite(self,*args,**kwargs):
 		#batch_araldite = self.page.sbBatchAraldite.value()
 		batch_araldite = self.page.leBatchAraldite.text()
-		self.setUIPage('supplies',batch_araldite=batch_araldite)
+		self.setUIPage('Supplies',batch_araldite=batch_araldite)
 
 	def goTrayComponent(self,*args,**kwargs):
 		tray_component_sensor = self.page.sbTrayComponent.value()
-		self.setUIPage('tooling',tray_component_sensor=tray_component_sensor)
+		self.setUIPage('Tooling',tray_component_sensor=tray_component_sensor)
 
 	def goTrayAssembly(self,*args,**kwargs):
 		tray_assembly = self.page.sbTrayAssembly.value()
-		self.setUIPage('tooling',tray_assembly=tray_assembly)
+		self.setUIPage('Tooling',tray_assembly=tray_assembly)
 
 	def setRunStartNow(self, *args, **kwargs):
 		localtime = time.localtime()

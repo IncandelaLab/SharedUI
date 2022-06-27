@@ -87,8 +87,8 @@
   <widget class="QLabel" name="label_4">
    <property name="geometry">
     <rect>
-     <x>340</x>
-     <y>660</y>
+     <x>360</x>
+     <y>540</y>
      <width>181</width>
      <height>21</height>
     </rect>
@@ -100,8 +100,8 @@
   <widget class="QFrame" name="frame_3">
    <property name="geometry">
     <rect>
-     <x>340</x>
-     <y>680</y>
+     <x>360</x>
+     <y>560</y>
      <width>241</width>
      <height>41</height>
     </rect>
@@ -188,8 +188,8 @@
   <widget class="QFrame" name="frame_5">
    <property name="geometry">
     <rect>
-     <x>670</x>
-     <y>160</y>
+     <x>690</x>
+     <y>40</y>
      <width>282</width>
      <height>81</height>
     </rect>
@@ -298,8 +298,8 @@
   <widget class="QLabel" name="label_8">
    <property name="geometry">
     <rect>
-     <x>680</x>
-     <y>140</y>
+     <x>700</x>
+     <y>20</y>
      <width>211</width>
      <height>21</height>
     </rect>
@@ -311,8 +311,8 @@
   <widget class="QLineEdit" name="leErrors">
    <property name="geometry">
     <rect>
-     <x>340</x>
-     <y>30</y>
+     <x>350</x>
+     <y>650</y>
      <width>611</width>
      <height>21</height>
     </rect>
@@ -327,14 +327,14 @@
   <widget class="QLabel" name="label_6">
    <property name="geometry">
     <rect>
-     <x>350</x>
-     <y>50</y>
+     <x>360</x>
+     <y>670</y>
      <width>321</width>
      <height>51</height>
     </rect>
    </property>
    <property name="text">
-    <string>NOTE:  Format of all text box input should be a comma-separated list of values.  ex. 1, 3, 4, ...</string>
+    <string>NOTE:  Format of channel text box input should be a comma-separated list of values.  ex. 1, 3, 4, ...</string>
    </property>
    <property name="wordWrap">
     <bool>true</bool>
@@ -343,8 +343,8 @@
   <widget class="QLabel" name="label_15">
    <property name="geometry">
     <rect>
-     <x>340</x>
-     <y>10</y>
+     <x>350</x>
+     <y>630</y>
      <width>181</width>
      <height>16</height>
     </rect>
@@ -1062,8 +1062,8 @@
   <widget class="QFrame" name="frame_11">
    <property name="geometry">
     <rect>
-     <x>330</x>
-     <y>160</y>
+     <x>350</x>
+     <y>40</y>
      <width>301</width>
      <height>481</height>
     </rect>
@@ -1512,8 +1512,8 @@
   <widget class="QLabel" name="label_11">
    <property name="geometry">
     <rect>
-     <x>330</x>
-     <y>140</y>
+     <x>350</x>
+     <y>20</y>
      <width>171</width>
      <height>21</height>
     </rect>
@@ -1525,8 +1525,8 @@
   <widget class="QFrame" name="frame_12">
    <property name="geometry">
     <rect>
-     <x>670</x>
-     <y>270</y>
+     <x>690</x>
+     <y>150</y>
      <width>281</width>
      <height>201</height>
     </rect>
@@ -1606,8 +1606,8 @@
   <widget class="QFrame" name="frame_13">
    <property name="geometry">
     <rect>
-     <x>670</x>
-     <y>500</y>
+     <x>690</x>
+     <y>380</y>
      <width>281</width>
      <height>201</height>
     </rect>

@@ -363,6 +363,8 @@ class func(object):
 
 		self.page.cbUserPerformed  .setEnabled( mode_creating or mode_editing)
 		self.page.leLocation       .setReadOnly(mode_view)
+		self.page.dtRunStart       .setReadOnly(mode_view)
+		self.page.dtRunStop        .setReadOnly(mode_view)
 		self.page.sbTrayComponent  .setReadOnly(mode_view)
 		self.page.sbTrayAssembly   .setReadOnly(mode_view)
 		self.page.leBatchAraldite  .setReadOnly(mode_view)
@@ -756,7 +758,7 @@ class func(object):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1 # last character of sender name is integer 1 through 6; subtract one for zero index
 		tool = self.sb_tools[which].value()
-		self.setUIPage('tooling',tool_pcb=tool)
+		self.setUIPage('Tooling',tool_pcb=tool)
 
 	def goPcb(self,*args,**kwargs):
 		sender_name = str(self.page.sender().objectName())
@@ -768,27 +770,27 @@ class func(object):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
 		protomodules = self.le_protomodules[which].value()
-		self.setUIPage('protomodules',ID=protomodule)
+		self.setUIPage('Protomodules',ID=protomodule)
 
 	def goModule(self,*args,**kwargs):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
 		module = self.le_modules[which].text()
-		self.setUIPage('modules',ID=module)
+		self.setUIPage('Modules',ID=module)
 
 	def goBatchAraldite(self,*args,**kwargs):
 		#batch_araldite = self.page.sbBatchAraldite.value()
 		batch_araldite = self.page.leBatchAraldite.text()
-		self.setUIPage('supplies',batch_araldite=batch_araldite)
+		self.setUIPage('Supplies',batch_araldite=batch_araldite)
 
 	def goTrayComponent(self,*args,**kwargs):
 		tray_component_pcb = self.page.sbTrayComponent.value()
-		self.setUIPage('tooling',tray_component_pcb=tray_component_pcb)
+		self.setUIPage('Tooling',tray_component_pcb=tray_component_pcb)
 
 	def goTrayAssembly(self,*args,**kwargs):
 		tray_assembly = self.page.sbTrayAssembly.value()
 		print(tray_assembly)
-		self.setUIPage('tooling',tray_assembly=tray_assembly)
+		self.setUIPage('Tooling',tray_assembly=tray_assembly)
 
 	def setRunStartNow(self, *args, **kwargs):
 		localtime = time.localtime()
@@ -817,7 +819,7 @@ class func(object):
 			if ID == "":
 				raise ValueError("ID cannot be empty")
 			tmp_inst, tmp_id = ID.split("_")
-			self.page.sbID.setValue(ID)
+			self.page.sbID.setValue(int(tmp_id))
 			self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(tmp_inst, -1))
 			self.loadStep()
 

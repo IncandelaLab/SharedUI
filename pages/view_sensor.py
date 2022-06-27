@@ -325,8 +325,8 @@ class func(object):
 	def goStepSensor(self,*args,**kwargs):
 		tmp_id = self.page.sbStepSensor.value()
 		tmp_inst = self.page.cbInstitutionStep.currentText()
-		if ID >= 0 and tmp_inst != "":
-			self.setUIPage('1. Sensor - pre-assembly',ID="{}_{}".format(tmp_id, tmp_inst))
+		if tmp_id >= 0 and tmp_inst != "":
+			self.setUIPage('1. Sensor - pre-assembly',ID="{}_{}".format(tmp_inst, tmp_id))
 
 	@enforce_mode('view')
 	def goProtomodule(self,*args,**kwargs):

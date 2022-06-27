@@ -308,8 +308,8 @@ class func(object):
 	def goStepSensor(self,*args,**kwargs):
 		tmp_id = self.page.sbStepSensor.value()
 		tmp_inst = self.page.cbInstitutionStepSensor.currentText()
-		if ID >= 0 and tmp_inst != "":
-			self.setUIPage('1. Sensor - pre-assembly',ID="{}_{}".format(tmp_id, tmp_inst))
+		if tmp_id >= 0 and tmp_inst != "":
+			self.setUIPage('1. Sensor - pre-assembly',ID="{}_{}".format(tmp_inst, tmp_id))
 
 	@enforce_mode('view')
 	def goSensor(self,*args,**kwargs):
@@ -327,8 +327,8 @@ class func(object):
 	def goStepPcb(self,*args,**kwargs):
 		tmp_id = self.page.sbStepPcb.value()
 		tmp_inst = self.page.cbInstitutionStepPcb.currentText()
-		if ID >= 0 and tmp_inst != "":
-			self.setUIPage('3. PCB - pre-assembly',ID="{}_{}".format(tmp_id, tmp_inst))
+		if tmp_id >= 0 and tmp_inst != "":
+			self.setUIPage('3. PCB - pre-assembly',ID="{}_{}".format(tmp_inst, tmp_id))
 
 	@enforce_mode('view')
 	def goModule(self,*args,**kwargs):

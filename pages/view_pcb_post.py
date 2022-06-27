@@ -434,7 +434,7 @@ class func(object):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
 		module = self.le_modules[which].text()
-		self.setUIPage('modules',ID=module)
+		self.setUIPage('Modules',ID=module)
 
 	def setCureStartNow(self, *args, **kwargs):
 		localtime = time.localtime()

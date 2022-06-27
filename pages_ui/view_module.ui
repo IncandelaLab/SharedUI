@@ -35,8 +35,8 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>330</x>
-     <y>80</y>
+     <x>357</x>
+     <y>260</y>
      <width>241</width>
      <height>16</height>
     </rect>
@@ -48,14 +48,14 @@
   <widget class="QLabel" name="label_3">
    <property name="geometry">
     <rect>
-     <x>330</x>
-     <y>300</y>
-     <width>181</width>
+     <x>357</x>
+     <y>80</y>
+     <width>201</width>
      <height>16</height>
     </rect>
    </property>
    <property name="text">
-    <string>Module qualification</string>
+    <string>PCB placement qualification</string>
    </property>
   </widget>
   <widget class="QFrame" name="frame">
@@ -63,8 +63,8 @@
     <rect>
      <x>10</x>
      <y>160</y>
-     <width>281</width>
-     <height>531</height>
+     <width>301</width>
+     <height>521</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -79,9 +79,9 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>180</x>
+      <x>160</x>
       <y>60</y>
-      <width>101</width>
+      <width>141</width>
       <height>20</height>
      </rect>
     </property>
@@ -104,7 +104,7 @@
      <rect>
       <x>0</x>
       <y>60</y>
-      <width>181</width>
+      <width>161</width>
       <height>21</height>
      </rect>
     </property>
@@ -121,9 +121,9 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>180</x>
+      <x>160</x>
       <y>80</y>
-      <width>101</width>
+      <width>141</width>
       <height>20</height>
      </rect>
     </property>
@@ -169,9 +169,9 @@
    <widget class="QPushButton" name="pbGoStepSensor">
     <property name="geometry">
      <rect>
-      <x>240</x>
-      <y>140</y>
-      <width>41</width>
+      <x>250</x>
+      <y>220</y>
+      <width>51</width>
       <height>21</height>
      </rect>
     </property>
@@ -182,9 +182,9 @@
    <widget class="QSpinBox" name="sbStepSensor">
     <property name="geometry">
      <rect>
-      <x>180</x>
-      <y>139</y>
-      <width>61</width>
+      <x>200</x>
+      <y>220</y>
+      <width>51</width>
       <height>21</height>
      </rect>
     </property>
@@ -201,9 +201,9 @@
    <widget class="QPushButton" name="pbGoProtomodule">
     <property name="geometry">
      <rect>
-      <x>240</x>
-      <y>281</y>
-      <width>41</width>
+      <x>250</x>
+      <y>201</y>
+      <width>51</width>
       <height>21</height>
      </rect>
     </property>
@@ -217,8 +217,8 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>180</x>
-      <y>301</y>
+      <x>200</x>
+      <y>280</y>
       <width>101</width>
       <height>20</height>
      </rect>
@@ -241,8 +241,8 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>39</y>
-      <width>141</width>
+      <y>40</y>
+      <width>161</width>
       <height>21</height>
      </rect>
     </property>
@@ -256,9 +256,9 @@
    <widget class="QLineEdit" name="leProtomodule">
     <property name="geometry">
      <rect>
-      <x>140</x>
-      <y>281</y>
-      <width>101</width>
+      <x>120</x>
+      <y>201</y>
+      <width>131</width>
       <height>20</height>
      </rect>
     </property>
@@ -270,8 +270,8 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>220</y>
-      <width>141</width>
+      <y>140</y>
+      <width>121</width>
       <height>21</height>
      </rect>
     </property>
@@ -287,7 +287,7 @@
      <rect>
       <x>0</x>
       <y>79</y>
-      <width>181</width>
+      <width>161</width>
       <height>21</height>
      </rect>
     </property>
@@ -302,8 +302,8 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>351</y>
-      <width>281</width>
+      <y>340</y>
+      <width>301</width>
       <height>91</height>
      </rect>
     </property>
@@ -311,9 +311,9 @@
    <widget class="QPushButton" name="pbGoPcb">
     <property name="geometry">
      <rect>
-      <x>240</x>
-      <y>261</y>
-      <width>41</width>
+      <x>250</x>
+      <y>181</y>
+      <width>51</width>
       <height>21</height>
      </rect>
     </property>
@@ -324,9 +324,9 @@
    <widget class="QSpinBox" name="sbStepPcb">
     <property name="geometry">
      <rect>
-      <x>180</x>
-      <y>179</y>
-      <width>61</width>
+      <x>200</x>
+      <y>240</y>
+      <width>51</width>
       <height>21</height>
      </rect>
     </property>
@@ -343,9 +343,9 @@
    <widget class="QPushButton" name="pbGoBaseplate">
     <property name="geometry">
      <rect>
-      <x>240</x>
-      <y>221</y>
-      <width>41</width>
+      <x>250</x>
+      <y>141</y>
+      <width>51</width>
       <height>21</height>
      </rect>
     </property>
@@ -356,8 +356,8 @@
    <widget class="QLineEdit" name="leLocation">
     <property name="geometry">
      <rect>
-      <x>140</x>
-      <y>39</y>
+      <x>160</x>
+      <y>40</y>
       <width>141</width>
       <height>21</height>
      </rect>
@@ -373,8 +373,8 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>451</y>
-      <width>281</width>
+      <y>440</y>
+      <width>301</width>
       <height>61</height>
      </rect>
     </property>
@@ -386,8 +386,8 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>240</y>
-      <width>141</width>
+      <y>160</y>
+      <width>121</width>
       <height>21</height>
      </rect>
     </property>
@@ -401,9 +401,9 @@
    <widget class="QLineEdit" name="lineEdit_53">
     <property name="geometry">
      <rect>
-      <x>1</x>
-      <y>0</y>
-      <width>141</width>
+      <x>0</x>
+      <y>1</y>
+      <width>161</width>
       <height>20</height>
      </rect>
     </property>
@@ -423,7 +423,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>140</x>
+      <x>160</x>
       <y>0</y>
       <width>141</width>
       <height>21</height>
@@ -436,9 +436,9 @@
    <widget class="QLineEdit" name="leBaseplate">
     <property name="geometry">
      <rect>
-      <x>140</x>
-      <y>221</y>
-      <width>101</width>
+      <x>120</x>
+      <y>141</y>
+      <width>131</width>
       <height>20</height>
      </rect>
     </property>
@@ -450,13 +450,13 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>179</y>
-      <width>181</width>
+      <y>240</y>
+      <width>121</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>PCB placement step</string>
+     <string>PCB step</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -465,9 +465,9 @@
    <widget class="QPushButton" name="pbGoSensor">
     <property name="geometry">
      <rect>
-      <x>240</x>
-      <y>241</y>
-      <width>41</width>
+      <x>250</x>
+      <y>161</y>
+      <width>51</width>
       <height>21</height>
      </rect>
     </property>
@@ -481,9 +481,9 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>180</x>
+      <x>160</x>
       <y>100</y>
-      <width>101</width>
+      <width>141</width>
       <height>20</height>
      </rect>
     </property>
@@ -510,7 +510,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>511</y>
+      <y>500</y>
       <width>111</width>
       <height>21</height>
      </rect>
@@ -522,9 +522,9 @@
    <widget class="QLineEdit" name="leSensor">
     <property name="geometry">
      <rect>
-      <x>140</x>
-      <y>241</y>
-      <width>101</width>
+      <x>120</x>
+      <y>161</y>
+      <width>131</width>
       <height>20</height>
      </rect>
     </property>
@@ -535,8 +535,8 @@
    <widget class="QPushButton" name="pbDeleteComment">
     <property name="geometry">
      <rect>
-      <x>160</x>
-      <y>331</y>
+      <x>180</x>
+      <y>320</y>
       <width>121</width>
       <height>21</height>
      </rect>
@@ -549,13 +549,13 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>139</y>
-      <width>181</width>
+      <y>220</y>
+      <width>121</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>Sensor placement step</string>
+     <string>Sensor step</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -565,8 +565,8 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>280</y>
-      <width>141</width>
+      <y>200</y>
+      <width>121</width>
       <height>21</height>
      </rect>
     </property>
@@ -581,8 +581,8 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>19</y>
-      <width>141</width>
+      <y>20</y>
+      <width>161</width>
       <height>21</height>
      </rect>
     </property>
@@ -596,9 +596,9 @@
    <widget class="QLineEdit" name="lineEdit_39">
     <property name="geometry">
      <rect>
-      <x>1</x>
-      <y>301</y>
-      <width>181</width>
+      <x>0</x>
+      <y>280</y>
+      <width>201</width>
       <height>20</height>
      </rect>
     </property>
@@ -613,8 +613,8 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>260</y>
-      <width>141</width>
+      <y>180</y>
+      <width>121</width>
       <height>21</height>
      </rect>
     </property>
@@ -629,8 +629,8 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>331</y>
-      <width>161</width>
+      <y>320</y>
+      <width>181</width>
       <height>21</height>
      </rect>
     </property>
@@ -644,9 +644,9 @@
    <widget class="QLineEdit" name="lePcb">
     <property name="geometry">
      <rect>
-      <x>140</x>
-      <y>261</y>
-      <width>101</width>
+      <x>120</x>
+      <y>181</y>
+      <width>131</width>
       <height>20</height>
      </rect>
     </property>
@@ -660,7 +660,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>140</x>
+      <x>160</x>
       <y>20</y>
       <width>141</width>
       <height>21</height>
@@ -705,7 +705,7 @@
      <rect>
       <x>0</x>
       <y>99</y>
-      <width>181</width>
+      <width>161</width>
       <height>21</height>
      </rect>
     </property>
@@ -719,9 +719,9 @@
    <widget class="QPushButton" name="pbGoStepPcb">
     <property name="geometry">
      <rect>
-      <x>240</x>
-      <y>180</y>
-      <width>41</width>
+      <x>250</x>
+      <y>240</y>
+      <width>51</width>
       <height>21</height>
      </rect>
     </property>
@@ -735,9 +735,9 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>180</x>
-      <y>160</y>
-      <width>101</width>
+      <x>120</x>
+      <y>220</y>
+      <width>81</width>
       <height>21</height>
      </rect>
     </property>
@@ -781,9 +781,9 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>180</x>
-      <y>200</y>
-      <width>101</width>
+      <x>120</x>
+      <y>240</y>
+      <width>81</width>
       <height>21</height>
      </rect>
     </property>
@@ -825,8 +825,8 @@
   <widget class="QFrame" name="frame_2">
    <property name="geometry">
     <rect>
-     <x>330</x>
-     <y>320</y>
+     <x>357</x>
+     <y>100</y>
      <width>271</width>
      <height>121</height>
     </rect>
@@ -1030,7 +1030,7 @@
    <widget class="QCheckBox" name="ckWirebondingCompleted">
     <property name="geometry">
      <rect>
-      <x>0</x>
+      <x>10</x>
       <y>100</y>
       <width>201</width>
       <height>23</height>
@@ -1047,8 +1047,8 @@
   <widget class="QFrame" name="frame_3">
    <property name="geometry">
     <rect>
-     <x>330</x>
-     <y>100</y>
+     <x>357</x>
+     <y>280</y>
      <width>361</width>
      <height>181</height>
     </rect>
