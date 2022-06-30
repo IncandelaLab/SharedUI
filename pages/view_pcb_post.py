@@ -25,15 +25,9 @@ INDEX_INSTITUTION = {
 }
 
 INDEX_GRADE = {
-	'A':0,
-	'B':1,
-	'C':2,
-}
-
-INDEX_COLOR_GRADE = {
-	'GREEN':0,
-	'YELLOW':1,
-	'RED':2,
+	'Green':0,
+	'Yellow':1,
+	'Red':2,
 }
 
 STATUS_NO_ISSUES = "valid (no issues)"

@@ -41,11 +41,10 @@ INDEX_CHANNEL = {
 }
 
 INDEX_GRADE = {
-	'A':0,
-	'B':1,
-	'C':2,
+	'Green':0,
+	'Yellow':1,
+	'Red':2,
 }
-
 
 class func(object):
 	def __init__(self,fm,page,setUIPage,setSwitchingEnabled):

@@ -475,37 +475,6 @@
      <string>Go to</string>
     </property>
    </widget>
-   <widget class="QComboBox" name="cbGrade">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>160</x>
-      <y>100</y>
-      <width>141</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="currentIndex">
-     <number>-1</number>
-    </property>
-    <item>
-     <property name="text">
-      <string>A</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>B</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>C</string>
-     </property>
-    </item>
-   </widget>
    <widget class="QPushButton" name="pbAddComment">
     <property name="geometry">
      <rect>
@@ -818,6 +787,37 @@
     <item>
      <property name="text">
       <string>HPK</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QComboBox" name="cbGrade">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>100</y>
+      <width>141</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>-1</number>
+    </property>
+    <item>
+     <property name="text">
+      <string>Green</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Yellow</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Red</string>
      </property>
     </item>
    </widget>

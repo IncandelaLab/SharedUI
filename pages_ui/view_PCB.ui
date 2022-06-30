@@ -952,34 +952,6 @@
    <property name="frameShadow">
     <enum>QFrame::Raised</enum>
    </property>
-   <widget class="QComboBox" name="cbGrade">
-    <property name="geometry">
-     <rect>
-      <x>180</x>
-      <y>40</y>
-      <width>81</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="currentIndex">
-     <number>-1</number>
-    </property>
-    <item>
-     <property name="text">
-      <string>A</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>B</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>C</string>
-     </property>
-    </item>
-   </widget>
    <widget class="QDoubleSpinBox" name="dsbThickness">
     <property name="geometry">
      <rect>
@@ -1071,6 +1043,34 @@
     <property name="singleStep">
      <double>0.050000000000000</double>
     </property>
+   </widget>
+   <widget class="QComboBox" name="cbGrade">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>40</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>-1</number>
+    </property>
+    <item>
+     <property name="text">
+      <string>Green</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Yellow</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Red</string>
+     </property>
+    </item>
    </widget>
   </widget>
   <widget class="QLabel" name="label_6">

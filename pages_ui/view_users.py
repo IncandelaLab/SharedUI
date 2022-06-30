@@ -28,7 +28,7 @@ class Ui_Form(object):
         self.pbEditSelected.setGeometry(QtCore.QRect(170, 430, 161, 21))
         self.pbEditSelected.setObjectName("pbEditSelected")
         self.frame = QtWidgets.QFrame(Form)
-        self.frame.setGeometry(QtCore.QRect(370, 40, 561, 371))
+        self.frame.setGeometry(QtCore.QRect(370, 40, 561, 381))
         self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame.setObjectName("frame")

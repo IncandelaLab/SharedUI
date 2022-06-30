@@ -904,17 +904,17 @@
    </property>
    <item>
     <property name="text">
-     <string>A</string>
+     <string>Green</string>
     </property>
    </item>
    <item>
     <property name="text">
-     <string>B</string>
+     <string>Yellow</string>
     </property>
    </item>
    <item>
     <property name="text">
-     <string>C</string>
+     <string>Red</string>
     </property>
    </item>
   </widget>

@@ -99,16 +99,13 @@ class simple_fsobj_pt(object):  # from tools
 			self.leStatus.setText("input an ID")
 			return
 		# Check whether part exists:
-		#tmp_module = fm.module()
 		tmp_ID = self.leID.text()
-		#tmp_exists = tmp_module.load(tmp_ID)
 		tmp_exists = self.fsobj_pt.load(tmp_ID)
 		if not tmp_exists:  # DNE; good to create
 			self.leStatus.setText("part DNE")
 			self.update_info(do_load=False)
 			self.fsobj_pt.clear()
 		else:
-			#self.module = tmp_module
 			self.leStatus.setText("part exists")
 			self.update_info()
 
@@ -118,9 +115,6 @@ class simple_fsobj_pt(object):  # from tools
 		if not tmp_exists:
 			self.leStatus.setText("does not exist")
 			self.fsobj_pt.clear()
-		#else:
-		#	#self.module = tmp_module
-		#	self.update_info()
 
 	def cancel_editing(self,*args,**kwargs):
 		self.update_info()
@@ -135,9 +129,7 @@ class simple_fsobj_pt(object):  # from tools
 		for i in range(self.listFiles.count()):
 			self.fsobj_pt.test_files.append(str(self.listFiles.item(i).text()))
 
-		print("Files were:", self.fsobj_pt.test_files)
 		self.fsobj_pt.save()
-		print("Files are now:", self.fsobj_pt.test_files)
 		self.update_info()
 
 
@@ -157,12 +149,10 @@ class simple_fsobj_pt(object):  # from tools
 		# Create a copy of the file in the module storage directory
 		tmp_filename = os.path.split(f)[1]
 		new_filepath = fdir + '/' + tmp_filename
-		print("GETFILE:  Copying file", f, "to", new_filepath)
 		shutil.copyfile(f, new_filepath)
 		# From here on, the file is ONLY referred to by its name, not the full path!
 		self.fsobj_pt.test_files.append(tmp_filename)
 		self.fsobj_pt.save()
-		print("File added: test_files is now", self.fsobj_pt.test_files)
 		self.update_info()
 
 	def delete_file(self,row):
@@ -173,14 +163,6 @@ class simple_fsobj_pt(object):  # from tools
 		self.fsobj_pt.test_files.remove(fname)
 		self.fsobj_pt.save()
 		self.update_info()
-		# Now need to remove the file...
-		#fdir, fname_ = self.fsobj_pt.get_filedir_filename()
-		#new_filepath = fdir + '/' + fname
-		#print("REMOVING FILE", new_filepath)
-		#os.remove(new_filepath)
-		#self.fsobj_pt.test_files.remove(new_filepath)
-		#self.update_info()
-
 
 
 

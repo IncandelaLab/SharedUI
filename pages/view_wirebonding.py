@@ -336,6 +336,7 @@ class func(object):
 		self.page.ckWirebondsInspectedFront.setEnabled(    mode_editing )
 		self.page.cbWirebondingUserFront.setEnabled(       mode_editing )
 		self.page.cbWirebondsRepairedUserFront.setEnabled( mode_editing )
+		self.page.pteWirebondingChannelsSkipFront.setReadOnly(not mode_editing)
 		self.page.pteUnbondedChannelsFront.setReadOnly(not mode_editing )
 
 		# front encapsulation
@@ -378,6 +379,7 @@ class func(object):
 		# First, check text boxes for errors; do nothing if found
 		self.page.leErrors.clear()
 		pteList = {
+				   "skip_front":self.page.pteWirebondingChannelsSkipFront,
 				   "unbonded_front":self.page.pteUnbondedChannelsFront
 				  }
 		pteErrs = []
@@ -473,8 +475,8 @@ class func(object):
 		self.module.wirebonds_inspected_front      = self.page.ckWirebondsInspectedFront.isChecked()
 		self.module.wirebonding_user_front         = str(self.page.cbWirebondingUserFront.currentText()      ) if str(self.page.cbWirebondingUserFront.currentText()      ) else None
 		self.module.wirebonds_repaired_user_front  = str(self.page.cbWirebondsRepairedUserFront.currentText()) if str(self.page.cbWirebondsRepairedUserFront.currentText()) else None
-		self.module.wirebonding_unbonded_channels_front = separate_sites(str(self.page.pteUnbondedChannelsFront.toPlainText()        )) if str(self.page.pteUnbondedChannelsFront.toPlainText() ) else None
-		self.module.wirebonds_skip_channels_front    = separate_sites(str(self.page.pteWirebondingChannelsSkipFront.toPlainText())) if str(self.page.pteWirebondingChannelsSkipFront.toPlainText()) else None
+		self.module.wirebonding_unbonded_channels_front = separate_sites(str(self.page.pteUnbondedChannelsFront.toPlainText()       )) if str(self.page.pteUnbondedChannelsFront.toPlainText())        else None
+		self.module.wirebonds_skip_channels_front       = separate_sites(str(self.page.pteWirebondingChannelsSkipFront.toPlainText())) if str(self.page.pteWirebondingChannelsSkipFront.toPlainText()) else None
 
 		# front encapsulation
 		self.module.encapsulation_front            = self.page.ckEncapsulationFront.isChecked()

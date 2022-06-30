@@ -276,37 +276,6 @@
      <number>-1</number>
     </property>
    </widget>
-   <widget class="QComboBox" name="cbGrade">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>180</x>
-      <y>150</y>
-      <width>81</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="currentIndex">
-     <number>-1</number>
-    </property>
-    <item>
-     <property name="text">
-      <string>A</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>B</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>C</string>
-     </property>
-    </item>
-   </widget>
    <widget class="QLineEdit" name="lineEdit_22">
     <property name="geometry">
      <rect>
@@ -416,6 +385,37 @@
      </property>
     </item>
    </widget>
+   <widget class="QComboBox" name="cbGrade">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>150</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>-1</number>
+    </property>
+    <item>
+     <property name="text">
+      <string>Green</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Yellow</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Red</string>
+     </property>
+    </item>
+   </widget>
    <zorder>lineEdit_9</zorder>
    <zorder>leLocation</zorder>
    <zorder>lineEdit_10</zorder>
@@ -430,11 +430,11 @@
    <zorder>lineEdit_38</zorder>
    <zorder>cbInstitution</zorder>
    <zorder>cbInsertUser</zorder>
-   <zorder>cbGrade</zorder>
    <zorder>lineEdit_22</zorder>
    <zorder>cbShape</zorder>
    <zorder>lineEdit_23</zorder>
    <zorder>cbType</zorder>
+   <zorder>cbGrade</zorder>
   </widget>
   <widget class="QFrame" name="frame_3">
    <property name="geometry">

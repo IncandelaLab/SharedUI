@@ -363,34 +363,6 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QComboBox" name="cbGrade">
-    <property name="geometry">
-     <rect>
-      <x>180</x>
-      <y>230</y>
-      <width>81</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="currentIndex">
-     <number>-1</number>
-    </property>
-    <item>
-     <property name="text">
-      <string>A</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>B</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>C</string>
-     </property>
-    </item>
-   </widget>
    <widget class="QComboBox" name="cbInspection">
     <property name="geometry">
      <rect>
@@ -532,6 +504,34 @@
     <item>
      <property name="text">
       <string>Full+Three</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QComboBox" name="cbGrade">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>230</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>-1</number>
+    </property>
+    <item>
+     <property name="text">
+      <string>Green</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Yellow</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Red</string>
      </property>
     </item>
    </widget>

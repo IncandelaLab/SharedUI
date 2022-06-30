@@ -24,9 +24,9 @@ INDEX_SHAPE = {
 }
 
 INDEX_GRADE = {
-    'A':0,
-    'B':1,
-    'C':2,
+	'Green':0,
+	'Yellow':1,
+	'Red':2,
 }
 
 

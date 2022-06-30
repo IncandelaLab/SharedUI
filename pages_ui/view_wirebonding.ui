@@ -1136,12 +1136,12 @@
       <rect>
        <x>2</x>
        <y>140</y>
-       <width>141</width>
+       <width>221</width>
        <height>16</height>
       </rect>
      </property>
      <property name="text">
-      <string>Unbonded channels</string>
+      <string>Unbonded channels (to ground)</string>
      </property>
     </widget>
     <widget class="QCheckBox" name="ckWirebondingFront">
@@ -1193,7 +1193,7 @@
       </rect>
      </property>
      <property name="readOnly">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
     </widget>
     <widget class="QLabel" name="label_13">
@@ -1206,7 +1206,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>Channels to skip (currently disabled)</string>
+      <string>Channels to skip</string>
      </property>
     </widget>
     <widget class="QComboBox" name="cbWirebondingUserFront">
