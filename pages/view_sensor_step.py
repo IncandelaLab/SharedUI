@@ -123,7 +123,6 @@ class func(object):
 		self.rig()
 		self.mode = 'view'
 		print("{} setup completed".format(PAGE_NAME))
-		#self.update_info()
 		self.loadStep()  # sb starts at 0, so load by default
 
 	@enforce_mode('setup')

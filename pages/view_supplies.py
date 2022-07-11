@@ -127,7 +127,6 @@ class simple_fsobj_vc(object):
 
 class func(object):
 	def __init__(self,fm,page,setUIPage,setSwitchingEnabled):
-		#self.fm        = fm
 		self.page      = page
 		self.setUIPage = setUIPage
 		self.setMainSwitchingEnabled = setSwitchingEnabled
@@ -149,7 +148,7 @@ class func(object):
 		
 		self.batch_wedge = simple_fsobj_vc(
 			fm.batch_wedge(),
-			self.page.sbWedgeID,
+			self.page.leWedgeID,
 			self.page.dWedgeReceived,
 			self.page.dWedgeExpires,
 			self.page.ckIsWedgeEmpty,
@@ -164,7 +163,7 @@ class func(object):
 
 		self.batch_sylgard = simple_fsobj_vc(
 			fm.batch_sylgard(),
-			self.page.sbSylgardID,
+			self.page.leSylgardID,
 			self.page.dSylgardReceived,
 			self.page.dSylgardExpires,
 			self.page.ckIsSylgardEmpty,
@@ -180,7 +179,7 @@ class func(object):
 
 		self.batch_bond_wire = simple_fsobj_vc(
 			fm.batch_bond_wire(),
-			self.page.sbBondWireID,
+			self.page.leBondWireID,
 			self.page.dBondWireReceived,
 			self.page.dBondWireExpires,
 			self.page.ckIsBondWireEmpty,
@@ -240,9 +239,9 @@ class func(object):
 	@enforce_mode('setup')
 	def rig(self):
 		self.page.leAralditeID.textChanged.connect(self.update_info_batch_araldite)
-		self.page.sbWedgeID.valueChanged.connect(self.update_info_batch_wedge)
-		self.page.sbSylgardID.valueChanged.connect(self.update_info_batch_sylgard)
-		self.page.sbBondWireID.valueChanged.connect(self.update_info_batch_bond_wire)
+		self.page.leWedgeID.textChanged.connect(self.update_info_batch_wedge)
+		self.page.leSylgardID.textChanged.connect(self.update_info_batch_sylgard)
+		self.page.leBondWireID.textChanged.connect(self.update_info_batch_bond_wire)
 
 		self.page.pbAralditeEditNew.clicked.connect(self.start_editing_batch_araldite)
 		self.page.pbWedgeEditNew.clicked.connect(self.start_editing_batch_wedge)
@@ -308,9 +307,9 @@ class func(object):
 		self.setMainSwitchingEnabled(mode_view)
 
 		self.page.leAralditeID.setEnabled(not mode_editing_batch_araldite)
-		self.page.sbWedgeID.setEnabled(not mode_editing_batch_wedge)
-		self.page.sbSylgardID.setEnabled(not mode_editing_batch_sylgard)
-		self.page.sbBondWireID.setEnabled(not mode_editing_batch_bond_wire)
+		self.page.leWedgeID.setEnabled(not mode_editing_batch_wedge)
+		self.page.leSylgardID.setEnabled(not mode_editing_batch_sylgard)
+		self.page.leBondWireID.setEnabled(not mode_editing_batch_bond_wire)
 
 		self.page.pbAralditeEditNew.setEnabled(mode_view)
 		self.page.pbWedgeEditNew.setEnabled(mode_view)

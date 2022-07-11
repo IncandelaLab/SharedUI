@@ -429,7 +429,7 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QSpinBox" name="sbBatchSylgard">
+   <widget class="QLineEdit" name="leBatchSylgard">
     <property name="geometry">
      <rect>
       <x>180</x>
@@ -438,14 +438,8 @@
       <height>21</height>
      </rect>
     </property>
-    <property name="minimum">
-     <number>-1</number>
-    </property>
-    <property name="maximum">
-     <number>2147483647</number>
-    </property>
    </widget>
-   <widget class="QSpinBox" name="sbBatchBondWire">
+   <widget class="QLineEdit" name="leBatchBondWire">
     <property name="geometry">
      <rect>
       <x>180</x>
@@ -454,14 +448,8 @@
       <height>21</height>
      </rect>
     </property>
-    <property name="minimum">
-     <number>-1</number>
-    </property>
-    <property name="maximum">
-     <number>2147483647</number>
-    </property>
    </widget>
-   <widget class="QSpinBox" name="sbBatchWedge">
+   <widget class="QLineEdit" name="leBatchWedge">
     <property name="geometry">
      <rect>
       <x>180</x>
@@ -469,12 +457,6 @@
       <width>101</width>
       <height>21</height>
      </rect>
-    </property>
-    <property name="minimum">
-     <number>-1</number>
-    </property>
-    <property name="maximum">
-     <number>2147483647</number>
     </property>
    </widget>
   </widget>

@@ -14,7 +14,7 @@ Additionally, you'll need to install the [CMS DB loader](https://github.com/vald
 - `git clone https://github.com/valdasraps/cmsdbldr.git`
 - `export PYTHONPATH=$PYTHONPATH:[install-dir]/cmsdbldr/src/main/python`
 
-The GUI also depends on the [resthub API.](https://github.com/valdasraps/resthub)  As before, you will need to clone the repo and add `[install-dir]/resthub/clients/python/src/main/python` to your `$PYTHONPATH`.
+The GUI also depends on the [resthub API.](https://github.com/p-masterson/resthub)  As before, you will need to clone the repo and add `[install-dir]/resthub/clients/python/src/main/python` to your `$PYTHONPATH`.
 
 It's recommended to use Qt Creator for editing the .ui files.  If it's not already installed, you can download it from the Qt Creator tab of [this page.](https://www.qt.io/offline-installers)  After making changes to the .ui files, run the script `compile.sh` (or `compile.bat`) in the .ui files' directory to carry all of the changes over to the corresponding .py files.  (Note:  Adding new .ui files will require you to modify compile.sh and compile.bat accordingly.)
 

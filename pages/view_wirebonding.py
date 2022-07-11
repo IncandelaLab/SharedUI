@@ -177,9 +177,9 @@ class func(object):
 
 		# pre-wirebonding qualification
 		self.page.cbPreinspection.setCurrentIndex(  INDEX_INSPECTION.get(self.module.preinspection  , -1))
-		self.page.sbBatchSylgard .setValue(self.module.wirebonding_sylgard if self.module.wirebonding_sylgard != None else -1)
-		self.page.sbBatchBondWire.setValue(self.module.wirebonding_bond_wire if self.module.wirebonding_bond_wire != None else -1)
-		self.page.sbBatchWedge   .setValue(self.module.wirebonding_wedge if self.module.wirebonding_wedge != None else -1)
+		self.page.leBatchSylgard .setText(self.module.wirebonding_sylgard   if self.module.wirebonding_sylgard   != None else "")
+		self.page.leBatchBondWire.setText(self.module.wirebonding_bond_wire if self.module.wirebonding_bond_wire != None else "")
+		self.page.leBatchWedge   .setText(self.module.wirebonding_wedge     if self.module.wirebonding_wedge     != None else "")
 
 		# Back wirebonding
 		self.page.ckWirebondingBack.setChecked(       False if self.module.wirebonding_back          is None else self.module.wirebonding_back         )
@@ -305,9 +305,9 @@ class func(object):
 
 		# pre-wirebonding qualification
 		self.page.cbPreinspection.setEnabled(     mode_editing )
-		self.page.sbBatchSylgard .setReadOnly(not mode_editing )
-		self.page.sbBatchBondWire.setReadOnly(not mode_editing )
-		self.page.sbBatchWedge   .setReadOnly(not mode_editing )
+		self.page.leBatchSylgard .setReadOnly(not mode_editing )
+		self.page.leBatchBondWire.setReadOnly(not mode_editing )
+		self.page.leBatchWedge   .setReadOnly(not mode_editing )
 
 		# back wirebonding
 		self.page.ckWirebondingBack.setEnabled(          mode_editing )
@@ -388,32 +388,35 @@ class func(object):
 				pteErrs.append(name)
 		# Check batch errors:  existence, emptiness, expiration
 		tmp_sylgard = fm.batch_sylgard()
-		if not tmp_sylgard.load(self.page.sbBatchSylgard.value()):
+		if not tmp_sylgard.load(self.page.leBatchSylgard.text()):
 			pteErrs.append("Sylgard DNE")
 		else:
-			if not (tmp_sylgard.date_expires) is None:
-				ydm = tmp_sylgard.date_expires.split('-')
-				expires = QtCore.QDate(int(ydm[2]), int(ydm[0]), int(ydm[1]))
-				if QtCore.QDate.currentDate() > expires:  pteErrs.append("Sylgard expired")
-			if tmp_sylgard.is_empty:  pteErrs.append("Sylgard empty")
+			#if not (tmp_sylgard.date_expires) is None:
+			#	ydm = tmp_sylgard.date_expires.split('-')
+			#	expires = QtCore.QDate(int(ydm[2]), int(ydm[0]), int(ydm[1]))
+			#	if QtCore.QDate.currentDate() > expires:  pteErrs.append("Sylgard expired")
+			if tmp_sylgard.is_expired:  pteErrs.append("Sylgard expired")
+			if tmp_sylgard.is_empty:    pteErrs.append("Sylgard empty")
 		tmp_bond_wire = fm.batch_bond_wire()
-		if not tmp_bond_wire.load(self.page.sbBatchBondWire.value()):
+		if not tmp_bond_wire.load(self.page.leBatchBondWire.text()):
 			pteErrs.append("Bond wire DNE")
 		else:
-			if not (tmp_bond_wire.date_expires) is None:
-				ydm = tmp_bond_wire.date_expires.split('-')
-				expires = QtCore.QDate(int(ydm[2]), int(ydm[0]), int(ydm[1]))
-				if QtCore.QDate.currentDate() > expires:  pteErrs.append("Bond wire expired")
-			if tmp_bond_wire.is_empty:  pteErrs.append("Bond wire empty")
+			#if not (tmp_bond_wire.date_expires) is None:
+			#	ydm = tmp_bond_wire.date_expires.split('-')
+			#	expires = QtCore.QDate(int(ydm[2]), int(ydm[0]), int(ydm[1]))
+			#	if QtCore.QDate.currentDate() > expires:  pteErrs.append("Bond wire expired")
+			if tmp_bond_wire.is_expired:  pteErrs.append("Bond wire expired")
+			if tmp_bond_wire.is_empty:    pteErrs.append("Bond wire empty")
 		tmp_wedge = fm.batch_wedge()
-		if not tmp_wedge.load(self.page.sbBatchWedge.value()):
+		if not tmp_wedge.load(self.page.leBatchWedge.text()):
 			pteErrs.append("Wedge DNE")
 		else:
-			if not (tmp_wedge.date_expires) is None:
-				ydm = tmp_wedge.date_expires.split('-')
-				expires = QtCore.QDate(int(ydm[2]), int(ydm[0]), int(ydm[1]))
-				if QtCore.QDate.currentDate() > expires:  pteErrs.append("Wedge expired")
-			if tmp_wedge.is_empty:  pteErrs.append("Wedge empty")
+			#if not (tmp_wedge.date_expires) is None:
+			#	ydm = tmp_wedge.date_expires.split('-')
+			#	expires = QtCore.QDate(int(ydm[2]), int(ydm[0]), int(ydm[1]))
+			#	if QtCore.QDate.currentDate() > expires:  pteErrs.append("Wedge expired")
+			if tmp_wedge.is_expired:  pteErrs.append("Wedge expired")
+			if tmp_wedge.is_empty:    pteErrs.append("Wedge empty")
 
 		if len(pteErrs) > 0:
 			self.page.leErrors.setText("Error:  {}".format(', '.join(pteErrs)))
@@ -440,9 +443,9 @@ class func(object):
 
 		# pre-wirebonding qualification
 		self.module.preinspection        = str(self.page.cbPreinspection.currentText()  ) if str(self.page.cbPreinspection.currentText()  ) else None
-		self.module.wirebonding_sylgard   = self.page.sbBatchSylgard.value()  if self.page.sbBatchSylgard.value() >= 0  else None
-		self.module.wirebonding_bond_wire = self.page.sbBatchBondWire.value() if self.page.sbBatchBondWire.value() >= 0 else None
-		self.module.wirebonding_wedge     = self.page.sbBatchWedge.value()    if self.page.sbBatchWedge.value() >= 0    else None
+		self.module.wirebonding_sylgard   = self.page.leBatchSylgard.text()  if self.page.sbBatchSylgard.text()  != "" else None
+		self.module.wirebonding_bond_wire = self.page.leBatchBondWire.text() if self.page.sbBatchBondWire.text() != "" else None
+		self.module.wirebonding_wedge     = self.page.leBatchWedge.text()    if self.page.sbBatchWedge.text()    != "" else None
 
 		# back wirebonding
 		self.module.wirebonding_back              = self.page.ckWirebondingBack.isChecked()
