@@ -1363,7 +1363,7 @@ class pcb(fsobj_part):
 			self.shape = value.split()[2]
 
 	def ready_step_pcb(self, step_pcb = None):
-		if self.step_pcb and self.step_pcb != self_pcb:
+		if self.step_pcb and self.step_pcb != step_pcb:
 			return False, "already assigned to module {}".format(self.module)
 		return True, ""
 

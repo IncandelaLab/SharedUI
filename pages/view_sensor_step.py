@@ -1,6 +1,8 @@
 from PyQt5 import QtCore
 import time
 import datetime
+import os
+import json
 
 from filemanager import fm
 
@@ -214,6 +216,9 @@ class func(object):
 
 			self.pb_clears[i].clicked.connect(self.clearRow)
 
+		self.page.pbAddPart.clicked.connect(self.finishSearch)
+		self.page.pbCancelSearch.clicked.connect(self.cancelSearch)
+
 		self.page.ckCheckFeet.stateChanged.connect(self.updateIssues)
 		self.page.cbUserPerformed.activated.connect(self.updateIssues)
 
@@ -346,11 +351,12 @@ class func(object):
 
 		self.updateElements()
 
-	@enforce_mode(['view','editing','creating'])
+	@enforce_mode(['view','editing','creating','searching'])
 	def updateElements(self,use_info=False):
-		mode_view     = self.mode == 'view'
-		mode_editing  = self.mode == 'editing'
-		mode_creating = self.mode == 'creating'
+		mode_view      = self.mode == 'view'
+		mode_editing   = self.mode == 'editing'
+		mode_creating  = self.mode == 'creating'
+		mode_searching = self.mode == 'searching'
 		tools_exist        = [_.value()>=0 for _ in self.sb_tools       ]
 		sensors_exist      = [_.text()!="" for _ in self.le_sensors]
 		baseplates_exist   = [_.text()!="" for _ in self.le_baseplates]
@@ -365,25 +371,33 @@ class func(object):
 		self.page.pbRunStopNow      .setEnabled(mode_creating or mode_editing)
 
 		self.page.cbUserPerformed  .setEnabled( mode_creating or mode_editing)
-		self.page.leLocation       .setReadOnly(mode_view)
-		self.page.dtRunStart       .setReadOnly(mode_view)
-		self.page.dtRunStop        .setReadOnly(mode_view)
-		self.page.sbTrayComponent  .setReadOnly(mode_view)
-		self.page.sbTrayAssembly   .setReadOnly(mode_view)
-		self.page.leBatchAraldite  .setReadOnly(mode_view)
+		self.page.leLocation       .setReadOnly(mode_view or mode_searching)
+		self.page.dtRunStart       .setReadOnly(mode_view or mode_searching)
+		self.page.dtRunStop        .setReadOnly(mode_view or mode_searching)
+		self.page.sbTrayComponent  .setReadOnly(mode_view or mode_searching)
+		self.page.sbTrayAssembly   .setReadOnly(mode_view or mode_searching)
+		self.page.leBatchAraldite  .setReadOnly(mode_view or mode_searching)
 
 		self.page.pbGoTrayComponent.setEnabled(mode_view and self.page.sbTrayComponent.value() >= 0)
 		self.page.pbGoTrayAssembly .setEnabled(mode_view and self.page.sbTrayAssembly .value() >= 0)
 		self.page.pbGoBatchAraldite.setEnabled(mode_view and self.page.leBatchAraldite.text() != "")
 
 		for i in range(6):
-			self.sb_tools[i].setReadOnly(       mode_view)
+			self.sb_tools[i].setReadOnly(         mode_view)
 			self.le_sensors[i].setReadOnly(       mode_view)
 			self.le_baseplates[i].setReadOnly(    mode_view)
 			self.pb_go_tools[i].setEnabled(       mode_view and tools_exist[i]       )
-			self.pb_go_sensors[i].setEnabled(     mode_view and sensors_exist[i]     )
-			self.pb_go_baseplates[i].setEnabled(  mode_view and baseplates_exist[i]  )
+			# ENABLED IF:
+			# - creating
+			# - view, and part exists
+			# DISABLED IF:
+			# - editing (shouldn't want to change parts after step done)
+			# - searching
+			# - view, and part DNE
+			self.pb_go_sensors[i].setEnabled(     mode_creating or (mode_view and self.le_sensors[i].text()    != "") )
+			self.pb_go_baseplates[i].setEnabled(  mode_creating or (mode_view and self.le_baseplates[i].text() != "") )
 			self.pb_go_protomodules[i].setEnabled(mode_view and protomodules_exist[i])
+			self.pb_clears[i].setEnabled(         mode_creating or mode_editing)
 
 		self.page.pbNew.setEnabled(    mode_view and not step_sensor_exists )
 		self.page.pbEdit.setEnabled(   mode_view and     step_sensor_exists )
@@ -391,6 +405,17 @@ class func(object):
 		self.page.pbCancel.setEnabled( mode_creating or mode_editing        )
 
 		self.page.ckCheckFeet.setEnabled(not mode_view)
+
+
+		self.page.pbAddPart     .setEnabled(mode_searching)
+		self.page.pbCancelSearch.setEnabled(mode_searching)
+		# NEW:  Update pb's based on search result
+		for i in range(6):
+			self.pb_go_tools[i]       .setText("" if self.sb_tools[i].value()        < 0  else "go to")
+			self.pb_go_protomodules[i].setText("" if self.le_protomodules[i].text() == "" else "go to")
+			for btn, ledit in [[self.pb_go_sensors[i],    self.le_sensors[i]],
+			                   [self.pb_go_baseplates[i], self.le_baseplates[i]]]:
+				btn.setText("select" if ledit.text() == "" else "go to")
 
 
 	#NEW:  Add all load() functions
@@ -436,15 +461,21 @@ class func(object):
 
 	@enforce_mode(['editing','creating'])
 	def loadBaseplate(self, *args, **kwargs):
-		sender_name = str(self.page.sender().objectName())
-		which = int(sender_name[-1]) - 1
+		if 'row' in kwargs.keys():
+			which = kwargs['row']
+		else:
+			sender_name = str(self.page.sender().objectName())
+			which = int(sender_name[-1]) - 1
 		self.baseplates[which].load(self.le_baseplates[which].text(), query_db=False)
 		self.updateIssues()
 
 	@enforce_mode(['editing','creating'])
 	def loadSensor(self, *args, **kwargs):
-		sender_name = str(self.page.sender().objectName())
-		which = int(sender_name[-1]) - 1
+		if 'row' in kwargs.keys():
+			which = kwargs['row']
+		else:
+			sender_name = str(self.page.sender().objectName())
+			which = int(sender_name[-1]) - 1
 		self.sensors[which].load(self.le_sensors[which].text(), query_db=False)
 		self.updateIssues()
 
@@ -742,13 +773,62 @@ class func(object):
 	def xmlModifiedReset(self):
 		self.xmlModList = []
 
-	# NEW:
 	def clearRow(self,*args,**kwargs):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
 		self.sb_tools[which].clear()
 		self.le_sensors[which].clear()
 		self.le_baseplates[which].clear()
+		self.update_issues()
+
+	# NEW
+	def doSearch(self,*args,**kwargs):
+		SEARCH_DB = False
+		tmp_part = getattr(fm, self.search_part)()
+		# Perform part search:
+		if SEARCH_DB:
+			pass  # TO IMPLEMENT LATER
+
+		# Search local-only parts:  open part file
+		part_file_name = os.sep.join([ fm.DATADIR, 'partlist', self.search_part+'s.json' ])
+		with open(part_file_name, 'r') as opfl:
+			part_list = json.load(opfl)
+
+		for part_id, date in part_list.items():
+			# If already added by DB query, skip:
+			if len(self.page.lwPartList.findItems("{} {}".format(self.search_part, part_id), \
+			                                      QtCore.Qt.MatchExactly)) > 0:
+				continue
+			# Search for one thing:  NOT already assigned to a protomod
+			tmp_part.load(part_id, query_db=False)  # db query already done
+			if tmp_part.protomodule is None:
+				self.page.lwPartList.addItem("{} {}".format(self.search_part, part_id))
+
+		self.page.leSearchStatus.setText('{}: row {}'.format(self.search_part, self.search_row))
+		self.mode = 'searching'
+		self.updateElements()
+		print("SEARCH DONE: mode is", self.mode)
+
+	def finishSearch(self,*args,**kwargs):
+		row = self.page.lwPartList.currentRow()
+		name = self.page.lwPartList.item(row).text().split()[1]
+		le_to_fill = getattr(self, 'le_{}s'.format(self.search_part))[self.search_row]
+		le_to_fill.setText(name)
+
+		self.page.lwPartList.clear()
+		self.page.leSearchStatus.clear()
+		self.mode = 'creating'
+		getattr(self, 'load'+self.search_part.capitalize())(row=row)  # load part object
+		self.updateElements()
+		self.updateIssues()
+
+	def cancelSearch(self,*args,**kwargs):
+		self.page.lwPartList.clear()
+		self.page.leSearchStatus.clear()
+		self.mode = 'creating'
+		self.updateElements()
+		self.updateIssues()
+
 
 	def goTool(self,*args,**kwargs):
 		sender_name = str(self.page.sender().objectName())
@@ -757,16 +837,30 @@ class func(object):
 		self.setUIPage('Tooling',tool_sensor=tool)
 
 	def goSensor(self,*args,**kwargs):
+		# NEW:  If sensor DNE, change mode to search
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
 		sensor = self.le_sensors[which].text()
-		self.setUIPage('Sensors',ID=sensor)
+		if sensor != "":
+			self.setUIPage('Sensors',ID=sensor)
+		else:
+			self.mode = 'searching'
+			self.search_part = 'sensor'
+			self.search_row = which
+			self.doSearch()
 
 	def goBaseplate(self,*args,**kwargs):
+		# NEW:  If baseplate DNE, change mode to search
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
 		baseplate = self.le_baseplates[which].text()
-		self.setUIPage('Baseplates',ID=baseplate)
+		if baseplate != "":
+			self.setUIPage('Baseplates',ID=baseplate)
+		else:
+			self.mode = 'searching'
+			self.search_part = 'baseplate'
+			self.search_row = which
+			self.doSearch()
 
 	def goProtomodule(self,*args,**kwargs):
 		sender_name = str(self.page.sender().objectName())

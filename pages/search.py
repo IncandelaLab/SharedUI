@@ -64,7 +64,6 @@ class func(object):
 		self.page.pbClearResults.clicked.connect( self.clearResults )
 		self.page.pbGoToPart.clicked.connect( self.goToPart )
 
-		#self.page.lwPartList.setEnabled(True)
 		self.updateElements()
 
 	def search(self, *args, **kwargs):

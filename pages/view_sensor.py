@@ -295,6 +295,7 @@ class func(object):
 		self.sensor.flatness = self.page.dsbFlatness.value() if self.page.dsbFlatness.value() else None
 
 		self.sensor.save()
+		self.sensor.clear()
 		self.mode = 'view'
 		self.update_info()
 
