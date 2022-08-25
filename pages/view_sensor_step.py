@@ -834,7 +834,7 @@ class func(object):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1 # last character of sender name is integer 1 through 6; subtract one for zero index
 		tool = self.sb_tools[which].value()
-		self.setUIPage('Tooling',tool_sensor=tool)
+		self.setUIPage('Tooling',tool_sensor=tool,institution=self.page.cbInstitution.currentText())
 
 	def goSensor(self,*args,**kwargs):
 		# NEW:  If sensor DNE, change mode to search

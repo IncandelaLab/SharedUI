@@ -1097,14 +1097,14 @@ class baseplate(fsobj_part):
 		"KIND_OF_PART":"kind_of_part",
 		"RECORD_INSERTION_USER":"insertion_user",
 		"SERIAL_NUMBER":"ID",
-		"COMMENT_DESCRIPTION":"description",
+		"COMMENT_DESCRIPTION":"comments_concat",
 		"LOCATION":"institution",
 		# NEW:
 		"THICKNESS":"thickness",
 		"FLATNESS":"flatness",
 		"MATERIAL":"material",
 		"GRADE":"grade",
-		"COMMENTS":"comments_concat",
+		#"COMMENTS":"comments_concat",
 	}}}
 
 	# List of vars that should NOT be edited in the GUI and are only loaded from DB
@@ -1192,13 +1192,13 @@ class sensor(fsobj_part):
 		"KIND_OF_PART":"kind_of_part",
 		"RECORD_INSERTION_USER":"insertion_user",
 		"SERIAL_NUMBER":"ID",
-		"COMMENT_DESCRIPTION":"description",
+		"COMMENT_DESCRIPTION":"comments_concat",
 		"LOCATION":"institution",
 		# NEW:
 		"THICKNESS":"thickness",
 		"VISUAL_INSPECTION":"inspection",
 		"GRADE":"grade",
-		"COMMENTS":"comments_concat",
+		#"COMMENTS":"comments_concat",
 		#"PREDEFINED_ATTRIBUTES":{  # Ignore this for now...
 		#	"ATTRIBUTE":{
 		#		"NAME":"HGC Silicon Sensor Type",
@@ -1330,13 +1330,13 @@ class pcb(fsobj_part):
 		"KIND_OF_PART":"kind_of_part",
 		"RECORD_INSERTION_USER":"insertion_user",
 		"SERIAL_NUMBER":"ID",
-		"COMMENT_DESCRIPTION":"comment_description",
+		"COMMENT_DESCRIPTION":"comments_concat",
 		"LOCATION":"institution",
 		"MANUFACTURER":"manufacturer",
 		"FLATNESS":"flatness",
 		"THICKNESS":"thickness",
 		"GRADE":"grade",
-		"COMMENTS":"comments_concat",
+		#"COMMENTS":"comments_concat",
 	}}}
 
 	DAQ_DATADIR = 'daq'
@@ -1352,7 +1352,7 @@ class pcb(fsobj_part):
 	
 	@property
 	def kind_of_part(self): # Determined entirely by size
-		return "PCB {} {}".format(self.resolution, self.shape)
+		return "PCB/Kapton {} {}".format(self.resolution, self.shape)
 	@kind_of_part.setter
 	def kind_of_part(self, value):
 		if value is None:
@@ -1427,7 +1427,7 @@ class protomodule(fsobj_part):
 	XML_UPLOAD_DICT = {"PARTS":{"PART":{
 		"KIND_OF_PART":"kind_of_part",
 		"SERIAL_NUMBER":"ID",
-		#"COMMENT_DESCRIPTION":"comment_description",
+		"COMMENT_DESCRIPTION":"comments_concat",
 		"LOCATION":"location",
 		"RECORD_INSERTION_USER":"insertion_user",
 		"THICKNESS":"thickness",
@@ -1439,7 +1439,7 @@ class protomodule(fsobj_part):
 				"VALUE":"assem_tray_posn",
 			}
 		},
-		"COMMENTS":"comments_concat",
+		#"COMMENTS":"comments_concat",
 		"CHILDREN":{
 			"PART":[{
 				"KIND_OF_PART":"baseplate_type",
@@ -1679,7 +1679,7 @@ class module(fsobj_part):
 	XML_UPLOAD_DICT = {"PARTS":{"PART":{
 		"KIND_OF_PART":"kind_of_part",
 		"SERIAL_NUMBER":"ID",
-		"COMMENT_DESCRIPTION":"description",
+		"COMMENT_DESCRIPTION":"comments_concat",
 		"LOCATION":"location",
 		"RECORD_INSERTION_USER":"insertion_user",
 		"THICKNES":"thickness",

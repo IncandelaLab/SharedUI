@@ -279,6 +279,8 @@ class func(object):
 
 	@enforce_mode(['view','editing_pcb_tool','editing_sensor_tray','editing_pcb_tray','editing_assembly_tray'])
 	def update_info_sensor_tool_ID(self,ID=None,*args,**kwargs):
+		print("update_info_sensor_tool_ID:  IS is", ID)
+		#print("")
 		if ID is None:
 			institution = None
 		else:
@@ -575,16 +577,18 @@ class func(object):
 	@enforce_mode('view')
 	def load_kwargs(self,kwargs):
 		keys = kwargs.keys()
+		if not "institution" in keys:  return
 		if "tool_sensor" in keys:
-			self.update_info_sensor_tool_ID(kwargs['tool_sensor'])
+			self.tool_sensor          .update_info(kwargs['tool_sensor'],           kwargs['institution'])
 		if "tool_pcb" in keys:
-			self.update_info_pcb_tool_ID(kwargs['tool_pcb'])
+			self.tool_pcb             .update_info(kwargs['tool_pcb'],              kwargs['institution'])
 		if "tray_component_sensor" in keys:
-			self.update_info_sensor_tray_ID(kwargs['tray_component_sensor'])
+			self.tray_component_sensor.update_info(kwargs['tray_component_sensor'], kwargs['institution'])
 		if "tray_component_pcb" in keys:
-			self.update_info_pcb_tray_ID(kwargs['tray_component_pcb'])
+			self.tray_component_pcb   .update_info(kwargs['tray_component_pcb'],    kwargs['institution'])
 		if "tray_assembly" in keys:
-			self.update_info_assembly_tray_ID(kwargs['tray_assembly'])
+			self.tray_assembly        .update_info(kwargs['tray_assembly'],         kwargs['institution'])
+
 
 	@enforce_mode('view')
 	def changed_to(self):
