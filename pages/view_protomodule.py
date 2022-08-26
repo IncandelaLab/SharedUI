@@ -266,7 +266,7 @@ class func(object):
 		self.protomodule.shape          = str(self.page.cbShape.currentText()      ) if str(self.page.cbShape.currentText()    ) else None
 		self.protomodule.grade          = str(self.page.cbGrade.currentText()      ) if str(self.page.cbGrade.currentText()    ) else None
 		self.protomodule.institution    = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
-		self.protomodule.insertion_user = str(self.page.cbInsertUser.currentText())  if str(self.page.cbInsertUser.currentText())  else None
+		self.protomodule.insertion_user = str(self.page.cbInsertUser.currentText() ) if str(self.page.cbInsertUser.currentText())  else None
 		self.protomodule.thickness      =     self.page.dsbThickness.value()         if self.page.dsbThickness.value() >=0 else None
 		self.protomodule.channels       =     self.page.sbChannels.value()           if self.page.sbChannels.value()   >=0 else None
 

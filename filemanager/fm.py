@@ -61,28 +61,14 @@ if not CWD.endswith('filemanager'):
 	CWD = os.sep.join([CWD,'filemanager'])
 
 def loadconfig(file=None):
-	if file is None:
-		file = os.sep.join([CWD, CFG_FILE])
-	
-	with open(file, 'r') as opfl:
-		data = json.load(opfl)
 
 	global DATADIR
 	global MAC
 
 	# NOTE:  Currently hardcoding the filemanager_data location, and ignoring the config information!
 	DATADIR  = os.sep.join([os.getcwd(), 'filemanager_data'])  # data['datadir']
-	MAC      = data['MAC']
-	ID_RANGE = MAC_ID_RANGES.get(MAC,[90000,99999])
-
-	if not MAC in MAC_ID_RANGES.keys():
-		print("Warning: MAC ({}) not in list of MAC names ({})".format(
-			MAC,
-			', '.join(MAC_ID_RANGES.keys())
-			))
 
 	# NEW for searching:  Need to store list of all searchable object IDs.  Easiest approach is to dump a list via json.
-	print("CALLING LOADCONFIG")
 	partlistdir = os.sep.join([DATADIR, 'partlist'])
 	if not os.path.exists(partlistdir):
 		os.makedirs(partlistdir)
@@ -138,8 +124,7 @@ class UserManager:
 			json.dump(self.userList, opfl)
 
 	def addUser(self, username, permList, isAdmin=False):
-		if len(permList) != len(self.pageList):
-			print("ERROR:  permissions list length does not equal page list length!")
+		assert len(permList) == len(self.pageList), "ERROR:  permissions list length does not equal page list length!"
 		if isAdmin:
 			permList = [True for p in self.pageList]
 		userdict = {'username':username,
@@ -151,10 +136,9 @@ class UserManager:
 
 	def updateUser(self, username, permList, isAdmin=False):
 		if not username in self.getAllUsers():
-			print("ERROR:  Attempted to update nonexistent user {}!".format(username))
+			print("WARNING:  Attempted to update nonexistent user {}!".format(username))
 			return
-		if len(permList) != len(self.pageList):
-			print("ERROR:  permissions list length does not equal page list length!")
+		assert len(permList) == len(self.pageList), "ERROR:  permissions list length does not equal page list length!"
 		if isAdmin:
 			permList = [True for p in self.pageList]
 		new_userdict = {'username':username,
@@ -167,7 +151,7 @@ class UserManager:
 
 	def removeUser(self, username):
 		if not username in self.getAllUsers():
-			print("ERROR:  Attempted to delete nonexistent user")
+			print("WARNING:  Attempted to delete nonexistent user {}!".format(username))
 			return False
 		else:
 			userindex = list(self.getAllUsers()).index(username)
@@ -187,14 +171,14 @@ class UserManager:
 
 	def isAdmin(self, username):
 		if not username in self.getAllUsers():
-			print("Warning: called isAdmin on {} (not a user)".format(username))
+			print("WARINING:  Attempted to call isAdmin on nonexistent user {}!".format(username))
 			return False
 		userindex = list(self.getAllUsers()).index(username)
 		return self.userList[userindex]['isAdmin']
 
 	def getUserPerms(self, username):
 		if not username in self.getAllUsers():
-			print("Warning: called getUserPerms on {} (not a user)".format(username))
+			print("WARNING: called getUserPerms on {} (not a user)".format(username))
 			return None
 		userindex = list(self.getAllUsers()).index(username)
 		return self.userList[userindex]['permissions']
@@ -338,11 +322,8 @@ class fsobj(object):
 			# if ordinary item, convert from str and assign
 			else:
 				itemdata = xml_tree.find('.//'+item_name)  # NOTE:  itemdata is an Element, not text!
-				if itemdata is None: #itemdata.text is None:
-					print("ERROR:  Found None search result in _load_from_dict(): {}".format(item_name))
-					idt = None
-				else:
-					idt = self._convert_str(itemdata.text)
+				assert not itemdata is None, "ERROR:  Found None search result for {} in _load_from_dict(), {} {}".format(item_name, self.__class__.__name__, self.ID)
+				idt = self._convert_str(itemdata.text)
 				setattr(self, item, idt)
 
 
@@ -421,9 +402,9 @@ class fsobj(object):
 			num_parts = sum([1 for p in protomodules if p])  # List with Nones if no protomodule
 		elif modules:
 			num_parts = sum([1 for p in modules if p])
-		else:  print("ERROR: failed to find protomodules, modules in generate_xml()!")
+		else:  print("WARNING:  Failed to find [proto]modules in make_dataset_element()!")
 		dataset_dict = getattr(self, item, None)
-		if not dataset_dict:  print("ERROR: failed to find dataset dict!")
+		if not dataset_dict:  print("ERROR: failed to find {}.{} in make_dataset_element()!".format(self.__class__.__name__, item))
 		for i in range(num_parts):
 			# Create a DATA_SET for each part
 			child = self.dict_to_element(dataset_dict, "DATA_SET", data_set_index=i)
@@ -447,7 +428,6 @@ class fsobj(object):
 			# CHANGE FOR NEW XML SYSTEM:
 			# item is a list (comments), dict (another XML layer), or string (var)
 			# If string, use getattr()
-			#print("    dict_to_element:  name, dict are:", item_name, item)
 
 			if item_name == "DATA_SET":
 				self.make_dataset_element(parent, item)
@@ -535,9 +515,9 @@ class fsobj(object):
 	@property
 	def comments_concat(self):
 		cmts = ';;'.join(self.comments)
-		# Impose len reqt of 4000 chars (for DB)
+		# Impose len reqt of 4000 chars (for DB; actual limit unknown/TBD)
 		if len(cmts) > 4000:
-			print("WARNING:  comment length exceeds 4000 chars - excess chars removed")
+			print("WARNING:  Total combined comments length exceeds 4000 chars - excess chars truncated")
 			cmts = cmts[:4000]
 		return cmts
 
@@ -579,12 +559,8 @@ class fsobj_tool(fsobj):
 			data = json.load(opfl)
 			if not self.ID in data.keys():
 				dcreated = time.localtime()
-				if self.ID == None:
-					print("ERROR:  self.ID in add_part_to_list (tool) is None!")
-					assert(False)
-				if self.institution == None:
-					print("ERROR:  self.institution in add_part_to_list (tool) is None!")
-					assert(False)
+				assert self.ID!=None, "ERROR:  self.ID in add_part_to_list (tool) is None!"
+				assert self.institution!=None, "ERROR:  self.institution in add_part_to_list (tool) is None!"
 				# Key difference here:  Key is (ID, institution)
 				data["{}_{}".format(self.ID, self.institution)] = '{}-{}-{}'.format(dcreated.tm_mon, dcreated.tm_mday, dcreated.tm_year)
 		with open(self.partlistfile, 'w') as opfl:
@@ -722,10 +698,7 @@ class fsobj_part(fsobj):
 		filedir, filename = self.get_filedir_filename(ID)
 		xml_file = os.sep.join([filedir, filename])
 
-		if not os.path.exists(xml_file):
-			print("ERROR: load() (part):  Step is present in partlistfile OR downloaded, but XML file {} does not exist!".format(xml_file))
-			self.clear()
-			return False
+		assert os.path.exists(xml_file), "ERROR: load() (fsobj_part):  Step is present in partlistfile OR downloaded, but XML file {} does not exist!".format(xml_file)
 
 		xml_tree = parse(xml_file)
 		self._load_from_dict(self.XML_STRUCT_DICT, xml_tree)
@@ -754,7 +727,7 @@ class fsobj_part(fsobj):
 			api = rh.RhApi(url='https://cmsdca.cern.ch/hgc_rhapi', debug=True, sso='login')
 			data = api.xml(sql_request, verbose=True)
 		except rh.RhApiRowLimitError as e:
-			print("ERROR:  Could not download files from DB:")
+			print("RhApi ERROR:  Could not download files from DB:")
 			print(e)
 			print("SQL query was:")
 			print(sql_request)
@@ -764,7 +737,7 @@ class fsobj_part(fsobj):
 		# Output is an empty XML file, header len 61
 		# NOTE:  Should be a SINGLE XML result!
 		if len(xml_string) < 62:
-			print("No files match the search criteria")
+			print("WARNING:  RhApi search:  No files match the search criteria")
 			return False
 		# Store requested file
 		xml_tree = fromstring(xml_string)
@@ -800,7 +773,7 @@ class fsobj_part(fsobj):
 		if value is None:
 			self.institution = None
 		elif not value in INSTITUTION_DICT.keys():
-			print("Warning:  institution_id:  Found invalid location ID {}".format(value))
+			print("WARNING:  institution_id:  Found invalid location ID {}".format(value))
 		else:
 			self.institution = INSTITUTION_DICT[value]
 
@@ -868,9 +841,10 @@ class fsobj_assembly(fsobj):
 			data = json.load(opfl)
 			if not str(ID) in data.keys():
 				#print("ASSEMBLY STEP NOT FOUND.  REQUESTED CONDITION TABLES:")
-				print("**TEMPORARY:  Part downloading disabled for testing!**")
-				return False
-				"""
+				if not ENABLE_DB_COMMUNICATION: return False
+				#print("**TEMPORARY:  Part downloading disabled for testing!**")
+				#return False
+				
 				self.ID = ID
 				search_conditions = {'ID':self.ID}  # Only condition needed
 				# For each XML file/table needed, make a request:
@@ -894,7 +868,7 @@ class fsobj_assembly(fsobj):
 				self.add_part_to_list()
 				dcreated = time.localtime()
 				dt = '{}-{}-{}'.format(dcreated.tm_mon, dcreated.tm_mday, dcreated.tm_year)
-				"""
+				
 			else:
 				# Note:  Names saved in partlistfile as str, not as int
 				dt = data[str(ID)]  # date created
@@ -904,10 +878,7 @@ class fsobj_assembly(fsobj):
 		condname = filename.replace('.xml', '_cond.xml')
 		xml_file      = os.sep.join([filedir, filename])
 
-		if not os.path.exists(xml_file):
-			print("ERROR:  Step is present in partlistfile OR downloaded, but XML file {} does not exist!".format(xml_file))
-			self.clear()
-			return False
+		assert os.path.exists(xml_file), "ERROR:  Step is present in partlistfile OR downloaded, but XML file {} does not exist!".format(xml_file)
 
 		xml_tree = parse(xml_file)
 		self._load_from_dict(self.XML_STRUCT_DICT, xml_tree)
@@ -918,13 +889,16 @@ class fsobj_assembly(fsobj):
 
 
 
-	"""
+	
 	# NEW: Must save to correct location!
 	def request_XML(self, table_name, search_conditions, suffix=None):
 		# NOTE NOTE NOTE:  Must save file in correct location AND add_part_to_list!
 		# suffix is added to the end of the filename (will be _cond)
+		if not ENABLE_DB_COMMUNICATION:
+			return False
+
 		if self.ID == None or self.ID == -1:
-			print("self.ID is None or \"\"; ignoring")
+			print("WARNING:  Called request_XML() on uninitialized object; ignoring")
 			return False
 
 		#filedir, filename = self.get_filedir_filename(self.ID)
@@ -936,14 +910,12 @@ class fsobj_assembly(fsobj):
 		# search_conditions is a dict:  {param_name:param_value}
 		for param, value in search_conditions.items():
 			sql_request = sql_request + ' p.{}={}'.format(param, value)
-		print("TEMP:  Using sql command")
-		print(sql_request)
 
 		try:
 			api = rh.RhApi(url='https://cmsdca.cern.ch/hgc_rhapi', debug=True, sso='login')
 			data = api.xml(sql_request, verbose=True)
 		except rh.RhApiRowLimitError as e:
-			print("Error:  Could not download files from DB:")
+			print("ERROR in request_xml():  Could not download files from DB:")
 			print(e)
 			return False
 
@@ -951,9 +923,7 @@ class fsobj_assembly(fsobj):
 		# Output is an empty XML file, header len 61
 		# NOTE:  Should be a SINGLE XML result!
 		if len(xml_str) < 62:
-			print("No files match the search criteria")
-			print("TEMP:  XML string is")
-			print(xml_str)
+			print("WARNING in request_xml():  No files match the search criteria")
 			return False
 		# Store requested file
 		xml_tree = fromstring(xml_str)
@@ -963,19 +933,17 @@ class fsobj_assembly(fsobj):
 		# XML date format = 26-MAR-18
 		# https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior
 		dt = datetime.strptime(date, '%d-%b-%y')
-		print("TEST:  found date", dt.strftime('%m-%d-%Y'))
 		filedir, filename = self.get_filedir_filename(ID, date)
 
 		if suffix:  filename = filename.replace('.xml', suffix+'.xml')
 
-		print("WRITING TO FILE:", os.path.join([filedir, filename]))
 		with open(os.path.join([filedir, filename]), 'w') as f:
 			f.write(xml_str)
 
 		self.add_part_to_list(datetime.strftime('%m-%d-%Y'))
 
 		return True
-	"""
+
 
 
 ###############################################
@@ -1478,8 +1446,6 @@ class protomodule(fsobj_part):
 	@kind_of_part.setter
 	def kind_of_part(self, value):
 		pass
-		#print("TODO:  protomod kind_of_part.setter:  implement when DB enabled")
-
 
 	@property
 	def assem_tray_pos(self):
@@ -1488,7 +1454,6 @@ class protomodule(fsobj_part):
 	@property
 	def comp_tray_pos(self):
 		return "CMPOSN_{}{}".format(self.tray_row, tray_col)
-
 
 	@property
 	def tray_posn(self):
@@ -1772,10 +1737,9 @@ class module(fsobj_part):
 		temp_pcb_step = step_pcb()
 		found = temp_pcb_step.load(self.step_pcb)
 		if not found:
-			print("ERROR in tray_posn:  module has sensor step {}, but none found!".format(self.step_pcb))
+			print("ERROR in tray_posn:  module {} has PCB step {}, but none found!".format(self.ID, self.step_pcb))
 			return "None"
 		else:
-			#print("Temp sensor step found.  Sensors:", temp_sensor_step.sensors)
 			position = temp_sensor_step.sensors.index(self.ID)
 			return position
 
@@ -1799,7 +1763,7 @@ class module(fsobj_part):
 			return None
 		temp_protomodule = protomodule()
 		if not temp_protomodule.load(self.protomodule):
-			print("ERROR:  Could not find child protomodule {}!".format(self.protomodule))
+			print("ERROR in protomodule_type:  Could not find child protomodule {}!".format(self.protomodule))
 			return None
 		return temp_protomodule.kind_of_part
 
@@ -1810,7 +1774,7 @@ class module(fsobj_part):
 			return None
 		temp_pcb = pcb()
 		if not temp_pcb.load(self.pcb):
-			print("ERROR:  Could not find child PCB {}!".format(self.pcb))
+			print("ERROR in pcb_type:  Could not find child PCB {}!".format(self.pcb))
 			return None
 		return temp_pcb.kind_of_part
 
@@ -1821,7 +1785,7 @@ class module(fsobj_part):
 			return None
 		temp_sensor = sensor()
 		if not temp_sensor.load(self.sensor):
-			print("ERROR:  Could not find child sensor {}!".format(self.sensor))
+			print("ERROR in module resolution:  Could not find child sensor {}!".format(self.sensor))
 			return None
 		return temp_sensor.resolution
 
