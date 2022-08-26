@@ -13,212 +13,6 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QPushButton" name="pbGoModule1">
-   <property name="geometry">
-    <rect>
-     <x>230</x>
-     <y>160</y>
-     <width>51</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>go to</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbGoModule2">
-   <property name="geometry">
-    <rect>
-     <x>230</x>
-     <y>180</y>
-     <width>51</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>go to</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbGoModule3">
-   <property name="geometry">
-    <rect>
-     <x>230</x>
-     <y>200</y>
-     <width>51</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>go to</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbGoModule4">
-   <property name="geometry">
-    <rect>
-     <x>230</x>
-     <y>260</y>
-     <width>51</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>go to</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbGoModule5">
-   <property name="geometry">
-    <rect>
-     <x>230</x>
-     <y>220</y>
-     <width>51</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>go to</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbGoModule6">
-   <property name="geometry">
-    <rect>
-     <x>230</x>
-     <y>240</y>
-     <width>51</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>go to</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_12">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>140</y>
-     <width>71</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>position</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_14">
-   <property name="geometry">
-    <rect>
-     <x>90</x>
-     <y>140</y>
-     <width>191</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Module serial</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_15">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>160</y>
-     <width>71</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>1 (1, 1)</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_16">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>180</y>
-     <width>71</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>2 (1, 2)</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_17">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>200</y>
-     <width>71</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>3 (2, 1)</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_18">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>220</y>
-     <width>71</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>4 (2, 2)</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_19">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>240</y>
-     <width>71</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>5 (3, 1)</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_20">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>260</y>
-     <width>71</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>6 (3, 2)</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
   <widget class="QLineEdit" name="lineEdit_26">
    <property name="geometry">
     <rect>
@@ -264,66 +58,6 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QLineEdit" name="leModule5">
-   <property name="geometry">
-    <rect>
-     <x>90</x>
-     <y>240</y>
-     <width>141</width>
-     <height>20</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="leModule1">
-   <property name="geometry">
-    <rect>
-     <x>90</x>
-     <y>160</y>
-     <width>141</width>
-     <height>20</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="leModule2">
-   <property name="geometry">
-    <rect>
-     <x>90</x>
-     <y>180</y>
-     <width>141</width>
-     <height>20</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="leModule4">
-   <property name="geometry">
-    <rect>
-     <x>90</x>
-     <y>220</y>
-     <width>141</width>
-     <height>20</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="leModule3">
-   <property name="geometry">
-    <rect>
-     <x>90</x>
-     <y>200</y>
-     <width>141</width>
-     <height>20</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="leModule6">
-   <property name="geometry">
-    <rect>
-     <x>90</x>
-     <y>260</y>
-     <width>141</width>
-     <height>20</height>
-    </rect>
-   </property>
-  </widget>
   <widget class="QLabel" name="label_3">
    <property name="geometry">
     <rect>
@@ -335,170 +69,6 @@
    </property>
    <property name="text">
     <string>Curing</string>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="dsbOffX4">
-   <property name="geometry">
-    <rect>
-     <x>290</x>
-     <y>220</y>
-     <width>71</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>false</bool>
-   </property>
-   <property name="minimum">
-    <double>-1000.000000000000000</double>
-   </property>
-   <property name="maximum">
-    <double>1000.000000000000000</double>
-   </property>
-   <property name="singleStep">
-    <double>0.010000000000000</double>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="dsbOffX6">
-   <property name="geometry">
-    <rect>
-     <x>290</x>
-     <y>260</y>
-     <width>71</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>false</bool>
-   </property>
-   <property name="minimum">
-    <double>-1000.000000000000000</double>
-   </property>
-   <property name="maximum">
-    <double>1000.000000000000000</double>
-   </property>
-   <property name="singleStep">
-    <double>0.010000000000000</double>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="dsbOffX2">
-   <property name="geometry">
-    <rect>
-     <x>290</x>
-     <y>180</y>
-     <width>71</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>false</bool>
-   </property>
-   <property name="minimum">
-    <double>-1000.000000000000000</double>
-   </property>
-   <property name="maximum">
-    <double>1000.000000000000000</double>
-   </property>
-   <property name="singleStep">
-    <double>0.010000000000000</double>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="dsbOffRot5">
-   <property name="geometry">
-    <rect>
-     <x>430</x>
-     <y>240</y>
-     <width>71</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>false</bool>
-   </property>
-   <property name="minimum">
-    <double>-180.000000000000000</double>
-   </property>
-   <property name="maximum">
-    <double>180.000000000000000</double>
-   </property>
-   <property name="singleStep">
-    <double>0.100000000000000</double>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_22">
-   <property name="geometry">
-    <rect>
-     <x>430</x>
-     <y>140</y>
-     <width>71</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>θ (°)</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="dsbOffY2">
-   <property name="geometry">
-    <rect>
-     <x>360</x>
-     <y>180</y>
-     <width>71</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>false</bool>
-   </property>
-   <property name="minimum">
-    <double>-1000.000000000000000</double>
-   </property>
-   <property name="maximum">
-    <double>1000.000000000000000</double>
-   </property>
-   <property name="singleStep">
-    <double>0.010000000000000</double>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_24">
-   <property name="geometry">
-    <rect>
-     <x>360</x>
-     <y>140</y>
-     <width>71</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>y (μm)</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="dsbOffRot2">
-   <property name="geometry">
-    <rect>
-     <x>430</x>
-     <y>180</y>
-     <width>71</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>false</bool>
-   </property>
-   <property name="minimum">
-    <double>-180.000000000000000</double>
-   </property>
-   <property name="maximum">
-    <double>180.000000000000000</double>
-   </property>
-   <property name="singleStep">
-    <double>0.100000000000000</double>
    </property>
   </widget>
   <widget class="QLabel" name="label_4">
@@ -514,582 +84,6 @@
     <string>Placement offsets</string>
    </property>
   </widget>
-  <widget class="QDoubleSpinBox" name="dsbOffRot3">
-   <property name="geometry">
-    <rect>
-     <x>430</x>
-     <y>200</y>
-     <width>71</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>false</bool>
-   </property>
-   <property name="minimum">
-    <double>-180.000000000000000</double>
-   </property>
-   <property name="maximum">
-    <double>180.000000000000000</double>
-   </property>
-   <property name="singleStep">
-    <double>0.100000000000000</double>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_21">
-   <property name="geometry">
-    <rect>
-     <x>290</x>
-     <y>140</y>
-     <width>71</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>x (μm)</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="dsbOffY4">
-   <property name="geometry">
-    <rect>
-     <x>360</x>
-     <y>220</y>
-     <width>71</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>false</bool>
-   </property>
-   <property name="minimum">
-    <double>-1000.000000000000000</double>
-   </property>
-   <property name="maximum">
-    <double>1000.000000000000000</double>
-   </property>
-   <property name="singleStep">
-    <double>0.010000000000000</double>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="dsbOffX3">
-   <property name="geometry">
-    <rect>
-     <x>290</x>
-     <y>200</y>
-     <width>71</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>false</bool>
-   </property>
-   <property name="minimum">
-    <double>-1000.000000000000000</double>
-   </property>
-   <property name="maximum">
-    <double>1000.000000000000000</double>
-   </property>
-   <property name="singleStep">
-    <double>0.010000000000000</double>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="dsbOffX1">
-   <property name="geometry">
-    <rect>
-     <x>290</x>
-     <y>160</y>
-     <width>71</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>false</bool>
-   </property>
-   <property name="minimum">
-    <double>-1000.000000000000000</double>
-   </property>
-   <property name="maximum">
-    <double>1000.000000000000000</double>
-   </property>
-   <property name="singleStep">
-    <double>0.010000000000000</double>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="dsbOffRot6">
-   <property name="geometry">
-    <rect>
-     <x>430</x>
-     <y>260</y>
-     <width>71</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>false</bool>
-   </property>
-   <property name="minimum">
-    <double>-180.000000000000000</double>
-   </property>
-   <property name="maximum">
-    <double>180.000000000000000</double>
-   </property>
-   <property name="singleStep">
-    <double>0.100000000000000</double>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="dsbOffRot1">
-   <property name="geometry">
-    <rect>
-     <x>430</x>
-     <y>160</y>
-     <width>71</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>false</bool>
-   </property>
-   <property name="minimum">
-    <double>-180.000000000000000</double>
-   </property>
-   <property name="maximum">
-    <double>180.000000000000000</double>
-   </property>
-   <property name="singleStep">
-    <double>0.100000000000000</double>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="dsbOffX5">
-   <property name="geometry">
-    <rect>
-     <x>290</x>
-     <y>240</y>
-     <width>71</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>false</bool>
-   </property>
-   <property name="minimum">
-    <double>-1000.000000000000000</double>
-   </property>
-   <property name="maximum">
-    <double>1000.000000000000000</double>
-   </property>
-   <property name="singleStep">
-    <double>0.010000000000000</double>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="dsbOffY6">
-   <property name="geometry">
-    <rect>
-     <x>360</x>
-     <y>260</y>
-     <width>71</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>false</bool>
-   </property>
-   <property name="minimum">
-    <double>-1000.000000000000000</double>
-   </property>
-   <property name="maximum">
-    <double>1000.000000000000000</double>
-   </property>
-   <property name="singleStep">
-    <double>0.010000000000000</double>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="dsbOffY5">
-   <property name="geometry">
-    <rect>
-     <x>360</x>
-     <y>240</y>
-     <width>71</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>false</bool>
-   </property>
-   <property name="minimum">
-    <double>-1000.000000000000000</double>
-   </property>
-   <property name="maximum">
-    <double>1000.000000000000000</double>
-   </property>
-   <property name="singleStep">
-    <double>0.010000000000000</double>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="dsbOffY3">
-   <property name="geometry">
-    <rect>
-     <x>360</x>
-     <y>200</y>
-     <width>71</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>false</bool>
-   </property>
-   <property name="minimum">
-    <double>-1000.000000000000000</double>
-   </property>
-   <property name="maximum">
-    <double>1000.000000000000000</double>
-   </property>
-   <property name="singleStep">
-    <double>0.010000000000000</double>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="dsbOffY1">
-   <property name="geometry">
-    <rect>
-     <x>360</x>
-     <y>160</y>
-     <width>71</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>false</bool>
-   </property>
-   <property name="minimum">
-    <double>-1000.000000000000000</double>
-   </property>
-   <property name="maximum">
-    <double>1000.000000000000000</double>
-   </property>
-   <property name="singleStep">
-    <double>0.010000000000000</double>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="dsbOffRot4">
-   <property name="geometry">
-    <rect>
-     <x>430</x>
-     <y>220</y>
-     <width>71</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>false</bool>
-   </property>
-   <property name="minimum">
-    <double>-180.000000000000000</double>
-   </property>
-   <property name="maximum">
-    <double>180.000000000000000</double>
-   </property>
-   <property name="singleStep">
-    <double>0.100000000000000</double>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_23">
-   <property name="geometry">
-    <rect>
-     <x>510</x>
-     <y>140</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Flat (mm)</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="dsbFlatness2">
-   <property name="geometry">
-    <rect>
-     <x>510</x>
-     <y>180</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>false</bool>
-   </property>
-   <property name="minimum">
-    <double>-10.000000000000000</double>
-   </property>
-   <property name="maximum">
-    <double>10.000000000000000</double>
-   </property>
-   <property name="singleStep">
-    <double>0.100000000000000</double>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="dsbFlatness6">
-   <property name="geometry">
-    <rect>
-     <x>510</x>
-     <y>260</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>false</bool>
-   </property>
-   <property name="minimum">
-    <double>-10.000000000000000</double>
-   </property>
-   <property name="maximum">
-    <double>10.000000000000000</double>
-   </property>
-   <property name="singleStep">
-    <double>0.100000000000000</double>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="dsbThickness3">
-   <property name="geometry">
-    <rect>
-     <x>590</x>
-     <y>200</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>false</bool>
-   </property>
-   <property name="minimum">
-    <double>-1.000000000000000</double>
-   </property>
-   <property name="maximum">
-    <double>100.000000000000000</double>
-   </property>
-   <property name="singleStep">
-    <double>0.100000000000000</double>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="dsbThickness2">
-   <property name="geometry">
-    <rect>
-     <x>590</x>
-     <y>180</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>false</bool>
-   </property>
-   <property name="minimum">
-    <double>-1.000000000000000</double>
-   </property>
-   <property name="maximum">
-    <double>100.000000000000000</double>
-   </property>
-   <property name="singleStep">
-    <double>0.100000000000000</double>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_30">
-   <property name="geometry">
-    <rect>
-     <x>590</x>
-     <y>140</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Thick (mm)</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="dsbFlatness5">
-   <property name="geometry">
-    <rect>
-     <x>510</x>
-     <y>240</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>false</bool>
-   </property>
-   <property name="minimum">
-    <double>-10.000000000000000</double>
-   </property>
-   <property name="maximum">
-    <double>10.000000000000000</double>
-   </property>
-   <property name="singleStep">
-    <double>0.100000000000000</double>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="dsbThickness6">
-   <property name="geometry">
-    <rect>
-     <x>590</x>
-     <y>260</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>false</bool>
-   </property>
-   <property name="minimum">
-    <double>-1.000000000000000</double>
-   </property>
-   <property name="maximum">
-    <double>100.000000000000000</double>
-   </property>
-   <property name="singleStep">
-    <double>0.100000000000000</double>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="dsbThickness5">
-   <property name="geometry">
-    <rect>
-     <x>590</x>
-     <y>240</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>false</bool>
-   </property>
-   <property name="minimum">
-    <double>-1.000000000000000</double>
-   </property>
-   <property name="maximum">
-    <double>100.000000000000000</double>
-   </property>
-   <property name="singleStep">
-    <double>0.100000000000000</double>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="dsbFlatness3">
-   <property name="geometry">
-    <rect>
-     <x>510</x>
-     <y>200</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>false</bool>
-   </property>
-   <property name="minimum">
-    <double>-10.000000000000000</double>
-   </property>
-   <property name="maximum">
-    <double>10.000000000000000</double>
-   </property>
-   <property name="singleStep">
-    <double>0.100000000000000</double>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="dsbFlatness1">
-   <property name="geometry">
-    <rect>
-     <x>510</x>
-     <y>160</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>false</bool>
-   </property>
-   <property name="minimum">
-    <double>-10.000000000000000</double>
-   </property>
-   <property name="maximum">
-    <double>10.000000000000000</double>
-   </property>
-   <property name="singleStep">
-    <double>0.100000000000000</double>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="dsbFlatness4">
-   <property name="geometry">
-    <rect>
-     <x>510</x>
-     <y>220</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>false</bool>
-   </property>
-   <property name="minimum">
-    <double>-10.000000000000000</double>
-   </property>
-   <property name="maximum">
-    <double>10.000000000000000</double>
-   </property>
-   <property name="singleStep">
-    <double>0.100000000000000</double>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="dsbThickness1">
-   <property name="geometry">
-    <rect>
-     <x>590</x>
-     <y>160</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>false</bool>
-   </property>
-   <property name="minimum">
-    <double>-1.000000000000000</double>
-   </property>
-   <property name="maximum">
-    <double>100.000000000000000</double>
-   </property>
-   <property name="singleStep">
-    <double>0.100000000000000</double>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="dsbThickness4">
-   <property name="geometry">
-    <rect>
-     <x>590</x>
-     <y>220</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>false</bool>
-   </property>
-   <property name="minimum">
-    <double>-1.000000000000000</double>
-   </property>
-   <property name="maximum">
-    <double>100.000000000000000</double>
-   </property>
-   <property name="singleStep">
-    <double>0.100000000000000</double>
-   </property>
-  </widget>
   <widget class="QLabel" name="label_5">
    <property name="geometry">
     <rect>
@@ -1103,22 +97,6 @@
     <string>Flatness &amp; thickness</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_31">
-   <property name="geometry">
-    <rect>
-     <x>680</x>
-     <y>140</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Grade</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
   <widget class="QLabel" name="label_6">
    <property name="geometry">
     <rect>
@@ -1130,19 +108,6 @@
    </property>
    <property name="text">
     <string>Quality</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbAddFile">
-   <property name="geometry">
-    <rect>
-     <x>290</x>
-     <y>340</y>
-     <width>101</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Select file</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_8">
@@ -1159,38 +124,6 @@
    </property>
    <property name="text">
     <string>Load assembly measurements from XML</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_32">
-   <property name="geometry">
-    <rect>
-     <x>290</x>
-     <y>310</y>
-     <width>101</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Uploaded file</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="leXML">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>390</x>
-     <y>310</y>
-     <width>231</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
    </property>
   </widget>
   <widget class="QFrame" name="frame">
@@ -1555,173 +488,1272 @@
     </property>
    </widget>
   </widget>
-  <widget class="QComboBox" name="cbGrade1">
+  <widget class="QFrame" name="frame_3">
    <property name="geometry">
     <rect>
-     <x>680</x>
-     <y>160</y>
-     <width>81</width>
-     <height>21</height>
+     <x>10</x>
+     <y>140</y>
+     <width>751</width>
+     <height>141</height>
     </rect>
    </property>
-   <property name="currentIndex">
-    <number>-1</number>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
    </property>
-   <item>
-    <property name="text">
-     <string>Green</string>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <widget class="QComboBox" name="cbGrade6">
+    <property name="geometry">
+     <rect>
+      <x>670</x>
+      <y>120</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
     </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Yellow</string>
+    <property name="currentIndex">
+     <number>-1</number>
     </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Red</string>
+    <item>
+     <property name="text">
+      <string>Green</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Yellow</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Red</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QDoubleSpinBox" name="dsbThickness1">
+    <property name="geometry">
+     <rect>
+      <x>580</x>
+      <y>20</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
     </property>
-   </item>
+    <property name="readOnly">
+     <bool>false</bool>
+    </property>
+    <property name="minimum">
+     <double>-1.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>100.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.100000000000000</double>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="dsbOffY1">
+    <property name="geometry">
+     <rect>
+      <x>350</x>
+      <y>20</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>false</bool>
+    </property>
+    <property name="minimum">
+     <double>-1000.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>1000.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.010000000000000</double>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="cbGrade2">
+    <property name="geometry">
+     <rect>
+      <x>670</x>
+      <y>40</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>-1</number>
+    </property>
+    <item>
+     <property name="text">
+      <string>Green</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Yellow</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Red</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QDoubleSpinBox" name="dsbFlatness1">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>20</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>false</bool>
+    </property>
+    <property name="minimum">
+     <double>-10.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>10.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.100000000000000</double>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="cbGrade1">
+    <property name="geometry">
+     <rect>
+      <x>670</x>
+      <y>20</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>-1</number>
+    </property>
+    <item>
+     <property name="text">
+      <string>Green</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Yellow</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Red</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QLineEdit" name="leModule3">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>60</y>
+      <width>141</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leModule2">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>40</y>
+      <width>141</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leModule6">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>120</y>
+      <width>141</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_21">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>0</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>x (μm)</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="dsbThickness3">
+    <property name="geometry">
+     <rect>
+      <x>580</x>
+      <y>60</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>false</bool>
+    </property>
+    <property name="minimum">
+     <double>-1.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>100.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.100000000000000</double>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbGoModule5">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>80</y>
+      <width>51</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>go to</string>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="dsbFlatness6">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>120</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>false</bool>
+    </property>
+    <property name="minimum">
+     <double>-10.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>10.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.100000000000000</double>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="dsbOffX3">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>60</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>false</bool>
+    </property>
+    <property name="minimum">
+     <double>-1000.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>1000.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.010000000000000</double>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbGoModule2">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>40</y>
+      <width>51</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>go to</string>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="dsbOffY4">
+    <property name="geometry">
+     <rect>
+      <x>350</x>
+      <y>80</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>false</bool>
+    </property>
+    <property name="minimum">
+     <double>-1000.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>1000.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.010000000000000</double>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_12">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>71</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>position</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="dsbOffX2">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>40</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>false</bool>
+    </property>
+    <property name="minimum">
+     <double>-1000.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>1000.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.010000000000000</double>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_23">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>0</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Flat (mm)</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="dsbOffX5">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>100</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>false</bool>
+    </property>
+    <property name="minimum">
+     <double>-1000.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>1000.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.010000000000000</double>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="dsbFlatness5">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>100</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>false</bool>
+    </property>
+    <property name="minimum">
+     <double>-10.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>10.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.100000000000000</double>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="dsbOffRot4">
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>80</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>false</bool>
+    </property>
+    <property name="minimum">
+     <double>-180.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>180.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.100000000000000</double>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="dsbOffRot1">
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>20</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>false</bool>
+    </property>
+    <property name="minimum">
+     <double>-180.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>180.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.100000000000000</double>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="dsbThickness6">
+    <property name="geometry">
+     <rect>
+      <x>580</x>
+      <y>120</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>false</bool>
+    </property>
+    <property name="minimum">
+     <double>-1.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>100.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.100000000000000</double>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leModule4">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>80</y>
+      <width>141</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_17">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>60</y>
+      <width>71</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>3 (2, 1)</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leModule5">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>100</y>
+      <width>141</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_31">
+    <property name="geometry">
+     <rect>
+      <x>670</x>
+      <y>0</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Grade</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="dsbOffY2">
+    <property name="geometry">
+     <rect>
+      <x>350</x>
+      <y>40</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>false</bool>
+    </property>
+    <property name="minimum">
+     <double>-1000.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>1000.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.010000000000000</double>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="dsbOffY6">
+    <property name="geometry">
+     <rect>
+      <x>350</x>
+      <y>120</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>false</bool>
+    </property>
+    <property name="minimum">
+     <double>-1000.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>1000.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.010000000000000</double>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="dsbOffRot6">
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>120</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>false</bool>
+    </property>
+    <property name="minimum">
+     <double>-180.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>180.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.100000000000000</double>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_14">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>0</y>
+      <width>191</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Module serial</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="dsbThickness2">
+    <property name="geometry">
+     <rect>
+      <x>580</x>
+      <y>40</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>false</bool>
+    </property>
+    <property name="minimum">
+     <double>-1.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>100.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.100000000000000</double>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="dsbFlatness3">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>60</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>false</bool>
+    </property>
+    <property name="minimum">
+     <double>-10.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>10.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.100000000000000</double>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="dsbThickness4">
+    <property name="geometry">
+     <rect>
+      <x>580</x>
+      <y>80</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>false</bool>
+    </property>
+    <property name="minimum">
+     <double>-1.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>100.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.100000000000000</double>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbGoModule4">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>120</y>
+      <width>51</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>go to</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbGoModule6">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>100</y>
+      <width>51</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>go to</string>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="dsbFlatness4">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>80</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>false</bool>
+    </property>
+    <property name="minimum">
+     <double>-10.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>10.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.100000000000000</double>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbGoModule3">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>60</y>
+      <width>51</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>go to</string>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="dsbOffX6">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>120</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>false</bool>
+    </property>
+    <property name="minimum">
+     <double>-1000.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>1000.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.010000000000000</double>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="dsbThickness5">
+    <property name="geometry">
+     <rect>
+      <x>580</x>
+      <y>100</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>false</bool>
+    </property>
+    <property name="minimum">
+     <double>-1.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>100.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.100000000000000</double>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_20">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>120</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>6 (3, 2)</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="dsbOffRot2">
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>40</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>false</bool>
+    </property>
+    <property name="minimum">
+     <double>-180.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>180.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.100000000000000</double>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_19">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>100</y>
+      <width>71</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>5 (3, 1)</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_22">
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>0</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>θ (°)</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="dsbOffRot5">
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>100</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>false</bool>
+    </property>
+    <property name="minimum">
+     <double>-180.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>180.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.100000000000000</double>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_15">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>20</y>
+      <width>71</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>1 (1, 1)</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="dsbOffY3">
+    <property name="geometry">
+     <rect>
+      <x>350</x>
+      <y>60</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>false</bool>
+    </property>
+    <property name="minimum">
+     <double>-1000.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>1000.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.010000000000000</double>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="dsbOffY5">
+    <property name="geometry">
+     <rect>
+      <x>350</x>
+      <y>100</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>false</bool>
+    </property>
+    <property name="minimum">
+     <double>-1000.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>1000.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.010000000000000</double>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="cbGrade5">
+    <property name="geometry">
+     <rect>
+      <x>670</x>
+      <y>100</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>-1</number>
+    </property>
+    <item>
+     <property name="text">
+      <string>Green</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Yellow</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Red</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_30">
+    <property name="geometry">
+     <rect>
+      <x>580</x>
+      <y>0</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Thick (mm)</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="cbGrade4">
+    <property name="geometry">
+     <rect>
+      <x>670</x>
+      <y>80</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>-1</number>
+    </property>
+    <item>
+     <property name="text">
+      <string>Green</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Yellow</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Red</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_24">
+    <property name="geometry">
+     <rect>
+      <x>350</x>
+      <y>0</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>y (μm)</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_16">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>40</y>
+      <width>71</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>2 (1, 2)</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_18">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>80</y>
+      <width>71</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>4 (2, 2)</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="dsbFlatness2">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>40</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>false</bool>
+    </property>
+    <property name="minimum">
+     <double>-10.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>10.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.100000000000000</double>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="cbGrade3">
+    <property name="geometry">
+     <rect>
+      <x>670</x>
+      <y>60</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>-1</number>
+    </property>
+    <item>
+     <property name="text">
+      <string>Green</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Yellow</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Red</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QDoubleSpinBox" name="dsbOffX1">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>20</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>false</bool>
+    </property>
+    <property name="minimum">
+     <double>-1000.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>1000.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.010000000000000</double>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="dsbOffX4">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>80</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>false</bool>
+    </property>
+    <property name="minimum">
+     <double>-1000.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>1000.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.010000000000000</double>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="dsbOffRot3">
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>60</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>false</bool>
+    </property>
+    <property name="minimum">
+     <double>-180.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>180.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.100000000000000</double>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leModule1">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>20</y>
+      <width>141</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbGoModule1">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>20</y>
+      <width>51</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>go to</string>
+    </property>
+   </widget>
   </widget>
-  <widget class="QComboBox" name="cbGrade2">
+  <widget class="QFrame" name="frame_4">
    <property name="geometry">
     <rect>
-     <x>680</x>
-     <y>180</y>
-     <width>81</width>
-     <height>21</height>
+     <x>290</x>
+     <y>310</y>
+     <width>331</width>
+     <height>51</height>
     </rect>
    </property>
-   <property name="currentIndex">
-    <number>-1</number>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
    </property>
-   <item>
-    <property name="text">
-     <string>Green</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Yellow</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Red</string>
-    </property>
-   </item>
-  </widget>
-  <widget class="QComboBox" name="cbGrade3">
-   <property name="geometry">
-    <rect>
-     <x>680</x>
-     <y>200</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
    </property>
-   <property name="currentIndex">
-    <number>-1</number>
-   </property>
-   <item>
-    <property name="text">
-     <string>Green</string>
+   <widget class="QLineEdit" name="leXML">
+    <property name="enabled">
+     <bool>true</bool>
     </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Yellow</string>
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>0</y>
+      <width>231</width>
+      <height>20</height>
+     </rect>
     </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Red</string>
+    <property name="readOnly">
+     <bool>true</bool>
     </property>
-   </item>
-  </widget>
-  <widget class="QComboBox" name="cbGrade4">
-   <property name="geometry">
-    <rect>
-     <x>680</x>
-     <y>220</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="currentIndex">
-    <number>-1</number>
-   </property>
-   <item>
-    <property name="text">
-     <string>Green</string>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_32">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>101</width>
+      <height>21</height>
+     </rect>
     </property>
-   </item>
-   <item>
     <property name="text">
-     <string>Yellow</string>
+     <string>Uploaded file</string>
     </property>
-   </item>
-   <item>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbAddFile">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>20</y>
+      <width>101</width>
+      <height>31</height>
+     </rect>
+    </property>
     <property name="text">
-     <string>Red</string>
+     <string>Select file</string>
     </property>
-   </item>
-  </widget>
-  <widget class="QComboBox" name="cbGrade5">
-   <property name="geometry">
-    <rect>
-     <x>680</x>
-     <y>240</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="currentIndex">
-    <number>-1</number>
-   </property>
-   <item>
-    <property name="text">
-     <string>Green</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Yellow</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Red</string>
-    </property>
-   </item>
-  </widget>
-  <widget class="QComboBox" name="cbGrade6">
-   <property name="geometry">
-    <rect>
-     <x>680</x>
-     <y>260</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="currentIndex">
-    <number>-1</number>
-   </property>
-   <item>
-    <property name="text">
-     <string>Green</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Yellow</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Red</string>
-    </property>
-   </item>
+   </widget>
   </widget>
  </widget>
  <resources/>
