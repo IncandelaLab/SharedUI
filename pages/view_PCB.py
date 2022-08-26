@@ -379,14 +379,12 @@ class func(object):
 		files = glob.glob(f + '/**/*.root', recursive=True)
 		if files != []:
 			# Need to call this to ensure that necessary dirs for storing item are created
-			print("Got files.  Saving to ensure creation of filemanager location...")
 			self.pcb.save()
 			for f in files:
 				fname = os.path.split(f)[1]  # Name of file
 				fdir, fname_ = self.pcb.get_filedir_filename()
 				tmp_filepath = (fdir + '/' + fname).rsplit('.', 1)  # Only want the last . to get replaced...
 				new_filepath = "_upload.".join(tmp_filepath)
-				print("GETFILE:  Copying file", f, "to", new_filepath)
 				shutil.copyfile(f, new_filepath)
 				self.page.listComments.addItem(new_filepath)
 				self.pcb.test_files.append(new_filepath)
@@ -403,7 +401,6 @@ class func(object):
 			# Now need to remove the file...
 			fdir, fname_ = self.pcb.get_filedir_filename()
 			new_filepath = fdir + '/' + fname
-			print("REMOVING FILE", new_filepath)
 			os.remove(new_filepath)
 			self.pcb.test_files.remove(new_filepath)
 			self.update_info()

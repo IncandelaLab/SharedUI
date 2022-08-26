@@ -107,7 +107,7 @@ class func(object):
 			self.page.cbInsertUser.addItem(user)
 
 
-	@enforce_mode(['view', 'editing', 'creating'])
+	@enforce_mode(['view', 'editing'])
 	def update_info(self,ID=None,*args,**kwargs):
 		if ID is None:
 			ID = self.page.leID.text()
@@ -169,7 +169,7 @@ class func(object):
 
 		self.updateElements()
 
-	@enforce_mode(['view','editing','creating'])
+	@enforce_mode(['view','editing'])
 	def updateElements(self):
 		if not self.mode == "view":
 			self.page.leStatus.setText(self.mode)
@@ -186,7 +186,6 @@ class func(object):
 
 		mode_view     = self.mode == 'view'
 		mode_editing  = self.mode == 'editing'
-		mode_creating = self.mode == 'creating'
 		
 		self.setMainSwitchingEnabled(mode_view)
 		self.page.leID.setReadOnly(not mode_view)
@@ -194,19 +193,19 @@ class func(object):
 		self.page.pbLoad.setEnabled(mode_view)
 
 		self.page.pbEdit.setEnabled(    mode_view and     protomodule_exists )
-		self.page.pbSave.setEnabled(    mode_editing or mode_creating )
-		self.page.pbCancel.setEnabled(  mode_editing or mode_creating )
+		self.page.pbSave.setEnabled(    mode_editing )
+		self.page.pbCancel.setEnabled(  mode_editing )
 
-		self.page.leLocation.setReadOnly(  not (mode_creating or mode_editing) )
-		self.page.cbShape.setEnabled(           mode_creating or mode_editing  )
-		self.page.cbInstitution.setEnabled(     mode_creating or mode_editing  )
-		self.page.cbInsertUser.setEnabled(      mode_creating or mode_editing  )
-		self.page.dsbThickness.setReadOnly(not (mode_creating or mode_editing) )
-		self.page.sbChannels.setReadOnly(  not (mode_creating or mode_editing) )
+		self.page.leLocation.setReadOnly(  not mode_editing )
+		self.page.cbShape.setEnabled(          mode_editing )
+		self.page.cbInstitution.setEnabled(    mode_editing )
+		self.page.cbInsertUser.setEnabled(     mode_editing )
+		self.page.dsbThickness.setReadOnly(not mode_editing )
+		self.page.sbChannels.setReadOnly(  not mode_editing )
 
-		self.page.pbDeleteComment.setEnabled(mode_creating or mode_editing)
-		self.page.pbAddComment.setEnabled(   mode_creating or mode_editing)
-		self.page.pteWriteComment.setEnabled(mode_creating or mode_editing)
+		self.page.pbDeleteComment.setEnabled(mode_editing)
+		self.page.pbAddComment.setEnabled(   mode_editing)
+		self.page.pteWriteComment.setEnabled(mode_editing)
 
 		self.page.pbGoStepSensor.setEnabled( mode_view and step_sensor_exists )
 		self.page.pbGoSensor.setEnabled(     mode_view and sensor_exists      )
@@ -214,11 +213,11 @@ class func(object):
 		self.page.pbGoStepPcb.setEnabled(    mode_view and step_pcb_exists    )
 		self.page.pbGoModule.setEnabled(     mode_view and module_exists      )
 
-		self.page.dsbOffsetTranslationX.setReadOnly( not (mode_creating or mode_editing) )
-		self.page.dsbOffsetTranslationY.setReadOnly( not (mode_creating or mode_editing) )
-		self.page.dsbOffsetRotation.setReadOnly(     not (mode_creating or mode_editing) )
-		self.page.dsbFlatness.setReadOnly(           not (mode_creating or mode_editing) )
-		self.page.dsbThickness.setReadOnly(          not (mode_creating or mode_editing) )
+		self.page.dsbOffsetTranslationX.setReadOnly( not mode_editing )
+		self.page.dsbOffsetTranslationY.setReadOnly( not mode_editing )
+		self.page.dsbOffsetRotation.setReadOnly(     not mode_editing )
+		self.page.dsbFlatness.setReadOnly(           not mode_editing )
+		self.page.dsbThickness.setReadOnly(          not mode_editing )
 
 
 
@@ -243,15 +242,6 @@ class func(object):
 
 
 	@enforce_mode('view')
-	def startCreating(self,*args,**kwargs):
-		print("THIS IS OLD AND BROKEN; has not been updated.  Do not use this.")
-		if not self.protomodule_exists:
-			ID = self.page.leID.value()
-			self.mode = 'creating'
-			self.protomodule.new(ID)
-			self.updateElements()
-
-	@enforce_mode('view')
 	def startEditing(self,*args,**kwargs):
 		tmp_protomodule = fm.protomodule()
 		tmp_ID = self.page.leID.text()
@@ -263,13 +253,12 @@ class func(object):
 			self.mode = 'editing'
 			self.update_info()
 
-	@enforce_mode(['editing','creating'])
+	@enforce_mode('editing')
 	def cancelEditing(self,*args,**kwargs):
-		if self.mode == 'creating':  self.protomodule.clear()
 		self.mode = 'view'
 		self.update_info()
 
-	@enforce_mode(['editing','creating'])
+	@enforce_mode('editing')
 	def saveEditing(self,*args,**kwargs):
 
 		self.protomodule.insertion_user = str(self.page.leInsertUser.text()        ) if str(self.page.leInsertUser.text()      ) else None
@@ -291,13 +280,13 @@ class func(object):
 		self.update_info()
 
 	
-	@enforce_mode(['editing','creating'])
+	@enforce_mode('editing')
 	def deleteComment(self,*args,**kwargs):
 		row = self.page.listComments.currentRow()
 		if row >= 0:
 			self.page.listComments.takeItem(row)
 
-	@enforce_mode(['editing','creating'])
+	@enforce_mode('editing')
 	def addComment(self,*args,**kwargs):
 		text = str(self.page.pteWriteComment.toPlainText())
 		if text:

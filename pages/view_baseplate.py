@@ -133,7 +133,6 @@ class func(object):
 			self.page.leID.setText(ID)
 
 		self.baseplate_exists = (ID == self.baseplate.ID)
-		print("update_info: baseplate_exists=", self.baseplate_exists, ", ID is", ID)
 
 		if not self.baseplate.insertion_user in self.index_users.keys() and not self.baseplate.insertion_user is None:
 			# Insertion user was deleted from user page...just add user to the dropdown

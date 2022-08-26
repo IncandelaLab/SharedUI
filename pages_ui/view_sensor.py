@@ -294,7 +294,7 @@ class Ui_Form(object):
         self.cbShape.setItemText(3, _translate("Form", "Left"))
         self.cbShape.setItemText(4, _translate("Form", "Right"))
         self.cbShape.setItemText(5, _translate("Form", "Five"))
-        self.cbShape.setItemText(6, _translate("Form", "Full+Three"))
+        self.cbShape.setItemText(6, _translate("Form", "Halfmoon-N"))
         self.cbGrade.setItemText(0, _translate("Form", "Green"))
         self.cbGrade.setItemText(1, _translate("Form", "Yellow"))
         self.cbGrade.setItemText(2, _translate("Form", "Red"))

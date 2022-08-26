@@ -279,8 +279,6 @@ class func(object):
 
 	@enforce_mode(['view','editing_pcb_tool','editing_sensor_tray','editing_pcb_tray','editing_assembly_tray'])
 	def update_info_sensor_tool_ID(self,ID=None,*args,**kwargs):
-		print("update_info_sensor_tool_ID:  IS is", ID)
-		#print("")
 		if ID is None:
 			institution = None
 		else:

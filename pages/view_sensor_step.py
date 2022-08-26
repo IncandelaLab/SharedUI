@@ -807,7 +807,6 @@ class func(object):
 		self.page.leSearchStatus.setText('{}: row {}'.format(self.search_part, self.search_row))
 		self.mode = 'searching'
 		self.updateElements()
-		print("SEARCH DONE: mode is", self.mode)
 
 	def finishSearch(self,*args,**kwargs):
 		row = self.page.lwPartList.currentRow()

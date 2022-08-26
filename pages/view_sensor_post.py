@@ -426,7 +426,6 @@ class func(object):
 			proto.save()
 
 
-		print("\n\n\nSAVING STEP SENSOR\n\n\n")
 		self.step_sensor.save()
 		self.unloadAllObjects()
 		self.mode = 'view'

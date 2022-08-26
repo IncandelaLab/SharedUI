@@ -299,7 +299,6 @@ class func(object):
 					self.sb_tools[i].setValue(-1)
 
 			if not (self.step_pcb.pcbs is None):
-				print("self.pcbs:", self.step_pcb.pcbs)
 				for i in range(6):
 					self.le_pcbs[i].setText(str(self.step_pcb.pcbs[i]) if not (self.step_pcb.pcbs[i] is None) else "")
 			else:
@@ -600,7 +599,6 @@ class func(object):
 			if modules_selected[i] != "":
 				num_parts += 1
 
-			print("NUM PARTS IS", num_parts)
 			if num_parts == 0:
 				rows_empty.append(i)
 			elif num_parts == 4:
@@ -656,10 +654,8 @@ class func(object):
 		tmp_inst = self.page.cbInstitution.currentText()
 		tmp_exists = tmp_step.load("{}_{}".format(tmp_inst, tmp_ID))
 		if not tmp_exists:
-			print("STEP NOW FOUND")
 			self.update_info()
 		else:
-			print("STEP FOUND")
 			self.step_pcb = tmp_step
 			self.update_info()
 
@@ -698,7 +694,6 @@ class func(object):
 
 	@enforce_mode(['editing','creating'])
 	def saveEditing(self,*args,**kwargs):
-		print("SAVING PCB STEP")
 		self.step_pcb.institution = self.page.cbInstitution.currentText()
 
 		self.step_pcb.user_performed = str(self.page.cbUserPerformed.currentText()) if str(self.page.cbUserPerformed.currentText()) else None
@@ -764,7 +759,6 @@ class func(object):
 
 		self.step_pcb.check_tool_feet = self.page.ckCheckFeet.isChecked()
 
-		print("SAVING STEP PCB OBJECT")
 		self.step_pcb.save()
 		self.unloadAllObjects()
 		self.mode = 'view'
@@ -805,7 +799,6 @@ class func(object):
 		self.page.leSearchStatus.setText('{}: row {}'.format(self.search_part, self.search_row))
 		self.mode = 'searching'
 		self.updateElements()
-		print("SEARCH DONE: mode is", self.mode)
 
 	def finishSearch(self,*args,**kwargs):
 		row = self.page.lwPartList.currentRow()
@@ -819,7 +812,6 @@ class func(object):
 		getattr(self, 'load'+self.search_part.capitalize())(row=row)  # load part object
 		self.updateElements()
 		self.updateIssues()
-		print("SEARCH FINISHED, mode is", self.mode)
 
 	def cancelSearch(self,*args,**kwargs):
 		self.page.lwPartList.clear()
@@ -876,7 +868,6 @@ class func(object):
 
 	def goTrayAssembly(self,*args,**kwargs):
 		tray_assembly = self.page.sbTrayAssembly.value()
-		print(tray_assembly)
 		self.setUIPage('Tooling',tray_assembly=tray_assembly)
 
 	def setRunStartNow(self, *args, **kwargs):

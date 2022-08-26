@@ -133,7 +133,7 @@ class func(object):
 			self.page.cbInsertUser.addItem(user)
 
 
-	@enforce_mode(['view', 'editing', 'creating'])
+	@enforce_mode(['view', 'editing'])
 	def update_info(self,ID=None,do_load=True,*args,**kwargs):
 		if ID is None:
 			ID = self.page.leID.text()
@@ -211,7 +211,7 @@ class func(object):
 		self.updateElements()
 
 
-	@enforce_mode(['view','editing','creating'])
+	@enforce_mode(['view','editing'])
 	def updateElements(self):
 		if not self.mode == "view":
 			self.page.leStatus.setText(self.mode)
@@ -230,22 +230,21 @@ class func(object):
 
 		mode_view     = self.mode == 'view'
 		mode_editing  = self.mode == 'editing'
-		mode_creating = self.mode == 'creating'
 
 		self.setMainSwitchingEnabled(mode_view) 
 		self.page.leID.setReadOnly(not mode_view)
 
 		self.page.pbLoad.setEnabled(mode_view)
 		self.page.pbEdit  .setEnabled( mode_view and     module_exists )
-		self.page.pbSave  .setEnabled( mode_creating or mode_editing   )
-		self.page.pbCancel.setEnabled( mode_creating or mode_editing   )
+		self.page.pbSave  .setEnabled( mode_editing   )
+		self.page.pbCancel.setEnabled( mode_editing   )
 
 		# characteristics
 		# Note: most non-editable b/c either fixed or filled in w/ assembly pages
-		self.page.leLocation.setReadOnly(   not (mode_creating or mode_editing) )
-		self.page.cbInstitution.setEnabled(      mode_creating or mode_editing  )
-		self.page.cbInsertUser.setEnabled(       mode_creating or mode_editing  )
-		self.page.cbInspection.setEnabled(       mode_creating or mode_editing  )
+		self.page.leLocation.setReadOnly(   not mode_editing )
+		self.page.cbInstitution.setEnabled(     mode_editing )
+		self.page.cbInsertUser.setEnabled(      mode_editing )
+		self.page.cbInspection.setEnabled(      mode_editing )
 
 		# parts and steps
 		self.page.pbGoStepSensor.setEnabled(   mode_view and step_sensor_exists   )
@@ -256,12 +255,12 @@ class func(object):
 		self.page.pbGoProtomodule.setEnabled(  mode_view and protomodule_exists   )
 
 		# comments
-		self.page.pbDeleteComment.setEnabled(mode_creating or mode_editing)
-		self.page.pbAddComment.setEnabled(   mode_creating or mode_editing)
-		self.page.pteWriteComment.setEnabled(mode_creating or mode_editing)
+		self.page.pbDeleteComment.setEnabled(mode_editing)
+		self.page.pbAddComment.setEnabled(   mode_editing)
+		self.page.pteWriteComment.setEnabled(mode_editing)
 
-		self.page.pbAddFiles.setEnabled(mode_creating or mode_editing)
-		self.page.pbDeleteFile.setEnabled(mode_creating or mode_editing)
+		self.page.pbAddFiles.setEnabled(  mode_editing)
+		self.page.pbDeleteFile.setEnabled(mode_editing)
 
 
 	# NEW:
@@ -284,16 +283,6 @@ class func(object):
 
 
 	@enforce_mode('view')
-	def startCreating(self,*args,**kwargs):
-		print("ERROR:  This is outdated and should not be used.")
-		assert(False)
-		if not self.module_exists:
-			ID = self.page.sbID.value()
-			self.mode = 'creating'
-			self.module.new(ID)
-			self.updateElements()
-
-	@enforce_mode('view')
 	def startEditing(self,*args,**kwargs):
 		tmp_module = fm.module()
 		tmp_ID = self.page.leID.text()
@@ -305,13 +294,12 @@ class func(object):
 			self.mode = 'editing'
 			self.update_info()
 
-	@enforce_mode(['editing','creating'])
+	@enforce_mode('editing')
 	def cancelEditing(self,*args,**kwargs):
-		if self.mode == 'creating':  self.module.clear()
 		self.mode = 'view'
 		self.update_info()
 
-	@enforce_mode(['editing','creating'])
+	@enforce_mode('editing')
 	def saveEditing(self,*args,**kwargs):
 		# characteristics
 		self.module.insertion_user  = str(self.page.cbInsertUser.currentText())  if str(self.page.cbInsertUser.currentText())  else None
@@ -344,13 +332,13 @@ class func(object):
 		self.xmlModList = []
 
 
-	@enforce_mode(['editing','creating'])
+	@enforce_mode('editing')
 	def deleteComment(self,*args,**kwargs):
 		row = self.page.listComments.currentRow()
 		if row >= 0:
 			self.page.listComments.takeItem(row)
 
-	@enforce_mode(['editing','creating'])
+	@enforce_mode('editing')
 	def addComment(self,*args,**kwargs):
 		text = str(self.page.pteWriteComment.toPlainText())
 		if text:
@@ -396,21 +384,19 @@ class func(object):
 			self.setUIPage('3. PCB - pre-assembly',ID="{}_{}".format(tmp_inst, tmp_id))
 
 
-	@enforce_mode(['editing', 'creating'])
+	@enforce_mode('editing')
 	def getFile(self,*args,**kwargs):
 		f = self.fwnd.getdir()
 		if f == '':  return
 		files = glob.glob(f + '/**/*.png', recursive=True) + glob.glob(f + '/**/*.jpg', recursive=True)
 		if files != []:
 			# Need to call this to ensure that necessary dirs for storing item are created
-			print("Got files.  Saving to ensure creation of filemanager location...")
 			self.module.save()
 			for f in files:
 				fname = os.path.split(f)[1]  # Name of file
 				fdir, fname_ = self.module.get_filedir_filename()
 				tmp_filepath = (fdir + '/' + fname).rsplit('.', 1)  # Only want the last . to get replaced...
 				new_filepath = "_upload.".join(tmp_filepath)
-				print("GETFILE:  Copying file", f, "to", new_filepath)
 				shutil.copyfile(f, new_filepath)
 				self.page.listComments.addItem(new_filepath)
 				self.module.test_files.append(new_filepath)
@@ -418,7 +404,7 @@ class func(object):
 		else:
 			print("WARNING:  Failed to find PNG files in chosen directory!")
 
-	@enforce_mode(['editing', 'creating'])
+	@enforce_mode('editing')
 	def deleteFile(self,*args,**kwargs):
 		row = self.page.listFiles.currentRow()
 		if row >= 0:
@@ -427,7 +413,6 @@ class func(object):
 			# Now need to remove the file...
 			fdir, fname_ = self.module.get_filedir_filename()
 			new_filepath = fdir + '/' + fname
-			print("REMOVING FILE", new_filepath)
 			os.remove(new_filepath)
 			self.module.test_files.remove(new_filepath)
 			self.update_info()
