@@ -377,7 +377,7 @@ class func(object):
 
 		self.page.pbGoTrayComponent.setEnabled(mode_view and self.page.sbTrayComponent.value() >= 0)
 		self.page.pbGoTrayAssembly .setEnabled(mode_view and self.page.sbTrayAssembly .value() >= 0)
-		self.page.pbGoBatchAraldite.setEnabled(mode_view and self.page.leBatchAraldite.text() != "")
+		self.page.pbGoBatchAraldite.setEnabled(mode_creating or (mode_view and self.page.leBatchAraldite.text() != ""))
 
 		for i in range(6):
 			self.sb_tools[i].setReadOnly(       mode_view)
@@ -406,6 +406,8 @@ class func(object):
 			for btn, ledit in [[self.pb_go_pcbs[i],         self.le_pcbs[i]],
 			                   [self.pb_go_protomodules[i], self.le_protomodules[i]]]:
 				btn.setText("select" if ledit.text() == "" else "go to")
+		aral = self.page.leBatchAraldite.text()
+		self.page.pbGoBatchAraldite.setText("select" if aral == "" else "go to")
 
 
 	#NEW:  Add all load() functions
@@ -791,9 +793,12 @@ class func(object):
 			if len(self.page.lwPartList.findItems("{} {}".format(self.search_part, part_id), \
 			                                      QtCore.Qt.MatchExactly)) > 0:
 				continue
-			# Search for one thing:  NOT already assigned to a mod
-			tmp_part.load(part_id, query_db=False)  # db query already done
-			if tmp_part.module is None:
+			if self.search_part in ['baseplate', 'sensor']:
+				# Search for one thing:  NOT already assigned to a mod
+				tmp_part.load(part_id, query_db=False)  # db query already done
+				if tmp_part.module is None:
+					self.page.lwPartList.addItem("{} {}".format(self.search_part, part_id))
+			else:
 				self.page.lwPartList.addItem("{} {}".format(self.search_part, part_id))
 
 		self.page.leSearchStatus.setText('{}: row {}'.format(self.search_part, self.search_row))
@@ -803,13 +808,19 @@ class func(object):
 	def finishSearch(self,*args,**kwargs):
 		row = self.page.lwPartList.currentRow()
 		name = self.page.lwPartList.item(row).text().split()[1]
-		le_to_fill = getattr(self, 'le_{}s'.format(self.search_part))[self.search_row]
+		if self.search_part in ['baseplate', 'sensor']:
+			le_to_fill = getattr(self, 'le_{}s'.format(self.search_part))[self.search_row]
+		else:  # araldite
+			le_to_fill = self.page.leBatchAraldite
 		le_to_fill.setText(name)
 
 		self.page.lwPartList.clear()
 		self.page.leSearchStatus.clear()
 		self.mode = 'creating'
-		getattr(self, 'load'+self.search_part.capitalize())(row=row)  # load part object
+		if self.search_part in ['baseplate', 'sensor']:
+			getattr(self, 'load'+self.search_part.capitalize())(row=row)  # load part object
+		else:
+			self.loadBatchAraldite()
 		self.updateElements()
 		self.updateIssues()
 
@@ -860,7 +871,13 @@ class func(object):
 	def goBatchAraldite(self,*args,**kwargs):
 		#batch_araldite = self.page.sbBatchAraldite.value()
 		batch_araldite = self.page.leBatchAraldite.text()
-		self.setUIPage('Supplies',batch_araldite=batch_araldite)
+		if batch_araldite != "":
+			self.setUIPage('Supplies',batch_araldite=batch_araldite)
+		else:
+			self.mode = "searching"
+			self.search_part = 'batch_araldite'
+			self.search_row = None
+			self.doSearch()
 
 	def goTrayComponent(self,*args,**kwargs):
 		tray_component_pcb = self.page.sbTrayComponent.value()

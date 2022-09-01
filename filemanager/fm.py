@@ -1834,16 +1834,7 @@ class step_sensor(fsobj_assembly):
 
 	ITEMLIST_LIST = ['comments', 'tools', 'sensors', 'baseplates', 'protomodules']
 
-	"""@property
-	def cure_duration(self):
-		if (self.cure_stop is None) or (self.cure_start is None):
-			return None
-		else:
-			return self.cure_stop - self.cure_start
-	"""
-
 	# NOTE WARNING:  Commenting all WIP changes for now
-
 	
 	@property
 	def temp_property(self):
