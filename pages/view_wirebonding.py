@@ -18,13 +18,6 @@ INDEX_INSPECTION = {
 	False:1,
 }
 
-INDEX_INSTITUTION = {
-	'CERN':0,
-	'FNAL':1,
-	'UCSB':2,
-	'UMN':3,
-}
-
 
 def separate_sites(sites_string):
 	s = sites_string

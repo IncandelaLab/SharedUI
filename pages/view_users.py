@@ -111,13 +111,13 @@ class func(object):
 		self.page.cbProtomodule.setChecked(False if userperms is None else userperms[3])
 		self.page.cbModule     .setChecked(False if userperms is None else userperms[4])
 		self.page.cbStepSensor .setChecked(False if userperms is None else userperms[5])
-		self.page.cbStepPcb    .setChecked(False if userperms is None else userperms[7])
-		self.page.cbBackWirebonding   .setChecked(False if userperms is None else userperms[9])
-		self.page.cbFrontWirebonding  .setChecked(False if userperms is None else userperms[10])
-		self.page.cbBackEncapsulation .setChecked(False if userperms is None else userperms[11])
-		self.page.cbFrontEncapsulation.setChecked(False if userperms is None else userperms[12])
-		self.page.cbTestBonds         .setChecked(False if userperms is None else userperms[13])
-		self.page.cbFinalInspection   .setChecked(False if userperms is None else userperms[14])
+		self.page.cbStepPcb    .setChecked(False if userperms is None else userperms[6])
+		self.page.cbBackWirebonding   .setChecked(False if userperms is None else userperms[7])
+		self.page.cbFrontWirebonding  .setChecked(False if userperms is None else userperms[8])
+		self.page.cbBackEncapsulation .setChecked(False if userperms is None else userperms[9])
+		self.page.cbFrontEncapsulation.setChecked(False if userperms is None else userperms[10])
+		self.page.cbTestBonds         .setChecked(False if userperms is None else userperms[11])
+		self.page.cbFinalInspection   .setChecked(False if userperms is None else userperms[12])
 
 		self.updateElements()
 
@@ -181,7 +181,7 @@ class func(object):
 		username = self.page.leUsername.text()
 		isAdmin = self.page.cbAdministrator.isChecked()
 		if isAdmin:
-			permissions = [True for i in range(9)]
+			permissions = [True for i in range(13)]
 		else:
 			permissions = [
 				self.page.cbBaseplate.isChecked(),
@@ -190,9 +190,9 @@ class func(object):
 				self.page.cbProtomodule.isChecked(),
 				self.page.cbModule.isChecked(),
 				self.page.cbStepSensor.isChecked(),
-				self.page.cbStepSensor.isChecked(),  # post
+				#self.page.cbStepSensor.isChecked(),  # post
 				self.page.cbStepPcb.isChecked(),
-				self.page.cbStepPcb.isChecked(),  # post
+				#self.page.cbStepPcb.isChecked(),  # post
 				self.page.cbBackWirebonding.isChecked(),
 				self.page.cbFrontWirebonding.isChecked(),
 				self.page.cbBackEncapsulation.isChecked(),

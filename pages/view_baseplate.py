@@ -1,4 +1,5 @@
 from filemanager import fm
+from PyQt5 import QtGui
 
 PAGE_NAME = "view_baseplate"
 OBJECTTYPE = "baseplate"
@@ -33,6 +34,7 @@ INDEX_INSTITUTION = {
 	'UMN':3,
 	'HEPHY':4,
 	'HPK':5,
+	'IHEP':6,
 }
 
 INDEX_CHANNEL = {
@@ -59,6 +61,11 @@ class func(object):
 
 		# NEW:  List of all modified XML files
 		self.xmlModList = []
+
+		# NEW:  Fix image location
+		pixmap = QtGui.QPixmap("pages_ui/pages_ui/baseplate_frame_80.png")
+
+		self.page.plt_image.setPixmap(pixmap)
 
 
 	def enforce_mode(mode):

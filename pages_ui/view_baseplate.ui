@@ -369,6 +369,11 @@
       <string>HPK</string>
      </property>
     </item>
+    <item>
+     <property name="text">
+      <string>IHEP</string>
+     </property>
+    </item>
    </widget>
    <widget class="QComboBox" name="cbInsertUser">
     <property name="geometry">
@@ -871,7 +876,7 @@
     <string>Front</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_2">
+  <widget class="QLabel" name="plt_image">
    <property name="geometry">
     <rect>
      <x>630</x>
@@ -880,11 +885,14 @@
      <height>381</height>
     </rect>
    </property>
+   <property name="layoutDirection">
+    <enum>Qt::LeftToRight</enum>
+   </property>
    <property name="text">
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap>pages_ui/new_baseplate.png</pixmap>
+    <pixmap>pages_ui/pages_ui/new_baseplate.png</pixmap>
    </property>
    <property name="scaledContents">
     <bool>true</bool>
@@ -1151,7 +1159,7 @@
   <zorder>label_10</zorder>
   <zorder>label_5</zorder>
   <zorder>frame_4</zorder>
-  <zorder>label_2</zorder>
+  <zorder>plt_image</zorder>
   <zorder>label_16</zorder>
   <zorder>label_18</zorder>
   <zorder>label_19</zorder>

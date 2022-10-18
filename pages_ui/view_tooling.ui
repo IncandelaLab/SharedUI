@@ -28,49 +28,6 @@
    <property name="frameShadow">
     <enum>QFrame::Raised</enum>
    </property>
-   <widget class="QComboBox" name="cbAssemblyTrayInstitution">
-    <property name="geometry">
-     <rect>
-      <x>110</x>
-      <y>20</y>
-      <width>71</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="currentIndex">
-     <number>-1</number>
-    </property>
-    <item>
-     <property name="text">
-      <string>CERN</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>FNAL</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>UCSB</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>UMN</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>HEPHY</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>HPK</string>
-     </property>
-    </item>
-   </widget>
    <widget class="QLineEdit" name="lineEdit_23">
     <property name="geometry">
      <rect>
@@ -243,28 +200,12 @@
      </rect>
     </property>
    </widget>
-  </widget>
-  <widget class="QFrame" name="frame_2">
-   <property name="geometry">
-    <rect>
-     <x>310</x>
-     <y>350</y>
-     <width>291</width>
-     <height>311</height>
-    </rect>
-   </property>
-   <property name="frameShape">
-    <enum>QFrame::StyledPanel</enum>
-   </property>
-   <property name="frameShadow">
-    <enum>QFrame::Raised</enum>
-   </property>
-   <widget class="QComboBox" name="cbPcbTrayInstitution">
+   <widget class="QComboBox" name="cbAssemblyTrayInstitution">
     <property name="geometry">
      <rect>
-      <x>150</x>
+      <x>110</x>
       <y>20</y>
-      <width>71</width>
+      <width>81</width>
       <height>21</height>
      </rect>
     </property>
@@ -301,7 +242,28 @@
       <string>HPK</string>
      </property>
     </item>
+    <item>
+     <property name="text">
+      <string>IHEP</string>
+     </property>
+    </item>
    </widget>
+  </widget>
+  <widget class="QFrame" name="frame_2">
+   <property name="geometry">
+    <rect>
+     <x>310</x>
+     <y>350</y>
+     <width>291</width>
+     <height>311</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
    <widget class="QLineEdit" name="lePcbTrayLocation">
     <property name="geometry">
      <rect>
@@ -474,26 +436,10 @@
      <string>save</string>
     </property>
    </widget>
-  </widget>
-  <widget class="QFrame" name="frame_3">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>350</y>
-     <width>251</width>
-     <height>311</height>
-    </rect>
-   </property>
-   <property name="frameShape">
-    <enum>QFrame::StyledPanel</enum>
-   </property>
-   <property name="frameShadow">
-    <enum>QFrame::Raised</enum>
-   </property>
-   <widget class="QComboBox" name="cbPcbToolInstitution">
+   <widget class="QComboBox" name="cbPcbTrayInstitution">
     <property name="geometry">
      <rect>
-      <x>110</x>
+      <x>150</x>
       <y>20</y>
       <width>71</width>
       <height>21</height>
@@ -532,7 +478,28 @@
       <string>HPK</string>
      </property>
     </item>
+    <item>
+     <property name="text">
+      <string>IHEP</string>
+     </property>
+    </item>
    </widget>
+  </widget>
+  <widget class="QFrame" name="frame_3">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>350</y>
+     <width>251</width>
+     <height>311</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
    <widget class="QPushButton" name="pbPcbToolSave">
     <property name="geometry">
      <rect>
@@ -705,26 +672,10 @@
      </rect>
     </property>
    </widget>
-  </widget>
-  <widget class="QFrame" name="frame_4">
-   <property name="geometry">
-    <rect>
-     <x>310</x>
-     <y>10</y>
-     <width>291</width>
-     <height>311</height>
-    </rect>
-   </property>
-   <property name="frameShape">
-    <enum>QFrame::StyledPanel</enum>
-   </property>
-   <property name="frameShadow">
-    <enum>QFrame::Raised</enum>
-   </property>
-   <widget class="QComboBox" name="cbSensorTrayInstitution">
+   <widget class="QComboBox" name="cbPcbToolInstitution">
     <property name="geometry">
      <rect>
-      <x>150</x>
+      <x>110</x>
       <y>20</y>
       <width>71</width>
       <height>21</height>
@@ -763,7 +714,28 @@
       <string>HPK</string>
      </property>
     </item>
+    <item>
+     <property name="text">
+      <string>IHEP</string>
+     </property>
+    </item>
    </widget>
+  </widget>
+  <widget class="QFrame" name="frame_4">
+   <property name="geometry">
+    <rect>
+     <x>310</x>
+     <y>10</y>
+     <width>291</width>
+     <height>311</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
    <widget class="QLineEdit" name="lineEdit_22">
     <property name="geometry">
      <rect>
@@ -936,26 +908,10 @@
      <string>cancel</string>
     </property>
    </widget>
-  </widget>
-  <widget class="QFrame" name="frame_5">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>10</y>
-     <width>251</width>
-     <height>311</height>
-    </rect>
-   </property>
-   <property name="frameShape">
-    <enum>QFrame::StyledPanel</enum>
-   </property>
-   <property name="frameShadow">
-    <enum>QFrame::Raised</enum>
-   </property>
-   <widget class="QComboBox" name="cbSensorToolInstitution">
+   <widget class="QComboBox" name="cbSensorTrayInstitution">
     <property name="geometry">
      <rect>
-      <x>110</x>
+      <x>150</x>
       <y>20</y>
       <width>71</width>
       <height>21</height>
@@ -994,7 +950,28 @@
       <string>HPK</string>
      </property>
     </item>
+    <item>
+     <property name="text">
+      <string>IHEP</string>
+     </property>
+    </item>
    </widget>
+  </widget>
+  <widget class="QFrame" name="frame_5">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>251</width>
+     <height>311</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
    <widget class="QPushButton" name="pbSensorToolCancel">
     <property name="geometry">
      <rect>
@@ -1166,6 +1143,54 @@
     <property name="readOnly">
      <bool>true</bool>
     </property>
+   </widget>
+   <widget class="QComboBox" name="cbSensorToolInstitution">
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>20</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>-1</number>
+    </property>
+    <item>
+     <property name="text">
+      <string>CERN</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>FNAL</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>UCSB</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>UMN</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>HEPHY</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>HPK</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>IHEP</string>
+     </property>
+    </item>
    </widget>
   </widget>
  </widget>

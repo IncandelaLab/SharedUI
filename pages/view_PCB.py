@@ -44,6 +44,7 @@ INDEX_INSTITUTION = {
 	'UMN':3,
 	'HEPHY':4,
 	'HPK':5,
+	'IHEP':6,
 }
 
 INDEX_RESOLUTION = {

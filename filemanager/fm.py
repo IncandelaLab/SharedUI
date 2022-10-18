@@ -106,9 +106,9 @@ class UserManager:
 		self.userList = []
 		self.pageList = ['view_baseplate', 'view_sensor', 'view_pcb',
 				    'view_protomodule', 'view_module',
-					'view_sensor_step', 'view_sensor_post',
-					'view_pcb_step', 'view_pcb_post',
-                    # NOTE:  'view_wirebonding' -> each individual wirebonding step
+					'view_sensor_step', #'view_sensor_post',
+					'view_pcb_step', #'view_pcb_post',
+                    #'view_wirebonding' -> each individual wirebonding step
 					'wirebonding_back', 'wirebonding_front',
 					'encapsulation_back', 'encapsulation_front',
 					'test_bonds', 'final_inspection'
@@ -124,6 +124,8 @@ class UserManager:
 			json.dump(self.userList, opfl)
 
 	def addUser(self, username, permList, isAdmin=False):
+		print("perm list:", len(permList))
+		print("pageList:", len(self.pageList))
 		assert len(permList) == len(self.pageList), "ERROR:  permissions list length does not equal page list length!"
 		if isAdmin:
 			permList = [True for p in self.pageList]
@@ -375,7 +377,7 @@ class fsobj(object):
 
 
 	def generate_xml(self, input_dict):
-		# Generate XML ElementTree from input_dictionary, and return the ElementTree.
+		# GenerateXML ElementTree from input_dictionary, and return the ElementTree.
 		# Note:  does not save XML file!
 		# Note:  input_dict is a list of all items contained by the ROOT.  ROOT is not included, but 
 		#        is generated automatically.
