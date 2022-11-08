@@ -262,8 +262,6 @@ class fsobj(object):
 		with open(self.partlistfile, 'r') as opfl:
 			data = json.load(opfl)
 			if not self.ID in data.keys():
-				#data.append(self.ID)
-				# Now a dictionary:
 				# Note creation date and pass it to the dict
 				dcreated = time.localtime()
 				if self.ID == None:  print("ERROR:  self.ID in add_part_to_list is None!!!")
@@ -293,11 +291,6 @@ class fsobj(object):
 		else:
 			return string
 
-
-	# USE XML_STRUCT_DICT to find vars in the XML tree and assign them to vars/properties
-	# Changes:
-	# - Don't need to worry about PROPERTIES_DO_NOT_SAVE; ignore them
-	# - ...can basically ignorne the below, because the new method is radically different
 
 	# Utility used for load():  Set vars of obj using struct_dict, xml_tree
 	# Recursively look through dict.  For each element found, assign XML value to corresponding var/property.
@@ -358,6 +351,7 @@ class fsobj(object):
 
 
 	def new(self, ID):
+		print("FSOBJ NEW")
 		self.ID = ID
 		PROPERTIES = self.PROPERTIES + self.PROPERTIES_COMMON
 		DEFAULTS = {**self.DEFAULTS_COMMON, **getattr(self, 'DEFAULTS', {})}
@@ -616,198 +610,62 @@ class fsobj_tool(fsobj):
 		for prop in PROPERTIES:
 			setattr(self, prop, DEFAULTS.get(prop, None))
 
-##########################################################
-###### PARENT CLASSES FOR PARTS AND ASSEMBLY STEPS #######
-##########################################################
+########################################################
+###### PARENT CLASS FOR PARTS AND ASSEMBLY STEPS #######
+########################################################
 
-class fsobj_part(fsobj):
-	# Var storing names of table to request XML files from
-	PART_TABLE = 'parts'  # By default
-	# Also requires XML_STRUCT_DICT
+# New:  .
+# NOTE:  ID can be saved as either an int OR a string.
 
-	# This WAS the same for all parts, turns out some have MANUFACTURERs while baseplates don't...
-	# Are there additional attrs to request...?
-	XML_STRUCT_DICT = None
-
-	# Must customize XML_UPLOAD_DICT slightly for each part type
-	XML_UPLOAD_DICT = None
-	XML_CONSTS = None
-
-	def __init__(self):  # Maybe this could be done OUTSIDE of init...but not sure I want to risk it.
-		super(fsobj_part, self).__init__()
-		# Add all other vars to XML_STRUCT_DICT
-		# (so they will be saved accordingly)
-		for var in self.PROPERTIES + self.PROPERTIES_COMMON:
-			# WARNING:  XML_STRUCT_DICT is {'data':{'row': and THEN the useful vars
-			if var not in self.XML_CONSTS:  self.XML_STRUCT_DICT['data']['row'][var] = var
-
-
-	# save() must also create and save the XML file for uploading...
-	def save(self):
-		# Ordinary save; should take care of XML stuff normally.
-		super(fsobj_part, self).save()
-		
-		# Addtionally, create and save the upload XML file:
-		# Get upload XML struct from self.XML_UPLOAD_DICT
-		part_name = self.__class__.__name__
-		self.partlistfile = os.sep.join([ DATADIR, 'partlist', part_name+'s.json' ])
-		with open(self.partlistfile, 'r') as opfl:
-			data = json.load(opfl)
-			if not self.ID in data.keys():
-				self.add_part_to_list()
-
-		# Generate XML tree:
-		struct_dict = self.XML_UPLOAD_DICT
-		xml_tree = self.generate_xml(struct_dict)
-
-		# Save xml file:
-		# Store in same directory as .json files, w/ same name:
-		filedir, filename = self.get_filedir_filename()  # self.ID)  #This should be unnecessary...
-		filename = filename.replace('.xml', '_upload.xml')
-		root = xml_tree.getroot()
-		#tostring imported from xml.etree.ElementTree
-		xmlstr = minidom.parseString(tostring(root)).toprettyxml(indent = '    ')
-		# Need to correct header...
-		xmlstr = xmlstr.replace("version=\"1.0\" ", "version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"")
-		with open(filedir+'/'+filename, 'w') as f:
-			f.write(xmlstr)
-
-
-
-	# load() requires downloading ability, but is otherwise normal.
-	# query_db:  if false, will only check for part locally
-	def load(self, ID, on_property_missing = "warn", query_db=True):
-		if ID == "" or ID == None:
-			self.clear()
-			return False
-
-		part_name = self.__class__.__name__
-		self.partlistfile = os.sep.join([ DATADIR, 'partlist', part_name+'s.json' ])
-		with open(self.partlistfile, 'r') as opfl:
-			data = json.load(opfl)
-			if not str(ID) in data.keys():
-				if not query_db:
-					return False
-				search_conditions = {'SERIAL_NUMBER':'\''+ID+'\''}  # Only condition needed; ID must be surrounded by quotes
-				# For each XML file/table needed, make a request:
-				# Should automatically determine where file should be saved AND add part to list
-				self.ID = ID
-				part_request = self.request_XML(self.PART_TABLE, search_conditions)
-				if not part_request:
-					self.clear()
-					return False
-
-		filedir, filename = self.get_filedir_filename(ID)
-		xml_file = os.sep.join([filedir, filename])
-
-		assert os.path.exists(xml_file), "ERROR: load() (fsobj_part):  Step is present in partlistfile OR downloaded, but XML file {} does not exist!".format(xml_file)
-
-		xml_tree = parse(xml_file)
-		self._load_from_dict(self.XML_STRUCT_DICT, xml_tree)
-
-		self.ID = ID
-		return True
-
-
-	# NEW: Must save to correct location!
-	def request_XML(self, table_name, search_conditions, suffix=None):
-
-		if not ENABLE_DB_COMMUNICATION:
-			return False
-
-		# NOTE:  Must save file in correct location AND add_part_to_list!
-		# suffix is added to the end of the filename (will be _cond)
-
-		sql_template = 'select * from hgc_int2r.{} p'
-		sql_request = sql_template.format(table_name)
-		sql_request = sql_request + ' where'
-		# search_conditions is a dict:  {param_name:param_value}
-		for param, value in search_conditions.items():
-			sql_request = sql_request + ' p.{}={}'.format(param, value)
-
-		try:
-			api = rh.RhApi(url='https://cmsdca.cern.ch/hgc_rhapi', debug=True, sso='login')
-			data = api.xml(sql_request, verbose=True)
-		except rh.RhApiRowLimitError as e:
-			print("RhApi ERROR:  Could not download files from DB:")
-			print(e)
-			print("SQL query was:")
-			print(sql_request)
-			return False
-
-		xml_string = minidom.parseString(data).toprettyxml(indent="    ")
-		# Output is an empty XML file, header len 61
-		# NOTE:  Should be a SINGLE XML result!
-		if len(xml_string) < 62:
-			print("WARNING:  RhApi search:  No files match the search criteria")
-			return False
-		# Store requested file
-		xml_tree = fromstring(xml_string)
-		ID = xml_tree.find('.//SERIAL_NUMBER').text
-		dcreated = time.localtime()
-		date = '{}-{}-{}'.format(dcreated.tm_mon, dcreated.tm_mday, dcreated.tm_year)
-
-		filedir, filename = self.get_filedir_filename(ID, date)
-
-		if suffix:  filename = filename.replace('.xml', suffix+'.xml')
-
-		if not os.path.exists(filedir):
-			os.makedirs(filedir)
-		with open(os.path.join(filedir, filename), 'w') as f:
-			f.write(xml_string)
-
-		self.add_part_to_list(date=date)
-
-		return True
-
-
-	# Universal properties
-
-	@property
-	def institution_id(self):
-		# INSTITUTION_DICT maps ID -> name#
-		for instID, instname in INSTITUTION_DICT.items():
-			if self.institution == instname:  return instID
-		print("ERROR:  location not found in INSTITUTION_DICT")
-		return None
-	@institution_id.setter
-	def institution_id(self, value):
-		if value is None:
-			self.institution = None
-		elif not value in INSTITUTION_DICT.keys():
-			print("WARNING:  institution_id:  Found invalid location ID {}".format(value))
-		else:
-			self.institution = INSTITUTION_DICT[value]
-
-
-
-
-
-
-class fsobj_assembly(fsobj):
-	# NOTE:  primary key ID is now a STRING, almost always INSTITUTION_ID.
+class fsobj_db(fsobj):
+	# NOTE:  primary key ID can be an int (assembly) OR a string (part)
 	# Vars storing names of tables to request XML files from
 	ASSM_TABLE = None
 	COND_TABLE = None
+
+	# For base xml file
+	XML_STRUCT_DICT = None
+	# For creating xml upload file
+	XML_UPLOAD_DICT = None
+	# For conditions file (thickness or temp/etc)
+	XML_COND_DICT = None
+	# List of vars that are only loaded (NOT edited by GUI)
+	XML_CONSTS = []
 	
 	# Also requires XML_STRUCT_DICT (for gui storage only),
 	# ...XML_UPLOAD_DICT, XML_COND_DICT (BOTH for uploading, see child class definitions).
 	# NOTE that the protomodule creation file is created by the protomodule class, and must be uploaded with these.
 
+	# Generic header for all COND files
+	COND_HEADER_DICT = {
+		'TYPE':{
+			'EXTENSION_TABLE_NAME':'COND_TABLE_NAME',
+			'NAME':'TABLE_DESC',
+		},
+		'RUN':{
+			'RUN_NAME':'RUN_TYPE',
+			'RUN_BEGIN_TIMESTAMP':'run_start_xml',  # Format:  2018-03-26 00:00:00
+			'RUN_END_TIMESTAMP':'run_stop_xml',
+			'INITIATED_BY_USER':'user_performed',
+			'LOCATION':'xml_location',
+			'COMMENT_DESCRIPTION':'CMT_DESCR',
+		}
+	}
+
+
+
 	def __init__(self):
-		super(fsobj, self).__init__()
+		super(fsobj_db, self).__init__()
 		# Add all other vars to XML_STRUCT_DICT
 		# (so they will be saved accordingly)
-		self.XML_STRUCT_DICT = {'data':{'row':{
-			# Fill below
-		}}}
+		if self.XML_STRUCT_DICT is None:
+			self.XML_STRUCT_DICT = {'data':{'row':{} } }
 		for var in self.PROPERTIES + self.PROPERTIES_COMMON:
-			# WARNING:  XML_STRUCT_DICT is {'data':{'row': and THEN the useful vars
-			self.XML_STRUCT_DICT['data']['row'][var] = var
+			if var not in self.XML_CONSTS:  self.XML_STRUCT_DICT['data']['row'][var] = var
 
 	def save(self):
 		# This one handles self.XML_STRUCT_DICT...
-		super(fsobj_assembly, self).save()
+		super(fsobj_db, self).save()
 
 		# NEXT, write the upload files!
 		# There's two:  One for Build_UCSB_ProtoModules_00.xml, one for ProtoModules_BuildCond_00.xml (base and cond).
@@ -833,7 +691,7 @@ class fsobj_assembly(fsobj):
 
 
 	def load(self, ID, on_property_missing = "warn"):
-		if ID == "" or ID == None:
+		if ID == "" or ID == -1 or ID == None:
 			self.clear()
 			return False
 
@@ -841,11 +699,12 @@ class fsobj_assembly(fsobj):
 		self.partlistfile = os.sep.join([ DATADIR, 'partlist', part_name+'s.json' ])
 		with open(self.partlistfile, 'r') as opfl:
 			data = json.load(opfl)
-			if not str(ID) in data.keys():
-				#print("ASSEMBLY STEP NOT FOUND.  REQUESTED CONDITION TABLES:")
-				if not ENABLE_DB_COMMUNICATION: return False
-				#print("**TEMPORARY:  Part downloading disabled for testing!**")
-				#return False
+			if str(ID) in data.keys():
+				dt = data[str(ID)]
+			else:
+				if not ENABLE_DB_COMMUNICATION:
+					print("**TEMPORARY:  Object downloading disabled for testing!**")
+					return False
 				
 				self.ID = ID
 				search_conditions = {'ID':self.ID}  # Only condition needed
@@ -862,20 +721,16 @@ class fsobj_assembly(fsobj):
 					self.clear()
 					return False
 				elif not (assm_request and cond_request):
-					print("Assembly step not found.  Returning false...")
+					print("Object not found.  Returning false...")
 					self.clear()
 					return False
 				# Otherwise, both files are found!  Load from both of them.
+				print("Object found!")
 				self.add_part_to_list()
 				self.add_part_to_list()
 				dcreated = time.localtime()
 				dt = '{}-{}-{}'.format(dcreated.tm_mon, dcreated.tm_mday, dcreated.tm_year)
 				
-			else:
-				# Note:  Names saved in partlistfile as str, not as int
-				dt = data[str(ID)]  # date created
-
-
 		filedir, filename = self.get_filedir_filename(ID)  #, date=dt)
 		condname = filename.replace('.xml', '_cond.xml')
 		xml_file      = os.sep.join([filedir, filename])
@@ -888,8 +743,6 @@ class fsobj_assembly(fsobj):
 		# NOTE:  Now saving cond file ONLY as an upload file.  Load all info from standard file.
 		self.ID = ID
 		return True
-
-
 
 	
 	# NEW: Must save to correct location!
@@ -945,6 +798,27 @@ class fsobj_assembly(fsobj):
 		self.add_part_to_list(datetime.strftime('%m-%d-%Y'))
 
 		return True
+
+	# Universal properties
+
+	@property
+	def institution_id(self):
+		# INSTITUTION_DICT maps ID -> name#
+		for instID, instname in INSTITUTION_DICT.items():
+			if self.institution == instname:  return instID
+		print("ERROR:  location not found in INSTITUTION_DICT")
+		return None
+	@institution_id.setter
+	def institution_id(self, value):
+		if value is None:
+			self.institution = None
+		elif not value in INSTITUTION_DICT.keys():
+			print("WARNING:  institution_id:  Found invalid location ID {}".format(value))
+		else:
+			self.institution = INSTITUTION_DICT[value]
+
+
+
 
 
 
@@ -1006,7 +880,7 @@ class tray_component_pcb(fsobj_tool):
 #####  components, protomodules, modules  #####
 ###############################################
 
-class baseplate(fsobj_part):
+class baseplate(fsobj_db):
 	OBJECTNAME = "baseplate"
 	FILEDIR = os.sep.join(['baseplates','{date}'])
 	FILENAME = "baseplate_{ID}.xml"
@@ -1053,7 +927,7 @@ class baseplate(fsobj_part):
 	}
 
 
-	XML_STRUCT_DICT = { "data":{"row":{
+	"""XML_STRUCT_DICT = { "data":{"row":{
 		"ID":"id_number",
 		"PART_PARENT_ID":'parent_id',  #Don't care about this (not needed for upload)
 		"KIND_OF_PART_ID":"kind_of_part_id",
@@ -1061,7 +935,7 @@ class baseplate(fsobj_part):
 		"LOCATION_ID":"institution_id",
 		"SERIAL_NUMBER":"ID",
 		"DESCRIPTION":"description",
-	}}}
+	}}}"""
 
 	XML_UPLOAD_DICT = {"PARTS":{"PART":{
 		"KIND_OF_PART":"kind_of_part",
@@ -1069,13 +943,25 @@ class baseplate(fsobj_part):
 		"SERIAL_NUMBER":"ID",
 		"COMMENT_DESCRIPTION":"comments_concat",
 		"LOCATION":"institution",
-		# NEW:
-		"THICKNESS":"thickness",
-		"FLATNESS":"flatness",
-		"MATERIAL":"material",
-		"GRADE":"grade",
-		#"COMMENTS":"comments_concat",
 	}}}
+
+	XML_COND_DICT = {
+		"HEADER":self.COND_HEADER_DICT,
+		"DATA_SET":{
+			"COMMENT_DESCRIPTION":"inspection_comment",
+			"VERSION":"VNUM",
+			"PART":{
+				"SERIAL_NUMBER":"ID",
+				"KIND_OF_PART":"kind_of_part",
+			}
+			"DATA":{
+				"FLATNESS":"flatness",
+				"COMMENTS":"inspection_comment",
+				"THICKNESS":"thickness",
+				"GRADE":"grade",
+			}
+		}
+	}
 
 	# List of vars that should NOT be edited in the GUI and are only loaded from DB
 	# (And some info would be redundant w/ other constants, eg KIND_OF_PART and self.size)
@@ -1108,7 +994,7 @@ class baseplate(fsobj_part):
 		return True, ""
 
 
-class sensor(fsobj_part):
+class sensor(fsobj_db):
 	OBJECTNAME = "sensor"
 	FILEDIR = os.sep.join(['sensors','{date}'])
 	FILENAME = "sensor_{ID}.xml"
@@ -1237,7 +1123,7 @@ class sensor(fsobj_part):
 
 
 
-class pcb(fsobj_part):
+class pcb(fsobj_db):
 	OBJECTNAME = "PCB"
 	FILEDIR = os.sep.join(['pcbs','{date}'])
 	FILENAME = "pcb_{ID}.xml"
@@ -1338,7 +1224,7 @@ class pcb(fsobj_part):
 		return True, ""
 
 
-class protomodule(fsobj_part):
+class protomodule(fsobj_db):
 	OBJECTNAME = "protomodule"
 	FILEDIR = os.sep.join(['protomodules','{date}'])
 	FILENAME = 'protomodule_{ID}.xml'
@@ -1526,7 +1412,7 @@ class protomodule(fsobj_part):
 
 
 
-class module(fsobj_part):
+class module(fsobj_db):
 	OBJECTNAME = "module"
 	FILEDIR    = os.sep.join(['modules','{date}','module_{ID}'])
 	FILENAME   = 'module_{ID}.xml'
@@ -1797,7 +1683,7 @@ class module(fsobj_part):
 ###############  assembly steps  ##############
 ###############################################
 
-class step_sensor(fsobj_assembly):
+class step_sensor(fsobj_db):
 	OBJECTNAME = "sensor step"
 	FILEDIR    = os.sep.join(['steps','sensor','{date}'])
 	FILENAME   = 'sensor_assembly_step_{ID:0>5}.xml'
@@ -2071,7 +1957,7 @@ class step_sensor(fsobj_assembly):
 
 
 
-class step_pcb(fsobj_assembly):
+class step_pcb(fsobj_db):
 	OBJECTNAME = "PCB step"
 	FILEDIR = os.sep.join(['steps','pcb','{date}'])
 	FILENAME = 'pcb_assembly_step_{ID:0>5}.xml'
