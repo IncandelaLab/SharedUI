@@ -27,8 +27,8 @@ INDEX_SHAPE = {
 	'Left':3,
 	'Right':4,
 	'Five':5,
-	'Three':6,
-	'Halfmoon-N':7,
+	'Full':6,
+	'Three':7,
 }
 
 INDEX_INSPECTION = {
@@ -136,29 +136,30 @@ class func(object):
 
 		self.sensor_exists = (ID == self.sensor.ID)
 
-		if not self.sensor.insertion_user in self.index_users.keys() and not self.sensor.insertion_user is None:
-			self.index_users[self.sensor.insertion_user] = max(self.index_users.values()) + 1
-			self.page.cbInsertUser.addItem(self.sensor.insertion_user)
-		self.page.cbInsertUser.setCurrentIndex(self.index_users.get(self.sensor.insertion_user, -1))
+		if not self.sensor.record_insertion_user in self.index_users.keys() and len(self.index_users.keys())!=0 and not self.sensor.record_insertion_user is None:
+			self.index_users[self.sensor.record_insertion_user] = max(self.index_users.values()) + 1
+			self.page.cbInsertUser.addItem(self.sensor.record_insertion_user)
+		self.page.cbInsertUser.setCurrentIndex(self.index_users.get(self.sensor.record_insertion_user, -1))
 
-		self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.sensor.institution, -1))
-		self.page.leLocation.setText(    "" if self.sensor.location     is None else self.sensor.location    )
+		self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.sensor.location_name, -1))
+		self.page.leLocation.setText(    "" if self.sensor.institution_location     is None else self.sensor.institution_location    )
 
 		self.page.leBarcode.setText(   "" if self.sensor.barcode     is None else self.sensor.barcode     )
-		self.page.cbType.setCurrentIndex(       INDEX_TYPE.get(       self.sensor.type,            -1))
-		self.page.cbShape.setCurrentIndex(      INDEX_SHAPE.get(      self.sensor.shape,           -1))
+		self.page.cbType.setCurrentIndex(       INDEX_TYPE.get(       self.sensor.sen_type,            -1))
+		self.page.cbShape.setCurrentIndex(      INDEX_SHAPE.get(      self.sensor.geometry,           -1))
 		self.page.cbChannelDensity.setCurrentIndex(INDEX_CHANNEL.get( self.sensor.channel_density, -1))
 		self.page.dsbFlatness.setValue(-1 if self.sensor.flatness is None else self.sensor.flatness )
 		if self.page.dsbFlatness.value() == -1: self.page.dsbFlatness.clear()
-		self.page.cbInspection.setCurrentIndex( INDEX_INSPECTION.get( self.sensor.inspection,      -1))
+		self.page.cbInspection.setCurrentIndex( INDEX_INSPECTION.get( self.sensor.visual_inspection,      -1))
 
 		self.page.listComments.clear()
-		for comment in self.sensor.comments:
-			self.page.listComments.addItem(comment)
+		if self.sensor.comments:
+			for comment in self.sensor.comments.split(";;"):
+				self.page.listComments.addItem(comment)
 		self.page.pteWriteComment.clear()
 
 
-		if self.sensor.step_sensor:
+		"""if self.sensor.step_sensor:
 			tmp_inst, tmp_id = self.sensor.step_sensor.split("_")
 			self.page.sbStepSensor.setValue(int(tmp_id))
 			self.page.cbInstitutionStep.setCurrentIndex(INDEX_INSTITUTION.get(tmp_inst, -1))
@@ -167,7 +168,7 @@ class func(object):
 			self.page.cbInstitutionStep.setCurrentIndex(-1)
 		self.page.leProtomodule.setText("" if self.sensor.protomodule is None else self.sensor.protomodule)
 		self.page.leModule.setText(     "" if self.sensor.module      is None else self.sensor.module)
-
+		"""
 		self.updateElements()
 
 
@@ -177,11 +178,11 @@ class func(object):
 			self.page.leStatus.setText(self.mode)
 
 		sensor_exists      = self.sensor_exists
-		step_sensor_exists = self.page.sbStepSensor.value()  >= 0 and \
+		"""step_sensor_exists = self.page.sbStepSensor.value()  >= 0 and \
 		                     self.page.cbInstitutionStep.currentText() != ""
 		protomodule_exists = self.page.leProtomodule.text()  != ""
 		module_exists      = self.page.leModule.text()       != ""
-
+		"""
 		mode_view     = self.mode == 'view'
 		mode_editing  = self.mode == 'editing'
 		mode_creating = self.mode == 'creating'
@@ -214,10 +215,10 @@ class func(object):
 		self.page.pbAddComment.setEnabled(   mode_creating or mode_editing)
 		self.page.pteWriteComment.setEnabled(mode_creating or mode_editing)
 
-		self.page.pbGoStepSensor.setEnabled( mode_view and step_sensor_exists)
+		"""self.page.pbGoStepSensor.setEnabled( mode_view and step_sensor_exists)
 		self.page.pbGoProtomodule.setEnabled(mode_view and protomodule_exists)
 		self.page.pbGoModule.setEnabled(     mode_view and module_exists     )
-
+		"""
 
 
 	# NEW:
@@ -278,21 +279,19 @@ class func(object):
 	@enforce_mode(['editing','creating'])
 	def saveEditing(self,*args,**kwargs):
 
-		self.sensor.location        = str(self.page.leLocation.text()          )    if str(self.page.leLocation.text()    )       else None
+		self.sensor.institution_location        = str(self.page.leLocation.text()          )    if str(self.page.leLocation.text()    )       else None
 		self.sensor.barcode         = str(self.page.leBarcode.text()           )    if str(self.page.leBarcode.text()     )       else None
-		self.sensor.type            = str(self.page.cbType.currentText()       )    if str(self.page.cbType.currentText() )       else None
-		self.sensor.shape           = str(self.page.cbShape.currentText()      )    if str(self.page.cbShape.currentText())       else None
-		self.sensor.institution     = str(self.page.cbInstitution.currentText())    if str(self.page.cbInstitution.currentText()) else None
-		self.sensor.insertion_user  = str(self.page.cbInsertUser.currentText())     if str(self.page.cbInsertUser.currentText())  else None
+		self.sensor.sen_type            = str(self.page.cbType.currentText()       )    if str(self.page.cbType.currentText() )       else None
+		self.sensor.geometry           = str(self.page.cbShape.currentText()      )    if str(self.page.cbShape.currentText())       else None
+		self.sensor.location_name     = str(self.page.cbInstitution.currentText())    if str(self.page.cbInstitution.currentText()) else None
+		self.sensor.record_insertion_user  = str(self.page.cbInsertUser.currentText())     if str(self.page.cbInsertUser.currentText())  else None
 		self.sensor.channel_density = str(self.page.cbChannelDensity.currentText()) if str(self.page.cbChannelDensity.currentText()) else None
 		self.sensor.grade           = str(self.page.cbGrade.currentText())          if str(self.page.cbGrade.currentText())       else None
 
 		num_comments = self.page.listComments.count()
-		self.sensor.comments = []
-		for i in range(num_comments):
-			self.sensor.comments.append(str(self.page.listComments.item(i).text()))
+		self.sensor.comments = ';;'.join([self.page.listComments.item(i).text() for i in range(num_comments)])
 
-		self.sensor.inspection = str(self.page.cbInspection.currentText()) if str(self.page.cbInspection.currentText()) else None
+		self.sensor.visual_inspection = str(self.page.cbInspection.currentText()) if str(self.page.cbInspection.currentText()) else None
 		self.sensor.flatness = self.page.dsbFlatness.value() if self.page.dsbFlatness.value() else None
 
 		self.sensor.save()

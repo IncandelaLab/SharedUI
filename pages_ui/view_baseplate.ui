@@ -10,6 +10,11 @@
     <height>720</height>
    </rect>
   </property>
+  <property name="font">
+   <font>
+    <family>Arial</family>
+   </font>
+  </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
@@ -194,7 +199,7 @@
      <rect>
       <x>1</x>
       <y>99</y>
-      <width>181</width>
+      <width>161</width>
       <height>21</height>
      </rect>
     </property>
@@ -226,7 +231,7 @@
      <rect>
       <x>1</x>
       <y>120</y>
-      <width>181</width>
+      <width>161</width>
       <height>20</height>
      </rect>
     </property>
@@ -240,9 +245,9 @@
    <widget class="QComboBox" name="cbMaterial">
     <property name="geometry">
      <rect>
-      <x>180</x>
+      <x>160</x>
       <y>99</y>
-      <width>81</width>
+      <width>101</width>
       <height>21</height>
      </rect>
     </property>
@@ -251,12 +256,12 @@
     </property>
     <item>
      <property name="text">
-      <string>CuW</string>
+      <string>CuW/Kapton</string>
      </property>
     </item>
     <item>
      <property name="text">
-      <string>PCB</string>
+      <string>PCB/Kapton</string>
      </property>
     </item>
    </widget>
@@ -298,9 +303,9 @@
    <widget class="QLineEdit" name="leBarcode">
     <property name="geometry">
      <rect>
-      <x>180</x>
+      <x>159</x>
       <y>80</y>
-      <width>80</width>
+      <width>101</width>
       <height>20</height>
      </rect>
     </property>
@@ -316,7 +321,7 @@
      <rect>
       <x>1</x>
       <y>80</y>
-      <width>181</width>
+      <width>161</width>
       <height>21</height>
      </rect>
     </property>
@@ -391,9 +396,9 @@
    <widget class="QComboBox" name="cbShape">
     <property name="geometry">
      <rect>
-      <x>180</x>
+      <x>160</x>
       <y>120</y>
-      <width>81</width>
+      <width>101</width>
       <height>20</height>
      </rect>
     </property>
@@ -432,12 +437,12 @@
     </item>
     <item>
      <property name="text">
-      <string>Three</string>
+      <string>Full</string>
      </property>
     </item>
     <item>
      <property name="text">
-      <string>Halfmoon</string>
+      <string>Three</string>
      </property>
     </item>
    </widget>
@@ -509,9 +514,9 @@
    <widget class="QComboBox" name="cbChannelDensity">
     <property name="geometry">
      <rect>
-      <x>180</x>
+      <x>160</x>
       <y>140</y>
-      <width>81</width>
+      <width>101</width>
       <height>20</height>
      </rect>
     </property>
@@ -534,7 +539,7 @@
      <rect>
       <x>0</x>
       <y>140</y>
-      <width>181</width>
+      <width>161</width>
       <height>20</height>
      </rect>
     </property>
@@ -615,6 +620,7 @@
    </property>
    <property name="font">
     <font>
+     <family>Arial</family>
      <pointsize>16</pointsize>
     </font>
    </property>
@@ -779,6 +785,7 @@
    </property>
    <property name="font">
     <font>
+     <family>Arial</family>
      <pointsize>16</pointsize>
     </font>
    </property>
@@ -797,6 +804,7 @@
    </property>
    <property name="font">
     <font>
+     <family>Arial</family>
      <pointsize>16</pointsize>
     </font>
    </property>
@@ -815,6 +823,7 @@
    </property>
    <property name="font">
     <font>
+     <family>Arial</family>
      <pointsize>16</pointsize>
     </font>
    </property>
@@ -833,6 +842,7 @@
    </property>
    <property name="font">
     <font>
+     <family>Arial</family>
      <pointsize>16</pointsize>
     </font>
    </property>
@@ -851,6 +861,7 @@
    </property>
    <property name="font">
     <font>
+     <family>Arial</family>
      <pointsize>16</pointsize>
     </font>
    </property>
@@ -869,6 +880,7 @@
    </property>
    <property name="font">
     <font>
+     <family>Arial</family>
      <pointsize>14</pointsize>
     </font>
    </property>

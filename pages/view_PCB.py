@@ -25,7 +25,8 @@ INDEX_SHAPE = {
 	'Left':3,
 	'Right':4,
 	'Five':5,
-	'Full+Three':6
+	'Full':6,
+	'Three':7
 }
 
 INDEX_CHECK = {
@@ -47,7 +48,7 @@ INDEX_INSTITUTION = {
 	'IHEP':6,
 }
 
-INDEX_RESOLUTION = {
+INDEX_CHANNEL = {
 	'HD':0,
 	'LD':1,
 }
@@ -158,27 +159,30 @@ class func(object):
 
 		self.pcb_exists = (ID == self.pcb.ID)
 		
-		if not self.pcb.insertion_user in self.index_users.keys() and not self.pcb.insertion_user is None:
-			# Insertion user was deleted from user page...just add user to the dropdown
-			self.index_users[self.pcb.insertion_user] = max(self.index_users.values()) + 1
-			self.page.cbInsertUser.addItem(self.pcb.insertion_user)
-		self.page.cbInsertUser.setCurrentIndex(self.index_users.get(self.pcb.insertion_user, -1))
+		if not self.pcb.record_insertion_user in self.index_users.keys() and len(self.index_users.keys())!=0 and not self.pcb.record_insertion_user is None:
+			# Insertion user is not in user page...fine for now, just add user to the dropdown
+			self.index_users[self.pcb.record_insrtion_user] = max(self.index_users.values()) + 1
+			self.page.cbInsertUser.addItem(self.pcb.initiated_by_user)
+		self.page.cbInsertUser.setCurrentIndex(self.index_users.get(self.pcb.record_insertion_user, -1))
 
-		self.page.cbInstitution.setCurrentIndex(   INDEX_INSTITUTION.get(    self.pcb.institution, -1)   )
-		self.page.leLocation.setText(    "" if self.pcb.location       is None else self.pcb.location    )
+		self.page.cbInstitution.setCurrentIndex(   INDEX_INSTITUTION.get(    self.pcb.location_name, -1)   )
+		self.page.leLocation.setText(    "" if self.pcb.institution_location       is None else self.pcb.institution_location    )
 
 		self.page.leBarcode.setText(     "" if self.pcb.barcode        is None else self.pcb.barcode     )
-		self.page.leManufacturer.setText("" if self.pcb.manufacturer   is None else self.pcb.manufacturer)
-		self.page.cbType.setCurrentIndex(          INDEX_TYPE.get(           self.pcb.type,-1)           )
-		self.page.cbResolution.setCurrentIndex(INDEX_RESOLUTION.get(self.pcb.resolution,-1))
-		self.page.sbNumRocs.setValue( -1 if self.pcb.num_rocs is None else self.pcb.num_rocs)
-		self.page.sbChannels.setValue(-1 if self.pcb.channels is None else self.pcb.channels)
-		if self.page.sbChannels.value() == -1: self.page.sbChannels.clear()
-		self.page.cbShape.setCurrentIndex(         INDEX_SHAPE.get(          self.pcb.shape,-1)          )
+		#self.page.leManufacturer.setText("" if self.pcb.manufacturer   is None else self.pcb.manufacturer)
+		# may be unnecessary now...
+		#self.page.cbType.setCurrentIndex(          INDEX_TYPE.get(           self.pcb.type,-1)           )
+		self.page.cbResolution.setCurrentIndex(INDEX_CHANNEL.get(self.pcb.channel_density,-1))
+		# may be unnecessary now
+		#self.page.sbNumRocs.setValue( -1 if self.pcb.num_rocs is None else self.pcb.num_rocs)
+		#self.page.sbChannels.setValue(-1 if self.pcb.channels is None else self.pcb.channels)
+		#if self.page.sbChannels.value() == -1: self.page.sbChannels.clear()
+		self.page.cbShape.setCurrentIndex(         INDEX_SHAPE.get(          self.pcb.geometry,-1)          )
 
 		self.page.listComments.clear()
-		for comment in self.pcb.comments:
-			self.page.listComments.addItem(comment)
+		if self.pcb.comments:
+			for comment in self.pcb.comments.split(";;"):
+				self.page.listComments.addItem(comment)
 		self.page.pteWriteComment.clear()
 
 		self.page.dsbFlatness.setValue( -1 if self.pcb.flatness  is None else self.pcb.flatness )
@@ -188,7 +192,7 @@ class func(object):
 		self.page.cbGrade.setCurrentIndex(         INDEX_GRADE.get(          self.pcb.grade, -1)         )
 
 
-		if self.pcb.step_pcb:
+		"""if self.pcb.step_pcb:
 			tmp_inst, tmp_id = self.pcb.step_pcb.split("_")
 			self.page.sbStepPcb.setValue(int(tmp_id))
 			self.page.cbInstitutionStep.setCurrentIndex(INDEX_INSTITUTION.get(tmp_inst, -1))
@@ -197,11 +201,13 @@ class func(object):
 			self.page.cbInstitutionStep.setCurrentIndex(-1)
 
 		self.page.leModule.setText(  "" if self.pcb.module   is None else self.pcb.module)
-
+		"""
+		# ;;-separated list of files
 		self.page.listFiles.clear()
-		for f in self.pcb.test_files:
-			name = os.path.split(f)[1]
-			self.page.listFiles.addItem(name)
+		if self.pcb.test_file_name:
+			for f in self.pcb.test_file_name.split(";;"):
+				#name = os.path.split(f)[1]
+				self.page.listFiles.addItem(f)
 
 		self.updateElements()
 
@@ -213,9 +219,10 @@ class func(object):
 
 		pcb_exists      = self.pcb_exists
 
-		step_pcb_exists = self.page.sbStepPcb.value() >=0 and \
+		"""step_pcb_exists = self.page.sbStepPcb.value() >=0 and \
 		                  self.page.cbInstitutionStep.currentText() != ""
 		module_exists   = self.page.leModule.text()  != ""
+		"""
 
 		mode_view     = self.mode == 'view'
 		mode_editing  = self.mode == 'editing'
@@ -236,12 +243,12 @@ class func(object):
 
 		self.page.leBarcode.setReadOnly(      not (mode_creating or mode_editing) )
 		self.page.leManufacturer.setReadOnly( not (mode_creating or mode_editing) )
-		self.page.cbType.setEnabled(               mode_creating or mode_editing  )
+		#self.page.cbType.setEnabled(               mode_creating or mode_editing  )
 		self.page.cbResolution.setEnabled(         mode_creating or mode_editing  )
 		self.page.cbShape.setEnabled(              mode_creating or mode_editing  )
 		self.page.cbGrade.setEnabled(              mode_creating or mode_editing  )
-		self.page.sbNumRocs.setReadOnly(      not (mode_creating or mode_editing) )
-		self.page.sbChannels.setReadOnly(     not (mode_creating or mode_editing) )
+		#self.page.sbNumRocs.setReadOnly(      not (mode_creating or mode_editing) )
+		#self.page.sbChannels.setReadOnly(     not (mode_creating or mode_editing) )
 
 		self.page.pbDeleteComment.setEnabled(mode_creating or mode_editing)
 		self.page.pbAddComment.setEnabled(   mode_creating or mode_editing)
@@ -310,22 +317,20 @@ class func(object):
 	@enforce_mode(['editing','creating'])
 	def saveEditing(self,*args,**kwargs):
 
-		self.pcb.insertion_user  = str(self.page.cbInsertUser.currentText())  if str(self.page.cbInsertUser.currentText())  else None
-		self.pcb.institution     = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
-		self.pcb.location        = str(self.page.leLocation.text()         )  if str(self.page.leLocation.text()          ) else None
+		self.pcb.record_insertion_user  = str(self.page.cbInsertUser.currentText())  if str(self.page.cbInsertUser.currentText())  else None
+		self.pcb.location_name     = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
+		self.pcb.institution_location        = str(self.page.leLocation.text()         )  if str(self.page.leLocation.text()          ) else None
 
 		self.pcb.barcode         = str(self.page.leBarcode.text()          )  if str(self.page.leBarcode.text()           ) else None
-		self.pcb.manufacturer    = str(self.page.leManufacturer.text()     )  if str(self.page.leManufacturer.text()      ) else None
-		self.pcb.resolution      = str(self.page.cbResolution.currentText())  if str(self.page.cbType.currentText()       ) else None
-		self.pcb.type            = str(self.page.cbType.currentText()      )  if str(self.page.cbType.currentText()       ) else None
-		self.pcb.num_rocs        = self.page.sbNumRocs.value()  if self.page.sbNumRocs.value()  >=0 else None
-		self.pcb.channels        = self.page.sbChannels.value() if self.page.sbChannels.value() >=0 else None
-		self.pcb.shape           = str(self.page.cbShape.currentText()     )  if str(self.page.cbShape.currentText()      ) else None
+		#self.pcb.manufacturer    = str(self.page.leManufacturer.text()     )  if str(self.page.leManufacturer.text()      ) else None
+		self.pcb.channel_density      = str(self.page.cbResolution.currentText())  if str(self.page.cbType.currentText()       ) else None
+		#self.pcb.type            = str(self.page.cbType.currentText()      )  if str(self.page.cbType.currentText()       ) else None
+		#self.pcb.num_rocs        = self.page.sbNumRocs.value()  if self.page.sbNumRocs.value()  >=0 else None
+		#self.pcb.channels        = self.page.sbChannels.value() if self.page.sbChannels.value() >=0 else None
+		self.pcb.geometry           = str(self.page.cbShape.currentText()     )  if str(self.page.cbShape.currentText()      ) else None
 
 		num_comments = self.page.listComments.count()
-		self.pcb.comments = []
-		for i in range(num_comments):
-			self.pcb.comments.append(str(self.page.listComments.item(i).text()))
+		self.pcb.comments = ';;'.join([self.page.listComments.item(i).text() for i in range(num_comments)])
 
 		self.pcb.flatness   =     self.page.dsbFlatness.value()         if     self.page.dsbFlatness.value()  >=0    else None
 		self.pcb.thickness  =     self.page.dsbThickness.value()        if     self.page.dsbThickness.value() >=0    else None
@@ -388,7 +393,7 @@ class func(object):
 				new_filepath = "_upload.".join(tmp_filepath)
 				shutil.copyfile(f, new_filepath)
 				self.page.listComments.addItem(new_filepath)
-				self.pcb.test_files.append(new_filepath)
+				self.pcb.test_file_name.append(new_filepath)
 			self.update_info()
 		else:
 			print("WARNING:  Failed to find root files in chosen directory!")
@@ -398,12 +403,15 @@ class func(object):
 		row = self.page.listFiles.currentRow()
 		if row >= 0:
 			fname = self.page.listFiles.item(row).text()
-			self.page.listFiles.takeItem(row)
+			#self.page.listFiles.takeItem(row)
 			# Now need to remove the file...
-			fdir, fname_ = self.pcb.get_filedir_filename()
-			new_filepath = fdir + '/' + fname
-			os.remove(new_filepath)
-			self.pcb.test_files.remove(new_filepath)
+			#fdir, fname_ = self.pcb.get_filedir_filename()
+			#new_filepath = fdir + '/' + fname
+			os.remove(fname) #new_filepath)
+			#self.pcb.test_file_name.remove(new_filepath)
+			if self.pcb.test_file_name.replace(fname+";;", "") == fname+";;":
+				# if substr;; not found, is probably at the end of the list, so:
+				self.pcb.test_file_name.replace(fname, "")
 			self.update_info()
 
 

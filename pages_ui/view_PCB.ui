@@ -114,11 +114,19 @@
     </item>
     <item>
      <property name="text">
-      <string>Full+Three</string>
+      <string>Full</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Three</string>
      </property>
     </item>
    </widget>
    <widget class="QComboBox" name="cbType">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>130</x>
@@ -170,6 +178,9 @@
     </item>
    </widget>
    <widget class="QLineEdit" name="leManufacturer">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>180</x>
@@ -237,6 +248,9 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="lineEdit_7">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -298,6 +312,9 @@
     </property>
    </widget>
    <widget class="QSpinBox" name="sbNumRocs">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>180</x>
@@ -365,6 +382,9 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="lineEdit_21">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -381,6 +401,9 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="lineEdit_16">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>0</x>

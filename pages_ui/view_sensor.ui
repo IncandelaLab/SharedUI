@@ -416,54 +416,6 @@
      <double>0.050000000000000</double>
     </property>
    </widget>
-   <widget class="QComboBox" name="cbShape">
-    <property name="geometry">
-     <rect>
-      <x>180</x>
-      <y>120</y>
-      <width>81</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="currentIndex">
-     <number>-1</number>
-    </property>
-    <item>
-     <property name="text">
-      <string>Full</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Top</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Bottom</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Left</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Right</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Five</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Halfmoon-N</string>
-     </property>
-    </item>
-   </widget>
    <widget class="QComboBox" name="cbGrade">
     <property name="geometry">
      <rect>
@@ -537,6 +489,59 @@
     <item>
      <property name="text">
       <string>IHEP</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QComboBox" name="cbShape">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>120</y>
+      <width>81</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>-1</number>
+    </property>
+    <item>
+     <property name="text">
+      <string>Full</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Top</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Bottom</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Left</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Right</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Five</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Full</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Three</string>
      </property>
     </item>
    </widget>

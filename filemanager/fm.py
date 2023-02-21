@@ -2,6 +2,7 @@ import json
 import time
 import glob
 import os
+import sys
 
 #NEW for xml file generation:
 from PyQt5 import QtCore
@@ -14,11 +15,13 @@ from xml.etree.ElementTree import tostring
 from xml.etree.ElementTree import fromstring
 import csv
 
-import rhapi_nolock as rh
+#import rhapi_nolock as rh
+# For DB requests:
+import cx_Oracle
 from xml.dom import minidom
 
 # IMPORTANT NOTE:  Setting this to false disables DB communication.  Purely for debugging.
-ENABLE_DB_COMMUNICATION = False
+ENABLE_DB_COMMUNICATION = True
 
 
 BASEPLATE_MATERIALS_NO_KAPTON = ['pcb']
@@ -89,8 +92,39 @@ def loadconfig(file=None):
 				# NOTE:  Format of dictionary is {ID:creation-date-string, ...}
 				json.dump({}, opfl)
 
-loadconfig()
 
+
+# Set up DB_CURSOR object for SQL requests:
+
+def connectOracle():
+	global DB_CURSOR
+	print("LOADING ORACLE LIBRARY")
+	try:
+		# Custom bash variable set up in .bashrc by install script
+		lib_dir = os.environ.get("INSTANT_CLIENT_HOME")
+		cx_Oracle.init_oracle_client(lib_dir=lib_dir)
+	except Exception as err:
+		print("FATAL ERROR:  Could not find Oracle InstantClient libraries.")
+		print("$INSTANT_CLIENT_HOME is", os.environ.get("INSTANT_CLIENT_HOME"))
+		print("$PATH is", os.environ.get("PATH"))
+		print("Exiting")
+		sys.exit(1)
+	print("Found instant client")
+	# Set up connection - takes ~1s, so do once
+	# EVERY db request goes through the cursor
+	# TODO:  Change this upon switching to production DB
+	print("Connecting...")
+	db_connection = cx_Oracle.connect(user="CMS_HGC_PRTTYPE_HGCAL_READER",
+					password="HGCAL_Reader_2016",
+					dsn="localhost:10132/int2r_lb.cern.ch",
+					encoding="UTF-8",
+					)
+	DB_CURSOR = db_connection.cursor()
+	print("Connected")
+
+loadconfig()
+os.system('ssh -f -N -M -S temp_socket -L 10131:itrac1609-v.cern.ch:10121 -L 10132:itrac1601-v.cern.ch:10121 phmaster@lxplus.cern.ch')
+connectOracle()
 
 
 ###############################################
@@ -108,7 +142,6 @@ class UserManager:
 				    'view_protomodule', 'view_module',
 					'view_sensor_step', #'view_sensor_post',
 					'view_pcb_step', #'view_pcb_post',
-                    #'view_wirebonding' -> each individual wirebonding step
 					'wirebonding_back', 'wirebonding_front',
 					'encapsulation_back', 'encapsulation_front',
 					'test_bonds', 'final_inspection'
@@ -204,7 +237,7 @@ class fsobj(object):
 	}
 
 	DEFAULTS_COMMON = {
-		'comments':[],
+		#'comments':[],
 	}
 
 	OBJECTNAME = "fsobj"
@@ -227,12 +260,12 @@ class fsobj(object):
 	# NEW
 	XML_STRUCT_DICT = None  # Should not use the base class!
 
-	# List of all class vars that are saved as a list--e.g. comments, parts, etc.
-	# Will be handled differently from normal xml items
-	ITEMLIST_LIST = ['comments']
+	# True if assembly step (multiple DATA_SETs per output file), else False
+	MULTIPART_CLASS = False
 
 	def __init__(self):
 		super(fsobj, self).__init__()
+		print("INIT (fsobj).  Calling clear()...")
 		self.clear() # sets attributes to None
 
 	def __str__(self):
@@ -255,26 +288,31 @@ class fsobj(object):
 
 
 	# NEW:  For search page
-	def add_part_to_list(self, date=None):
+	def add_part_to_list(self, ID=None, date=None):
 		# NOTE:  Date must have format {m}-{d}-{y}
+		# ID param is for tooling:  self.ID is NOT the key that must be saved!
+		# Instead, "ID_institution" is used.
+		# self.ID -> id_
+		id_ = self.ID if ID is None else ID
+
 		part_name = self.__class__.__name__
 		self.partlistfile = os.sep.join([ DATADIR, 'partlist', part_name+'s.json' ])
 		with open(self.partlistfile, 'r') as opfl:
 			data = json.load(opfl)
-			if not self.ID in data.keys():
+			if not id_ in data.keys():
 				# Note creation date and pass it to the dict
 				dcreated = time.localtime()
-				if self.ID == None:  print("ERROR:  self.ID in add_part_to_list is None!!!")
+				if id_ == None:  print("ERROR:  id_ in add_part_to_list is None!!!")
 				if date:
 					dc = date
 				else:
 					dc = '{}-{}-{}'.format(dcreated.tm_mon, dcreated.tm_mday, dcreated.tm_year)
-				data[str(self.ID)] = dc
+				data[str(id_)] = dc
 		with open(self.partlistfile, 'w') as opfl:
 			json.dump(data, opfl)
 
 
-	# Utility for _load_...:  Take a string from an XML element and return a var w/ the correct type
+	# Utility for xml-based _load_...:  Take a string from an XML element and return a var w/ the correct type
 	# "True" -> bool, 100 -> int, etc.
 	def _convert_str(self, string):
 		if not string:  return None
@@ -292,48 +330,23 @@ class fsobj(object):
 			return string
 
 
-	# Utility used for load():  Set vars of obj using struct_dict, xml_tree
-	# Recursively look through dict.  For each element found, assign XML value to corresponding var/property.
-	# - If dict, recusive case.
-	# - If list, create multiple elements w/ same tag.
-	# - Else assign normally.
-	def _load_from_dict(self, struct_dict, xml_tree):
-		for item_name, item in struct_dict.items():
-			# item_name = XML tag name, item = name of var/prop to assign
-			# If dict, recursive case.
-			if type(item) is dict:
-				self._load_from_dict(item, xml_tree)
-			# If list item, load all elements:
-			elif item in self.ITEMLIST_LIST:
-				itemdata = xml_tree.findall('.//'+item_name)  # List of all contents of matching tags
-				# NOTE:  Items could be text or ints!  Convert accordingly.
-				itemdata = [self._convert_str(it.text) for it in itemdata]
-				if itemdata == []:
-					setattr(self, item, None)
-				elif itemdata == ['[]'] or itemdata == '[]':
-					setattr(self, item, [])
-				else:
-					setattr(self, item, itemdata)  # Should be a list containing contents; just assign it to the var
-			# if ordinary item, convert from str and assign
-			else:
-				itemdata = xml_tree.find('.//'+item_name)  # NOTE:  itemdata is an Element, not text!
-				assert not itemdata is None, "ERROR:  Found None search result for {} in _load_from_dict(), {} {}".format(item_name, self.__class__.__name__, self.ID)
-				idt = self._convert_str(itemdata.text)
-				setattr(self, item, idt)
-
-
-	def load(self, ID, on_property_missing = "warn"):
+	def load(self, ID):
+		print("Attempting to load", ID)
 		if ID == -1:
 			self.clear()
 			return False
 
+		# First, check partlistfile to confirm existence.
+		# If not found in partlistfile, return false.
 		part_name = self.__class__.__name__
 		self.partlistfile = os.sep.join([ DATADIR, 'partlist', part_name+'s.json' ])
 		with open(self.partlistfile, 'r') as opfl:
 			data = json.load(opfl)
+			print("Keys:", data.keys())
 			if not str(ID) in data.keys():
 				self.clear()
 				return False
+		print("Found in partlistfile")
 
 		filedir, filename = self.get_filedir_filename(ID)
 		xml_file = os.sep.join([filedir, filename])
@@ -341,17 +354,36 @@ class fsobj(object):
 		if not os.path.exists(xml_file):
 			self.clear()
 			return False
+		print("Found xml file")
 
-		xml_tree = parse(xml_file)
-		self._load_from_dict(self.XML_STRUCT_DICT, xml_tree)
+		with open(xml_file, 'r') as opfl:
+			data = json.load(opfl)
 
 		self.ID = ID
+		data_keys = data.keys()
+		PROPERTIES = self.PROPERTIES + self.PROPERTIES_COMMON
+		DEFAULTS = {**self.DEFAULTS_COMMON, **getattr(self, 'DEFAULTS', {})}
+
+		props_in_data = [prop in data_keys for prop in PROPERTIES]
+		print("data_keys:", data_keys)
+		print("Properties:", PROPERTIES)
+		print("props in data", props_in_data)
+
+		for i,prop in enumerate(PROPERTIES):
+			prop_in_data = props_in_data[i]
+
+			if prop_in_data:
+				setattr(self, prop, data[prop])
+			else:
+				prop_default = DEFAULTS[prop] if prop in DEFAULTS.keys() else None
+
 		return True
 
 
 
 	def new(self, ID):
-		print("FSOBJ NEW")
+		# NOTE:  Should never be called on an existing object.
+		# The only person you can blame for doing this is yourself.
 		self.ID = ID
 		PROPERTIES = self.PROPERTIES + self.PROPERTIES_COMMON
 		DEFAULTS = {**self.DEFAULTS_COMMON, **getattr(self, 'DEFAULTS', {})}
@@ -362,6 +394,8 @@ class fsobj(object):
 	def clear(self):
 		self.ID = None
 		PROPERTIES = self.PROPERTIES + self.PROPERTIES_COMMON
+		print("IN CLEAR():  properties are:")
+		print(PROPERTIES)
 		DEFAULTS   = {**self.DEFAULTS, **self.DEFAULTS_COMMON}
 		for prop in PROPERTIES:
 			setattr(self, prop, DEFAULTS.get(prop, None))
@@ -381,7 +415,7 @@ class fsobj(object):
 		tree = ElementTree(root)
 
 		for item_name, item in input_dict.items():
-			if item_name == "DATA_SET":
+			if item_name == "DATA_SET" and self.MULTIPART_CLASS:
 				self.make_dataset_element(root, item)
 			else:
 				child = self.dict_to_element(item, item_name)
@@ -417,6 +451,7 @@ class fsobj(object):
 		# NEW:  Add special case for multi-item assembly steps.  Will always appear in DATA_SET dict.
 		# If in DATA_SET, data_set_index will NOT be None.  If not None, and the requested item is a list, 
 		# 	return element i instead of the usual list handling case.
+		print("dict_to_element: input_dict is", input_dict)
 
 		parent = Element(element_name)
 		
@@ -426,6 +461,7 @@ class fsobj(object):
 			# If string, use getattr()
 
 			if item_name == "DATA_SET":
+				print("DATA SET FOUND; this is WIP")
 				self.make_dataset_element(parent, item)
 			elif type(item) == dict:
 				# Recursive case: Create an element from the child dictionary.
@@ -470,9 +506,7 @@ class fsobj(object):
 		return parent
 
 
-	# Should be fully general--all objects can use this if XML_STRUCT_DICT works.
-	# Need separate implementation for tools?
-	# NOTE:  Can pass new_struct_dict if multiple XML files must be saved for a part/assembly step.
+	# NOT fully general--db-involving parts need more code to handle files-to-upload.
 	def save(self):
 		# NOTE:  Can't check item existence via filepath existence, bc filepath isn't known until after item creation!
 		# Instead, go into partlist dict and check to see whether item exists:
@@ -485,20 +519,14 @@ class fsobj(object):
 				# ...until the date has been set via add_part_to_list.  Do that now.
 				self.add_part_to_list()
 
-		# Generate XML tree:
-		struct_dict = self.XML_STRUCT_DICT
-
-		xml_tree = self.generate_xml(struct_dict)
-
-		# Save xml file:
 		filedir, filename = self.get_filedir_filename()
+		file = os.sep.join([filedir, filename])
 		if not os.path.exists(filedir):
-			os.makedirs(filedir)
-		root = xml_tree.getroot()
-		#tostring imported from xml.etree.ElementTree
-		xmlstr = minidom.parseString(tostring(root)).toprettyxml(indent = '    ')
-		with open(filedir+'/'+filename, 'w') as f:
-			f.write(xmlstr)
+			os.makedirs(filedir)	
+
+		with open(file, 'w') as opfl:
+			json.dump(vars(self), opfl, indent=4)
+
 
 	# Return a list of all files to be uploaded to the DB
 	# (i.e. all files in the object's storage dir with "upload" in the filename)
@@ -518,304 +546,32 @@ class fsobj(object):
 		return cmts
 
 
+
 # CLASS FOR TOOLS:
 # These need to be treated separately because they're saved based on ID+institution and not just institution
 # Mostly identical to fsobj, but with institution added as a primary key.
-
+# Must "act" as if it's saved w/ 2 primary keys, but actually there's only one.
 
 class fsobj_tool(fsobj):
 
-	# This is the same for all tools!
-	XML_STRUCT_DICT = {'TOOL':{
-		'ID':'ID',
-		'INSTITUTION':'institution',
-		'LOCATION':'location',
-		'COMMENT':'comments'
-	}}
+	#def add_part_to_list(self):
+	#	super(fsobj_tool, self).add_part_to_list("{}_{}".format(self.ID, self.institution))
 
-	PROPERTIES = [
-		'institution',
-	]
-
-	# NEW--used only for tooling parts.
-	def get_filedir_filename(self, ID = None, institution = None):
-		if ID is None:
-			ID = self.ID
-		if institution is None:
-			institution = self.institution
-		filedir  = os.sep.join([ DATADIR, self.FILEDIR.format(ID=ID, institution=institution, century = CENTURY.format(ID//100)) ])
-		filename = self.FILENAME.format(ID=ID, institution=institution)
-		return filedir, filename
-
-	# For search page
-	def add_part_to_list(self):
-		part_name = self.__class__.__name__
-		self.partlistfile = os.sep.join([ DATADIR, 'partlist', part_name+'s.json' ])
-		with open(self.partlistfile, 'r') as opfl:
-			data = json.load(opfl)
-			if not self.ID in data.keys():
-				dcreated = time.localtime()
-				assert self.ID!=None, "ERROR:  self.ID in add_part_to_list (tool) is None!"
-				assert self.institution!=None, "ERROR:  self.institution in add_part_to_list (tool) is None!"
-				# Key difference here:  Key is (ID, institution)
-				data["{}_{}".format(self.ID, self.institution)] = '{}-{}-{}'.format(dcreated.tm_mon, dcreated.tm_mday, dcreated.tm_year)
-		with open(self.partlistfile, 'w') as opfl:
-			json.dump(data, opfl)
-
-
-	def load(self, ID, institution, on_property_missing = "warn"):
-		part_name = self.__class__.__name__
-		self.partlistfile = os.sep.join([ DATADIR, 'partlist', part_name+'s.json' ])
-		with open(self.partlistfile, 'r') as opfl:
-			data = json.load(opfl)
-			if not "{}_{}".format(ID, institution) in data.keys():  # Key modification
-				self.clear()
-				return False
-
-		if ID == -1:
-			self.clear()
-			return False
-		if institution == None:
-			self.clear()
-			return False
-
-		filedir, filename = self.get_filedir_filename(ID, institution)
-		xml_file = os.sep.join([filedir, filename])
-
-		if not os.path.exists(xml_file):
-			self.clear()
-			return False
-
-		xml_tree = parse(xml_file)
-		self._load_from_dict(self.XML_STRUCT_DICT, xml_tree)
-
-		self.ID = ID
-		return True
-
+	def load(self, ID, institution):
+		return super(fsobj_tool, self).load("{}_{}".format(ID, institution))
 
 	def new(self, ID, institution):
-		self.ID = ID
-		self.institution = institution
-		PROPERTIES = self.PROPERTIES + self.PROPERTIES_COMMON
-		DEFAULTS = {**self.DEFAULTS_COMMON, **getattr(self, 'DEFAULTS', {})}
-		for prop in PROPERTIES:
-			setattr(self, prop, DEFAULTS[prop] if prop in DEFAULTS.keys() else None)
-	
+		#self.institution = institution
+		super(fsobj_tool, self).new("{}_{}".format(ID, institution))
 
-	def clear(self):
-		self.ID = None
-		self.institution = None
-		PROPERTIES = self.PROPERTIES + self.PROPERTIES_COMMON
-		DEFAULTS   = {**self.DEFAULTS, **self.DEFAULTS_COMMON}
-		for prop in PROPERTIES:
-			setattr(self, prop, DEFAULTS.get(prop, None))
-
-########################################################
-###### PARENT CLASS FOR PARTS AND ASSEMBLY STEPS #######
-########################################################
-
-# New:  .
-# NOTE:  ID can be saved as either an int OR a string.
-
-class fsobj_db(fsobj):
-	# NOTE:  primary key ID can be an int (assembly) OR a string (part)
-	# Vars storing names of tables to request XML files from
-	ASSM_TABLE = None
-	COND_TABLE = None
-
-	# For base xml file
-	XML_STRUCT_DICT = None
-	# For creating xml upload file
-	XML_UPLOAD_DICT = None
-	# For conditions file (thickness or temp/etc)
-	XML_COND_DICT = None
-	# List of vars that are only loaded (NOT edited by GUI)
-	XML_CONSTS = []
-	
-	# Also requires XML_STRUCT_DICT (for gui storage only),
-	# ...XML_UPLOAD_DICT, XML_COND_DICT (BOTH for uploading, see child class definitions).
-	# NOTE that the protomodule creation file is created by the protomodule class, and must be uploaded with these.
-
-	# Generic header for all COND files
-	COND_HEADER_DICT = {
-		'TYPE':{
-			'EXTENSION_TABLE_NAME':'COND_TABLE_NAME',
-			'NAME':'TABLE_DESC',
-		},
-		'RUN':{
-			'RUN_NAME':'RUN_TYPE',
-			'RUN_BEGIN_TIMESTAMP':'run_start_xml',  # Format:  2018-03-26 00:00:00
-			'RUN_END_TIMESTAMP':'run_stop_xml',
-			'INITIATED_BY_USER':'user_performed',
-			'LOCATION':'xml_location',
-			'COMMENT_DESCRIPTION':'CMT_DESCR',
-		}
-	}
-
-
-
-	def __init__(self):
-		super(fsobj_db, self).__init__()
-		# Add all other vars to XML_STRUCT_DICT
-		# (so they will be saved accordingly)
-		if self.XML_STRUCT_DICT is None:
-			self.XML_STRUCT_DICT = {'data':{'row':{} } }
-		for var in self.PROPERTIES + self.PROPERTIES_COMMON:
-			if var not in self.XML_CONSTS:  self.XML_STRUCT_DICT['data']['row'][var] = var
-
-	def save(self):
-		# This one handles self.XML_STRUCT_DICT...
-		super(fsobj_db, self).save()
-
-		# NEXT, write the upload files!
-		# There's two:  One for Build_UCSB_ProtoModules_00.xml, one for ProtoModules_BuildCond_00.xml (base and cond).
-		# Defined in XML_UPLOAD_DICT, XML_COND_DICT
-		filedir, filename = self.get_filedir_filename()
-		fname_build = filename.replace('.xml', '_build_upload.xml')
-		fname_cond  = filename.replace('.xml', '_cond_upload.xml')
-		# Build file:
-		xml_tree = self.generate_xml(self.XML_UPLOAD_DICT)
-		root = xml_tree.getroot()
-		xmlstr = minidom.parseString(tostring(root)).toprettyxml(indent = '    ')  #tostring imported from xml.etree.ElementTree
-		xmlstr = xmlstr.replace("version=\"1.0\" ", "version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"")
-		with open(filedir+'/'+fname_build, 'w') as f:
-			f.write(xmlstr)
-		# Cond file:
-		xml_tree = self.generate_xml(self.XML_COND_DICT)
-		root = xml_tree.getroot()
-		xmlstr = minidom.parseString(tostring(root)).toprettyxml(indent = '    ')
-		xmlstr = xmlstr.replace("version=\"1.0\" ", "version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"")
-		with open(filedir+'/'+fname_cond, 'w') as f:
-			f.write(xmlstr)
-
-
-
-	def load(self, ID, on_property_missing = "warn"):
-		if ID == "" or ID == -1 or ID == None:
-			self.clear()
-			return False
-
-		part_name = self.__class__.__name__
-		self.partlistfile = os.sep.join([ DATADIR, 'partlist', part_name+'s.json' ])
-		with open(self.partlistfile, 'r') as opfl:
-			data = json.load(opfl)
-			if str(ID) in data.keys():
-				dt = data[str(ID)]
-			else:
-				if not ENABLE_DB_COMMUNICATION:
-					print("**TEMPORARY:  Object downloading disabled for testing!**")
-					return False
-				
-				self.ID = ID
-				search_conditions = {'ID':self.ID}  # Only condition needed
-				# For each XML file/table needed, make a request:
-				# Should automatically determine where file should be saved AND add part to list
-				assm_request = self.request_XML(self.ASSM_TABLE, search_conditions)
-
-				cond_request = self.request_XML(self.COND_TABLE, search_conditions, suffix="_cond")
-
-				if assm_request != cond_request:  # One file is found, the other isn't:
-					print("ERROR:  Only one of 2 requested files was found!")
-					print("Base file found: ", assm_request)
-					print("Cond file found: ", cond_request)
-					self.clear()
-					return False
-				elif not (assm_request and cond_request):
-					print("Object not found.  Returning false...")
-					self.clear()
-					return False
-				# Otherwise, both files are found!  Load from both of them.
-				print("Object found!")
-				self.add_part_to_list()
-				self.add_part_to_list()
-				dcreated = time.localtime()
-				dt = '{}-{}-{}'.format(dcreated.tm_mon, dcreated.tm_mday, dcreated.tm_year)
-				
-		filedir, filename = self.get_filedir_filename(ID)  #, date=dt)
-		condname = filename.replace('.xml', '_cond.xml')
-		xml_file      = os.sep.join([filedir, filename])
-
-		assert os.path.exists(xml_file), "ERROR:  Step is present in partlistfile OR downloaded, but XML file {} does not exist!".format(xml_file)
-
-		xml_tree = parse(xml_file)
-		self._load_from_dict(self.XML_STRUCT_DICT, xml_tree)
-
-		# NOTE:  Now saving cond file ONLY as an upload file.  Load all info from standard file.
-		self.ID = ID
-		return True
-
-	
-	# NEW: Must save to correct location!
-	def request_XML(self, table_name, search_conditions, suffix=None):
-		# NOTE NOTE NOTE:  Must save file in correct location AND add_part_to_list!
-		# suffix is added to the end of the filename (will be _cond)
-		if not ENABLE_DB_COMMUNICATION:
-			return False
-
-		if self.ID == None or self.ID == -1:
-			print("WARNING:  Called request_XML() on uninitialized object; ignoring")
-			return False
-
-		#filedir, filename = self.get_filedir_filename(self.ID)
-		#condname = filename.replace('.xml', '_cond.xml')
-
-		sql_template = 'select * from hgc_int2r.{} p'
-		sql_request = sql_template.format(table_name)
-		sql_request = sql_request + ' where'
-		# search_conditions is a dict:  {param_name:param_value}
-		for param, value in search_conditions.items():
-			sql_request = sql_request + ' p.{}={}'.format(param, value)
-
-		try:
-			api = rh.RhApi(url='https://cmsdca.cern.ch/hgc_rhapi', debug=True, sso='login')
-			data = api.xml(sql_request, verbose=True)
-		except rh.RhApiRowLimitError as e:
-			print("ERROR in request_xml():  Could not download files from DB:")
-			print(e)
-			return False
-
-		xml_str = minidom.parseString(data).toprettyxml(indent="    ")
-		# Output is an empty XML file, header len 61
-		# NOTE:  Should be a SINGLE XML result!
-		if len(xml_str) < 62:
-			print("WARNING in request_xml():  No files match the search criteria")
-			return False
-		# Store requested file
-		xml_tree = fromstring(xml_str)
-		ID = int(xml_tree.find('.//ID').text)
-		date = xml_tree.find('.//TIME_START')
-		# file date format = {}-{}-{}, mdy
-		# XML date format = 26-MAR-18
-		# https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior
-		dt = datetime.strptime(date, '%d-%b-%y')
-		filedir, filename = self.get_filedir_filename(ID, date)
-
-		if suffix:  filename = filename.replace('.xml', suffix+'.xml')
-
-		with open(os.path.join([filedir, filename]), 'w') as f:
-			f.write(xml_str)
-
-		self.add_part_to_list(datetime.strftime('%m-%d-%Y'))
-
-		return True
-
-	# Universal properties
+	#def clear(self):
+	#	self.institution = None
+	#	super(fsobj_tool, self).clear()
 
 	@property
-	def institution_id(self):
-		# INSTITUTION_DICT maps ID -> name#
-		for instID, instname in INSTITUTION_DICT.items():
-			if self.institution == instname:  return instID
-		print("ERROR:  location not found in INSTITUTION_DICT")
-		return None
-	@institution_id.setter
-	def institution_id(self, value):
-		if value is None:
-			self.institution = None
-		elif not value in INSTITUTION_DICT.keys():
-			print("WARNING:  institution_id:  Found invalid location ID {}".format(value))
-		else:
-			self.institution = INSTITUTION_DICT[value]
+	def institution(self):
+		 return self.ID.split("_")[1]
+
 
 
 
@@ -829,7 +585,7 @@ class fsobj_db(fsobj):
 class tool_sensor(fsobj_tool):
 	OBJECTNAME = "sensor tool"
 	FILEDIR = os.sep.join(['tooling','tool_sensor'])
-	FILENAME = 'tool_sensor_{institution}_{ID:0>5}.xml'
+	FILENAME = 'tool_sensor_{ID}.json'
 	PROPERTIES = [
 		'location',
 	]
@@ -842,7 +598,7 @@ class tool_sensor(fsobj_tool):
 class tool_pcb(fsobj_tool):
 	OBJECTNAME = "PCB tool"
 	FILEDIR = os.sep.join(['tooling','tool_pcb'])
-	FILENAME = 'tool_pcb_{institution}_{ID:0>5}.xml'
+	FILENAME = 'tool_pcb_{ID}.json'
 	PROPERTIES = [
 		'location',
 	]
@@ -851,7 +607,7 @@ class tool_pcb(fsobj_tool):
 class tray_assembly(fsobj_tool):
 	OBJECTNAME = "assembly tray"
 	FILEDIR = os.sep.join(['tooling','tray_assembly'])
-	FILENAME = 'tray_assembly_{institution}_{ID:0>5}.xml'
+	FILENAME = 'tray_assembly_{ID}.json'
 	PROPERTIES = [
 		'location',
 	]
@@ -860,7 +616,7 @@ class tray_assembly(fsobj_tool):
 class tray_component_sensor(fsobj_tool):
 	OBJECTNAME = "sensor tray"
 	FILEDIR = os.sep.join(['tooling','tray_component_sensor'])
-	FILENAME = 'tray_component_sensor_{institution}_{ID:0>5}.xml'
+	FILENAME = 'tray_component_sensor_{ID}.json'
 	PROPERTIES = [
 		'location',
 	]
@@ -869,10 +625,298 @@ class tray_component_sensor(fsobj_tool):
 class tray_component_pcb(fsobj_tool):
 	OBJECTNAME = "pcb tray"
 	FILEDIR = os.sep.join(['tooling','tray_component_pcb'])
-	FILENAME = 'tray_component_pcb_{institution}_{ID:0>5}.xml'
+	FILENAME = 'tray_component_pcb_{ID}.json'
 	PROPERTIES = [
 		'location',
 	]
+
+
+
+########################################################
+###### PARENT CLASS FOR PARTS AND ASSEMBLY STEPS #######
+########################################################
+
+# NOTE:  ID can be saved as either an int OR a string.
+
+class fsobj_db(fsobj):
+	# Key vars and utilities:
+	XML_CONSTS = []  # List of vars loaded, but not edited, by GUI
+
+	VNUM = 1   # Param in conditions XML
+
+	COND_HEADER_DICT = {
+		'TYPE':{
+			'EXTENSION_TABLE_NAME':'COND_TABLE_NAME',
+			'NAME':'TABLE_DESC',
+		},
+		'RUN':{
+			'RUN_NAME':'RUN_TYPE',
+			'RUN_BEGIN_TIMESTAMP':'run_begin_timestamp',  # Format:  2018-03-26 00:00:00
+			'RUN_END_TIMESTAMP':'run_end_timestamp',
+			'INITIATED_BY_USER':'initiated_by_user',
+			'LOCATION':'location',
+			'COMMENT_DESCRIPTION':'comment_description',
+		}
+	}
+
+	# Member functions:
+
+	def __init__(self):
+		super(fsobj_db, self).__init__()
+		# NO LONGER NECESSARY (via json):
+		# Add all other vars to XML_STRUCT_DICT
+		# (so they will be saved accordingly)
+		#if self.XML_STRUCT_DICT is None:
+		#	self.XML_STRUCT_DICT = {'data':{'row':{} } }
+		#for var in self.PROPERTIES + self.PROPERTIES_COMMON:
+		#	if var not in self.XML_CONSTS:  self.XML_STRUCT_DICT['data']['row'][var] = var
+
+	# Universal properties:
+
+	@property
+	def institution_id(self):
+		# INSTITUTION_DICT maps ID -> name#
+		if self.institution == None:
+			return None
+		for instID, instname in INSTITUTION_DICT.items():
+			if self.institution == instname:
+				return instID
+		print("WARNING:  institution ID for {} not found in INSTITUTION_DICT".format(self.institution))
+		return None
+	@institution_id.setter
+	def institution_id(self, value):
+		if value is None:
+			self.institution = None
+		elif not value in INSTITUTION_DICT.keys():
+			print("WARNING:  institution_id:  Found invalid location ID {}".format(value))
+			self.institution = None
+		else:
+			self.institution = INSTITUTION_DICT[value]
+
+
+
+### PARENT CLASS FOR PARTS
+
+
+class fsobj_part(fsobj_db):
+	# COND_TABLE varies, defined in each class
+	# Table names:  CMS_HGC_HGCAL_COND.x
+	# baseplates:  SI_MODULE_BASEPLATE
+	# sensors:     SI_MODULE_SENSOR
+	# PCBs:        FLATNS_PBC_ROCS_DATA
+	# protomods:   HGC_PRTO_MOD_ASMBLY_COND
+	# mods:        HGC_MOD_ASMBLY_COND
+
+	COND_TABLE = None  # Table containing cond info, varies from obj to obj
+	XML_PART_TEMPLATE = None  # Dict describing structure of part upload XML file
+	XML_COND_TEMPLATE = None  # ............................ cond upload XML file
+
+	PART_PROPERTIES = [
+		# Read-only:
+		"display_name",  # only entry from KINDS_OF_PARTS table
+		# NOTE:  -> kind_of_part in XML
+		"part_id",
+		"record_insertion_user",  # read-only, likely not used
+		"kind_of_part_id",  # NOTE:  Not used
+		"manufacturer_id",  # -> manufacturer in XML, not always necessary
+		"barcode",  # CANNOT upload this, breaks the xml
+		"serial_number"
+		# Read/write:
+		#"location", # replaced
+		#"location_name",  # NOTE:  Actually institution
+		"production_date",
+		"batch_number",
+		"record_lastupdate_user",  # NOTE:  Using this in GUI
+
+		# local storage only (not in DB)
+		"institution_location", # location at institution
+
+		# NOTE:  All other vars in PARTS are ignored by the GUI.
+		# Will be downloaded into json, but not used/uploaded.
+		#"is_record_deleted",
+		#"record_insertion_time",
+		#"version",
+		#"name_label",
+		#"installed_date",
+		#"removed_date",
+		#"installed_by_user",
+		#"removed_by_user",
+		#"extension_table_name",
+		#"record_lastupdate_time",
+		#"comment_description"
+	]
+	
+	COND_HEADER_PROPERTIES = [
+		"run_name",
+		"run_begin_timestamp",
+		"run_end_timestamp",
+		"initiated_by_user",
+		"location_name",
+		"comment_description"
+	]
+
+	COND_PROPERTIES = []
+	LOCAL_PROPERTIES = []
+
+	XML_PART_TEMPLATE = {"PARTS":{"PART":{  # same for all parts
+		"KIND_OF_PART":"kind_of_part",
+		"RECORD_INSERTION_USER":"record_insertion_user",
+		"SERIAL_NUMBER":"ID",
+		"COMMENT_DESCRIPTION":"comment_description",
+		"LOCATION":"location_name",
+		"MANUFACTURER":"manufacturer"  # Usually not used
+	}}}
+	# XML_COND_TEMPLATE is separate for each part
+
+	def __init__(self):
+		self.PROPERTIES = self.PART_PROPERTIES + self.COND_PROPERTIES \
+						  + self.COND_HEADER_PROPERTIES + self.LOCAL_PROPERTIES
+		super(fsobj_part, self).__init__()
+
+
+	def sql_request_part(self, ID):
+		#return "select * from PARTS p where p.SERIAL_NUMBER={}".format(self.ID)
+		# old - also want to get KIND_OF_PART name for geometry info
+		return """select kp.DISPLAY_NAME, p.*
+from CMS_HGC_CORE_CONSTRUCT.PARTS p
+inner join CMS_HGC_CORE_CONSTRUCT.KINDS_OF_PARTS kp
+on p.KIND_OF_PART_ID = kp.KIND_OF_PART_ID
+where p.SERIAL_NUMBER=\'{}\'
+""".format(ID)
+
+	def sql_request_cond(self, ID):
+		# SQL command:  Given a part SERIAL_NUMBER, select the entire corresponding row from COND_TABLE
+		# NOTE:  LOCATION_NAME is new, since PART only stores ID number
+		return """select p.SERIAL_NUMBER, fd.*, lo.LOCATION_NAME
+from CMS_HGC_CORE_COND.COND_DATA_SETS ds
+inner join CMS_HGC_HGCAL_COND.{} fd
+on fd.CONDITION_DATA_SET_ID = ds.CONDITION_DATA_SET_ID
+inner join CMS_HGC_CORE_CONSTRUCT.PARTS p
+on p.PART_ID = ds.PART_ID
+inner join CMS_HGC_CORE_MANAGEMNT.LOCATIONS lo
+on p.LOCATION_ID = lo.LOCATION_ID
+where p.SERIAL_NUMBER=\'{}\'""".format(self.COND_TABLE, ID)
+
+
+	def save(self):
+		# This one handles the json files
+		super(fsobj_part, self).save()
+
+		# NEXT, write the upload files!
+		# There's two:  One for Build_UCSB_ProtoModules_00.xml, one for ProtoModules_BuildCond_00.xml (part and cond).
+		# Defined in XML_PART_TEMPLATE, XML_COND_TEMPLATE
+		filedir, filename = self.get_filedir_filename()
+		fname_build = filename.replace('.xml', '_build_upload.xml')
+		fname_cond  = filename.replace('.xml', '_cond_upload.xml')
+		# Build file:
+		xml_tree = self.generate_xml(self.XML_PART_TEMPLATE)
+		root = xml_tree.getroot()
+		xmlstr = minidom.parseString(tostring(root)).toprettyxml(indent = '    ')  #tostring imported from xml.etree.ElementTree
+		xmlstr = xmlstr.replace("version=\"1.0\" ", "version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"")
+		with open(filedir+'/'+fname_build, 'w') as f:
+			f.write(xmlstr)
+		# Cond file:
+		if self.XML_COND_TEMPLATE:
+			xml_tree = self.generate_xml(self.XML_COND_TEMPLATE)
+			root = xml_tree.getroot()
+			xmlstr = minidom.parseString(tostring(root)).toprettyxml(indent = '    ')
+			xmlstr = xmlstr.replace("version=\"1.0\" ", "version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"")
+			with open(filedir+'/'+fname_cond, 'w') as f:
+				f.write(xmlstr)
+	
+		# NEXT:  Upload to DB!
+		# Create new process (user should not wait for this):
+		# upload base file first
+		# wait n seconds
+		# upload cond file second
+		
+
+
+	# Revamped
+	def load(self, ID, on_property_missing = "warn"):
+		if ID == "" or ID == -1 or ID == None:
+			self.clear()
+			return False
+
+		part_name = self.__class__.__name__
+		self.partlistfile = os.sep.join([ DATADIR, 'partlist', part_name+'s.json' ])
+		data = None
+		with open(self.partlistfile, 'r') as opfl:
+			data = json.load(opfl)
+		if str(ID) in data.keys():
+			print("      FOUND in partlistfile, can quick load")
+			dt = data[str(ID)]
+			super(fsobj_part, self).load(ID)
+
+		else:
+			if not ENABLE_DB_COMMUNICATION:
+				print("**TEMPORARY:  Object not found, and downloading disabled for testing!**")
+				return False
+
+			# Use DB_CURSOR and self.SQL_REQUEST to find XML files
+			# Data from part table
+			print("Requesting part data")
+			DB_CURSOR.execute(self.sql_request_part(ID))
+			# Reformat
+			columns = [col[0] for col in DB_CURSOR.description]
+			DB_CURSOR.rowfactory = lambda *args: dict(zip(columns, args))
+			data_part = DB_CURSOR.fetchone()
+			if data_part is None:
+				# Part not found
+				print("SQL query found nothing")
+				return False
+
+			# Data from cond table
+			print("Requesting cond data")
+			print("QUERY:")
+			print(self.sql_request_cond(ID))
+			DB_CURSOR.execute(self.sql_request_cond(ID))
+			# Reformat
+			columns = [col[0] for col in DB_CURSOR.description]
+			DB_CURSOR.rowfactory = lambda *args: dict(zip(columns, args))
+			data_cond = DB_CURSOR.fetchone()
+			# data_* is now a dict:  {"SERIAL_NUMBER":"xyz", "THICKNESS":"0.01", ...}
+
+			# Load all data into self.
+			# DB col names are [local var name].upper()
+			print("Downloaded part data:")
+			print(data_part)
+			print("Downloaded cond data:")
+			print(data_cond)
+
+			def fill_self(data_x):
+				for colname, var in data_x.items():
+					# NOTE:  datetime objs cannot be stored as json, or simply sent to xml...so stringify
+					if type(var) == datetime.datetime:
+						dstring = "{}-{}-{} {:02d}:{:02d}:{:02d}".format(var.year, var.month, var.day, var.hour, var.minute, var.second)
+						setattr(self, colname.lower(), dstring)
+					elif type(var) == datetime.date:
+						dstring = "{}-{}-{}".format(var.year, var.month, var.day)
+						setattr(self, colname.lower(), dstring)
+					elif type(var) == str:
+						st = self._convert_str(var)
+						setattr(self, colname.lower(), st)
+					else:
+						setattr(self, colname.lower(), var)
+			fill_self(data_part)
+			fill_self(data_cond)
+
+			# Data is now in python obj.  Ensure save:
+			self.ID = ID
+			self.save()
+
+		#self.ID = ID
+		return True
+
+
+
+#class fsobj_assembly(fsobj):
+#	#@property
+#	#def sql_request(self):
+#	#	return "select * from PARTS p where p.SERIAL_NUMBER={}".format(self.ID)
+
+
+
 
 
 
@@ -880,88 +924,60 @@ class tray_component_pcb(fsobj_tool):
 #####  components, protomodules, modules  #####
 ###############################################
 
-class baseplate(fsobj_db):
+class baseplate(fsobj_part):
 	OBJECTNAME = "baseplate"
 	FILEDIR = os.sep.join(['baseplates','{date}'])
 	FILENAME = "baseplate_{ID}.xml"
 
-	PROPERTIES = [
-		# location
-		"institution",
-		"location",  # physical location of part
-
-		# characteristics (defined upon reception)
-		"barcode",
-		"material",     # physical material
-		"size",         # hexagon width, numerical. 6 or 8 (integers) for 6-inch or 8-inch
-		"shape",        # 
-
-		# baseplate qualification 
+	# Note:  serial_number == self.ID
+	COND_PROPERTIES = [
+		# Read/write from cond:
+		"thickness",
 		"flatness",
-		"thickness",           # measure thickness of baseplate
-		"grade",   # A, B, or C
-		"channel_density", # NEW - needed for geometry information
-
-		"check_edges_firm", # None if not checked yet; True if passed; False if failed
-		"check_glue_spill", # None if not checked yet; True if passed; False if failed
-
-		# sensor application
-		"step_sensor", # which step_sensor used it
-		"protomodule", # what protomodule (ID) it's a part of; None if not part of any
-
-		# Associations to other objects
-		"module", # what module (ID) it's a part of; None if not part of any
-
-		# NEW to match XML script
-		"insertion_user", # may not need this...
-
-		# NEW:  Data to be read from base XML file
-		# Will be given straight to the upload file, or held onto
-		"id_number",
-		"parent_ID",
-		"description",
+		"grade",
+		"comments",	
 	]
+
+	LOCAL_PROPERTIES = [
+		# Locally-saved, not part of DB:
+		"institution_location",  # location at institution
+		"protomodule",  # TBD
+		"module",
+	]
+
+	# Derived properties:
+	# material (from display_name)
+	# geometry
+	# channel density
 
 	DEFAULTS = {
 		"size":     '8', # This should not be changed!
+		"display_name": "None Baseplate None None"
 	}
 
 
-	"""XML_STRUCT_DICT = { "data":{"row":{
-		"ID":"id_number",
-		"PART_PARENT_ID":'parent_id',  #Don't care about this (not needed for upload)
-		"KIND_OF_PART_ID":"kind_of_part_id",
-		"KIND_OF_PART":"kind_of_part",
-		"LOCATION_ID":"institution_id",
-		"SERIAL_NUMBER":"ID",
-		"DESCRIPTION":"description",
-	}}}"""
-
-	XML_UPLOAD_DICT = {"PARTS":{"PART":{
-		"KIND_OF_PART":"kind_of_part",
-		"RECORD_INSERTION_USER":"insertion_user",
-		"SERIAL_NUMBER":"ID",
-		"COMMENT_DESCRIPTION":"comments_concat",
-		"LOCATION":"institution",
-	}}}
-
-	XML_COND_DICT = {
-		"HEADER":self.COND_HEADER_DICT,
+	XML_COND_TEMPLATE = {
+		"HEADER":fsobj_db.COND_HEADER_DICT,
 		"DATA_SET":{
-			"COMMENT_DESCRIPTION":"inspection_comment",
+			"COMMENT_DESCRIPTION":"comment_description",
 			"VERSION":"VNUM",
 			"PART":{
 				"SERIAL_NUMBER":"ID",
 				"KIND_OF_PART":"kind_of_part",
-			}
+			},
 			"DATA":{
 				"FLATNESS":"flatness",
-				"COMMENTS":"inspection_comment",
 				"THICKNESS":"thickness",
 				"GRADE":"grade",
+				"MATERIAL":"mat_type",
+				"COMMENTS":"comments",
 			}
 		}
 	}
+
+	# for HEADER_DICT
+	COND_TABLE = "SI_MODULE_BASEPLATE"
+	TABLE_DESC = "Si Module Baseplate Test Data"
 
 	# List of vars that should NOT be edited in the GUI and are only loaded from DB
 	# (And some info would be redundant w/ other constants, eg KIND_OF_PART and self.size)
@@ -969,132 +985,159 @@ class baseplate(fsobj_db):
 		'size',
 	]
 
-	# List of vars that are stored as lists.
-	# Need to be treated separately @ loading from XML
-	ITEMLIST_LIST = ['comments'] # 'corner_heights'
-
 
 	@property
 	def kind_of_part(self):
-		return "{} Baseplate {}".format(self.material, self.shape)
-	@kind_of_part.setter
-	def kind_of_part(self, value):
-		# Parse and read in the baseplate size
-		if value is None or value == "None":
-			self.material = None
-			self.shape = None
-		else:
-			self.material = value.split()[0]
-			self.shape = value.split()[2]
+		return self.display_name
+		#"{} Baseplate {} {}".format(self.material, self.channel_density, self.shape)
+
+	@property
+	def mat_type(self):
+		print("********PLT MAT_TYPE IS:", self.display_name.split()[0])
+		return self.display_name.split()[0]
+	@mat_type.setter  # eventually, these will not be used
+	def mat_type(self, value):
+		# Cannot replace bc of case w/ multiple Nones
+		# split, then change and recombine
+		splt = self.display_name.split(" ")
+		splt[0] = str(value)
+		self.display_name = " ".join(splt)
+
+	@property
+	def channel_density(self):
+		if self.display_name is None:  return None
+		return self.display_name.split()[2]
+	@channel_density.setter
+	def channel_density(self, value):
+		splt = self.display_name.split(" ")
+		splt[2] = str(value)
+		self.display_name = " ".join(splt)
+
+	@property
+	def geometry(self):
+		if self.display_name is None:  return None
+		return self.display_name.split()[3]
+	@geometry.setter
+	def geometry(self, value):
+		splt = self.display_name.split(" ")
+		splt[3] = str(value)
+		self.display_name = " ".join(splt)
 
 
 	def ready_step_sensor(self, step_sensor = None, max_flatness = None):
+		# POSSIBLE:  Query DB to check for sensors?
+		# unless this is already done via goto/etc...
 		if self.step_sensor and self.step_sensor != step_sensor:
 			return False, "already assigned to protomodule {}".format(self.protomodule)
 		return True, ""
 
 
-class sensor(fsobj_db):
+class sensor(fsobj_part):
 	OBJECTNAME = "sensor"
 	FILEDIR = os.sep.join(['sensors','{date}'])
 	FILENAME = "sensor_{ID}.xml"
-	PROPERTIES = [
-		# location
-		"institution",
-		"location",  # physical location of part
 
-		# characteristics (defined upon reception)
-		"barcode",
-		"manufacturer",
-		"type",         # NEW:  This is now chosen from a drop-down menu
-		"size",         # 
-		"channel_density",  # HD or LD
-		"shape",        # 
+	# Note:  serial_number == self.ID
+	COND_PROPERTIES = [
+		# Read/write from cond:
+		"thickness",
+		"flatness",
 		"grade",
-		"flatness",     # 
-
-		# sensor qualification
-		"inspection", # None if not inspected yet; True if passed; False if failed
-
-		# sensor step
-		"step_sensor", # which step_sensor placed this sensor
-		"protomodule", # which protomodule this sensor is a part of
-
-		# associations to other objects
-		"module", # which module this sensor is a part of
-
-		# New to match Akshay's script
-		"insertion_user",
-		# NEW:  Data to be read from base XML file
-		"id_number",
-		"description",
-
+		"comments",	
+		"visual_inspection"
 	]
 
+	LOCAL_PROPERTIES = [
+		# Locally-saved, not part of DB:
+		"location",  # location at institution
+		"protomodule",  # TBD
+		"module",
+	]
+
+	# Derived properties:
+	# material (from display_name)
+	# geometry
+	# channel density
+
 	DEFAULTS = {
-		"size":    '8',  # DO NOT MODIFY
+		"size":     '8', # This should not be changed!
+		"display_name": "None Si Sensor None None"
 	}
 
-	XML_STRUCT_DICT = { "data":{"row":{
-		"KIND_OF_PART_ID":"kind_of_part_id",
-		"KIND_OF_PART":"kind_of_part", #TBD:  Property
-		"LOCATION_ID":"institution_id", # same...
-		"MANUFACTURER":"manufacturer",
-		"SERIAL_NUMBER":"ID",
-		"DESCRIPTION":"description",  # Can probably leave this blank...
-	}}}
+	XML_COND_TEMPLATE = {
+		"HEADER":fsobj_db.COND_HEADER_DICT,
+		"DATA_SET":{
+			"COMMENT_DESCRIPTION":"comment_description",
+			"VERSION":"VNUM",
+			"PART":{
+				"SERIAL_NUMBER":"ID",
+				"KIND_OF_PART":"kind_of_part",
+			},
+			"DATA":{
+				"FLATNESS":"flatness",
+				"THICKNESS":"thickness",
+				"GRADE":"grade",
+				"COMMENTS":"comments",
+				"VISUAL_INSPECTION":"visual_inspection",
+			}
+		}
+	}
 
-	XML_UPLOAD_DICT = {"PARTS":{"PART":{
-		"KIND_OF_PART":"kind_of_part",
-		"RECORD_INSERTION_USER":"insertion_user",
-		"SERIAL_NUMBER":"ID",
-		"COMMENT_DESCRIPTION":"comments_concat",
-		"LOCATION":"institution",
-		# NEW:
-		"THICKNESS":"thickness",
-		"VISUAL_INSPECTION":"inspection",
-		"GRADE":"grade",
-		#"COMMENTS":"comments_concat",
-		#"PREDEFINED_ATTRIBUTES":{  # Ignore this for now...
-		#	"ATTRIBUTE":{
-		#		"NAME":"HGC Silicon Sensor Type",
-		#		"VALUE":"200DD",
-		#	}
-		#}
-	}}}
+	# for HEADER_DICT
+	COND_TABLE = "FLATNS_SENSOR_DATA"
+	TABLE_DESC = "HGC Sensor Flatness Data"
 
+
+	# List of vars that should NOT be edited in the GUI and are only loaded from DB
+	# (And some info would be redundant w/ other constants, eg KIND_OF_PART and self.size)
 	XML_CONSTS = [
 		'size',
 	]
 
-	ITEMLIST_LIST = ['comments']
-
-	@property
-	def resolution(self):
-		return self.channel_density
-	@resolution.setter
-	def resolution(self, value):
-		self.channel_density = value
 
 	@property
 	def kind_of_part(self):
-		return "{} Si Sensor {} {}".format(self.type, self.resolution, self.shape)
-	@kind_of_part.setter
-	def kind_of_part(self, value):
-		# Parse and read in the baseplate size
-		if value is None:
-			self.type = None
-			self.resolution = None
-			self.shape = None
-		else:
-			self.type = value.split()[0]
-			self.resolution = value.split()[2]
-			self.shape = value.split()[3]
+		return self.display_name
 
 	@property
+	def sen_type(self):
+		return self.display_name.split()[0]
+	@sen_type.setter  # eventually, these will not be used
+	def sen_type(self, value):
+		# Cannot replace bc of case w/ multiple Nones
+		# split, then change and recombine
+		print("SEN_TYPE SETTER")
+		splt = self.display_name.split(" ")
+		splt[0] = str(value)
+		self.display_name = " ".join(splt)
+
+	@property
+	def channel_density(self):
+		if self.display_name is None:  return None
+		return self.display_name.split()[3]
+	@channel_density.setter
+	def channel_density(self, value):
+		splt = self.display_name.split(" ")
+		splt[3] = str(value)
+		self.display_name = " ".join(splt)
+
+	@property
+	def geometry(self):
+		if self.display_name is None:  return None
+		return self.display_name.split()[4]
+	@geometry.setter
+	def geometry(self, value):
+		splt = self.display_name.split(" ")
+		splt[4] = str(value)
+		self.display_name = " ".join(splt)
+
+
+	@property  # Note: not a measured value
 	def thickness(self):
 		return float(self.type.split('um')[0])/1000
-
+	@thickness.setter
+	def thickness(self, value):
+		pass
 
 
 	# Should not be passing any of these params yet
@@ -1123,100 +1166,97 @@ class sensor(fsobj_db):
 
 
 
-class pcb(fsobj_db):
+class pcb(fsobj_part):
 	OBJECTNAME = "PCB"
 	FILEDIR = os.sep.join(['pcbs','{date}'])
 	FILENAME = "pcb_{ID}.xml"
-	PROPERTIES = [
-		# location
-		"institution",
-		"location",  # physical location of part
 
-		# details / measurements / characteristics
-		"insertion_user",
-		"barcode", 
-		"manufacturer", # 
-		"type",         # 
-		"resolution",   # NEW
-		"num_rocs",     # NEW
-		"size",         # 
-		"channels",     # 
-		"shape",        # 
-
-		# pcb qualification
+	# Note:  serial_number == self.ID
+	COND_PROPERTIES = [
+		# Read/write from cond:
+		"thickness",
+		"flatness",
 		"grade",
-		"thickness",  # 
-		"flatness",   # 
-		
-		# pcb step
-		"step_pcb", # which step_pcb placed this pcb
-		"module",   # which module this pcb is a part of
-
-		# NEW:  Data to be read from base XML file
-		"id_number",
-		"kind_of_part_id",
-		"kind_of_part",
-		"description",
-
-		"manufacturer",  # for output XML
-		"version",
-		"batch_number",
-
-		"test_files",
+		"comments",	
+		"test_file_name",
 	]
+
+	LOCAL_PROPERTIES = [
+		# Locally-saved, not part of DB:
+		"location",  # location at institution
+		"protomodule",  # TBD
+		"module",
+	]
+
+	# Derived properties:
+	# material (from display_name)
+	# geometry
+	# channel density
 
 	DEFAULTS = {
-		"size":     '8',
-		"comment_description":  "TEST",
-		"test_files":[],
+		"size":     '8', # This should not be changed!
+		"display_name": "None PCB None None"
 	}
 
-	XML_STRUCT_DICT = { "data":{"row":{
-		"ID":"id_number",
-		"KIND_OF_PART_ID":"kind_of_part_id",
-		"KIND_OF_PART":"kind_of_part", #TBD:  Property
-		"LOCATION_ID":"institution_id", # same...
-		"MANUFACTURER":"manufacturer",
-		"SERIAL_NUMBER":"ID",
-		"VERSION":"version",
-		"BATCH_NUMBER":"batch_number",
-	}}}
 
-	XML_UPLOAD_DICT = {"PARTS":{"PART":{
-		"KIND_OF_PART":"kind_of_part",
-		"RECORD_INSERTION_USER":"insertion_user",
-		"SERIAL_NUMBER":"ID",
-		"COMMENT_DESCRIPTION":"comments_concat",
-		"LOCATION":"institution",
-		"MANUFACTURER":"manufacturer",
-		"FLATNESS":"flatness",
-		"THICKNESS":"thickness",
-		"GRADE":"grade",
-		#"COMMENTS":"comments_concat",
-	}}}
+	XML_COND_TEMPLATE = {
+		"HEADER":fsobj_db.COND_HEADER_DICT,
+		"DATA_SET":{
+			"COMMENT_DESCRIPTION":"comment_description",
+			"VERSION":"VNUM",
+			"PART":{
+				"SERIAL_NUMBER":"ID",
+				"KIND_OF_PART":"kind_of_part",
+			},
+			"DATA":{
+				"FLATNESS":"flatness",
+				"THICKNESS":"thickness",
+				"GRADE":"grade",
+				"MATERIAL":"mat_type",
+				"TESTED_BY":"tested_by",
+				"TEST_DATE":"test_date",
+				"TEST_FILE_NAME":"test_file_name",
+				"COMMENTS":"comments",
+			}
+		}
+	}
 
-	DAQ_DATADIR = 'daq'
+	# for HEADER_DICT
+	COND_TABLE = "FLATNS_PCB_ROCS_DATA"
+	TABLE_DESC = "HGC PCB Flatness & Test Data"
 
+	# List of vars that should NOT be edited in the GUI and are only loaded from DB
+	# (And some info would be redundant w/ other constants, eg KIND_OF_PART and self.size)
 	XML_CONSTS = [
-		#'ID',  # does NOT count
-		'resolution_type',
+		'size',
 	]
 
-	ITEMLIST_LIST = ['comments', 'test_files']
 
-	# WIP, go back and fix!
-	
 	@property
-	def kind_of_part(self): # Determined entirely by size
-		return "PCB/Kapton {} {}".format(self.resolution, self.shape)
-	@kind_of_part.setter
-	def kind_of_part(self, value):
-		if value is None:
-			self.resolution = None
-			self.shape = None
-		else:
-			self.resolution = value.split()[1]
-			self.shape = value.split()[2]
+	def kind_of_part(self):
+		return self.display_name
+
+	# no mat_type
+	@property
+	def channel_density(self):
+		if self.display_name is None:  return None
+		return self.display_name.split()[1]
+	@channel_density.setter
+	def channel_density(self, value):
+		splt = self.display_name.split(" ")
+		splt[1] = str(value)
+		self.display_name = " ".join(splt)
+
+	@property
+	def geometry(self):
+		if self.display_name is None:  return None
+		return self.display_name.split()[2]
+	@geometry.setter
+	def geometry(self, value):
+		splt = self.display_name.split(" ")
+		splt[2] = str(value)
+		self.display_name = " ".join(splt)
+
 
 	def ready_step_pcb(self, step_pcb = None):
 		if self.step_pcb and self.step_pcb != step_pcb:
@@ -1224,61 +1264,956 @@ class pcb(fsobj_db):
 		return True, ""
 
 
-class protomodule(fsobj_db):
+class protomodule(fsobj_part):
 	OBJECTNAME = "protomodule"
 	FILEDIR = os.sep.join(['protomodules','{date}'])
 	FILENAME = 'protomodule_{ID}.xml'
-	PROPERTIES = [
-		# location
-		"institution",
-		"location",  # physical location of part
 
-		# characteristics - taken from child parts upon creation of protomodule
-		"insertion_user",
-		"thickness",   # sum of baseplate and sensor, plus glue gap
-		"channels",    # from sensor
-		"size",        # from baseplate or sensor (identical)
-		"shape",       # from baseplate or sensor (identical)
-		"grade",
-		# initial location is also filled from child parts
-
-		# sensor step - filled upon creation
-		"step_sensor", # ID of sensor step
-		"baseplate",   # ID of baseplate
-		"sensor",      # ID of sensor
-
-		# protomodule qualification
-		"offset_translation_x", # translational offset of placement
-		"offset_translation_y",
-		"offset_rotation",    # rotation offset of placement
-		"flatness",           # flatness of sensor surface after curing
-
-		# pcb step
-		"step_pcb", # ID of pcb step
-		"module",   # ID of module
-
-		# NEW:  Data to be read from base XML file
-		"id_number",
-		"part_parent_id",
-		"kind_of_part_id",
-		"kind_of_part",
-		"comment_description",
+	# Note:  serial_number == self.ID
+	COND_PROPERTIES = [
+		# Read/write from cond:
+		"asmbl_tray_name",
+		"plt_ser_num",
+		"plt_asm_row",
+		"plt_asm_col",
+		"plt_fltnes_mm",
+		"plt_thknes_mm",
+		"comp_tray_name",
+		"snsr_ser_num",
+		"snsr_cmp_row",
+		"snsr_cmp_col",
+		"snsr_x_offst",
+		"snsr_y_offst",
+		"snsr_ang_offset",
+		"snsr_tool_name",
+		"snsr_tool_ht_set",
+		"snsr_tool_ht_chk",
+		"glue_type",
+		"glue_batch_num",
+		"slvr_epxy_type",
+		"slvr_epxy_batch_num",
+		"plt_grade",
+		"snsr_tool_feet_chk",
+		"snsr_step"
 	]
 
+	LOCAL_PROPERTIES = [
+		# Locally-saved, not part of DB:
+		"location",  # location at institution
+		#"protomodule",  # TBD
+		"module",
+	]
+
+	# Derived properties:
+	# material (from display_name)
+	# geometry
+	# channel density
+
 	DEFAULTS = {
-		"size":     '8',
-		"comment_description":"top layer: pcb",  # SUBJECT TO CHANGE
+		"size":     '8', # This should not be changed!
+		"display_name": "None None Si ProtoModule None None"
 	}
 
+
+	XML_COND_TEMPLATE = {
+		"HEADER":fsobj_db.COND_HEADER_DICT,
+		"DATA_SET":{
+			"COMMENT_DESCRIPTION":"comment_description",
+			"VERSION":"VNUM",
+			"PART":{
+				"SERIAL_NUMBER":"ID",
+				"KIND_OF_PART":"kind_of_part",
+			},
+			"DATA":{
+				"ASMBL_TRAY_NAME":"asmbl_tray_name",
+				"PLT_SER_NUM":"plt_ser_num",
+				"PLT_ASM_ROW":"plt_asm_row",
+				"PLT_ASM_COL":"plt_asm_col",
+				"PLT_FLTNS_MM":"plt_fltns_mm",
+				"PLT_CHKNES_MM":"plt_thknes_mm",
+				"COMP_TRAY_NAME":"comp_tray_name",
+				"SNSR_SER_NUM":"snsr_ser_num",
+				"SNSR_COMP_ROW":"snsr_cmp_row",
+				"SNSR_X_OFFST":"snsr_x_offst",
+				"SNSR_T_OFFST":"snsr_y_offst",
+				"SNSR_ANG_OFFSET":"snsr_ang_offset",
+				"SNSR_TOOL_NAME":"snsr_tool_name",
+				"SNSR_TOOL_HT_SET":"snsr_tool_ht_set",
+				"SNSR_TOOL_HT_CHK":"snsr_tool_ht_chk",
+				"GLUE_TYPE":"glue_type",
+				"GLUE_BATCH_NUM":"glue_batch_num",
+				"SLVR_EPXY_TYPE":"slvr_epxy_type",
+				"SLVR_EPXY_BATCH_NUM":"slvr_epxy_batch_num",
+				"PLT_GRADE":"plt_grade",
+				"SNSR_TOOL_FEET_CHK":"snsr_tool_feet_chk",
+				"SNSR_STEP":"snsr_step"
+
+			}
+		}
+	}
+
+	# for HEADER_DICT
+	COND_TABLE = "HGC_PRTO_MOD_ASMBLY"
+	TABLE_DESC = "HGC Six Inch Proto Module Assembly"
+
+	# List of vars that should NOT be edited in the GUI and are only loaded from DB
+	# (And some info would be redundant w/ other constants, eg KIND_OF_PART and self.size)
+	XML_CONSTS = [
+		'size',
+	]
+
+
+	# Note:  auto-complete this if part is created from baseplate/sensor/etc
+	@property
+	def kind_of_part(self):
+		return self.display_name
+		#"{} Baseplate {} {}".format(self.material, self.channel_density, self.shape)
+
+	# TODO : name this, decide whether to auto-set or manually set type
+	@property
+	def calorimeter_type(self):
+		# 'EM' if self.baseplate.material=='CuW' else 'HAD'	
+		return self.display_name.split()[0]
+	@calorimeter_type.setter  # eventually, these will not be used
+	def calorimeter_type(self, value):
+		# Cannot replace bc of case w/ multiple Nones
+		# split, then change and recombine
+		print("CALORIMETER_TYPE SETTER")
+		splt = self.display_name.split(" ")
+		splt[0] = str(value)
+		self.display_name = " ".join(splt)
+
+	@property
+	def sen_type(self):
+		return self.display_name.split()[1]
+	@sen_type.setter  # eventually, these will not be used
+	def sen_type(self, value):
+		# Cannot replace bc of case w/ multiple Nones
+		# split, then change and recombine
+		print("SEN_TYPE SETTER")
+		splt = self.display_name.split(" ")
+		splt[1] = str(value)
+		self.display_name = " ".join(splt)
+
+	@property
+	def channel_density(self):
+		if self.display_name is None:  return None
+		return self.display_name.split()[4]
+	@channel_density.setter
+	def channel_density(self, value):
+		splt = self.display_name.split(" ")
+		splt[4] = str(value)
+		self.display_name = " ".join(splt)
+
+	@property
+	def geometry(self):
+		if self.display_name is None:  return None
+		return self.display_name.split()[5]
+	@geometry.setter
+	def geometry(self, value):
+		splt = self.display_name.split(" ")
+		splt[5] = str(value)
+		self.display_name = " ".join(splt)
+
+
+	@property  # Note: not a measured value
+	def thickness(self):
+		return float(self.type.split('um')[1])/1000
+	@thickness.setter
+	def thickness(self, value):
+		pass
+
+
+	"""
+	@property
+	def assem_tray_pos(self):
+		return 
+		#return "TRPOSN_{}{}".format(self.tray_row, tray_col)
+
+	@property
+	def comp_tray_pos(self):
+		return "CMPOSN_{}{}".format(self.tray_row, tray_col)
+
+	@property
+	def tray_posn(self):
+		# If has a sensor step, grab the position of this sensor and return it here...
+		if self.step_sensor is None:
+			print("Warning:  assm_tray_posn:  no sensor step yet")
+			return "None"
+		temp_sensor_step = step_sensor()
+		found = temp_sensor_step.load(self.step_sensor)
+		if not found:
+			print("ERROR in tray_posn:  protomodule has sensor step {}, but none found!".format(self.step_sensor))
+			return "None"
+		else:
+			position = temp_sensor_step.sensors.index(self.ID)
+			return position
+
+	@property
+	def tray_row(self):
+		posn = self.tray_posn()
+		if posn == "None":  return posn
+		else:  return posn%2+1
+
+	@property
+	def tray_col(self):
+		posn = self.tray_posn()
+		if posn == "None": return posn
+		else:  return posn//3+1
 	
-	XML_STRUCT_DICT = { "data":{"row":{
-		"ID":"id_number",
-		"PART_PARENT_ID":"part_parent_id",
-		"KIND_OF_PART_ID":"kind_of_part_id",
+	@property
+	def baseplate_type(self):
+		if self.baseplate is None:
+			print("In baseplate_type:  protomod has no baseplate!")
+			return None
+		temp_baseplate = baseplate()
+		if not temp_baseplate.load(self.baseplate):
+			print("ERROR:  failed to load baseplate {} in baseplate_type!".format(self.baseplate))
+			return None
+		return temp_baseplate.description
+
+	@property
+	def sensor_type(self):
+		if self.sensor is None:
+			print("In sensor_type:  protomod has no sensor!")
+			return None
+		temp_sensor = sensor()
+		if not temp_sensor.load(self.sensor):
+			print("ERROR:  failed to load sensor {} in sensor_type!".format(self.sensor))
+			return None
+		return temp_sensor.description
+
+	@property
+	def resolution(self):
+		if self.sensor is None:
+			print("ERROR in module resolution:  sensor is None!")
+			return None
+		temp_sensor = sensor()
+		if not temp_sensor.load(self.sensor):
+			print("ERROR:  Could not find child sensor {}!".format(self.sensor))
+			return None
+		return temp_sensor.resolution
+	"""
+
+
+	def ready_step_pcb(self, step_pcb = None):
+		if self.step_pcb and self.step_pcb != step_pcb:
+			return False, "already assigned to module {}".format(self.module)
+		return True, ""
+
+		
+
+
+
+class module(fsobj_part):
+	OBJECTNAME = "module"
+	FILEDIR    = os.sep.join(['modules','{date}','module_{ID}'])
+	FILENAME   = 'module_{ID}.xml'
+
+	# Note:  serial_number == self.ID
+	COND_PROPERTIES = [
+		# Read/write from cond:
+		"asmbl_tray_name",
+		"prto_ser_num",
+		"prto_asm_row",
+		"prto_asm_col",
+		"comp_tray_name",
+		"pcb_ser_num",
+		"pcb_fltnes_mm",
+		"pcb_thknes_mm",
+		"pcb_cmp_row",
+		"pcb_cmp_col",
+		"pcb_tool_name",
+		"pcb_tool_ht_set",
+		"pcb_tool_ht_chk",
+		"glue_type",
+		"glue_batch_num",
+		"pcb_tool_feet_chk",
+		"mod_grade",
+		"pcb_step",
+		"pcb_plcment_x_offset",
+		"pcb_plcment_y_offset",
+		"pcb_plcment_ang_offset",
+		"mod_thkns_mm",
+		"mod_fltns_mm",
+
+		# wirebonding:
+		"bond_wire_batch_num",
+		"pre_inspection",
+		"sylgard_batch",
+		"wedge_batch",
+		"back_bonds",
+		"back_bonds_date",
+		"back_bonds_user",
+		"back_unbonded",
+		"back_bond_inspxn",
+		"back_repair_user",
+		"front_bonds",
+		"front_bonds_date",
+		"front_bonds_user",
+		"front_skip",
+		"front_unbonded",
+		"front_bond_inspxn",
+		"front_repair_user",
+		"back_encap",
+		"back_encap_user",
+		"back_encap_cure_start",
+		"back_encap_cure_stop",
+		"back_encap_inspxn",
+		"front_encap",
+		"front_encap_user",
+		"front_encap_cure_start",
+		"front_encap_cure_stop",
+		"front_encap_inspxn",
+		"is_test_bond_module",
+		"bond_iull_user",  # typo in DB.......
+		"bond_pull_avg",
+		"bond_pull_stddev",
+		"final_inspxn_user",
+		"final_inspxn_ok",
+		"wirebond_comments"
+	]
+
+	LOCAL_PROPERTIES = [
+		# Locally-saved, not part of DB:
+		"location",  # location at institution
+		#"protomodule",  # TBD
+	]
+
+	# Derived properties:
+	# material (from display_name)
+	# geometry
+	# channel density
+
+	DEFAULTS = {
+		"size":     '8', # This should not be changed!
+		"display_name": "None None Si ProtoModule None None"
+	}
+
+
+	XML_COND_TEMPLATE = {
+		"HEADER":fsobj_db.COND_HEADER_DICT,
+		"DATA_SET":{
+			"COMMENT_DESCRIPTION":"comment_description",
+			"VERSION":"VNUM",
+			"PART":{
+				"SERIAL_NUMBER":"ID",
+				"KIND_OF_PART":"kind_of_part",
+			},
+			"DATA":{
+				"ASMBL_TRAY_NAME":"asmbl_tray_name",
+				"PRTO_SER_NUM":"prto_ser_num",
+				"PRTO_ASM_ROW":"prto_asm_row",
+				"PRTO_ASM_COL":"prto_asm_col",
+				"COMP_TRAY_NAME":"comp_tray_name",
+				"PCB_SER_NUM":"pcb_ser_num",
+				"PCB_FLTNES_MM":"pcb_fltnes_mm",
+				"PCB_THKNES_MM":"pcb_thknes_mm",
+				"PCB_CMP_ROW":"pcb_cmp_row",
+				"PCB_CMP_COL":"pcb_cmp_col",
+				"PCB_TOOL_NAME":"pcb_tool_name",
+				"PCB_TOOL_HT_SET":"pcb_tool_ht_set",
+				"PCB_TOOL_HT_CHK":"pcb_tool_ht_chk",
+				"GLUE_TYPE":"glue_type",
+				"GLUE_BATCH_NUM":"glue_batch_num",
+				"PCB_TOOL_FEET_CHK":"pcb_tool_feet_chk",
+				"MOD_GRADE":"mod_grade",
+				"PCB_STEP":"pcb_step",
+				"PCB_PLCMENT_X_OFFST":"pcb_plcment_x_offst",
+				"PCB_PLCMENT_Y_OFFST":"pcb_plcment_y_offst",
+				"SNSR_ANG_OFFSET":"snsr_ang_offset",
+				"MOD_FLTNS_MM":"mod_fltns_mm",
+				"MOD_FLTNS_MM":"mod_fltns_mm"
+			}
+		}
+	}
+
+	# Wirebonding-specific:
+	WIREBOND_TABLE_NAME = "HGC_MOD_WIREBOND_TEST"
+	WIREBOND_HEADER_DICT = {
+		'TYPE':{
+			'EXTENSION_TABLE_NAME':'WIREBOND_TABLE_NAME',
+			'NAME':'TABLE_DESC',
+		},
+		'RUN':{
+			'RUN_NAME':'RUN_TYPE',
+			'RUN_BEGIN_TIMESTAMP':'run_begin_timestamp',  # Format:  2018-03-26 00:00:00
+			'RUN_END_TIMESTAMP':'run_end_timestamp',
+			'INITIATED_BY_USER':'initiated_by_user',
+			'LOCATION':'location',
+			'COMMENT_DESCRIPTION':'comment_description',
+		}
+	}
+	XML_WIREBOND_TEMPLATE = {
+		"HEADER":fsobj_db.COND_HEADER_DICT,
+		"DATA_SET":{
+			"COMMENT_DESCRIPTION":"comment_description",
+			"VERSION":"VNUM",
+			"PART":{
+				"SERIAL_NUMBER":"ID",
+				"KIND_OF_PART":"kind_of_part",
+			},
+			"DATA":{
+				"BOND_WIRE_BATCH_NUM":"bond_wire_batch_num",
+				"PRE_INSPECTION":"pre_inspection",
+				"SYLGARD_BATCH":"sylgard_batch",
+				"WEDGE_BATCH":"wedge_batch",
+				"BACK_BONDS":"back_bonds",
+				"BACK_BONDS_DATE":"back_bonds_date",
+				"BACK_BONDS_USER":"back_bonds_user",
+				"BACK_UNBONDED":"back_unbonded",
+				"BACK_BOND_INSPXN":"back_bond_inspxn",
+				"BACK_REPAIR_USER":"back_repair_user",
+				"FRONT_BONDS":"front_bonds",
+				"FRONT_BONDS_DATE":"front_bonds_date",
+				"FRONT_BONDS_USER":"front_bonds_user",
+				"FRONT_SKIP":"front_skip",
+				"FRONT_UNBONDED":"front_unbonded",
+				"FRONT_BOND_INSPXN":"front_bond_inspxn",
+				"FRONT_REPAIR_USER":"front_repair_user",
+				"BACK_ENCAP":"back_encap",
+				"BACK_ENCAP_USER":"back_encap_user",
+				"BACK_ENCAP_CURE_START":"back_encap_cure_start",
+				"BACK_ENCAP_CURE_STOP":"back_encap_cure_stop",
+				"BACK_ENCAP_INSPXN":"back_encap_inspxn",
+				"FRONT_ENCAP":"front_encap",
+				"FRONT_ENCAP_USER":"front_encap_user",
+				"FRONT_ENCAP_CURE_START":"front_encap_cure_start",
+				"FRONT_ENCAP_CURE_STOP":"front_encap_cure_stop",
+				"FRONT_ENCAP_INSPXN":"front_encap_inspxn",
+				"IS_TEST_BOND_MODULE":"is_test_bond_module",
+				"BOND_IULL_USER":"bond_iull_user",  # typo in DB.......
+				"BOND_PULL_AVG":"bond_pull_avg",
+				"BOND_PULL_STDDEV":"bond_pull_stddev",
+				"FINAL_INSPXN_USER":"final_inspxn_user",
+				"FINAL_INSPXN_OK":"final_inspxn_ok",
+				"WIREBOND_COMMENTS":"wirebond_comments"
+
+			}
+		}
+	}
+
+
+	# for HEADER_DICT
+	COND_TABLE = "HGC_MOD_ASMBLY"
+	TABLE_DESC = "HGC Six Inch Module Assembly"
+
+	# List of vars that should NOT be edited in the GUI and are only loaded from DB
+	# (And some info would be redundant w/ other constants, eg KIND_OF_PART and self.size)
+	XML_CONSTS = [
+		'size',
+	]
+
+
+	# Properties are same as protomodule's
+	# Note:  auto-complete this if part is created from baseplate/sensor/etc
+	@property
+	def kind_of_part(self):
+		return self.display_name
+
+	# TODO : name this, decide whether to auto-set or manually set type
+	@property
+	def calorimeter_type(self):
+		# 'EM' if self.baseplate.material=='CuW' else 'HAD'	
+		return self.display_name.split()[0]
+	@calorimeter_type.setter  # eventually, these will not be used
+	def calorimeter_type(self, value):
+		# Cannot replace bc of case w/ multiple Nones
+		# split, then change and recombine
+		print("CALORIMETER_TYPE SETTER")
+		splt = self.display_name.split(" ")
+		splt[0] = str(value)
+		self.display_name = " ".join(splt)
+
+	@property
+	def sen_type(self):
+		return self.display_name.split()[1]
+	@sen_type.setter  # eventually, these will not be used
+	def sen_type(self, value):
+		# Cannot replace bc of case w/ multiple Nones
+		# split, then change and recombine
+		print("SEN_TYPE SETTER")
+		splt = self.display_name.split(" ")
+		splt[1] = str(value)
+		self.display_name = " ".join(splt)
+
+	@property
+	def channel_density(self):
+		if self.display_name is None:  return None
+		return self.display_name.split()[4]
+	@channel_density.setter
+	def channel_density(self, value):
+		splt = self.display_name.split(" ")
+		splt[4] = str(value)
+		self.display_name = " ".join(splt)
+
+	@property
+	def geometry(self):
+		if self.display_name is None:  return None
+		return self.display_name.split()[5]
+	@geometry.setter
+	def geometry(self, value):
+		splt = self.display_name.split(" ")
+		splt[5] = str(value)
+		self.display_name = " ".join(splt)
+
+
+	@property  # Note: not a measured value
+	def thickness(self):
+		return float(self.type.split('um')[1])/1000
+	@thickness.setter
+	def thickness(self, value):
+		pass
+
+
+	"""
+	# TEMPORARY:  NOTE:  Must fix this...
+	@property
+	def wirebonding_completed(self):
+		return self.wirebonding_back and \
+		       self.wirebonds_inspected_back and \
+		       self.wirebonding_front and \
+		       self.wirebonds_inspected_front and \
+		       self.encapsulation_inspection_back and \
+               self.encapsulation_inspection_front and \
+		       self.wirebonding_final_inspection_ok == 'pass'
+
+	@property
+	def assem_tray_pos(self):
+		return "TRPOSN_{}{}".format(self.tray_posn%2+1, tray_posn//3+1)
+
+	@property
+	def comp_tray_pos(self):
+		return "CMPOSN_{}{}".format(self.tray_posn%2+1, tray_posn//3+1)
+	
+
+	@property
+	def tray_posn(self):
+		# If has a pcb step, grab the position of this PCB and return it here...
+		if self.step_pcb is None:
+			print("assm_tray_posn:  no sensor step yet")
+			return "None"
+		temp_pcb_step = step_pcb()
+		found = temp_pcb_step.load(self.step_pcb)
+		if not found:
+			print("ERROR in tray_posn:  module {} has PCB step {}, but none found!".format(self.ID, self.step_pcb))
+			return "None"
+		else:
+			position = temp_sensor_step.sensors.index(self.ID)
+			return position
+
+	@property
+	def tray_row(self):
+		posn = self.tray_posn()
+		if posn == "None":  return posn
+		else:  return posn%2+1
+
+	@property
+	def tray_col(self):
+		posn = self.tray_posn()
+		if posn == "None": return posn
+		else:  return posn//3+1
+	"""
+
+	# NEW:  Need to add an additional file/etc to handle wirebonding
+
+	def save(self):
+		# This one handles the json files
+		super(module, self).save()
+
+		# Additionally:  Write wirebonding XML file
+		filedir, filename = self.get_filedir_filename()
+		fname_wirebond = filename.replace('.xml', 'wirebonding_upload.xml')
+
+		xml_tree = self.generate_xml(self.XML_WIREBOND_TEMPLATE)
+		root = xml_tree.getroot()
+		xmlstr = minidom.parseString(tostring(root)).toprettyxml(indent = '    ')  #tostring imported from xml.etree.ElementTree
+		xmlstr = xmlstr.replace("version=\"1.0\" ", "version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"")
+		with open(filedir+'/'+fname_build, 'w') as f:
+			f.write(xmlstr)
+
+
+	# Revamped
+	def load(self, ID, on_property_missing = "warn"):
+		if ID == "" or ID == -1 or ID == None:
+			self.clear()
+			return False
+
+		part_name = self.__class__.__name__
+		self.partlistfile = os.sep.join([ DATADIR, 'partlist', part_name+'s.json' ])
+		data = None
+		with open(self.partlistfile, 'r') as opfl:
+			data = json.load(opfl)
+		if str(ID) in data.keys():
+			print("      FOUND in partlistfile, can quick load")
+			dt = data[str(ID)]
+			super(fsobj_part, self).load(ID)
+
+		else:
+			if not ENABLE_DB_COMMUNICATION:
+				print("**TEMPORARY:  Object not found, and downloading disabled for testing!**")
+				return False
+
+			# Use DB_CURSOR and self.SQL_REQUEST to find XML files
+			# Data from part table
+			print("Requesting part data")
+			DB_CURSOR.execute(self.sql_request_part(ID))
+			# Reformat
+			columns = [col[0] for col in DB_CURSOR.description]
+			DB_CURSOR.rowfactory = lambda *args: dict(zip(columns, args))
+			data_part = DB_CURSOR.fetchone()
+			if data_part is None:
+				# Part not found
+				print("SQL query found nothing")
+				return False
+
+			# Data from cond table
+			print("Requesting cond data")
+			print("QUERY:")
+			print(self.sql_request_cond(ID))
+			DB_CURSOR.execute(self.sql_request_cond(ID))
+			# Reformat
+			columns = [col[0] for col in DB_CURSOR.description]
+			DB_CURSOR.rowfactory = lambda *args: dict(zip(columns, args))
+			data_cond = DB_CURSOR.fetchone()
+			# data_* is now a dict:  {"SERIAL_NUMBER":"xyz", "THICKNESS":"0.01", ...}
+
+			# Load all data into self.
+			# DB col names are [local var name].upper()
+			print("Downloaded part data:")
+			print(data_part)
+			print("Downloaded cond data:")
+			print(data_cond)
+
+			def fill_self(data_x):
+				for colname, var in data_x.items():
+					# NOTE:  datetime objs cannot be stored as json, or simply sent to xml...so stringify
+					if type(var) == datetime.datetime:
+						dstring = "{}-{}-{} {:02d}:{:02d}:{:02d}".format(var.year, var.month, var.day, var.hour, var.minute, var.second)
+						setattr(self, colname.lower(), dstring)
+					elif type(var) == datetime.date:
+						dstring = "{}-{}-{}".format(var.year, var.month, var.day)
+						setattr(self, colname.lower(), dstring)
+					else:
+						setattr(self, colname.lower(), var)
+			fill_self(data_part)
+			fill_self(data_cond)
+
+			# Data is now in python obj.  Ensure save:
+			self.ID = ID
+			self.save()
+
+		#self.ID = ID
+		return True
+
+
+
+
+
+###############################################
+###############  assembly steps  ##############
+###############################################
+
+
+"""
+class fsobj_step(fsobj_db):
+	# Note:  fsobj_db is currently minimalistic, only really contains cond header
+	# Could very feasibly remove at this point?
+
+	# Goals:
+	# Init arr of 6 protomodules
+	# Upon load:
+	# - sql query for protomod IDs matching step name
+	# - Download all into local protomodules
+	# GUI:
+	# - Access all step-specific info via attrs that get info from child protomods
+	# Upon save:
+	# - define getDataSet() for each protomod - return dict
+	# - Use above to build all cond, etc dicts
+	# Upload:  Keep manual for now
+	# - Upload assembly files for STEP ONLY - avoid 6 scp's if possible
+
+	OBJECTNAME = "sensor step"
+	FILEDIR    = os.sep.join(['steps','sensor','{date}'])
+	FILENAME   = 'sensor_assembly_{ID:0>5}.xml'
+
+	def __init__(self):
+		# protomods start None, get filled only once they're known to exist
+		self.protomodules = [None for i in range(6)]
+
+	def load(self, ID):
+		# ID is [asmbly_institution]_[number], defined by UI
+
+		# First, check local:
+		if ID == "" or ID == -1 or ID == None:
+			self.clear()
+			return False
+
+		part_name = self.__class__.__name__
+		self.partlistfile = os.sep.join([ DATADIR, 'partlist', part_name+'s.json' ])
+		data = None
+		with open(self.partlistfile, 'r') as opfl:
+			data = json.load(opfl)
+		if str(ID) in data.keys():
+			print("      FOUND in partlistfile, can quick load")
+			dt = data[str(ID)]
+			super(fsobj_part, self).load(ID)
+
+		else:
+			if not ENABLE_DB_COMMUNICATION:
+				print("**TEMPORARY:  Object not found, and downloading disabled for testing!**")
+					return False
+
+			# Use DB_CURSOR and self.SQL_REQUEST to find XML files
+			# Data from part table
+			print("Requesting part data")
+			DB_CURSOR.execute(self.sql_request_part(ID))
+
+		sql_request = "s"s"select pa.SNSR_STEP, p.SERIAL_NUMBER
+from CMS_HGC_HGCAL_COND.HGC_PRTO_MOD_ASMBLY pa
+inner join CMS_HGC_CORE_CONSTRUCT.PARTS p
+on p.PART_ID = ds.PART_ID
+where pa.SNSR_STEP=\'{}\'"s"s".format(ID)
+		DB_CURSOR.execute()
+
+
+
+
+	# COND_TABLE varies, defined in each class
+	# Table names:  CMS_HGC_HGCAL_COND.x
+	# baseplates:  SI_MODULE_BASEPLATE
+	# sensors:     SI_MODULE_SENSOR
+	# PCBs:        FLATNS_PBC_ROCS_DATA
+	# protomods:   HGC_PRTO_MOD_ASMBLY_COND
+	# mods:        HGC_MOD_ASMBLY_COND
+
+
+
+	COND_TABLE = None  # Table containing cond info, varies from obj to obj
+	XML_PART_TEMPLATE = None  # Dict describing structure of part upload XML file
+	XML_COND_TEMPLATE = None  # ............................ cond upload XML file
+
+	PART_PROPERTIES = [
+		# Read-only:
+		"display_name",  # only entry from KINDS_OF_PARTS table
+		# NOTE:  -> kind_of_part in XML
+		"part_id",
+		"record_insertion_user",
+		"kind_of_part_id",  # NOTE:  Not used
+		"manufacturer_id",  # -> manufacturer in XML, not always necessary
+		"barcode",  # CANNOT upload this, breaks the xml
+		"serial_number"
+		# Read/write:
+		"location",  # NOTE:  Not location_id
+		"production_date",
+		"batch_number",
+
+		# local storage only (not in DB)
+		"institution_location", # location at institution
+
+		# NOTE:  All other vars in PARTS are ignored by the GUI.
+		# Will be downloaded into json, but not used/uploaded.
+		#"is_record_deleted",
+		#"record_insertion_time",
+		#"version",
+		#"name_label",
+		#"installed_date",
+		#"removed_date",
+		#"installed_by_user",
+		#"removed_by_user",
+		#"extension_table_name",
+		#"record_lastupdate_time",
+		#"record_lastupdate_user",
+		#"comment_description"
+	]
+	
+	COND_PROPERTIES = []
+	LOCAL_PROPERTIES = []
+
+	XML_PART_TEMPLATE = {"PARTS":{"PART":{  # same for all parts
 		"KIND_OF_PART":"kind_of_part",
-		"LOCATION_ID":"institution_id",
+		"RECORD_INSERTION_USER":"record_insertion_user",
 		"SERIAL_NUMBER":"ID",
+		"COMMENT_DESCRIPTION":"comment_description",
+		"LOCATION":"location",
+		"MANUFACTURER":"manufacturer"  # Usually not used
 	}}}
+	# XML_COND_TEMPLATE is separate for each part
+
+	def __init__(self):
+		self.PROPERTIES = self.PART_PROPERTIES + self.COND_PROPERTIES \
+						  + self.LOCAL_PROPERTIES
+		super(fsobj_part, self).__init__()
+
+
+	def sql_request_part(self, ID):
+		#return "select * from PARTS p where p.SERIAL_NUMBER={}".format(self.ID)
+		# old - also want to get KIND_OF_PART name for geometry info
+		return "s"s"select kp.DISPLAY_NAME, p.*
+from CMS_HGC_CORE_CONSTRUCT.PARTS p
+inner join CMS_HGC_CORE_CONSTRUCT.KINDS_OF_PARTS kp
+on p.KIND_OF_PART_ID = kp.KIND_OF_PART_ID
+where p.SERIAL_NUMBER=\'{}\'
+"s"s".format(ID)
+
+	def sql_request_cond(self, ID):
+		# SQL command:  Given a part SERIAL_NUMBER, select the entire corresponding row from COND_TABLE
+		return "s"s"select p.SERIAL_NUMBER, fd.*
+from CMS_HGC_CORE_COND.COND_DATA_SETS ds
+inner join CMS_HGC_HGCAL_COND.{} fd
+on fd.CONDITION_DATA_SET_ID = ds.CONDITION_DATA_SET_ID
+inner join CMS_HGC_CORE_CONSTRUCT.PARTS p
+on p.PART_ID = ds.PART_ID
+where p.SERIAL_NUMBER=\'{}\'"s"s".format(self.COND_TABLE, ID)
+
+
+	def save(self):
+		# This one handles the json files
+		super(fsobj_part, self).save()
+
+		# NEXT, write the upload files!
+		# There's two:  One for Build_UCSB_ProtoModules_00.xml, one for ProtoModules_BuildCond_00.xml (part and cond).
+		# Defined in XML_PART_TEMPLATE, XML_COND_TEMPLATE
+		filedir, filename = self.get_filedir_filename()
+		fname_build = filename.replace('.xml', '_build_upload.xml')
+		fname_cond  = filename.replace('.xml', '_cond_upload.xml')
+		# Build file:
+		xml_tree = self.generate_xml(self.XML_PART_TEMPLATE)
+		root = xml_tree.getroot()
+		xmlstr = minidom.parseString(tostring(root)).toprettyxml(indent = '    ')  #tostring imported from xml.etree.ElementTree
+		xmlstr = xmlstr.replace("version=\"1.0\" ", "version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"")
+		with open(filedir+'/'+fname_build, 'w') as f:
+			f.write(xmlstr)
+		# Cond file:
+		if self.XML_COND_TEMPLATE:
+			xml_tree = self.generate_xml(self.XML_COND_TEMPLATE)
+			root = xml_tree.getroot()
+			xmlstr = minidom.parseString(tostring(root)).toprettyxml(indent = '    ')
+			xmlstr = xmlstr.replace("version=\"1.0\" ", "version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"")
+			with open(filedir+'/'+fname_cond, 'w') as f:
+				f.write(xmlstr)
+	
+		# NEXT:  Upload to DB!
+		# Create new process (user should not wait for this):
+		# upload base file first
+		# wait n seconds
+		# upload cond file second
+		
+
+
+	# Revamped
+	def load(self, ID, on_property_missing = "warn"):
+		if ID == "" or ID == -1 or ID == None:
+			self.clear()
+			return False
+
+		part_name = self.__class__.__name__
+		self.partlistfile = os.sep.join([ DATADIR, 'partlist', part_name+'s.json' ])
+		data = None
+		with open(self.partlistfile, 'r') as opfl:
+			data = json.load(opfl)
+		if str(ID) in data.keys():
+			print("      FOUND in partlistfile, can quick load")
+			dt = data[str(ID)]
+			super(fsobj_part, self).load(ID)
+
+		else:
+			if not ENABLE_DB_COMMUNICATION:
+				print("**TEMPORARY:  Object not found, and downloading disabled for testing!**")
+					return False
+
+			# Use DB_CURSOR and self.SQL_REQUEST to find XML files
+			# Data from part table
+			print("Requesting part data")
+			DB_CURSOR.execute(self.sql_request_part(ID))
+			# Reformat
+			columns = [col[0] for col in DB_CURSOR.description]
+			DB_CURSOR.rowfactory = lambda *args: dict(zip(columns, args))
+			data_part = DB_CURSOR.fetchone()
+			if data_part is None:
+				# Part not found
+				print("SQL query found nothing")
+				return False
+
+			# Data from cond table
+			print("Requesting cond data")
+			print("QUERY:")
+			print(self.sql_request_cond(ID))
+			DB_CURSOR.execute(self.sql_request_cond(ID))
+			# Reformat
+			columns = [col[0] for col in DB_CURSOR.description]
+			DB_CURSOR.rowfactory = lambda *args: dict(zip(columns, args))
+			data_cond = DB_CURSOR.fetchone()
+			# data_* is now a dict:  {"SERIAL_NUMBER":"xyz", "THICKNESS":"0.01", ...}
+
+			# Load all data into self.
+			# DB col names are [local var name].upper()
+			print("Downloaded part data:")
+			print(data_part)
+			print("Downloaded cond data:")
+			print(data_cond)
+
+			def fill_self(data_x):
+				for colname, var in data_x.items():
+					# NOTE:  datetime objs cannot be stored as json, or simply sent to xml...so stringify
+					if type(var) == datetime.datetime:
+						dstring = "{}-{}-{} {:02d}:{:02d}:{:02d}".format(var.year, var.month, var.day, var.hour, var.minute, var.second)
+						setattr(self, colname.lower(), dstring)
+					elif type(var) == datetime.date:
+						dstring = "{}-{}-{}".format(var.year, var.month, var.day)
+						setattr(self, colname.lower(), dstring)
+					else:
+						setattr(self, colname.lower(), var)
+			fill_self(data_part)
+			fill_self(data_cond)
+
+			# Data is now in python obj.  Ensure save:
+			self.ID = ID
+			self.save()
+
+		#self.ID = ID
+		return True
+
+
+
+
+class step_sensor(fsobj_step):
+	OBJECTNAME = "sensor step"
+	FILEDIR    = os.sep.join(['steps','sensor','{date}'])
+	FILENAME   = 'sensor_assembly_step_{ID:0>5}.xml'
+	PROPERTIES = [
+		'user_performed', # name of user who performed step
+		'institution',
+		'location', # New--instituition where step was performed
+
+		'run_start',  # New--unix time @ start of run
+		'run_stop',  # New--unix time @ end of run
+		'cure_start',
+		'cure_stop',
+
+		# Note:  Semiconductors types are stored in the sensor objects
+
+		'cure_temperature', # Average temperature during curing (centigrade)
+		'cure_humidity',    # Average humidity during curing (percent)
+
+		'tools',        # list of pickup (sensor) tool IDs, ordered by pickup tool location
+		'sensors',      # list of sensor      IDs, ordered by component tray position
+		'baseplates',   # list of baseplate   IDs, ordered by assembly tray position
+		'protomodules', # list of protomodule IDs assigned to new protomodules, by assembly tray location
+
+		'tray_component_sensor', # ID of component tray used
+		'tray_assembly',         # ID of assembly  tray used
+		'batch_araldite',        # ID of araldite batch used
+
+		# TEMP:
+		'kind_of_part_id',
+		'kind_of_part',
+
+		'check_tool_feet',
+
+		'xml_data_file',
+	]
+
 
 	XML_UPLOAD_DICT = {"PARTS":{"PART":{
 		"KIND_OF_PART":"kind_of_part",
@@ -1318,409 +2253,6 @@ class protomodule(fsobj_db):
 		}
 	}}}
 
-	XML_CONSTS = [
-		#'ID',  # does NOT count
-		'resolution_type',
-	]
-
-	ITEMLIST_LIST = ['comments']
-
-	@property
-	def kind_of_part(self):
-		if not self.sensor or not self.baseplate:  return None
-		return '{} {} Si ProtoModule {} {}'.format('EM' if self.baseplate.material=='CuW' else 'HAD', 
-                                                  self.sensor.type, self.sensor.resolution, self.shape)
-
-	@kind_of_part.setter
-	def kind_of_part(self, value):
-		pass
-
-	@property
-	def assem_tray_pos(self):
-		return "TRPOSN_{}{}".format(self.tray_row, tray_col)
-
-	@property
-	def comp_tray_pos(self):
-		return "CMPOSN_{}{}".format(self.tray_row, tray_col)
-
-	@property
-	def tray_posn(self):
-		# If has a sensor step, grab the position of this sensor and return it here...
-		if self.step_sensor is None:
-			print("Warning:  assm_tray_posn:  no sensor step yet")
-			return "None"
-		temp_sensor_step = step_sensor()
-		found = temp_sensor_step.load(self.step_sensor)
-		if not found:
-			print("ERROR in tray_posn:  protomodule has sensor step {}, but none found!".format(self.step_sensor))
-			return "None"
-		else:
-			position = temp_sensor_step.sensors.index(self.ID)
-			return position
-
-	@property
-	def tray_row(self):
-		posn = self.tray_posn()
-		if posn == "None":  return posn
-		else:  return posn%2+1
-
-	@property
-	def tray_col(self):
-		posn = self.tray_posn()
-		if posn == "None": return posn
-		else:  return posn//3+1
-
-	@property
-	def baseplate_type(self):
-		if self.baseplate is None:
-			print("In baseplate_type:  protomod has no baseplate!")
-			return None
-		temp_baseplate = baseplate()
-		if not temp_baseplate.load(self.baseplate):
-			print("ERROR:  failed to load baseplate {} in baseplate_type!".format(self.baseplate))
-			return None
-		return temp_baseplate.description
-
-	@property
-	def sensor_type(self):
-		if self.sensor is None:
-			print("In sensor_type:  protomod has no sensor!")
-			return None
-		temp_sensor = sensor()
-		if not temp_sensor.load(self.sensor):
-			print("ERROR:  failed to load sensor {} in sensor_type!".format(self.sensor))
-			return None
-		return temp_sensor.description
-
-	@property
-	def resolution(self):
-		if self.sensor is None:
-			print("ERROR in module resolution:  sensor is None!")
-			return None
-		temp_sensor = sensor()
-		if not temp_sensor.load(self.sensor):
-			print("ERROR:  Could not find child sensor {}!".format(self.sensor))
-			return None
-		return temp_sensor.resolution
-
-	def ready_step_pcb(self, step_pcb = None):
-		if self.step_pcb and self.step_pcb != step_pcb:
-			return False, "already assigned to module {}".format(self.module)
-		return True, ""
-
-		
-
-
-
-class module(fsobj_db):
-	OBJECTNAME = "module"
-	FILEDIR    = os.sep.join(['modules','{date}','module_{ID}'])
-	FILENAME   = 'module_{ID}.xml'
-	PROPERTIES = [
-		# location
-		"institution",
-		"location",  # physical location of part
-
-		# characteristics - taken from child parts upon creation of module
-		"insertion_user",
-		"thickness",   # sum of protomodule and sensor, plus glue gap
-		"flatness",    # NEW
-		"channels",    # from protomodule or pcb (identical)
-		"size",        # from protomodule or pcb (identical)
-		"shape",       # from protomodule or pcb (identical)
-		"grade",
-		# initial location is also filled from child parts
-		"inspection",  # may want to get rid of this / move it to the assembly page
-
-		# components and steps - filled upon creation
-		"baseplate",     # 
-		"sensor",        # 
-		"protomodule",   # 
-		"pcb",           # 
-		"step_sensor",   # 
-		"step_pcb",      # 
-
-		# module qualification
-		"preinspection",
-		"offset_translation_x",
-		"offset_translation_y",
-		"offset_rotation",
-
-		# wirebonding
-		# NEW: NOTE:  This info is filled out using the wirebonding page exclusively!
-		"wirebonding_comments",  # Comments from wirebonding page only
-		"wirebonding_date_back",
-		"wirebonding_date_front",
-
-		"wirebonding_sylgard",
-		"wirebonding_bond_wire",
-		"wirebonding_wedge",
-
-		# back wirebonding
-		"wirebonding_back",                # has wirebonding been done
-		"wirebonding_unbonded_channels_back", # list of sites that were not wirebonded
-		"wirebonding_user_back",           # who performed wirebonding
-		"wirebonds_inspected_back",     # whether inspection has happened
-		"wirebonds_repaired_user_back", # who repaired bonds
-
-		# front wirebonding
-		"wirebonding_front",                # has wirebonding been done
-		"wirebonding_skip_channels_front",  # list of channels to ignore
-		"wirebonding_unbonded_channels_front", # list of sites that were not wirebonded
-		"wirebonding_user_front",           # who performed wirebonding
-		"wirebonds_inspected_front",     # whether inspection has happened
-		"wirebonds_repaired_user_front", # who repaired bonds
-
-		# back encapsulation
-		"encapsulation_back",             # has encapsulation been done
-		"encapsulation_user_back",        # who performed encapsulation
-		"encapsulation_cure_start_back", # (unix) time at start of encapsulation
-		"encapsulation_cure_stop_back",  # (unix) time at end of encapsulation
-		"encapsulation_inspection_back", # None if not yet inspected; True if pased; False if failed
-
-		# front encapsulation
-		"encapsulation_front",             # has encapsulation been done
-		"encapsulation_user_front",        # who performed encapsulation
-		"encapsulation_cure_start_front", # (unix) time at start of encapsulation
-		"encapsulation_cure_stop_front",  # (unix) time at end of encapsulation
-		"encapsulation_inspection_front", # None if not yet inspected; True if pased; False if failed
-
-		"encapsulation_comments",
-
-		# test bonds
-		"test_bonds",             # is this a module for which test bonds will be done?
-		"test_bonds_pulled_user", # who pulled test bonds
-		"test_bonds_pull_avg",    # average pull strength
-		"test_bonds_pull_std",    # stddev of pull strength
-
-		"wirebonding_final_inspection_user",
-		"wirebonding_final_inspection_ok",
-
-
-		# NEW:  Data to be read from base XML file
-		"id_number",
-		"part_parent_id",
-		"description",
-
-		"test_files",
-	]
-	
-	PROPERTIES_DO_NOT_SAVE = [
-	]
-
-	DEFAULTS = {
-		"wirebonding_comments":[],
-		"encapsulation_comments":[],
-		"size":    '8',
-		"test_files":[],
-	}
-
-	ITEMLIST_LIST = ['comments', 'wirebonding_comments', 'encapsulation_comments', 'test_files',
-		'wirebonding_unbonded_channels_front'
-	]
-
-	XML_STRUCT_DICT = { "data":{"row":{
-		"ID":"id_number",
-		"PART_PARENT_ID":"part_parent_id",
-		"KIND_OF_PART_ID":"kind_of_part_id",
-		"KIND_OF_PART":"kind_of_part",
-		"LOCATION_ID":"institution_id",
-		"SERIAL_NUMBER":"ID",
-		"DESCRIPTION":"description",
-	}}}
-
-	XML_UPLOAD_DICT = {"PARTS":{"PART":{
-		"KIND_OF_PART":"kind_of_part",
-		"SERIAL_NUMBER":"ID",
-		"COMMENT_DESCRIPTION":"comments_concat",
-		"LOCATION":"location",
-		"RECORD_INSERTION_USER":"insertion_user",
-		"THICKNES":"thickness",
-		"GRADE":"grade",
-		"COMMENTS":"comments_concat",
-		"PREDEFINED_ATTRIBUTES":{
-			"ATTRIBUTE":{  # ignore for now per Umesh
-				"NAME":"AsmTrayPosn",
-				"VALUE":"assem_tray_posn",
-			},
-			"ATTRIBUTE":{
-				"NAME":"WireBonded",
-				"VALUE":"wirebonding_completed",
-			}
-		},
-		"CHILDREN":{
-			"PART":[{
-				"KIND_OF_PART":"protomodule_type",
-				"SERIAL_NUMBER":"protomodule",
-				"PREDEFINED_ATTRIBUTES":{
-					"ATTRIBUTE":{
-						"NAME":"AsmTrayPosn",
-						"VALUE":"assem_tray_posn",
-					}
-				}
-			},
-			{
-				"KIND_OF_PART":"pcb_type",
-				"SERIAL_NUMBER":"pcb",
-				"PREDEFINED_ATTRIBUTES":{
-					"ATTRIBUTE":{
-						"NAME":"CmpTrayPosn",
-						"VALUE":"comp_tray_posn",
-					}
-				}
-			}]
-		}
-	}}}
-
-	XML_CONSTS = [
-		#'ID',  # does NOT count
-		'resolution_type',
-	]
-
-
-	@property
-	def kind_of_part(self):
-		if not self.sensor or not self.baseplate:  return None
-		return '{} {} Si Module {} {}'.format('EM' if self.baseplate.material=='CuW' else 'HAD', 
-                                                   self.sensor.type, self.sensor.resolution, self.shape)
-	@kind_of_part.setter
-	def kind_of_part(self, value):
-		print("TODO:  mod kind_of_part:  implement when DB enabled")
-
-	@kind_of_part.setter
-	def kind_of_part(self, value):
-		# Parse and read in the baseplate size
-		if value is None:
-			return None
-		else:
-			print("PLACEHOLDER:  Need to handle case:  downloaded module w/o corresponding pcb/protomod")
-
-	# TEMPORARY:  NOTE:  Must fix this...
-	@property
-	def wirebonding_completed(self):
-		return self.wirebonding_back and \
-		       self.wirebonds_inspected_back and \
-		       self.wirebonding_front and \
-		       self.wirebonds_inspected_front and \
-		       self.encapsulation_inspection_back and \
-               self.encapsulation_inspection_front and \
-		       self.wirebonding_final_inspection_ok == 'pass'
-
-
-	@property
-	def assem_tray_pos(self):
-		return "TRPOSN_{}{}".format(self.tray_posn%2+1, tray_posn//3+1)
-
-	@property
-	def comp_tray_pos(self):
-		return "CMPOSN_{}{}".format(self.tray_posn%2+1, tray_posn//3+1)
-
-
-	@property
-	def tray_posn(self):
-		# If has a pcb step, grab the position of this PCB and return it here...
-		if self.step_pcb is None:
-			print("assm_tray_posn:  no sensor step yet")
-			return "None"
-		temp_pcb_step = step_pcb()
-		found = temp_pcb_step.load(self.step_pcb)
-		if not found:
-			print("ERROR in tray_posn:  module {} has PCB step {}, but none found!".format(self.ID, self.step_pcb))
-			return "None"
-		else:
-			position = temp_sensor_step.sensors.index(self.ID)
-			return position
-
-	@property
-	def tray_row(self):
-		posn = self.tray_posn()
-		if posn == "None":  return posn
-		else:  return posn%2+1
-
-	@property
-	def tray_col(self):
-		posn = self.tray_posn()
-		if posn == "None": return posn
-		else:  return posn//3+1
-
-
-	@property
-	def protomodule_type(self):
-		if self.protomodule is None:
-			print("ERROR in protomodule_type:  protomodule is None!")
-			return None
-		temp_protomodule = protomodule()
-		if not temp_protomodule.load(self.protomodule):
-			print("ERROR in protomodule_type:  Could not find child protomodule {}!".format(self.protomodule))
-			return None
-		return temp_protomodule.kind_of_part
-
-	@property
-	def pcb_type(self):
-		if self.pcb is None:
-			print("ERROR in pcb_type:  pcb is None!")
-			return None
-		temp_pcb = pcb()
-		if not temp_pcb.load(self.pcb):
-			print("ERROR in pcb_type:  Could not find child PCB {}!".format(self.pcb))
-			return None
-		return temp_pcb.kind_of_part
-
-	@property
-	def resolution(self):
-		if self.sensor is None:
-			print("ERROR in module resolution:  sensor is None!")
-			return None
-		temp_sensor = sensor()
-		if not temp_sensor.load(self.sensor):
-			print("ERROR in module resolution:  Could not find child sensor {}!".format(self.sensor))
-			return None
-		return temp_sensor.resolution
-
-
-
-###############################################
-###############  assembly steps  ##############
-###############################################
-
-class step_sensor(fsobj_db):
-	OBJECTNAME = "sensor step"
-	FILEDIR    = os.sep.join(['steps','sensor','{date}'])
-	FILENAME   = 'sensor_assembly_step_{ID:0>5}.xml'
-	PROPERTIES = [
-		'user_performed', # name of user who performed step
-		'institution',
-		'location', # New--instituition where step was performed
-
-		'run_start',  # New--unix time @ start of run
-		'run_stop',  # New--unix time @ end of run
-		'cure_start',
-		'cure_stop',
-
-		# Note:  Semiconductors types are stored in the sensor objects
-
-		'cure_temperature', # Average temperature during curing (centigrade)
-		'cure_humidity',    # Average humidity during curing (percent)
-
-		'tools',        # list of pickup (sensor) tool IDs, ordered by pickup tool location
-		'sensors',      # list of sensor      IDs, ordered by component tray position
-		'baseplates',   # list of baseplate   IDs, ordered by assembly tray position
-		'protomodules', # list of protomodule IDs assigned to new protomodules, by assembly tray location
-
-		'tray_component_sensor', # ID of component tray used
-		'tray_assembly',         # ID of assembly  tray used
-		'batch_araldite',        # ID of araldite batch used
-
-		# TEMP:
-		'kind_of_part_id',
-		'kind_of_part',
-
-		'check_tool_feet',
-
-		'xml_data_file',
-	]
-
-	ITEMLIST_LIST = ['comments', 'tools', 'sensors', 'baseplates', 'protomodules']
 
 	# NOTE WARNING:  Commenting all WIP changes for now
 	
@@ -1847,7 +2379,6 @@ class step_sensor(fsobj_db):
 	COND_TABLE_DESC = 'HGC Eight Inch Proto Module Curing Cond'
 	RUN_TYPE        = 'HGC 8inch Proto Module Assembly'
 	CMT_DESCR = 'Build 8inch proto modules'
-	VNUM = 1
 
 	# Vars for tables - constants
 	GLUE_TYPE = 'Araldite'
@@ -1957,7 +2488,7 @@ class step_sensor(fsobj_db):
 
 
 
-class step_pcb(fsobj_db):
+class step_pcb(fsobj_step):
 	OBJECTNAME = "PCB step"
 	FILEDIR = os.sep.join(['steps','pcb','{date}'])
 	FILENAME = 'pcb_assembly_step_{ID:0>5}.xml'
@@ -1988,9 +2519,6 @@ class step_pcb(fsobj_db):
 		'xml_data_file',
 	]
 
-
-	# PASTED RECENTLY, needs revision
-	ITEMLIST_LIST = ['comments', 'tools', 'pcbs', 'protomodules', 'modules']
 
 	# NOTE WARNING:  Commenting all WIP changes for now
 
@@ -2078,7 +2606,6 @@ class step_pcb(fsobj_db):
 	COND_TABLE_DESC = 'HGC Six Inch Module Curing Cond'
 	RUN_TYPE        = 'HGC 8inch Module Assembly'
 	CMT_DESCR = 'Build 8inch modules'
-	VNUM = 1
 
 	# Vars for tables - constants
 	GLUE_TYPE = 'Araldite'
@@ -2185,7 +2712,7 @@ class step_pcb(fsobj_db):
 		tmp_mod = module()
 		tmp_mod.load(mod)
 		return tmp_mod.kind_of_part
-
+"""
 
 
 ###############################################
@@ -2218,37 +2745,13 @@ class batch_araldite(fsobj_supply):
 	OBJECTNAME = "araldite batch"
 	FILEDIR = os.sep.join(['supplies','batch_araldite','{date}'])
 	FILENAME = 'batch_araldite_{ID:0>5}.xml'
-	"""PROPERTIES = [
-		'date_received',
-		'date_expires',
-		'is_empty',
-	]
-
-	XML_STRUCT_DICT = {'BATCH':{
-		'ID':'ID',
-		'RECEIVE_DATE':'date_received',
-		'EXPIRE_DATE':'date_expires',
-		'IS_EMPTY':'is_empty',
-		'COMMENTS':'comments'
-	}}"""
 	# Dates should have the format "{}-{}-{} {}:{}:{}".  NOT a property; the UI pages handle the loading.
 
 class batch_wedge(fsobj_supply):
 	OBJECTNAME = "wedge batch"
 	FILEDIR = os.sep.join(['supplies','batch_wedge','{date}'])
 	FILENAME = 'batch_wedge_{ID:0>5}.xml'
-	"""PROPERTIES = [
-		'date_received',
-		'date_expired',
-		'is_empty',
-	]
-	XML_STRUCT_DICT = {'BATCH':{
-		'ID':'ID',
-		'RECEIVE_DATE':'date_received',
-		'EXPIRE_DATE':'date_expires',
-		'IS_EMPTY':'is_empty',
-		'COMMENTS':'comments'
-	}}"""
+
 
 class batch_sylgard(fsobj_supply):  # was sylgar_thick
 	OBJECTNAME = "sylgard batch"
@@ -2260,33 +2763,13 @@ class batch_sylgard(fsobj_supply):  # was sylgar_thick
 		'is_empty',
 		'curing_agent',
 	]
-	XML_STRUCT_DICT = {'BATCH':{
-		'ID':'ID',
-		'RECEIVE_DATE':'date_received',
-		'EXPIRE_DATE':'date_expires',
-		'IS_EMPTY':'is_empty',
-		'CURING_AGENT':'curing_agent',
-		'COMMENTS':'comments'
-	}}
+
 
 
 class batch_bond_wire(fsobj_supply):
 	OBJECTNAME = "bond wire batch"
 	FILEDIR = os.sep.join(['supplies','batch_bond_wire','{date}'])
 	FILENAME = 'batch_bond_wire_{ID:0>5}.xml'
-	"""PROPERTIES = [
-		'date_received',
-		'date_expires',
-		'is_empty',
-	]
-	XML_STRUCT_DICT = {'BATCH':{
-		'ID':'ID',
-		'RECEIVE_DATE':'date_received',
-		'EXPIRE_DATE':'date_expires',
-		'IS_EMPTY':'is_empty',
-		'COMMENTS':'comments'
-	}}"""
-
 
 
 
@@ -2294,5 +2777,122 @@ class batch_bond_wire(fsobj_supply):
 
 if __name__ == '__main__':
 	# test features without UI here
-	# currently unused
-	...
+	"""
+	test_pcb_tool = tool_sensor()
+	test_pcb_tool.new("tool1", "UCSB")
+	test_pcb_tool.location="place"
+	test_pcb_tool.save()
+	test_pcb_tool.clear()
+	if test_pcb_tool.load("tool1", "UCSB"):
+		print("Loaded tool")
+	else:
+		print("FAILED to load tool")
+	print("Final tool location:", test_pcb_tool.location)
+	print("TOOL TESTS COMPLETE.\n")
+
+	test_arl = batch_araldite()
+	test_arl.new("batch1")
+	test_arl.is_empty = True
+	test_arl.save()
+	test_arl.clear()
+	if test_arl.load("batch1"):
+		print("Loaded batch")
+	else:
+		print("FAILED to load batch")
+	print("Final batch status:", test_arl.is_empty)
+	"""
+
+	"""test_plt = baseplate()
+	test_plt.load("plt1")
+	test_plt.location = "place"
+	test_plt.save()
+	test_plt.clear()
+	if test_plt.load("plt1"):
+		print("Loaded plate")
+		print(vars(test_plt))
+	else:
+		print("FAILED to load plate")
+	print("Final plate location:", test_plt.location)
+	
+
+	# Now test DB retrieval
+	test_plt = baseplate()
+	test_plt.clear()
+	if test_plt.load("TEST_PRELIM_MODULE_PHMASTER_3"):
+		print("location:", test_plt.location)
+		print("grade:", test_plt.grade)
+		print("material:", test_plt.mat_type)
+		print("type:", test_plt.display_name)
+		print("geo:", test_plt.geometry)
+		test_plt.save()
+	else:
+		print("LOAD FROM DB FAILED")
+	
+
+	# Now test DB uploading
+
+
+	# Now test sensor, PCB
+
+	print("\n\nSENSOR\n")
+	test_plt = sensor()
+	test_plt.clear()
+	if test_plt.load("TEST_PRELIM_SENSOR_PHMASTER_1"):
+		print("location:", test_plt.location)
+		print("grade:", test_plt.grade)
+		print("sensor type:", test_plt.sen_type)
+		print("type:", test_plt.display_name)
+		print("geo:", test_plt.geometry)
+		test_plt.save()
+	else:
+		print("LOAD FROM DB FAILED")
+	"""
+	print("\n\nPCB\n")
+	test_plt = pcb()
+	test_plt.clear()
+	if test_plt.load("TEST_PRELIM_PCB_PHMASTER_4"):
+		print("location:", test_plt.location_name)
+		print("grade:", test_plt.grade)
+		print("type:", test_plt.display_name)
+		print("geo:", test_plt.geometry)
+		print("Comments:", test_plt.comments)
+		test_plt.save()
+	else:
+		print("LOAD FROM DB FAILED")
+	test_plt.clear()
+	test_plt.new("pltname")
+	print("New comments:", test_plt.comments)
+
+
+	# Now test proto/module
+	# ERR:  Can't test this or assembly steps until after successful DB upload...
+	# esp since mod needs wirebond xml testing
+	"""
+	print("\n\nPROTOMODULE\n")
+	test_plt = protomodule()
+	test_plt.clear()
+	if test_plt.load("TEST_PRELIM_SENSOR_PHMASTER_1"):
+		print("location:", test_plt.location)
+		print("grade:", test_plt.grade)
+		print("sensor type:", test_plt.sen_type)
+		print("type:", test_plt.display_name)
+		print("geo:", test_plt.geometry)
+		test_plt.save()
+	else:
+		print("LOAD FROM DB FAILED")
+
+	print("\n\nMODULE\n")
+	test_plt = pcb()
+	test_plt.clear()
+	if test_plt.load("TEST_PRELIM_PCB_PHMASTER_4"):
+		print("location:", test_plt.location)
+		print("grade:", test_plt.grade)
+		print("type:", test_plt.display_name)
+		print("geo:", test_plt.geometry)
+		test_plt.save()
+	else:
+		print("LOAD FROM DB FAILED")
+	"""
+
+
+

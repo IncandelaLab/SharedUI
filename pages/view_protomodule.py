@@ -21,7 +21,8 @@ INDEX_SHAPE = {
 	'Left':3,
 	'Right':4,
 	'Five':5,
-	'Full+Three':6
+	'Full':6,
+	'Three':7
 }
 
 INDEX_GRADE = {
@@ -117,23 +118,24 @@ class func(object):
 
 		self.protomodule_exists = (ID == self.protomodule.ID)
 
-		if not self.protomodule.insertion_user in self.index_users.keys() and not self.protomodule.insertion_user is None:
+		if not self.protomodule.record_insertion_user in self.index_users.keys() and len(self.index_users.keys())!=0 and not self.protomodule.record_insertion_user is None:
 			# Insertion user was deleted from user page...just add user to the dropdown
-			self.index_users[self.protomodule.insertion_user] = max(self.index_users.values()) + 1
-			self.page.cbInsertUser.addItem(self.protomodule.insertion_user)
-		self.page.cbInsertUser.setCurrentIndex(self.index_users.get(self.protomodule.insertion_user, -1))
+			self.index_users[self.protomodule.record_insertion_user] = max(self.index_users.values()) + 1
+			self.page.cbInsertUser.addItem(self.protomodule.record_insertion_user)
+		self.page.cbInsertUser.setCurrentIndex(self.index_users.get(self.protomodule.record_insertion_user, -1))
 
-		self.page.cbInstitution.setCurrentIndex(   INDEX_INSTITUTION.get(self.protomodule.institution, -1)    )
-		self.page.leLocation.setText(    "" if self.protomodule.location     is None else     self.protomodule.location    )
+		self.page.cbInstitution.setCurrentIndex(   INDEX_INSTITUTION.get(self.protomodule.location_name, -1)    )
+		self.page.leLocation.setText(    "" if self.protomodule.institution_location     is None else     self.protomodule.institution_location    )
 
-		self.page.cbShape.setCurrentIndex(    INDEX_SHAPE.get(    self.protomodule.shape    ,-1))
+		self.page.cbShape.setCurrentIndex(    INDEX_SHAPE.get(    self.protomodule.geometry    ,-1))
 		self.page.cbGrade.setCurrentIndex(    INDEX_GRADE.get(    self.protomodule.grade    ,-1))
-		self.page.sbChannels.setValue(   -1 if self.protomodule.channels  is None else self.protomodule.channels  )
-		if self.page.sbChannels.value()   == -1: self.page.sbChannels.clear()
+		#self.page.sbChannels.setValue(   -1 if self.protomodule.channels  is None else self.protomodule.channels  )
+		#if self.page.sbChannels.value()   == -1: self.page.sbChannels.clear()
 
 		self.page.listComments.clear()
-		for comment in self.protomodule.comments:
-			self.page.listComments.addItem(comment)
+		if self.protomodule.comments:
+			for comment in self.protomodule.comments.split(";;"):
+				self.page.listComments.addItem(comment)
 		self.page.pteWriteComment.clear()
 
 		if self.protomodule.step_sensor:
@@ -147,11 +149,11 @@ class func(object):
 		self.page.leSensor.setText(     "" if self.protomodule.sensor      is None else str(self.protomodule.sensor)     )
 		self.page.leBaseplate.setText(  "" if self.protomodule.baseplate   is None else str(self.protomodule.baseplate)  )
 
-		self.page.dsbOffsetTranslationX.setValue( -1 if self.protomodule.offset_translation_x is None else self.protomodule.offset_translation_x )
-		self.page.dsbOffsetTranslationY.setValue( -1 if self.protomodule.offset_translation_y is None else self.protomodule.offset_translation_y )
-		self.page.dsbOffsetRotation.setValue(    -1 if self.protomodule.offset_rotation    is None else self.protomodule.offset_rotation    )
-		self.page.dsbFlatness.setValue(          -1 if self.protomodule.flatness           is None else self.protomodule.flatness           )
-		self.page.dsbThickness.setValue( -1 if self.protomodule.thickness is None else self.protomodule.thickness )
+		self.page.dsbOffsetTranslationX.setValue(-1 if self.protomodule.snsr_x_offst is None else self.protomodule.snsr_x_offst )
+		self.page.dsbOffsetTranslationY.setValue(-1 if self.protomodule.snsr_y_offst is None else self.protomodule.snsr_y_offst )
+		self.page.dsbOffsetRotation.setValue(    -1 if self.protomodule.snsr_ang_offset    is None else self.protomodule.snsr_ang_offset    )
+		self.page.dsbFlatness.setValue(          -1 if self.protomodule.flatness           is None else self.protomodule.plt_fltnes_mm           )
+		self.page.dsbThickness.setValue( -1 if self.protomodule.thickness is None else self.protomodule.plt_thknes_mm )
 		if self.page.dsbOffsetTranslationX.value() == -1: self.page.dsbOffsetTranslationX.clear()
 		if self.page.dsbOffsetTranslationY.value() == -1: self.page.dsbOffsetTranslationY.clear()
 		if self.page.dsbOffsetRotation.value() == -1: self.page.dsbOffsetRotation.clear()
@@ -202,7 +204,7 @@ class func(object):
 		self.page.cbInstitution.setEnabled(    mode_editing )
 		self.page.cbInsertUser.setEnabled(     mode_editing )
 		self.page.dsbThickness.setReadOnly(not mode_editing )
-		self.page.sbChannels.setReadOnly(  not mode_editing )
+		#self.page.sbChannels.setReadOnly(  not mode_editing )
 
 		self.page.pbDeleteComment.setEnabled(mode_editing)
 		self.page.pbAddComment.setEnabled(   mode_editing)
@@ -262,19 +264,16 @@ class func(object):
 	@enforce_mode('editing')
 	def saveEditing(self,*args,**kwargs):
 
-		self.protomodule.insertion_user = str(self.page.leInsertUser.text()        ) if str(self.page.leInsertUser.text()      ) else None
-		self.protomodule.location       = str(self.page.leLocation.text()          ) if str(self.page.leLocation.text()        ) else None
-		self.protomodule.shape          = str(self.page.cbShape.currentText()      ) if str(self.page.cbShape.currentText()    ) else None
+		self.protomodule.record_insertion_user = str(self.page.cbInsertUser.currentText() ) if str(self.page.cbInsertUser.currentText())  else None
+		self.protomodule.institution_location       = str(self.page.leLocation.text()          ) if str(self.page.leLocation.text()        ) else None
+		self.protomodule.geometry          = str(self.page.cbShape.currentText()      ) if str(self.page.cbShape.currentText()    ) else None
 		self.protomodule.grade          = str(self.page.cbGrade.currentText()      ) if str(self.page.cbGrade.currentText()    ) else None
-		self.protomodule.institution    = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
-		self.protomodule.insertion_user = str(self.page.cbInsertUser.currentText() ) if str(self.page.cbInsertUser.currentText())  else None
+		self.protomodule.location_name    = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
 		self.protomodule.thickness      =     self.page.dsbThickness.value()         if self.page.dsbThickness.value() >=0 else None
-		self.protomodule.channels       =     self.page.sbChannels.value()           if self.page.sbChannels.value()   >=0 else None
+		#self.protomodule.channels       =     self.page.sbChannels.value()           if self.page.sbChannels.value()   >=0 else None
 
 		num_comments = self.page.listComments.count()
-		self.protomodule.comments = []
-		for i in range(num_comments):
-			self.protomodule.comments.append(str(self.page.listComments.item(i).text()))
+		self.protomodule.comments = ';;'.join(self.page.listComments.item(i).text() for i in range(num_comments))
 
 		self.protomodule.save()
 		self.mode = 'view'

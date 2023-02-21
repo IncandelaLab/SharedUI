@@ -6,8 +6,8 @@ OBJECTTYPE = "baseplate"
 DEBUG = False
 
 INDEX_MATERIAL = {
-	'CuW':0,
-	'PCB':1,
+	'CuW/Kapton':0,
+	'PCB/Kapton':1,
 }
 
 INDEX_SHAPE = {
@@ -17,7 +17,8 @@ INDEX_SHAPE = {
 	'Left':3,
 	'Right':4,
 	'Five':5,
-	'Full+Three':6,
+	'Full':6,
+	'Three':7,
 }
 
 INDEX_CHECK = {
@@ -27,6 +28,7 @@ INDEX_CHECK = {
 	False:1,
 }
 
+#TBD
 INDEX_INSTITUTION = {
 	'CERN':0,
 	'FNAL':1,
@@ -141,23 +143,31 @@ class func(object):
 
 		self.baseplate_exists = (ID == self.baseplate.ID)
 
-		if not self.baseplate.insertion_user in self.index_users.keys() and not self.baseplate.insertion_user is None:
+		# was insertion_user
+		if not self.baseplate.record_insertion_user in self.index_users.keys() and len(self.index_users.keys())!=0  and not self.baseplate.record_insertion_user is None:
 			# Insertion user was deleted from user page...just add user to the dropdown
-			self.index_users[self.baseplate.insertion_user] = max(self.index_users.values()) + 1
-			self.page.cbInsertUser.addItem(self.baseplate.insertion_user)
-		self.page.cbInsertUser.setCurrentIndex(self.index_users.get(self.baseplate.insertion_user, -1))
+			self.index_users[self.baseplate.record_insertion_user] = max(self.index_users.values()) + 1
+			self.page.cbInsertUser.addItem(self.baseplate.record_insertion_user)
+		self.page.cbInsertUser.setCurrentIndex(self.index_users.get(self.baseplate.record_insertion_user, -1))
 
-		self.page.cbInstitution   .setCurrentIndex(INDEX_INSTITUTION.get(self.baseplate.institution    , -1))
-		self.page.leLocation      .setText("" if self.baseplate.location is None else self.baseplate.location)
+		# institution -> location_name
+		# location -> institution_location
+		self.page.cbInstitution   .setCurrentIndex(INDEX_INSTITUTION.get(self.baseplate.location_name    , -1))
+		# location -> institution
+		self.page.leLocation      .setText("" if self.baseplate.institution_location is None else self.baseplate.institution_location)
 
 		self.page.leBarcode       .setText("" if self.baseplate.barcode  is None else self.baseplate.barcode )
-		self.page.cbMaterial      .setCurrentIndex(INDEX_MATERIAL   .get(self.baseplate.material       , -1))
-		self.page.cbShape         .setCurrentIndex(INDEX_SHAPE      .get(self.baseplate.shape          , -1))
+		# was mat_type
+		self.page.cbMaterial      .setCurrentIndex(INDEX_MATERIAL   .get(self.baseplate.mat_type       , -1))
+		# was shape
+		self.page.cbShape         .setCurrentIndex(INDEX_SHAPE      .get(self.baseplate.geometry          , -1))
 		self.page.cbChannelDensity.setCurrentIndex(INDEX_CHANNEL    .get(self.baseplate.channel_density, -1))
 
+		# NEW:  Comments are now a ;;-separated string, manage here
 		self.page.listComments.clear()
-		for comment in self.baseplate.comments:
-			self.page.listComments.addItem(comment)
+		if self.baseplate.comments:  # default=None
+			for comment in self.baseplate.comments.split(";;"):
+				self.page.listComments.addItem(comment)
 		self.page.pteWriteComment.clear()
 
 
@@ -167,7 +177,7 @@ class func(object):
 		if self.page.dsbFlatness.value() == -1: self.page.dsbFlatness.clear()
 		self.page.cbGrade         .setCurrentIndex(INDEX_GRADE      .get(self.baseplate.grade          , -1))
 
-		if self.baseplate.step_sensor:
+		"""if self.baseplate.step_sensor:
 			tmp_inst, tmp_id = self.baseplate.step_sensor.split("_")
 			self.page.sbStepSensor.setValue(int(tmp_id))
 			self.page.cbInstitutionStep.setCurrentIndex(INDEX_INSTITUTION.get(tmp_inst, -1))
@@ -177,7 +187,7 @@ class func(object):
 		if self.page.sbStepSensor.value() == -1: self.page.sbStepSensor.clear()
 		self.page.leProtomodule.setText("" if self.baseplate.protomodule is None else self.baseplate.protomodule)
 		self.page.leModule.setText(     "" if self.baseplate.module      is None else self.baseplate.module)
-
+		"""
 		self.updateElements()
 
 
@@ -186,11 +196,11 @@ class func(object):
 		self.page.leStatus.setText(self.mode)
 
 		baseplate_exists = self.baseplate_exists
-		step_sensor_exists   = self.page.sbStepSensor.value() >= 0 and \
+		"""step_sensor_exists   = self.page.sbStepSensor.value() >= 0 and \
 		                       self.page.cbInstitutionStep.currentText() != ""
 		protomodule_exists   = self.page.leProtomodule.text() != ""
 		module_exists        = self.page.leModule.text()      != ""
-
+		"""
 		mode_view     = self.mode == 'view'
 		mode_editing  = self.mode == 'editing'
 		mode_creating = self.mode == 'creating'
@@ -214,7 +224,7 @@ class func(object):
 		self.page.cbShape.setEnabled(           mode_creating or mode_editing  )
 		self.page.cbChannelDensity.setEnabled(  mode_creating or mode_editing  )
 
-		self.page.dsbThickness.setReadOnly(not (mode_creating or mode_editing) )
+		self.page.dsbThickness.setEnabled(      mode_creating or mode_editing  )
 		self.page.dsbFlatness.setEnabled(       mode_creating or mode_editing  )
 		self.page.cbGrade.setEnabled(           mode_creating or mode_editing  )
 
@@ -222,10 +232,10 @@ class func(object):
 		self.page.pbAddComment.setEnabled(      mode_creating or mode_editing  )
 		self.page.pteWriteComment.setEnabled(   mode_creating or mode_editing  )
 
-		self.page.pbGoStepSensor.setEnabled(    mode_view and step_sensor_exists)
+		"""self.page.pbGoStepSensor.setEnabled(    mode_view and step_sensor_exists)
 		self.page.pbGoProtomodule.setEnabled(   mode_view and protomodule_exists)
 		self.page.pbGoModule.setEnabled(        mode_view and module_exists)
-
+		"""
 
 
 	# NEW:
@@ -285,22 +295,20 @@ class func(object):
 	@enforce_mode(['editing','creating'])
 	def saveEditing(self,*args,**kwargs):
 
-		self.baseplate.insertion_user  = str(self.page.cbInsertUser.currentText())  if str(self.page.cbInsertUser.currentText())  else None
-		self.baseplate.institution     = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
-		self.baseplate.location        = str(self.page.leLocation.text())           if str(self.page.leLocation.text())           else None
+		self.baseplate.record_insertion_user    = str(self.page.cbInsertUser.currentText())  if str(self.page.cbInsertUser.currentText())  else None
+		self.baseplate.location_name = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
+		self.baseplate.institution_location          = str(self.page.leLocation.text())           if str(self.page.leLocation.text())           else None
 
-		self.baseplate.barcode         = str(self.page.leBarcode.text())            if str(self.page.leBarcode.text())            else None
-		self.baseplate.material        = str(self.page.cbMaterial.currentText())    if str(self.page.cbMaterial.currentText())    else None
-		self.baseplate.shape           = str(self.page.cbShape.currentText())       if str(self.page.cbShape.currentText())       else None
-		self.baseplate.thickness       =     self.page.dsbThickness.value()         if self.page.dsbThickness.value() >=0         else None
-		self.baseplate.flatness        =     self.page.dsbFlatness.value()          if self.page.dsbFlatness.value() >= 0         else None
-		self.baseplate.channel_density = str(self.page.cbChannelDensity.currentText()) if str(self.page.cbChannelDensity.currentText())  else None
-		self.baseplate.grade           = str(self.page.cbGrade.currentText())       if str(self.page.cbGrade.currentText())       else None
+		self.baseplate.barcode              = str(self.page.leBarcode.text())            if str(self.page.leBarcode.text())            else None
+		self.baseplate.mat_type             = str(self.page.cbMaterial.currentText())    if str(self.page.cbMaterial.currentText())    else None
+		self.baseplate.geometry             = str(self.page.cbShape.currentText())       if str(self.page.cbShape.currentText())       else None
+		self.baseplate.thickness            =     self.page.dsbThickness.value()         if self.page.dsbThickness.value() >=0         else None
+		self.baseplate.flatness             =     self.page.dsbFlatness.value()          if self.page.dsbFlatness.value() >= 0         else None
+		self.baseplate.channel_density      = str(self.page.cbChannelDensity.currentText()) if str(self.page.cbChannelDensity.currentText())  else None
+		self.baseplate.grade                = str(self.page.cbGrade.currentText())       if str(self.page.cbGrade.currentText())       else None
 
 		num_comments = self.page.listComments.count()
-		self.baseplate.comments = []
-		for i in range(num_comments):
-			self.baseplate.comments.append(str(self.page.listComments.item(i).text()))
+		self.baseplate.comments = ';;'.join([self.page.listComments.item(i).text() for i in range(num_comments)])
 
 		self.baseplate.save()
 		self.mode = 'view'

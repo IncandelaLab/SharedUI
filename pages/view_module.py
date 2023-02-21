@@ -16,7 +16,8 @@ INDEX_SHAPE = {
 	'Left':3,
 	'Right':4,
 	'Five':5,
-	'Full+Three':6
+	'Full':6,
+	'Three':7
 }
 
 INDEX_INSPECTION = {
@@ -143,18 +144,18 @@ class func(object):
 		
 		self.module_exists = (ID == self.module.ID)
 		
-		if not self.module.insertion_user in self.index_users.keys() and not self.module.insertion_user is None:
+		if not self.module.record_insertion_user in self.index_users.keys() and len(self.index_users.keys())!=0 and not self.module.record_insertion_user is None:
 			# Insertion user was deleted from user page...just add user to the dropdown
-			self.index_users[self.module.insertion_user] = max(self.index_users.values()) + 1
-			self.page.cbInsertUser.addItem(self.module.insertion_user)
-		self.page.cbInsertUser.setCurrentIndex(self.index_users.get(self.module.insertion_user, -1))
-		self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.module.institution, -1))
-		self.page.leLocation.setText("" if self.module.location is None else self.module.location)
+			self.index_users[self.module.record_insertion_user] = max(self.index_users.values()) + 1
+			self.page.cbInsertUser.addItem(self.module.initiated_by_user)
+		self.page.cbInsertUser.setCurrentIndex(self.index_users.get(self.module.record_insertion_user, -1))
+		self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.module.location_name, -1))
+		self.page.leLocation.setText("" if self.module.institution_location is None else self.module.institution_location)
 
 		# characteristics
-		self.page.cbShape.setCurrentIndex(      INDEX_SHAPE.get(      self.module.shape    , -1)  )
+		self.page.cbShape.setCurrentIndex(      INDEX_SHAPE.get(      self.module.geometry    , -1)  )
 		self.page.cbGrade.setCurrentIndex(      INDEX_GRADE.get(      self.module.grade    , -1)  )
-		self.page.cbInspection.setCurrentIndex( INDEX_INSPECTION.get( self.module.inspection,  -1))
+		self.page.cbInspection.setCurrentIndex( INDEX_INSPECTION.get( self.module.pre_inspection,  -1))
 
 		# parts and steps
 		if self.module.step_sensor:
@@ -172,10 +173,11 @@ class func(object):
 			self.page.sbStepPcb.clear()
 			self.page.cbInstitutionStepPcb.setCurrentIndex(-1)
 
+		# NOTE - TBD - may have to remove/comment
 		self.page.leBaseplate.setText(    "" if self.module.baseplate     is None else self.module.baseplate     )
 		self.page.leSensor.setText(       "" if self.module.sensor        is None else self.module.sensor        )
-		self.page.lePcb.setText(          "" if self.module.pcb           is None else self.module.pcb           )
-		self.page.leProtomodule.setText(  "" if self.module.protomodule   is None else self.module.protomodule   )
+		self.page.lePcb.setText(          "" if self.module.pcb_ser_num           is None else self.module.pcb_ser_num           )
+		self.page.leProtomodule.setText(  "" if self.module.prto_ser_num   is None else self.module.prto_ser_num   )
 		if self.page.sbStepSensor.value()  == -1:  self.page.sbStepSensor.clear()
 		if self.page.sbStepPcb.value()     == -1:  self.page.sbStepPcb.clear()
 		if self.page.leBaseplate.text()    == -1:  self.page.leBaseplate.clear()
@@ -183,13 +185,14 @@ class func(object):
 		if self.page.lePcb.text()          == -1:  self.page.lePcb.clear()
 		if self.page.leProtomodule.text()  == -1:  self.page.leProtomodule.clear()
 
-		self.page.ckWirebondingCompleted.setChecked(False if self.module.wirebonding_completed is None else self.module.wirebonding_completed)
+		self.page.ckWirebondingCompleted.setChecked(False if self.module.final_inspxn_ok is None else self.module.final_inspxn_ok)
 
 
 		# comments
 		self.page.listComments.clear()
-		for comment in self.module.comments:
-			self.page.listComments.addItem(comment)
+		if self.module.comments:
+			for comment in self.module.comments.split(";;"):
+				self.page.listComments.addItem(comment)
 		self.page.pteWriteComment.clear()
 
 
@@ -198,11 +201,11 @@ class func(object):
 			name = os.path.split(f)[1]
 			self.page.listFiles.addItem(name)
 
-		self.page.dsbOffsetTranslationX.setValue( -1 if self.module.offset_translation_x is None else self.module.offset_translation_x )
-		self.page.dsbOffsetTranslationY.setValue( -1 if self.module.offset_translation_y is None else self.module.offset_translation_y )
-		self.page.dsbOffsetRotation.setValue(    -1 if self.module.offset_rotation    is None else self.module.offset_rotation    )
-		self.page.dsbThickness.setValue(-1 if self.module.thickness   is None else self.module.thickness  )
-		self.page.dsbFlatness.setValue( -1 if self.module.flatness    is None else self.module.flatness   )
+		self.page.dsbOffsetTranslationX.setValue( -1 if self.module.pcb_plcment_x_offset is None else self.module.pcb_plcment_x_offst )
+		self.page.dsbOffsetTranslationY.setValue( -1 if self.module.pcb_plcment_y_offset is None else self.module.pcb_plcment_y_offst )
+		self.page.dsbOffsetRotation.setValue(    -1 if self.module.pcb_plcment_ang_offset    is None else self.module.pcb_plcment_ang_offset )
+		self.page.dsbThickness.setValue(-1 if self.module.mod_thkns_mm   is None else self.module.mod_thkns_mm  )
+		self.page.dsbFlatness.setValue( -1 if self.module.mod_fltns_mm   is None else self.module.mod_fltns_mm   )
 		if self.page.dsbOffsetTranslationX.value() == -1: self.page.dsbOffsetTranslationX.clear()
 		if self.page.dsbOffsetTranslationY.value() == -1: self.page.dsbOffsetTranslationY.clear()
 		if self.page.dsbOffsetRotation.value() == -1: self.page.dsbOffsetRotation.clear()
@@ -303,19 +306,17 @@ class func(object):
 	@enforce_mode('editing')
 	def saveEditing(self,*args,**kwargs):
 		# characteristics
-		self.module.insertion_user  = str(self.page.cbInsertUser.currentText())  if str(self.page.cbInsertUser.currentText())  else None
-		self.module.location        = str(self.page.leLocation.text()        ) if str(self.page.leLocation.text())             else None
-		self.module.institution     = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
-		self.module.inspection      = str(self.page.cbInspection.currentText())  if str(self.page.cbInspection.currentText())  else None
+		self.module.record_insertion_user  = str(self.page.cbInsertUser.currentText())  if str(self.page.cbInsertUser.currentText())  else None
+		self.module.institution_location        = str(self.page.leLocation.text()        ) if str(self.page.leLocation.text())             else None
+		self.module.location_name     = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
+		self.module.final_inspxn_ok      = str(self.page.cbInspection.currentText())  if str(self.page.cbInspection.currentText())  else None
 
 		# comments
 		num_comments = self.page.listComments.count()
-		self.module.comments = []
-		for i in range(num_comments):
-			self.module.comments.append(str(self.page.listComments.item(i).text()))
+		self.module.comments = ';;'.join([self.page.listComments.item(i).text() for i in range(num_comments)])
 
-		self.protomodule.offset_translation_x = self.page.dsbOffsetTranslationX.value() if self.page.dsbOffsetTranslationX.value() >=0 else None
-		self.module.offset_translation_y = self.page.dsbOffsetTranslationY.value() if self.page.dsbOffsetTranslationY.value() >=0 else None
+		self.module.pcb_plcment_x_offst = self.page.dsbOffsetTranslationX.value() if self.page.dsbOffsetTranslationX.value() >=0 else None
+		self.module.pcb_plcment_y_offst = self.page.dsbOffsetTranslationY.value() if self.page.dsbOffsetTranslationY.value() >=0 else None
 		self.module.offset_rotation      = self.page.dsbOffsetRotation.value()    if self.page.dsbOffsetRotation.value()    >=0 else None
 
 		self.module.save()
