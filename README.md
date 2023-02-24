@@ -32,7 +32,7 @@ A dialog box asking for your lxplus username will pop up.  After inputting your 
 
 The GUI is divided into two main sections:  Parts, tooling, and supplies; and production steps and testing routines.  There is also a part search page that lets users quickly find parts that have been uploaded to the DB.  To switch between pages, simply double-click on the page name in the sidebar.  (If a page does not open, it's probably WIP.)
 
-###Parts, tooling, and supplies
+### Parts, tooling, and supplies
 
 Before performing a production step, all necessary parts, tools, and supplies must be created using their respective pages.  For instance, a kapton placement step requires an existing sensor tool, baseplate, sensor component tray, etc.  To create a part, enter the desired part ID into the "[part] ID" box on the corresponding page, then click "New".  You can then save the changes with "Save" or discard them with "Cancel".  "Load" will check the DB to see whether a part exists, and if the part is found, all relevant data will be downloaded so you can view and edit it.  Parts may also be edited after creation with the "Edit" button (if it's greyed-out, try pressing "Load" first).
 
@@ -42,7 +42,7 @@ Note that protomodules and modules are automatically created by the sensor place
 
 In the future, all baseplates, sensors, and PCBs should be entered into the DB prior to being shipped to MACs, and creation of those parts with the GUI will be disabled.
 
-###Production steps and testing routines
+### Production steps and testing routines
 
 WIP - not currently implemented
 
