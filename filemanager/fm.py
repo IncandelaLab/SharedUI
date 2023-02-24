@@ -123,8 +123,8 @@ def connectOracle():
 	print("Connected")
 
 loadconfig()
-os.system('ssh -f -N -M -S temp_socket -L 10131:itrac1609-v.cern.ch:10121 -L 10132:itrac1601-v.cern.ch:10121 phmaster@lxplus.cern.ch')
-connectOracle()
+# moved to mainUI: (must call after tunnel)
+#connectOracle()
 
 
 ###############################################
@@ -230,7 +230,6 @@ userManager = UserManager("userInfoFile")
 
 class fsobj(object):
 	PROPERTIES_COMMON = [
-		'comments',
 		]
 
 	DEFAULTS = {
@@ -265,7 +264,6 @@ class fsobj(object):
 
 	def __init__(self):
 		super(fsobj, self).__init__()
-		print("INIT (fsobj).  Calling clear()...")
 		self.clear() # sets attributes to None
 
 	def __str__(self):
@@ -449,7 +447,7 @@ class fsobj(object):
 		# NEW:  Add special case for multi-item assembly steps.  Will always appear in DATA_SET dict.
 		# If in DATA_SET, data_set_index will NOT be None.  If not None, and the requested item is a list, 
 		# 	return element i instead of the usual list handling case.
-		print("dict_to_element: input_dict is", input_dict)
+		#print("dict_to_element: input_dict is", input_dict)
 
 		parent = Element(element_name)
 		
@@ -772,6 +770,7 @@ class fsobj_part(fsobj_db):
 		"KIND_OF_PART":"kind_of_part",
 		"RECORD_INSERTION_USER":"record_insertion_user",
 		"SERIAL_NUMBER":"ID",
+		"BARCODE":"barcode",
 		"COMMENT_DESCRIPTION":"comment_description",
 		"LOCATION":"location_name",
 		"MANUFACTURER":"manufacturer"  # Usually not used
@@ -844,7 +843,9 @@ where p.SERIAL_NUMBER=\'{}\'""".format(self.COND_TABLE, ID)
 	def filesToUpload(self):
 		print("Finding files:")
 		if self.ID == "" or self.ID is None:  return []
+		print("filesToUpload: Getting filedir filename")
 		filedir, filename = self.get_filedir_filename()
+		print("Got filedir filename")
 		fname_build = filename.replace('.json', '_build_upload.xml')
 		fname_cond  = filename.replace('.json', '_cond_upload.xml')
 		print("Found", [os.path.join(filedir, fname_build), os.path.join(filedir, fname_cond)])
@@ -1018,7 +1019,6 @@ class baseplate(fsobj_part):
 
 	@property
 	def mat_type(self):
-		print("********PLT MAT_TYPE IS:", self.display_name.split()[0])
 		return self.display_name.split()[0]
 	@mat_type.setter  # eventually, these will not be used
 	def mat_type(self, value):

@@ -274,6 +274,7 @@ class func(object):
 
 		num_comments = self.page.listComments.count()
 		self.protomodule.comments = ';;'.join(self.page.listComments.item(i).text() for i in range(num_comments))
+		if num_comments == 0:  self.protomodule.comments = ';;'
 
 		self.protomodule.save()
 		self.mode = 'view'

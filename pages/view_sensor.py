@@ -292,6 +292,7 @@ class func(object):
 
 		num_comments = self.page.listComments.count()
 		self.sensor.comments = ';;'.join([self.page.listComments.item(i).text() for i in range(num_comments)])
+		if num_comments == 0:  self.sensor.comments = ';;'
 
 		self.sensor.visual_inspection = str(self.page.cbInspection.currentText()) if str(self.page.cbInspection.currentText()) else None
 		self.sensor.flatness = self.page.dsbFlatness.value() if self.page.dsbFlatness.value() else None

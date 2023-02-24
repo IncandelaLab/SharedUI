@@ -331,6 +331,7 @@ class func(object):
 
 		num_comments = self.page.listComments.count()
 		self.pcb.comments = ';;'.join([self.page.listComments.item(i).text() for i in range(num_comments)])
+		if num_comments == 0:  self.pcb.comments = ';;'
 
 		self.pcb.flatness   =     self.page.dsbFlatness.value()         if     self.page.dsbFlatness.value()  >=0    else None
 		self.pcb.thickness  =     self.page.dsbThickness.value()        if     self.page.dsbThickness.value() >=0    else None

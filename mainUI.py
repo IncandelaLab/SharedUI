@@ -225,6 +225,9 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 			print("Closed ssh connection")
 		atexit.register(close_ssh)
 
+		# After tunnel established, :
+		fm.connectOracle()
+
 		# NEW:  If not already present, create new ssh key for user
 		# Enables scp without password prompt every time
 		"""
@@ -349,8 +352,8 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 			# NEW:  Enable/disable uploading accordingly.
 			enableUploading = which_page in UPLOAD_ENABLED_PAGES
 			self.pbUploadObject.setEnabled(enableUploading)
-			self.pbUploadDate.setEnabled(  enableUploading)
-			self.dUpload.setEnabled(       enableUploading)
+			#self.pbUploadDate.setEnabled(  enableUploading)
+			#self.dUpload.setEnabled(       enableUploading)
 			self.leStatus.setText("")
 			self.leStatus.setEnabled(      enableUploading)
 
@@ -443,6 +446,8 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 				# 20s is a conservative estimate for the worst-case upload duration
 				# (It's also really obnoxious w/ multiple passwords and must change ASAP)
 				print("Waiting 20s before uploading dependent file...")
+				print("Note:  You must reenter your password again after the wait.")
+				print("This will hopefully change in future versions.")
 				time.sleep(20)
 		if success:
 			self.leStatus.setText("Success!")

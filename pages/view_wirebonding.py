@@ -427,12 +427,14 @@ class func(object):
 		num_comments = self.page.listComments.count()
 		self.module.wirebonding_comments = []
 		for i in range(num_comments):
-			self.module.wirebonding_comments.append(str(self.page.listComments.item(i).text()))
+			self.module.comments = ';;'.join(self.page.listComments.item(i).text() for i in range(num_comments))
+		if num_comments == 0:  self.module.wirebonding_comments = ';;'
 
 		num_comments_encap = self.page.listCommentsEncap.count()
 		self.module.encapsulation_comments = []
 		for i in range(num_comments_encap):
 			self.module.encapsulation_comments.append(str(self.page.listCommentsEncap.item(i).text()))
+		if num_comments_encap == 0:  self.module.encapsulation_comments = ';;'
 
 		# pre-wirebonding qualification
 		self.module.preinspection        = str(self.page.cbPreinspection.currentText()  ) if str(self.page.cbPreinspection.currentText()  ) else None
