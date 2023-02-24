@@ -168,6 +168,9 @@
         </item>
         <item>
          <widget class="QLineEdit" name="lineEdit">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>Production steps and testing</string>
           </property>
@@ -175,6 +178,9 @@
         </item>
         <item>
          <widget class="QListWidget" name="listAssembly">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
             <horstretch>0</horstretch>
@@ -314,7 +320,7 @@
           </widget>
           <widget class="QPushButton" name="pbUploadObject">
            <property name="enabled">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="geometry">
             <rect>
@@ -341,6 +347,9 @@
            </property>
           </widget>
           <widget class="QLabel" name="label">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="geometry">
             <rect>
              <x>5</x>
@@ -487,7 +496,7 @@
      <x>0</x>
      <y>0</y>
      <width>1417</width>
-     <height>22</height>
+     <height>37</height>
     </rect>
    </property>
   </widget>

@@ -13,42 +13,6 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QListWidget" name="lwPartList">
-   <property name="geometry">
-    <rect>
-     <x>490</x>
-     <y>60</y>
-     <width>281</width>
-     <height>201</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbGoToPart">
-   <property name="geometry">
-    <rect>
-     <x>600</x>
-     <y>290</y>
-     <width>171</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Go to selected item</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label">
-   <property name="geometry">
-    <rect>
-     <x>490</x>
-     <y>40</y>
-     <width>191</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Search results:</string>
-   </property>
-  </widget>
   <widget class="QPushButton" name="pbSearch">
    <property name="geometry">
     <rect>
@@ -60,64 +24,6 @@
    </property>
    <property name="text">
     <string>Search</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="leStatus">
-   <property name="geometry">
-    <rect>
-     <x>550</x>
-     <y>260</y>
-     <width>221</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_26">
-   <property name="geometry">
-    <rect>
-     <x>490</x>
-     <y>260</y>
-     <width>61</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Status:</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbClearResults">
-   <property name="geometry">
-    <rect>
-     <x>490</x>
-     <y>290</y>
-     <width>101</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Clear results</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_6">
-   <property name="geometry">
-    <rect>
-     <x>60</x>
-     <y>360</y>
-     <width>351</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>NOTE:  DB search is currently disabled</string>
    </property>
   </widget>
   <widget class="QPushButton" name="pbClearParams">
@@ -149,16 +55,19 @@
     <enum>QFrame::Raised</enum>
    </property>
    <widget class="QCheckBox" name="ckUseDate">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>310</x>
+      <x>300</x>
       <y>120</y>
       <width>71</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>Enable</string>
+     <string>Include</string>
     </property>
    </widget>
    <widget class="QComboBox" name="cbChannelDensity">
@@ -239,7 +148,7 @@
    </widget>
    <widget class="QDateEdit" name="dCreated">
     <property name="enabled">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
     <property name="geometry">
      <rect>
@@ -325,6 +234,9 @@
     </property>
    </widget>
    <widget class="QComboBox" name="cbAssmCol">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>330</x>
@@ -479,21 +391,19 @@
     </item>
     <item>
      <property name="text">
+      <string>Full</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
       <string>Three</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Halfmoon</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Full+Three</string>
      </property>
     </item>
    </widget>
    <widget class="QComboBox" name="cbAssmRow">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>250</x>
@@ -530,6 +440,9 @@
     </item>
    </widget>
    <widget class="QLineEdit" name="lineEdit_22">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>300</x>
@@ -564,17 +477,17 @@
     </item>
     <item>
      <property name="text">
-      <string>120 um</string>
+      <string>120um</string>
      </property>
     </item>
     <item>
      <property name="text">
-      <string>200 um</string>
+      <string>200um</string>
      </property>
     </item>
     <item>
      <property name="text">
-      <string>300 um</string>
+      <string>300um</string>
      </property>
     </item>
    </widget>
@@ -627,6 +540,9 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="lineEdit_21">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>220</x>
@@ -734,6 +650,132 @@
    <property name="text">
     <string>Part attributes:</string>
    </property>
+  </widget>
+  <widget class="QFrame" name="frame_2">
+   <property name="geometry">
+    <rect>
+     <x>470</x>
+     <y>50</y>
+     <width>581</width>
+     <height>281</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <widget class="QPushButton" name="pbGoToPart">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>250</y>
+      <width>171</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Go to selected item</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leStatus">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>220</y>
+      <width>221</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QListWidget" name="lwTypeList">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>20</y>
+      <width>281</width>
+      <height>201</height>
+     </rect>
+    </property>
+    <property name="midLineWidth">
+     <number>1</number>
+    </property>
+   </widget>
+   <widget class="QListWidget" name="lwPartList">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>281</width>
+      <height>201</height>
+     </rect>
+    </property>
+    <property name="midLineWidth">
+     <number>1</number>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_26">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>220</y>
+      <width>61</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Status:</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbClearResults">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>250</y>
+      <width>101</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Clear results</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>0</y>
+      <width>191</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Search results:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>0</y>
+      <width>191</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Part type:</string>
+    </property>
+   </widget>
   </widget>
  </widget>
  <resources/>

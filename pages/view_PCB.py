@@ -161,7 +161,7 @@ class func(object):
 		
 		if not self.pcb.record_insertion_user in self.index_users.keys() and len(self.index_users.keys())!=0 and not self.pcb.record_insertion_user is None:
 			# Insertion user is not in user page...fine for now, just add user to the dropdown
-			self.index_users[self.pcb.record_insrtion_user] = max(self.index_users.values()) + 1
+			self.index_users[self.pcb.record_insertion_user] = max(self.index_users.values()) + 1
 			self.page.cbInsertUser.addItem(self.pcb.initiated_by_user)
 		self.page.cbInsertUser.setCurrentIndex(self.index_users.get(self.pcb.record_insertion_user, -1))
 
@@ -323,7 +323,7 @@ class func(object):
 
 		self.pcb.barcode         = str(self.page.leBarcode.text()          )  if str(self.page.leBarcode.text()           ) else None
 		#self.pcb.manufacturer    = str(self.page.leManufacturer.text()     )  if str(self.page.leManufacturer.text()      ) else None
-		self.pcb.channel_density      = str(self.page.cbResolution.currentText())  if str(self.page.cbType.currentText()       ) else None
+		self.pcb.channel_density      = str(self.page.cbResolution.currentText())  if str(self.page.cbResolution.currentText()       ) else None
 		#self.pcb.type            = str(self.page.cbType.currentText()      )  if str(self.page.cbType.currentText()       ) else None
 		#self.pcb.num_rocs        = self.page.sbNumRocs.value()  if self.page.sbNumRocs.value()  >=0 else None
 		#self.pcb.channels        = self.page.sbChannels.value() if self.page.sbChannels.value() >=0 else None

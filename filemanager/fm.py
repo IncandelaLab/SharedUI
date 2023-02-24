@@ -354,7 +354,7 @@ class fsobj(object):
 		if not os.path.exists(xml_file):
 			self.clear()
 			return False
-		print("Found xml file")
+		print("Found xml file", xml_file)
 
 		with open(xml_file, 'r') as opfl:
 			data = json.load(opfl)
@@ -394,8 +394,6 @@ class fsobj(object):
 	def clear(self):
 		self.ID = None
 		PROPERTIES = self.PROPERTIES + self.PROPERTIES_COMMON
-		print("IN CLEAR():  properties are:")
-		print(PROPERTIES)
 		DEFAULTS   = {**self.DEFAULTS, **self.DEFAULTS_COMMON}
 		for prop in PROPERTIES:
 			setattr(self, prop, DEFAULTS.get(prop, None))
@@ -530,10 +528,11 @@ class fsobj(object):
 
 	# Return a list of all files to be uploaded to the DB
 	# (i.e. all files in the object's storage dir with "upload" in the filename)
-	def filesToUpload(self):
-		fdir, fname = self.get_filedir_filename()
-		# Grab all files in that directory
-		return glob.glob(fdir + "/*upload*")
+	#def filesToUpload(self):
+	#	fdir, fname = self.get_filedir_filename()
+	#	# Grab all files in that directory
+	#	print("Found files to upload:", glob.glob(fdir + "/*upload*"))
+	#	return glob.glob(fdir + "/*upload*")
 
 	# NEW:  All parts/assembly steps use this, bc can't write multiple XML tags w/ same name
 	@property
@@ -651,8 +650,8 @@ class fsobj_db(fsobj):
 		},
 		'RUN':{
 			'RUN_NAME':'RUN_TYPE',
-			'RUN_BEGIN_TIMESTAMP':'run_begin_timestamp',  # Format:  2018-03-26 00:00:00
-			'RUN_END_TIMESTAMP':'run_end_timestamp',
+			'RUN_BEGIN_TIMESTAMP':'run_begin_timestamp_',  # Format:  2018-03-26 00:00:00
+			'RUN_END_TIMESTAMP':'run_end_timestamp_',
 			'INITIATED_BY_USER':'initiated_by_user',
 			'LOCATION':'location',
 			'COMMENT_DESCRIPTION':'comment_description',
@@ -692,6 +691,17 @@ class fsobj_db(fsobj):
 			self.institution = None
 		else:
 			self.institution = INSTITUTION_DICT[value]
+
+	# Auto-set:  if value downloaded, leave unchanged.  Otherwise, set to now.
+	@property
+	def run_begin_timestamp_(self):
+		# Auto-formatted: {}-{}-{} {}:{}:{}.{}
+		return str(datetime.datetime.now()) if self.run_begin_timestamp is None else self.run_begin_timestamp
+
+	@property
+	def run_end_timestamp_(self):
+		return str(datetime.datetime.now()) if self.run_end_timestamp is None else self.run_end_timestamp
+
 
 
 
@@ -806,8 +816,8 @@ where p.SERIAL_NUMBER=\'{}\'""".format(self.COND_TABLE, ID)
 		# There's two:  One for Build_UCSB_ProtoModules_00.xml, one for ProtoModules_BuildCond_00.xml (part and cond).
 		# Defined in XML_PART_TEMPLATE, XML_COND_TEMPLATE
 		filedir, filename = self.get_filedir_filename()
-		fname_build = filename.replace('.xml', '_build_upload.xml')
-		fname_cond  = filename.replace('.xml', '_cond_upload.xml')
+		fname_build = filename.replace('.json', '_build_upload.xml')
+		fname_cond  = filename.replace('.json', '_cond_upload.xml')
 		# Build file:
 		xml_tree = self.generate_xml(self.XML_PART_TEMPLATE)
 		root = xml_tree.getroot()
@@ -829,6 +839,16 @@ where p.SERIAL_NUMBER=\'{}\'""".format(self.COND_TABLE, ID)
 		# upload base file first
 		# wait n seconds
 		# upload cond file second
+
+	# Now just inheriting
+	def filesToUpload(self):
+		print("Finding files:")
+		if self.ID == "" or self.ID is None:  return []
+		filedir, filename = self.get_filedir_filename()
+		fname_build = filename.replace('.json', '_build_upload.xml')
+		fname_cond  = filename.replace('.json', '_cond_upload.xml')
+		print("Found", [os.path.join(filedir, fname_build), os.path.join(filedir, fname_cond)])
+		return [os.path.join(filedir, fname_build), os.path.join(filedir, fname_cond)]
 		
 
 
@@ -885,6 +905,8 @@ where p.SERIAL_NUMBER=\'{}\'""".format(self.COND_TABLE, ID)
 			print(data_cond)
 
 			def fill_self(data_x):
+				# sometimes, no cond dataset will be uploaded.  If so:
+				if not data_x:  return
 				for colname, var in data_x.items():
 					# NOTE:  datetime objs cannot be stored as json, or simply sent to xml...so stringify
 					if type(var) == datetime.datetime:
@@ -910,6 +932,7 @@ where p.SERIAL_NUMBER=\'{}\'""".format(self.COND_TABLE, ID)
 
 
 
+
 #class fsobj_assembly(fsobj):
 #	#@property
 #	#def sql_request(self):
@@ -927,9 +950,11 @@ where p.SERIAL_NUMBER=\'{}\'""".format(self.COND_TABLE, ID)
 class baseplate(fsobj_part):
 	OBJECTNAME = "baseplate"
 	FILEDIR = os.sep.join(['baseplates','{date}'])
-	FILENAME = "baseplate_{ID}.xml"
+	FILENAME = "baseplate_{ID}.json"
 
 	# Note:  serial_number == self.ID
+	COND_TABLE_NAME = 'SI_MODULE_BASEPLATE'
+
 	COND_PROPERTIES = [
 		# Read/write from cond:
 		"thickness",
@@ -1023,7 +1048,6 @@ class baseplate(fsobj_part):
 		splt[3] = str(value)
 		self.display_name = " ".join(splt)
 
-
 	def ready_step_sensor(self, step_sensor = None, max_flatness = None):
 		# POSSIBLE:  Query DB to check for sensors?
 		# unless this is already done via goto/etc...
@@ -1035,11 +1059,17 @@ class baseplate(fsobj_part):
 class sensor(fsobj_part):
 	OBJECTNAME = "sensor"
 	FILEDIR = os.sep.join(['sensors','{date}'])
-	FILENAME = "sensor_{ID}.xml"
+	FILENAME = "sensor_{ID}.json"
+
+	COND_TABLE_NAME = "FLATNS_SENSOR_DATA"
 
 	# Note:  serial_number == self.ID
 	COND_PROPERTIES = [
 		# Read/write from cond:
+		"tested_by",
+		"test_date",
+		"status",
+		"test_file_name",
 		"thickness",
 		"flatness",
 		"grade",
@@ -1074,6 +1104,10 @@ class sensor(fsobj_part):
 				"KIND_OF_PART":"kind_of_part",
 			},
 			"DATA":{
+				"TESTED_BY":"tested_by",
+				"TEST_DATE":"test_date_",
+				"STATUS":"status",
+				"TEST_FILE_NAME":"test_file_name",
 				"FLATNESS":"flatness",
 				"THICKNESS":"thickness",
 				"GRADE":"grade",
@@ -1082,6 +1116,9 @@ class sensor(fsobj_part):
 			}
 		}
 	}
+	# Note:  properties w/ _ at the end of the filename are auto-filled
+	# e.x. test_date:  If not null (if downloaded value), leave unchanged.
+	# If null, set to current date.
 
 	# for HEADER_DICT
 	COND_TABLE = "FLATNS_SENSOR_DATA"
@@ -1139,6 +1176,9 @@ class sensor(fsobj_part):
 	def thickness(self, value):
 		pass
 
+	@property
+	def test_date_(self):
+		return str(datetime.datetime.now()) if self.test_date is None else self.test_date
 
 	# Should not be passing any of these params yet
 	def ready_step_sensor(self, step_sensor = None, max_flatness = None):
@@ -1169,11 +1209,16 @@ class sensor(fsobj_part):
 class pcb(fsobj_part):
 	OBJECTNAME = "PCB"
 	FILEDIR = os.sep.join(['pcbs','{date}'])
-	FILENAME = "pcb_{ID}.xml"
+	FILENAME = "pcb_{ID}.json"
+
+	COND_TABLE_NAME = "FLATNS_PCB_ROCS_DATA"
 
 	# Note:  serial_number == self.ID
 	COND_PROPERTIES = [
 		# Read/write from cond:
+		"tested_by",
+		"test_date",
+		"status",
 		"thickness",
 		"flatness",
 		"grade",
@@ -1195,7 +1240,7 @@ class pcb(fsobj_part):
 
 	DEFAULTS = {
 		"size":     '8', # This should not be changed!
-		"display_name": "None PCB None None"
+		"display_name": "PCB None None"
 	}
 
 
@@ -1209,12 +1254,12 @@ class pcb(fsobj_part):
 				"KIND_OF_PART":"kind_of_part",
 			},
 			"DATA":{
+				"TESTED_BY":"tested_by",
+				"TEST_DATE":"test_date_",
+				"STATUS":"status",
 				"FLATNESS":"flatness",
 				"THICKNESS":"thickness",
 				"GRADE":"grade",
-				"MATERIAL":"mat_type",
-				"TESTED_BY":"tested_by",
-				"TEST_DATE":"test_date",
 				"TEST_FILE_NAME":"test_file_name",
 				"COMMENTS":"comments",
 			}
@@ -1223,7 +1268,7 @@ class pcb(fsobj_part):
 
 	# for HEADER_DICT
 	COND_TABLE = "FLATNS_PCB_ROCS_DATA"
-	TABLE_DESC = "HGC PCB Flatness & Test Data"
+	TABLE_DESC = "Flatness PCB ROCs Mounted"
 
 	# List of vars that should NOT be edited in the GUI and are only loaded from DB
 	# (And some info would be redundant w/ other constants, eg KIND_OF_PART and self.size)
@@ -1257,6 +1302,9 @@ class pcb(fsobj_part):
 		splt[2] = str(value)
 		self.display_name = " ".join(splt)
 
+	@property
+	def test_date_(self):
+		return str(datetime.datetime.now()) if self.test_date is None else self.test_date
 
 	def ready_step_pcb(self, step_pcb = None):
 		if self.step_pcb and self.step_pcb != step_pcb:
@@ -1267,7 +1315,7 @@ class pcb(fsobj_part):
 class protomodule(fsobj_part):
 	OBJECTNAME = "protomodule"
 	FILEDIR = os.sep.join(['protomodules','{date}'])
-	FILENAME = 'protomodule_{ID}.xml'
+	FILENAME = 'protomodule_{ID}.json'
 
 	# Note:  serial_number == self.ID
 	COND_PROPERTIES = [
@@ -1508,7 +1556,7 @@ class protomodule(fsobj_part):
 class module(fsobj_part):
 	OBJECTNAME = "module"
 	FILEDIR    = os.sep.join(['modules','{date}','module_{ID}'])
-	FILENAME   = 'module_{ID}.xml'
+	FILENAME   = 'module_{ID}.json'
 
 	# Note:  serial_number == self.ID
 	COND_PROPERTIES = [
@@ -1637,8 +1685,8 @@ class module(fsobj_part):
 		},
 		'RUN':{
 			'RUN_NAME':'RUN_TYPE',
-			'RUN_BEGIN_TIMESTAMP':'run_begin_timestamp',  # Format:  2018-03-26 00:00:00
-			'RUN_END_TIMESTAMP':'run_end_timestamp',
+			'RUN_BEGIN_TIMESTAMP':'run_begin_timestamp_',  # Format:  2018-03-26 00:00:00
+			'RUN_END_TIMESTAMP':'run_end_timestamp_',
 			'INITIATED_BY_USER':'initiated_by_user',
 			'LOCATION':'location',
 			'COMMENT_DESCRIPTION':'comment_description',
@@ -2180,7 +2228,7 @@ where p.SERIAL_NUMBER=\'{}\'"s"s".format(self.COND_TABLE, ID)
 class step_sensor(fsobj_step):
 	OBJECTNAME = "sensor step"
 	FILEDIR    = os.sep.join(['steps','sensor','{date}'])
-	FILENAME   = 'sensor_assembly_step_{ID:0>5}.xml'
+	FILENAME   = 'sensor_assembly_step_{ID:0>5}.json'
 	PROPERTIES = [
 		'user_performed', # name of user who performed step
 		'institution',
@@ -2491,7 +2539,7 @@ class step_sensor(fsobj_step):
 class step_pcb(fsobj_step):
 	OBJECTNAME = "PCB step"
 	FILEDIR = os.sep.join(['steps','pcb','{date}'])
-	FILENAME = 'pcb_assembly_step_{ID:0>5}.xml'
+	FILENAME = 'pcb_assembly_step_{ID:0>5}.json'
 	PROPERTIES = [
 		'user_performed', # name of user who performed step
 		'institution',

@@ -10,6 +10,10 @@ from cmsdbldr_client import LoaderClient
 import atexit  # Close ssh tunnel upon exiting the GUI
 import glob
 
+# For uploading XML files in background
+import threading
+import subprocess
+
 
 # Import page functionality classes
 from pages.view_users       import func as cls_func_view_users
@@ -155,13 +159,13 @@ PAGE_IDS = {
 
 # List of all pages where DB expects info to upload
 UPLOAD_ENABLED_PAGES = [
-	#'Baseplates',  # In theory, should never have to upload these
-	#'Sensors',
-	#'PCBs',
+	'Baseplates',  # In theory, should never have to upload these
+	'Sensors',
+	'PCBs',
 	#'Protomodules',
 	#'Modules',
-	'2. Sensor - post-assembly',
-	'4. PCB - post-assembly'
+	#'2. Sensor - post-assembly',
+	#'4. PCB - post-assembly'
 ]
 
 
@@ -211,13 +215,38 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		#	loginResult = ldlg.exec_()
 		#	if loginResult == 1:  break
 		#	attempts += 1
+		self.username = ldlg.getUsername()
 		print("Got username:  ",  ldlg.getUsername())
-		username = ldlg.getUsername()
-		os.system('ssh -f -N -M -S temp_socket -L 10131:itrac1609-v.cern.ch:10121 -L 10132:itrac1601-v.cern.ch:10121 {}@lxplus.cern.ch'.format(username))
+		os.system('ssh -f -N -M -S temp_socket -L 10131:itrac1609-v.cern.ch:10121 -L 10132:itrac1601-v.cern.ch:10121 {}@lxplus.cern.ch'.format(self.username))
 		# Close upon exiting
 		def close_ssh():
+			print("Closing ssh connection")
 			os.system('ssh -S temp_socket -O exit lxplus.cern.ch')
+			print("Closed ssh connection")
 		atexit.register(close_ssh)
+
+		# NEW:  If not already present, create new ssh key for user
+		# Enables scp without password prompt every time
+		"""
+		ssh_dir = os.path.expanduser('~/.ssh/hgcal_gui')
+		if not os.path.isfile(ssh_dir+'/id_rsa_'.format(self.username)):
+			# generate new ssh key at ~/.ssh/hgcal_gui/id_rsa_USERNAME
+			print("NOTE:  Existing ssh key for DB loader not found.  Generating new ssh key (mandatory)...")
+			if not os.path.exists(ssh_dir):
+				os.mkdir(ssh_dir)
+			keygen_result = subprocess.run(['ssh-keygen', '-f', ssh_dir+'/id_rsa_'+self.username, '-t', 'rsa', '-N', '\'\''])
+			if keygen_result.returncode != 0:
+				print("ERROR:  Problem occurred during ssh-keygen: status {}".format(keygen_result.returncode))
+				print(keygen_result.stderr)
+				exit()
+			copy_result = subprocess.run(['ssh-copy-id', '-i', ssh_dir+'/id_rsa_'+self.username, self.username+'@dbloader-hgcal.cern.ch'])
+			if copy_result.returncode != 0:
+				print("ERROR:  Problem occurred during ssh-copy-id: status {}".format(copy_result.returncode))
+				print(copy_result.stderr)
+				exit()
+		else:
+			print("Existing ssh key found at {}/id_rsa_{}".format(ssh_dir, self.username))
+		"""
 
 
 	def setupPagesUI(self):
@@ -346,29 +375,31 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 
 		# OUTDATED:
 		# FIRST:  Check to see whether there's any modified XML files
-		"""
-		xmlStepList = [self.func_view_baseplate, self.func_view_sensor, self.func_view_PCB, self.func_view_sensor_step]
-		xmlFilesModified = 0
-		for step in xmlStepList:
-			xmlModList = step.xmlModified()
-			if len(xmlModList) != 0:  xmlFilesModified += 1
 
-		if xmlFilesModified == 0:
-			print("ALL CHANGES HAVE ALREADY BEEN SAVED")
-			return
-		"""
 		currentPage = self.func_list[self.swPages.currentIndex()]
 		upload_files = currentPage.filesToUpload()
 		print("Preparing to upload files for single object:", upload_files)
-		lc = LoaderClient()
-		success = True
+		"""
+		# New method:  Zip all files together and scp
 		for f in upload_files:
-			upload_status = lc.run(iargs=["--login", "--url", "https://cmsdca.cern.ch/hgc_loader/hgc/int2r", f, "--verbose"])
-			success = (upload_status == 200) and success
-		if success:
-			leStatus.setText("Success!")
+			os.system('zip tempzip.zip {}'.format(f))
+		success = os.system('scp tempzip.zip phmaster@dbloader-hgcal.cern.ch:/home/dbspool/spool/hgc/int2r')
+		#os.remove('tempzip.zip')
+		
+		if success==0:
+			print("Upload successful")
+			self.leStatus.setText("Success!")
 		else:
-			leStatus.setText("Error during upload!")
+			print("Upload failed!")
+			self.leStatus.setText("Error during upload!")
+		"""
+
+
+		# Now upload files in separate thread - will need to wait if multiple files, loader can only handle 1
+		x = threading.Thread(target=self.uploadFilesAndSleep, args=(upload_files,))
+		x.start()
+		print("Starting upload.  Will continue in background.")
+
 
 		"""
 		print("DISPLAYING POP-UP")
@@ -387,7 +418,39 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		else:
 			print("Upload unsuccessful!")
 		"""
+	
+	def uploadFilesAndSleep(self, flist):
+		if len(flist)==0: return
 
+		#lc = LoaderClient()
+		success = True
+		for f in flist:
+			# Note:  .bash_history does NOT store commands run w/ subprocess
+			#upload_status = lc.run(iargs=["--login", "--url", "https://cmsdca.cern.ch/hgc_loader/hgc/int2r", f, "--verbose"])
+			scpcmd = "scp {} {}@dbloader-hgcal.cern.ch:/home/dbspool/spool/hgc/int2r".format(f, self.username)
+			print("Scping...")
+			result = os.system(scpcmd)
+			print("scp'ed...")
+			success = success and result == 0
+			#success = (upload_status == 200) and success
+			if result != 0:
+				print("File transfer:  possible error!  Return code {}".format(result.returncode))
+
+			if f != flist[-1]:  # if not final:
+				# Wait 20s before uploading the next file
+				# (If cond files are uploaded before the base file is read into the DB,
+				# the DB won't be able to find the part and will throw and error)
+				# 20s is a conservative estimate for the worst-case upload duration
+				# (It's also really obnoxious w/ multiple passwords and must change ASAP)
+				print("Waiting 20s before uploading dependent file...")
+				time.sleep(20)
+		if success:
+			self.leStatus.setText("Success!")
+		else:
+			self.leStatus.setText("Upload failed!")
+
+		print("Finished uploading files.  See GUI status bar for result.")
+	
 
 	def goUploadDate(self):
 		lDate = self.dUpload.date()
@@ -401,13 +464,15 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		# NOTE:  Writing all errors to upload_errors.log
 		sys.stdout = open('upload_errors.log', 'w+')
 		for f in part_files + step_files:
-			upload_status = lc.run(iargs=["--login", "--url", "https://cmsdca.cern.ch/hgc_loader/hgc/int2r", f, "--verbose"])
+			print("UPLOADING", f)
+			# removed "--login" arg
+			upload_status = lc.run(iargs=["--url", "https://cmsdca.cern.ch/hgc_loader/hgc/int2r", f, "--verbose"])
 			success = (upload_status == 200) and success
 		sys.stdout.close()
 		if success:
-			leStatus.setText("Success!")
+			self.leStatus.setText("Success!")
 		else:
-			leStatus.setText("Error during upload!")
+			self.leStatus.setText("Error during upload!")
 
 
 # Class for requesting GUI username at start (for ssh tunnel)
@@ -419,12 +484,15 @@ class UserDialog(wdgt.QDialog):
 		self.setWindowTitle("SSH tunnel:  username required")
 		
 		self.textName = wdgt.QLineEdit(self)
+		#self.passName = wdgt.QLineEdit(self)
+		#passName.setEchoMode(gui.QLineEdit.Password) # conceal password
 		self.buttonLogin = wdgt.QPushButton('Connect', self)
 		self.buttonCancel = wdgt.QPushButton('Cancel', self)
 		self.buttonLogin.clicked.connect(self.handleLogin)
 		self.buttonCancel.clicked.connect(self.handleCancel)
 		layout = wdgt.QVBoxLayout(self)
 		layout.addWidget(self.textName)
+		#layout.addWidget(self.passName)
 		layout.addWidget(self.buttonLogin)
 		layout.addWidget(self.buttonCancel)
 

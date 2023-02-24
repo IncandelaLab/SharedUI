@@ -34,6 +34,27 @@ PART_NAME_DICT = {
 	'Module':     '% {sen_type} Si Module {channel_density} {geometry}'
 }
 
+# Need to filter out all part types other than the ones used in the GUI.
+# Ex want "120um Si Sensor HD Full" and NOT "300um LD Si Sensor Wafer"
+PART_NAME_FILTER = {
+	'Baseplate': '',
+	# Easy, no filter needed
+	'Sensor': """\nand regexp_like(kp.DISPLAY_NAME, \'.* .* Sensor (HD|LD) .*\')
+and not kp.DISPLAY_NAME like \'%Halfmoon%\'""",
+	# include: 120um Si Sensor HD Full
+	# exclude: 120um Si Sensor HD Halfmoon-B
+	# exclude: 300um LD Si Sensor Wafer
+	# exclude: HPK Six Inch 256 Sensor Guard Ring
+	#          % % Sensor [HD][LD] %
+	#    NOT REGEXP '%Halfmoon%'
+	'PCB': '\nand regexp_like(kp.DISPLAY_NAME, \'PCB (HD|LD)\')',
+	# exclude:  PCB/Kapton Baseplate ..., PCB baseplate...
+	'Protomodule': '',
+	# No filter needed
+	'Module': '',
+	# No filter needed
+}
+
 INDEX_INSTITUTION = {
 	'':0,
 	'CERN':1,
@@ -42,6 +63,7 @@ INDEX_INSTITUTION = {
 	'UMN':4,
 	'HEPHY':5,
 	'HPK':6,
+	'IHEP':7,
 }
 
 
@@ -76,68 +98,86 @@ class func(object):
 	def search(self, *args, **kwargs):  # WIP WIP WIP
 		self.clearResults()
 
-		search_dict = { self.page.cbInstitution:'location', self.page.cbShape:'geometry',
+		search_dict = { self.page.cbInstitution:'location_name', self.page.cbShape:'geometry',
 						self.page.cbMaterial:'mat_type', self.page.cbThickness:'sen_type',
-						self.page.cbChannelDensity:'channel_density', self.page.cbPCBType:'pcb_type',
+						self.page.cbChannelDensity:'channel_density', #self.page.cbPCBType:'pcb_type',
 						self.page.cbAssmRow:'tray_row', self.page.cbAssmCol:'tray_col' }
 		# Treat dCreated separately
 		# Search criteria will be a dict:  'var_name':'value'
 		search_criteria = {}
 		for box, qty in search_dict.items():
-			if box.isEnabled() and box.currentText() != '':
+			if box.isEnabled(): # and box.currentText() != '':
 				search_criteria[qty] = box.currentText() if box.currentText() != "" else "%"
-		search_date = self.page.ckUseDate.isChecked()
-		if search_date:
-			d_c = self.page.dCreated.date()
-			d_created = "{}-{}-{}".format(d_c.month(), d_c.day(), d_c.year())
+		#search_date = self.page.ckUseDate.isChecked()
+		#if search_date: # to implement
+		#	d_c = self.page.dCreated.date()
+		#	d_created = "{}-{}-{}".format(d_c.month(), d_c.day(), d_c.year())
 
-		"""
-		# Now using DB_CURSOR:
-		if fm.ENABLE_DB_COMMUNICATION:
-			# In general:  Assemble sql query w/ items from search_dict
-			part_type = self.page.cbPartType.currentText()
-			# pt_template:  should be %_%_NAME_HD_% etc - % for anything not specified
-			pt_template = PART_NAME_DICT[part_type].format(mat_type=search_criteria['mat_type'],
-														   sen_type=search_criteria['sen_type'],
-														   channel_density=search_criteria['channel_density'].
-														   geometry=search_criteria['geometry'], )
-			sql_query = "select kp.DISPLAY_NAME, p.*
-from CMS_HGC_CORE_CONSTRUCT.PARTS p
-inner join CMS_HGC_CORE_CONSTRUCT.KINDS_OF_PARTS kp
-on p.KIND_OF_PART_ID = kp.KIND_OF_PART_ID
-where kp.DISPLAY_NAME LIKE \'%{}%\'".format(pt_template)
-			DB_CURSOR.execute(sql_query)
-			columns = [col[0] for col in DB_CURSOR.description]
-			DB_CURSOR.rowfactory = lambda *args: dict(zip(columns, args))
-			data_part = DB_CURSOR.fetchone()
-			if data_part is None:
-				# Part not found
-				print("SQL query found nothing")
-		"""	
-
-		
 		part_type = self.page.cbPartType.currentText()
 		if not part_type in PART_DICT.keys():  # disabled proto/modules
 			print("WARNING: {}s are currently disabled".format(part_type))
-			self.displayResults([])
+			self.displayResults([], [])
 			return
-
 		part_temp = PART_DICT[part_type]()  # Constructs instance of searched-for class
+		# Search for locally-stored parts:
 		part_file_name = os.sep.join([ fm.DATADIR, 'partlist', part_type.lower()+'s.json' ])
 		with open(part_file_name, 'r') as opfl:
 			part_list = json.load(opfl)
+		# Go through all parts in part_list, load each, and check search criteria...
 
-		# Go through all parts in part_list, load each, and check qtys...
-		found_parts = []
+		found_local_parts = {}
 		for part_id, date in part_list.items():
+			print("Checking part for match:", part_id)
 			part_temp.load(part_id)
 			found = True
 			for qty, value in search_criteria.items():
-				if str(getattr(part_temp, qty, None)) != value:  found = False
-			if found:  found_parts.append("{} {}".format(part_type, part_id))
-		
+				if value == '%':  continue  # "wildcard" option, ignore this
+				if str(getattr(part_temp, qty, None)) != value:
+					print("Mismatch:", qty, str(getattr(part_temp, qty, None)), value)
+					found = False
+			if found:  found_local_parts[part_id] = part_temp.display_name
 
-		self.displayResults(found_parts)
+		# Search for parts in DB:
+		found_remote_parts = {}  # serial:type
+		if fm.ENABLE_DB_COMMUNICATION:
+			# In general:  Assemble sql query w/ items from search_dict
+			# pt_template:  should be %_%_NAME_HD_% etc - % is a wildcard for anything not specified
+			print("search_criteria is:\n", search_criteria)
+			pt_template = PART_NAME_DICT[part_type]
+			pt_query = pt_template.format(**search_criteria)
+			pt_filter = PART_NAME_FILTER[part_type]
+			#						mat_type=search_criteria['mat_type'],
+			#						      sen_type=search_criteria['sen_type'],
+			#						      channel_density=search_criteria['channel_density'],
+			#						      geometry=search_criteria['geometry'], )
+			sql_query = """select p.SERIAL_NUMBER, kp.DISPLAY_NAME
+from CMS_HGC_CORE_CONSTRUCT.PARTS p
+inner join CMS_HGC_CORE_CONSTRUCT.KINDS_OF_PARTS kp
+on p.KIND_OF_PART_ID = kp.KIND_OF_PART_ID
+inner join CMS_HGC_CORE_MANAGEMNT.LOCATIONS l
+on p.LOCATION_ID = l.LOCATION_ID
+where kp.DISPLAY_NAME like \'{}\'
+and l.LOCATION_NAME like \'{}\'""".format(pt_query, search_criteria['location_name']) + pt_filter
+
+			print("Executing query:\n", sql_query)
+			fm.DB_CURSOR.execute(sql_query)
+			columns = [col[0] for col in fm.DB_CURSOR.description]
+			fm.DB_CURSOR.rowfactory = lambda *args: dict(zip(columns, args))
+			data_part = fm.DB_CURSOR.fetchall()#fetchone()
+			print("Query results:\n", data_part)
+			if data_part is None:
+				# Part not found
+				print("SQL query found nothing")
+			# results:   [{'SERIAL_NUMBER': 'serial'}, ...]
+			for el in data_part:
+				found_remote_parts[el['SERIAL_NUMBER']] = el['DISPLAY_NAME']
+
+		# If both in local and remote DB, remove from local list:
+		for rp in found_remote_parts.keys():
+			if rp in found_local_parts.keys():
+				found_local_parts.pop(rp)
+
+		self.displayResults(found_local_parts, found_remote_parts)
 
 
 	
@@ -151,7 +191,7 @@ where kp.DISPLAY_NAME LIKE \'%{}%\'".format(pt_template)
 		self.page.cbMaterial      .setEnabled(part_type == 'Baseplate')
 		self.page.cbThickness     .setEnabled(part_type == 'Sensor')
 		self.page.cbChannelDensity.setEnabled(True)
-		self.page.cbPCBType       .setEnabled(part_type == 'PCB')
+		#self.page.cbPCBType       .setEnabled(part_type == 'PCB')
 		self.page.ckUseDate       .setEnabled(part_type == 'Protomodule' or part_type == 'Module')
 		useDate = self.page.ckUseDate.isChecked()
 		self.page.dCreated        .setReadOnly(not useDate or not (part_type == 'Protomodule' or part_type == 'Module'))
@@ -169,35 +209,40 @@ where kp.DISPLAY_NAME LIKE \'%{}%\'".format(pt_template)
 	def clearResults(self,*args,**kwargs):
 		# empty lwPartList
 		self.page.lwPartList.clear()
+		self.page.lwTypeList.clear()
 		self.page.leStatus.setText("")
 
-	def displayResults(self, displayList):
-		if displayList == []:
+	def displayResults(self, localList, remoteList):
+		# result list is [ [serial, type], ... ]
+		if localList=={} and remoteList=={}:
 			self.page.leStatus.setText("No results found")
 			return
 
-		for part in displayList:
-			self.page.lwPartList.addItem(part)
+		for serial, typ in localList.items(): # serial: type
+			self.page.lwPartList.addItem(serial+" (not uploaded to DB)")
+			self.page.lwTypeList.addItem(typ)
+		for serial, typ in remoteList.items():
+			self.page.lwPartList.addItem(serial)
+			self.page.lwTypeList.addItem(typ)
 		self.page.leStatus.setText("Results found!")
 
 	def goToPart(self,*args,**kwargs):
-		name = self.page.lwPartList.currentItem().text().split()
-		partType = name[0]
-		partID = name[1]
-		pageName = PAGE_NAME_DICT[partType]
+		if not self.page.lwPartList.currentItem():  return
+		name = self.page.lwPartList.currentItem().text().replace(" (not uploaded to DB)", "") #.text().split()
+		# find corresponding part type
+		typ = self.page.lwTypeList.item(self.page.lwPartList.currentRow()).text()
+		for pttype in PAGE_NAME_DICT:
+			# note:  "module" in "protomodule", but module is last -> self-correcting.
+			print(pttype.lower(), typ.lower())
+			if pttype.lower() in typ.lower():
+				pageName = PAGE_NAME_DICT[pttype]
 
-		self.setUIPage(pageName, ID=partID)
+		self.setUIPage(pageName, ID=name)
 
 
 	def load_kwargs(self,kwargs):
 		if 'ID' in kwargs.keys():
 			print("Warning:  attempted to pass search page an ID (there's probably a bug somewhere)")
-			"""ID = kwargs['ID']
-			if not (type(ID) is str):
-				raise TypeError("Expected type <str> for ID; got <{}>".format(type(ID)))
-			if int(ID) < 0:
-				raise ValueError("ID cannot be negative")
-			self.page.sbShipmentID.setValue(int(ID))"""
 
 	def changed_to(self):
 		print("changed to {}".format(PAGE_NAME))

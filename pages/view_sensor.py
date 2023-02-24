@@ -136,10 +136,10 @@ class func(object):
 
 		self.sensor_exists = (ID == self.sensor.ID)
 
-		if not self.sensor.record_insertion_user in self.index_users.keys() and len(self.index_users.keys())!=0 and not self.sensor.record_insertion_user is None:
-			self.index_users[self.sensor.record_insertion_user] = max(self.index_users.values()) + 1
-			self.page.cbInsertUser.addItem(self.sensor.record_insertion_user)
-		self.page.cbInsertUser.setCurrentIndex(self.index_users.get(self.sensor.record_insertion_user, -1))
+		if not self.sensor.tested_by in self.index_users.keys() and len(self.index_users.keys())!=0 and not self.sensor.tested_by is None:
+			self.index_users[self.sensor.tested_by] = max(self.index_users.values()) + 1
+			self.page.cbInsertUser.addItem(self.sensor.tested_by)
+		self.page.cbInsertUser.setCurrentIndex(self.index_users.get(self.sensor.tested_by, -1))
 
 		self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.sensor.location_name, -1))
 		self.page.leLocation.setText(    "" if self.sensor.institution_location     is None else self.sensor.institution_location    )
@@ -151,6 +151,7 @@ class func(object):
 		self.page.dsbFlatness.setValue(-1 if self.sensor.flatness is None else self.sensor.flatness )
 		if self.page.dsbFlatness.value() == -1: self.page.dsbFlatness.clear()
 		self.page.cbInspection.setCurrentIndex( INDEX_INSPECTION.get( self.sensor.visual_inspection,      -1))
+		self.page.cbGrade         .setCurrentIndex(INDEX_GRADE      .get(self.sensor.grade          , -1))
 
 		self.page.listComments.clear()
 		if self.sensor.comments:
@@ -284,8 +285,9 @@ class func(object):
 		self.sensor.sen_type            = str(self.page.cbType.currentText()       )    if str(self.page.cbType.currentText() )       else None
 		self.sensor.geometry           = str(self.page.cbShape.currentText()      )    if str(self.page.cbShape.currentText())       else None
 		self.sensor.location_name     = str(self.page.cbInstitution.currentText())    if str(self.page.cbInstitution.currentText()) else None
-		self.sensor.record_insertion_user  = str(self.page.cbInsertUser.currentText())     if str(self.page.cbInsertUser.currentText())  else None
+		self.sensor.tested_by  = str(self.page.cbInsertUser.currentText())     if str(self.page.cbInsertUser.currentText())  else None
 		self.sensor.channel_density = str(self.page.cbChannelDensity.currentText()) if str(self.page.cbChannelDensity.currentText()) else None
+		self.sensor.flatness        = self.page.dsbFlatness.value()          if self.page.dsbFlatness.value() >= 0         else None
 		self.sensor.grade           = str(self.page.cbGrade.currentText())          if str(self.page.cbGrade.currentText())       else None
 
 		num_comments = self.page.listComments.count()
@@ -295,7 +297,7 @@ class func(object):
 		self.sensor.flatness = self.page.dsbFlatness.value() if self.page.dsbFlatness.value() else None
 
 		self.sensor.save()
-		self.sensor.clear()
+		#self.sensor.clear()
 		self.mode = 'view'
 		self.update_info()
 
