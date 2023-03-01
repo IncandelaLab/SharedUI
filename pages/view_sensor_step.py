@@ -19,7 +19,11 @@ INDEX_INSTITUTION = {
 	'UMN':3,
 	'HEPHY':4,
 	'HPK':5,
-	'IHEP':6,
+	'CMU':6,
+	'TTU':7,
+	'IHEP':8,
+	'TIFR':9,
+	'NEU':10,
 }
 
 STATUS_NO_ISSUES = "valid (no issues)"

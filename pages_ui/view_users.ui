@@ -379,6 +379,22 @@
     <rect>
      <x>20</x>
      <y>470</y>
+     <width>311</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Before using the GUI, you should add yourself (and/or others) as a user with this page.  Click &quot;create new user&quot;, then enter in your username and select the pages that you want to show up in the drop-down user menu for.  &quot;Administrator&quot; will automatically add you as a user for all pages.</string>
+   </property>
+   <property name="wordWrap">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>380</x>
+     <y>440</y>
      <width>191</width>
      <height>51</height>
     </rect>

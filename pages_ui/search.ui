@@ -145,6 +145,31 @@
       <string>HPK</string>
      </property>
     </item>
+    <item>
+     <property name="text">
+      <string>CMU</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>TTU</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>IHEP</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>TIFR</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>NEU</string>
+     </property>
+    </item>
    </widget>
    <widget class="QDateEdit" name="dCreated">
     <property name="enabled">

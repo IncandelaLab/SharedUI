@@ -16,13 +16,17 @@ OBJECTTYPE = "PCB_step"
 DEBUG = False
 
 INDEX_INSTITUTION = {
-    'CERN':0,
-    'FNAL':1,
-    'UCSB':2,
-    'UMN':3,
+	'CERN':0,
+	'FNAL':1,
+	'UCSB':2,
+	'UMN':3,
 	'HEPHY':4,
 	'HPK':5,
-	'IHEP':6,
+	'CMU':6,
+	'TTU':7,
+	'IHEP':8,
+	'TIFR':9,
+	'NEU':10,
 }
 
 INDEX_GRADE = {

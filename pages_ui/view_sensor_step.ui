@@ -220,8 +220,13 @@ before assembly</string>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>-1</number>
+     <number>0</number>
     </property>
+    <item>
+     <property name="text">
+      <string/>
+     </property>
+    </item>
     <item>
      <property name="text">
       <string>CERN</string>
@@ -254,7 +259,27 @@ before assembly</string>
     </item>
     <item>
      <property name="text">
+      <string>CMU</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>TTU</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
       <string>IHEP</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>TIFR</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>NEU</string>
      </property>
     </item>
    </widget>

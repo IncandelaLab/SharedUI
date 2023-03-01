@@ -430,14 +430,15 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		for f in flist:
 			# Note:  .bash_history does NOT store commands run w/ subprocess
 			#upload_status = lc.run(iargs=["--login", "--url", "https://cmsdca.cern.ch/hgc_loader/hgc/int2r", f, "--verbose"])
-			scpcmd = "scp {} {}@dbloader-hgcal.cern.ch:/home/dbspool/spool/hgc/int2r".format(f, self.username)
+			self.leStatus.setText("TEMP: OPEN TERMINAL WINDOW AND ENTER PASSWORD")
+			scpcmd = "scp -vvv {} {}@dbloader-hgcal.cern.ch:/home/dbspool/spool/hgc/int2r".format(f, self.username)
 			print("Scping...")
 			result = os.system(scpcmd)
 			print("scp'ed...")
 			success = success and result == 0
 			#success = (upload_status == 200) and success
 			if result != 0:
-				print("File transfer:  possible error!  Return code {}".format(result.returncode))
+				print("File transfer:  possible error!  Return code {}".format(result))
 
 			if f != flist[-1]:  # if not final:
 				# Wait 20s before uploading the next file
@@ -445,9 +446,7 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 				# the DB won't be able to find the part and will throw and error)
 				# 20s is a conservative estimate for the worst-case upload duration
 				# (It's also really obnoxious w/ multiple passwords and must change ASAP)
-				print("Waiting 20s before uploading dependent file...")
-				print("Note:  You must reenter your password again after the wait.")
-				print("This will hopefully change in future versions.")
+				print("Waiting 20s before uploading the next file...(you must re-enter your password after the wait)")
 				time.sleep(20)
 		if success:
 			self.leStatus.setText("Success!")

@@ -332,54 +332,6 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QComboBox" name="cbInstitution">
-    <property name="geometry">
-     <rect>
-      <x>120</x>
-      <y>20</y>
-      <width>141</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="currentIndex">
-     <number>-1</number>
-    </property>
-    <item>
-     <property name="text">
-      <string>CERN</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>FNAL</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>UCSB</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>UMN</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>HEPHY</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>HPK</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>IHEP</string>
-     </property>
-    </item>
-   </widget>
    <widget class="QComboBox" name="cbInsertUser">
     <property name="geometry">
      <rect>
@@ -550,6 +502,79 @@
      <bool>true</bool>
     </property>
    </widget>
+   <widget class="QComboBox" name="cbInstitution">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>20</y>
+      <width>141</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
+    <item>
+     <property name="text">
+      <string/>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>CERN</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>FNAL</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>UCSB</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>UMN</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>HEPHY</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>HPK</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>CMU</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>TTU</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>IHEP</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>TIFR</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>NEU</string>
+     </property>
+    </item>
+   </widget>
    <zorder>lineEdit_11</zorder>
    <zorder>lineEdit_3</zorder>
    <zorder>leLocation</zorder>
@@ -559,7 +584,6 @@
    <zorder>lineEdit_38</zorder>
    <zorder>lineEdit_9</zorder>
    <zorder>leBarcode</zorder>
-   <zorder>cbInstitution</zorder>
    <zorder>cbInsertUser</zorder>
    <zorder>cbShape</zorder>
    <zorder>pbAddComment</zorder>
@@ -569,6 +593,7 @@
    <zorder>pteWriteComment</zorder>
    <zorder>cbChannelDensity</zorder>
    <zorder>lineEdit_16</zorder>
+   <zorder>cbInstitution</zorder>
   </widget>
   <widget class="QLabel" name="label_8">
    <property name="geometry">

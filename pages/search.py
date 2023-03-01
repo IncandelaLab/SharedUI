@@ -63,7 +63,11 @@ INDEX_INSTITUTION = {
 	'UMN':4,
 	'HEPHY':5,
 	'HPK':6,
-	'IHEP':7,
+	'CMU':7,
+	'TTU':8,
+	'IHEP':9,
+	'TIFR':10,
+	'NEU':11,
 }
 
 
