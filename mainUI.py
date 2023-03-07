@@ -217,7 +217,8 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		#	attempts += 1
 		self.username = ldlg.getUsername()
 		print("Got username:  ",  ldlg.getUsername())
-		os.system('ssh -f -N -M -S temp_socket -L 10131:itrac1609-v.cern.ch:10121 -L 10132:itrac1601-v.cern.ch:10121 {}@lxplus.cern.ch'.format(self.username))
+		#os.system('ssh -f -N -M -S temp_socket -L 10131:itrac1609-v.cern.ch:10121 -L 10132:itrac1601-v.cern.ch:10121 {}@lxplus.cern.ch'.format(self.username))
+		os.system('ssh -vvv -f -N -M -L 10131:itrac1609-v.cern.ch:10121 -L 10132:itrac1601-v.cern.ch:10121 {}@lxplus.cern.ch'.format(self.username))
 		# Close upon exiting
 		def close_ssh():
 			print("Closing ssh connection")

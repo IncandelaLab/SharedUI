@@ -776,6 +776,9 @@
     </item>
    </widget>
    <widget class="QComboBox" name="cbInstitution">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>160</x>
@@ -839,7 +842,12 @@
     </item>
     <item>
      <property name="text">
-      <string>NEU</string>
+      <string>NTU</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>FSU</string>
      </property>
     </item>
    </widget>

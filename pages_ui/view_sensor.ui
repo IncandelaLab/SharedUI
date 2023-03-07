@@ -561,7 +561,12 @@
     </item>
     <item>
      <property name="text">
-      <string>NEU</string>
+      <string>NTU</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>FSU</string>
      </property>
     </item>
    </widget>

@@ -49,7 +49,8 @@ INDEX_INSTITUTION = {
 	'TTU':7,
 	'IHEP':8,
 	'TIFR':9,
-	'NEU':10,
+	'NTU':10,
+	'FSU':11
 }
 
 INDEX_CHANNEL = {

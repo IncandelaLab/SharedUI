@@ -67,7 +67,8 @@ INDEX_INSTITUTION = {
 	'TTU':8,
 	'IHEP':9,
 	'TIFR':10,
-	'NEU':11,
+	'NTU':11,
+	'FSU':12
 }
 
 
