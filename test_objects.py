@@ -29,9 +29,9 @@ objlist = ['baseplate', 'sensor', 'pcb', 'protomodule', 'module']
 
 @pytest.mark.parametrize("objtype", objlist)
 	
-#def test_bad_load(objtype):
-#	test_obj = getattr(fm, objtype)()
-#	assert(not test_obj.load("THIS_SHOULD_FAIL"))
+def test_bad_load(objtype):
+	test_obj = getattr(fm, objtype)()
+	assert(not test_obj.load("THIS_SHOULD_FAIL"))
 
 def test_load_save(objtype):
 	test_obj = getattr(fm, objtype)()
