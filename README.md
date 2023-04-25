@@ -18,8 +18,6 @@ The script will install all software prerequisites in `path/to/software/dir`; th
 
 Additionally, all users will need a lxplus account.  You will need to add yourself to the cms-hgcal-assemblyOperators [E-group](https://e-groups.cern.ch/e-groups/EgroupsSearchForm.do) in order to get permission to upload to the DB.
 
-**For developers only:**  It's recommended to use Qt Creator for editing the .ui files.  If it's not already installed, you can download it from the Qt Creator tab of [this page.](https://www.qt.io/offline-installers)  After making changes to the .ui files, run the script `compile.sh` (or `compile.bat`) in the .ui files' directory to carry all of the changes over to the corresponding .py files.  (Note:  Adding new .ui files will require you to modify compile.sh and compile.bat accordingly.)  Installing SQL Developer is also highly recommended for developers, since you may need to view the raw contents of the DB and test SQL queries.  You can download it [here.](https://www.oracle.com/database/sqldeveloper/technologies/download/)
-
 ## Running and using the GUI
 
 To run the GUI, `cd` into the `SharedUI` directory and use the following command:
@@ -51,5 +49,77 @@ Once all necessary information in the parts, tooling, and supplies section has b
 ### Part search
 
 To use the part search page, simply select the type of part you want to search for using the drop-down menu at the upper-left-hand corner, then select any other criteria you want using the options below.  You can then press "Search" to perform the query and display the results.  Lastly, you can jump to a part's info page by clicking on the part name in the "search results" box, then clicking the "Go to selected item" button underneath.
+
+
+## Instructions for developers
+
+This section is intended for developers only, and ordinary users can safely ignore this section.
+
+(Currently an outline, pending future architecture changes)
+
+### GUI overview
+
+![GUI structure](https://user-images.githubusercontent.com/53322354/234279465-5c297726-f480-40dd-97ca-77bf5f68c5c6.png)
+
+In general:
+- GUI receives data from:
+   - Manual user input
+   - Downloading from DB upon user prompting
+   - Direct connection to lab software (TBD)
+- GUI creates:
+   - json files for:
+      - local cache
+      - longer-term, local storage at institution for data not stored in DB
+   - xml files for uploading to DB loader
+   - NOTE:  Currently planning to package the above w/ a custom-built software library
+
+### Architecture
+
+![GUI architecture](https://user-images.githubusercontent.com/53322354/234278118-5038d9ed-7e29-44b0-bb62-816cb76a5dd7.png)
+
+- `mainUI.py`:  Entry point, runs main user interface window + manages page switching
+   - UI defined by `main_ui/mainwindow.py`
+   - `mainwindow.py` file generated from graphical `mainwindow.ui` file via compile.sh
+- `pages/search.py`, `view_*.py`:  Manage user interaction/data updating/etc for each GUI page
+   - UI defined by `pages_ui/search.py`, `view_*.py`
+   - `*.py` files generated from graphical `*.ui` files via compile.sh
+- `filemanager/fm.py`:
+   - Responsible for all data management
+   - Defines classes for each object used in GUI (baseplate, sensor tool, PCB step, etc)
+      - Each class has built-in new(), save(), load(), etc functions
+   - Responsible for all json/xml generation, uploading, downloading, etc
+      - Auto-created/saved/etc by built-in methods for each class
+   - Also defines UserManager - class for tracking list of users at the institution (stored locally w/ json)
+
+### Class structure for filemanager/fm.py
+
+- fsobj:  Base class
+   - fsobj\_tool:  Class for all tools
+      - Sensor tool
+      - PCB tool
+      - Assembly tray
+      - Sensor component tray
+      - PCB component tray
+   - fsobj\_supply:  Class for all supply batches
+      - batch\_araldite
+      - batch\_wedge
+      - batch\_sylgard
+      - batch\_bond\_wire
+   - fsobj\_db:  Class for objects that can interact w/ DB (Note: may remove, merge properties into child classes)
+      - fsobj\_part:  Class for parts used in assembly process
+          - baseplate
+          - sensor
+          - pcb
+          - protomodule
+          - module
+      - fsobj\_assembly:  Class for assembly steps
+          - step\_sensor
+          - step\_pcb
+
+### Making changes to the user interface
+
+It's recommended to use Qt Creator for editing the .ui files.  If it's not already installed, you can download it from the Qt Creator tab of [this page.](https://www.qt.io/offline-installers)  After making changes to the .ui files, run the script `compile.sh` (or `compile.bat`) in the .ui files' directory to carry all of the changes over to the corresponding .py files.  (Note:  Adding new .ui files will require you to modify compile.sh and compile.bat accordingly.)  Installing SQL Developer is also highly recommended for developers, since you may need to view the raw contents of the DB and test SQL queries.  You can download it [here.](https://www.oracle.com/database/sqldeveloper/technologies/download/)
+
+
 
 
