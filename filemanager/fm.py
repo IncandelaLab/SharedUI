@@ -21,7 +21,7 @@ import cx_Oracle
 from xml.dom import minidom
 
 # IMPORTANT NOTE:  Setting this to false disables DB communication.  Purely for debugging.
-ENABLE_DB_COMMUNICATION = True
+ENABLE_DB_COMMUNICATION = False
 
 
 BASEPLATE_MATERIALS_NO_KAPTON = ['pcb']
@@ -1871,13 +1871,13 @@ class module(fsobj_part):
 
 		# Additionally:  Write wirebonding XML file
 		filedir, filename = self.get_filedir_filename()
-		fname_wirebond = filename.replace('.xml', 'wirebonding_upload.xml')
+		fname_wirebond = filename.replace('.json', '_wirebonding_upload.xml')
 
 		xml_tree = self.generate_xml(self.XML_WIREBOND_TEMPLATE)
 		root = xml_tree.getroot()
 		xmlstr = minidom.parseString(tostring(root)).toprettyxml(indent = '    ')  #tostring imported from xml.etree.ElementTree
 		xmlstr = xmlstr.replace("version=\"1.0\" ", "version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"")
-		with open(filedir+'/'+fname_build, 'w') as f:
+		with open(filedir+'/'+fname_wirebond, 'w') as f:
 			f.write(xmlstr)
 
 
