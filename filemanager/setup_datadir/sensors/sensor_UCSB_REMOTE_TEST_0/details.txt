@@ -1,7 +1,0 @@
-ID = 0
-identifier = test0
-type = test_type
-size = 6
-channels = 256
-manufacturer = test_manuf
-onModuleID = 0
