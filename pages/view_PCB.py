@@ -149,11 +149,6 @@ class func(object):
 		self.page.pbAddFiles.clicked.connect(self.getFile)
 		self.page.pbDeleteFile.clicked.connect(self.deleteFile)
 
-		auth_users = fm.userManager.getAuthorizedUsers(PAGE_NAME)
-		self.index_users = {auth_users[i]:i for i in range(len(auth_users))}
-		for user in self.index_users.keys():
-			self.page.cbInsertUser.addItem(user)
-
 
 	@enforce_mode(['view', 'editing', 'creating'])
 	def update_info(self,ID=None,do_load=True,*args,**kwargs):
@@ -164,6 +159,12 @@ class func(object):
 
 		self.pcb_exists = (ID == self.pcb.ID)
 		
+		self.page.cbInsertUser.clear()
+		auth_users = fm.userManager.getAuthorizedUsers(PAGE_NAME)
+		self.index_users = {auth_users[i]:i for i in range(len(auth_users))}
+		for user in self.index_users.keys():
+			self.page.cbInsertUser.addItem(user)
+
 		if not self.pcb.record_insertion_user in self.index_users.keys() and len(self.index_users.keys())!=0 and not self.pcb.record_insertion_user is None:
 			# Insertion user is not in user page...fine for now, just add user to the dropdown
 			self.index_users[self.pcb.record_insertion_user] = max(self.index_users.values()) + 1

@@ -132,11 +132,6 @@ class func(object):
 		self.page.pbDeleteComment.clicked.connect(self.deleteComment)
 		self.page.pbAddComment.clicked.connect(self.addComment)
 
-		auth_users = fm.userManager.getAuthorizedUsers(PAGE_NAME)
-		self.index_users = {auth_users[i]:i for i in range(len(auth_users))}
-		for user in self.index_users.keys():
-			self.page.cbInsertUser.addItem(user)
-
 
 	@enforce_mode(['view', 'editing', 'creating']) # NEW:  Now allowed in editing, creating mode
 	def update_info(self,do_load=True,ID=None):
@@ -147,6 +142,13 @@ class func(object):
 			self.page.leID.setText(ID)
 
 		self.baseplate_exists = (ID == self.baseplate.ID)
+
+		# Moved - get available users and fill cbInsertUser
+		self.page.cbInsertUser.clear()
+		auth_users = fm.userManager.getAuthorizedUsers(PAGE_NAME)
+		self.index_users = {auth_users[i]:i for i in range(len(auth_users))}
+		for user in self.index_users.keys():
+			self.page.cbInsertUser.addItem(user)
 
 		# was insertion_user
 		if not self.baseplate.record_insertion_user in self.index_users.keys() and len(self.index_users.keys())!=0  and not self.baseplate.record_insertion_user is None:

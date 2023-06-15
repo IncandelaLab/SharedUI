@@ -213,7 +213,6 @@ class UserManager:
 
 	def getUserPerms(self, username):
 		if not username in self.getAllUsers():
-			print("WARNING: called getUserPerms on {} (not a user)".format(username))
 			return None
 		userindex = list(self.getAllUsers()).index(username)
 		return self.userList[userindex]['permissions']

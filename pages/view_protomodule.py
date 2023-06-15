@@ -108,12 +108,6 @@ class func(object):
 		self.page.pbAddComment.clicked.connect(self.addComment)
 
 
-		auth_users = fm.userManager.getAuthorizedUsers(PAGE_NAME)
-		self.index_users = {auth_users[i]:i for i in range(len(auth_users))}
-		for user in self.index_users.keys():
-			self.page.cbInsertUser.addItem(user)
-
-
 	@enforce_mode(['view', 'editing'])
 	def update_info(self,ID=None,*args,**kwargs):
 		if ID is None:
@@ -122,6 +116,12 @@ class func(object):
 			self.page.leID.setText(ID)
 
 		self.protomodule_exists = (ID == self.protomodule.ID)
+
+		self.page.cbInsertUser.clear()
+		auth_users = fm.userManager.getAuthorizedUsers(PAGE_NAME)
+		self.index_users = {auth_users[i]:i for i in range(len(auth_users))}
+		for user in self.index_users.keys():
+			self.page.cbInsertUser.addItem(user)
 
 		if not self.protomodule.record_insertion_user in self.index_users.keys() and len(self.index_users.keys())!=0 and not self.protomodule.record_insertion_user is None:
 			# Insertion user was deleted from user page...just add user to the dropdown

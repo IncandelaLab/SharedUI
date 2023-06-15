@@ -127,10 +127,6 @@ class func(object):
 		self.page.pbDeleteComment.clicked.connect(self.deleteComment)
 		self.page.pbAddComment.clicked.connect(self.addComment)
 
-		auth_users = fm.userManager.getAuthorizedUsers(PAGE_NAME)
-		self.index_users = {auth_users[i]:i for i in range(len(auth_users))}
-		for user in self.index_users.keys():
-			self.page.cbInsertUser.addItem(user)
 
 	@enforce_mode(['view', 'editing', 'creating'])
 	def update_info(self,ID=None,do_load=True,*args,**kwargs):
@@ -140,6 +136,12 @@ class func(object):
 			self.page.leID.setText(ID)
 
 		self.sensor_exists = (ID == self.sensor.ID)
+
+		self.page.cbInsertUser.clear()
+		auth_users = fm.userManager.getAuthorizedUsers(PAGE_NAME)
+		self.index_users = {auth_users[i]:i for i in range(len(auth_users))}
+		for user in self.index_users.keys():
+			self.page.cbInsertUser.addItem(user)
 
 		if not self.sensor.tested_by in self.index_users.keys() and len(self.index_users.keys())!=0 and not self.sensor.tested_by is None:
 			self.index_users[self.sensor.tested_by] = max(self.index_users.values()) + 1
