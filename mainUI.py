@@ -181,6 +181,10 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 
 	def __init__(self):
 		super(mainDesigner,self).__init__(None)
+		print("Setting up filemanager...")
+		fm.setup()
+		print("Finished setting up filemanager.  DATADIR is", fm.DATADIR)
+
 		print("Setting up main UI ...")
 		self.setupUi(self)
 		print("Finished setting up main UI.")

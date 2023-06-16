@@ -58,7 +58,7 @@ fi
 echo 'Installing python modules...'
 
 # install the easy stuff first
-python -m pip install ilock numpy PyQt5 requests cx_Oracle pytest
+python -m pip install ilock numpy PyQt5 requests cx_Oracle jinja2 pytest
 
 echo 'Done.'
 echo 'Installing cmsdbldr...'
