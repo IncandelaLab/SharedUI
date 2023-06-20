@@ -56,7 +56,8 @@ INDEX_GRADE = {
 
 
 class func(object):
-	def __init__(self,fm,page,setUIPage,setSwitchingEnabled):
+	def __init__(self,fm,userManager,page,setUIPage,setSwitchingEnabled):
+		self.userManager = userManager
 		self.page      = page
 		self.setUIPage = setUIPage
 		self.setMainSwitchingEnabled = setSwitchingEnabled
@@ -138,15 +139,15 @@ class func(object):
 		self.sensor_exists = (ID == self.sensor.ID)
 
 		self.page.cbInsertUser.clear()
-		auth_users = fm.userManager.getAuthorizedUsers(PAGE_NAME)
+		auth_users = self.userManager.getAuthorizedUsers(PAGE_NAME)
 		self.index_users = {auth_users[i]:i for i in range(len(auth_users))}
 		for user in self.index_users.keys():
 			self.page.cbInsertUser.addItem(user)
 
-		if not self.sensor.tested_by in self.index_users.keys() and len(self.index_users.keys())!=0 and not self.sensor.tested_by is None:
-			self.index_users[self.sensor.tested_by] = max(self.index_users.values()) + 1
-			self.page.cbInsertUser.addItem(self.sensor.tested_by)
-		self.page.cbInsertUser.setCurrentIndex(self.index_users.get(self.sensor.tested_by, -1))
+		if not self.sensor.record_insertion_user in self.index_users.keys() and len(self.index_users.keys())!=0 and not self.sensor.record_insertion_user is None:
+			self.index_users[self.sensor.record_insertion_user] = max(self.index_users.values()) + 1
+			self.page.cbInsertUser.addItem(self.sensor.record_insertion_user)
+		self.page.cbInsertUser.setCurrentIndex(self.index_users.get(self.sensor.record_insertion_user, -1))
 
 		self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.sensor.location_name, -1))
 		self.page.leLocation.setText(    "" if self.sensor.institution_location     is None else self.sensor.institution_location    )
@@ -292,7 +293,7 @@ class func(object):
 		self.sensor.sen_type            = str(self.page.cbType.currentText()       )    if str(self.page.cbType.currentText() )       else None
 		self.sensor.geometry           = str(self.page.cbShape.currentText()      )    if str(self.page.cbShape.currentText())       else None
 		self.sensor.location_name     = str(self.page.cbInstitution.currentText())    if str(self.page.cbInstitution.currentText()) else None
-		self.sensor.tested_by  = str(self.page.cbInsertUser.currentText())     if str(self.page.cbInsertUser.currentText())  else None
+		self.sensor.record_insertion_user  = str(self.page.cbInsertUser.currentText())     if str(self.page.cbInsertUser.currentText())  else None
 		self.sensor.channel_density = str(self.page.cbChannelDensity.currentText()) if str(self.page.cbChannelDensity.currentText()) else None
 		self.sensor.flatness        = self.page.dsbFlatness.value()          if self.page.dsbFlatness.value() >= 0         else None
 		self.sensor.grade           = str(self.page.cbGrade.currentText())          if str(self.page.cbGrade.currentText())       else None

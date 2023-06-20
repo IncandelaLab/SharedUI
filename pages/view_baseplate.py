@@ -56,7 +56,8 @@ INDEX_GRADE = {
 }
 
 class func(object):
-	def __init__(self,fm,page,setUIPage,setSwitchingEnabled):
+	def __init__(self,fm,userManager,page,setUIPage,setSwitchingEnabled):
+		self.userManager = userManager
 		self.page      = page
 		self.setUIPage = setUIPage
 		self.setMainSwitchingEnabled = setSwitchingEnabled
@@ -145,7 +146,7 @@ class func(object):
 
 		# Moved - get available users and fill cbInsertUser
 		self.page.cbInsertUser.clear()
-		auth_users = fm.userManager.getAuthorizedUsers(PAGE_NAME)
+		auth_users = self.userManager.getAuthorizedUsers(PAGE_NAME)
 		self.index_users = {auth_users[i]:i for i in range(len(auth_users))}
 		for user in self.index_users.keys():
 			self.page.cbInsertUser.addItem(user)

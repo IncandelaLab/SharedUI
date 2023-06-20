@@ -53,8 +53,10 @@ CWD = os.getcwd()
 if not CWD.endswith('filemanager'):
 	CWD = os.sep.join([CWD,'filemanager'])
 
-#global DATADIR
+# Directory to store all temp part data
 DATADIR = None
+# Directory where all XML templates are found (hardcoded)
+TEMPLATEDIR = None
 
 # setup() MUST be called before creating an instance of any fsobj subclass.  It:
 # - defines a directory DATADIR where all object data is stored
@@ -62,11 +64,13 @@ DATADIR = None
 
 def setup(datadir=None):
 	global DATADIR
+	global TEMPLATEDIR
 
 	if datadir==None:
 		DATADIR = os.sep.join([os.getcwd(), 'filemanager_data'])  # data['datadir']
 	else:
 		DATADIR = datadir
+	TEMPLATEDIR = os.sep.join([os.getcwd(), 'filemanager', 'xml_templates'])
 
 	# NEW for searching:  Need to store list of all searchable object IDs.  Easiest approach is to dump a list via json.
 	partlistdir = os.sep.join([DATADIR, 'partlist'])
@@ -132,7 +136,7 @@ def connectOracle():
 
 class UserManager:
 
-	def __init__(self, userFile):
+	def __init__(self, userFile="userInfoFile"):
 		# json file to store user info
 		self.userFile = 'filemanager_data/' + userFile + '.json'
 		self.userList = []
@@ -216,18 +220,15 @@ class UserManager:
 		return self.userList[userindex]['permissions']
 
 
-userManager = UserManager("userInfoFile")
-
-
-
 
 ###############################################
 ############## fsobj base class ###############
 ###############################################
 
 class fsobj(object):
-	DEFAULTS = {
-	}
+	# Var for storing all obj properties:
+	PROPERTIES = []
+	DEFAULTS = {}
 
 	# List containing locations of all xml template files to write
 	# If non-empty, read each and write
@@ -250,7 +251,6 @@ class fsobj(object):
 	def __init__(self):
 		super(fsobj, self).__init__()
 		self.clear() # sets attributes to None
-		assert(not DATADIR is None, "DATADIR has not been set up with fm.setup()!")
 
 	def __str__(self):
 		return "<{} {}>".format(self.OBJECTNAME, self.ID)
@@ -294,24 +294,6 @@ class fsobj(object):
 				data[str(id_)] = dc
 		with open(self.partlistfile, 'w') as opfl:
 			json.dump(data, opfl)
-
-
-	# Utility for xml-based _load_...:  Take a string from an XML element and return a var w/ the correct type
-	# "True" -> bool, 100 -> int, etc.
-	def _convert_str(self, string):
-		if not string:  return None
-		if string.isdigit():
-			return int(string)
-		elif string.replace('.','',1).isdigit():
-			return float(string)
-		elif string == "True":  # direct bool conversion fails...
-			return True
-		elif string == "False":
-			return False
-		elif string == "None":
-			return None
-		else:
-			return string
 
 
 	def load(self, ID):
@@ -371,7 +353,9 @@ class fsobj(object):
 		self.ID = ID
 		#PROPERTIES = self.PROPERTIES + self.PROPERTIES_COMMON
 		#DEFAULTS = {**self.DEFAULTS_COMMON, **getattr(self, 'DEFAULTS', {})}
+		print("Defaults are:", self.DEFAULTS)
 		for prop in self.PROPERTIES:
+			print("Setting property {} to {}".format(prop, self.DEFAULTS[prop] if prop in self.DEFAULTS.keys() else None))
 			setattr(self, prop, self.DEFAULTS[prop] if prop in self.DEFAULTS.keys() else None)
 
 
@@ -408,17 +392,36 @@ class fsobj(object):
 		with open(file, 'w') as opfl:
 			json.dump(vars(self), opfl, indent=4)
 
-		# NEW:  If obj has XML template files, write them.
+
+	# NEW:  If obj has XML template files, write them.
+	def generate_xml(self):
+		# save():  Required for add_part_to_list (for filedir_filename)
+		self.save()
+		filedir, filename = self.get_filedir_filename()
 		for template in self.XML_TEMPLATES:
+			template_file = os.sep.join([TEMPLATEDIR, self.OBJECTNAME, template])
+			print("DEBUG:  Opening template file", template_file)
 			with open(template_file, 'r') as file:
 				template_content = file.read()
 			template = Template(template_content)
 			rendered = template.render()
 			# outfile name:  [outfilename]_[templatename].xml
-			outfile =  filename.replace(".xml", "") + "_" + os.path.basename(template_file)
+			template_file_name = os.path.basename(template_file)
+			outfile = filename.replace(".xml", "") + "_" + template_file_name
 			print("TEMP:  Writing to XML output file", os.sep.join([filedir, outfile]))
 			with open(os.sep.join([filedir, outfile]), 'w') as file:
 				file.write(rendered)
+
+	# Return all XML files to upload (full filepath)
+	def filesToUpload(self):
+		if self.XML_TEMPLATES is None:  return None
+		filedir, filename = self.get_filedir_filename()
+		upFiles = []
+		for xt in self.XML_TEMPLATES:
+			template_file_name = os.path.basename(template_file)
+			outfile =  filename.replace(".xml", "") + "_" + template_file_name
+			upFiles.append(outfile)
+		return upFiles
 
 
 	# Return a list of all files to be uploaded to the DB
@@ -440,78 +443,6 @@ class fsobj(object):
 		return cmts
 
 
-
-
-########################################################
-###### PARENT CLASS FOR PARTS AND ASSEMBLY STEPS #######
-########################################################
-
-# NOTE:  ID can be saved as either an int OR a string.
-
-class fsobj_db(fsobj):
-	# Key vars and utilities:
-	XML_CONSTS = []  # List of vars loaded, but not edited, by GUI
-
-	VNUM = 1   # Param in conditions XML
-
-	COND_HEADER_DICT = {
-		'TYPE':{
-			'EXTENSION_TABLE_NAME':'COND_TABLE_NAME',
-			'NAME':'TABLE_DESC',
-		},
-		'RUN':{
-			'RUN_NAME':'RUN_TYPE',
-			'RUN_BEGIN_TIMESTAMP':'run_begin_timestamp_',  # Format:  2018-03-26 00:00:00
-			'RUN_END_TIMESTAMP':'run_end_timestamp_',
-			'INITIATED_BY_USER':'initiated_by_user',
-			'LOCATION':'location',
-			'COMMENT_DESCRIPTION':'comment_description',
-		}
-	}
-
-	# Member functions:
-
-	def __init__(self):
-		super(fsobj_db, self).__init__()
-		# NO LONGER NECESSARY (via json):
-		# Add all other vars to XML_STRUCT_DICT
-		# (so they will be saved accordingly)
-		#if self.XML_STRUCT_DICT is None:
-		#	self.XML_STRUCT_DICT = {'data':{'row':{} } }
-		#for var in self.PROPERTIES + self.PROPERTIES_COMMON:
-		#	if var not in self.XML_CONSTS:  self.XML_STRUCT_DICT['data']['row'][var] = var
-
-	# Universal properties:
-
-	@property
-	def institution_id(self):
-		# INSTITUTION_DICT maps ID -> name#
-		if self.institution == None:
-			return None
-		for instID, instname in INSTITUTION_DICT.items():
-			if self.institution == instname:
-				return instID
-		print("WARNING:  institution ID for {} not found in INSTITUTION_DICT".format(self.institution))
-		return None
-	@institution_id.setter
-	def institution_id(self, value):
-		if value is None:
-			self.institution = None
-		elif not value in INSTITUTION_DICT.keys():
-			print("WARNING:  institution_id:  Found invalid location ID {}".format(value))
-			self.institution = None
-		else:
-			self.institution = INSTITUTION_DICT[value]
-
-	# Auto-set:  if value downloaded, leave unchanged.  Otherwise, set to now.
-	@property
-	def run_begin_timestamp_(self):
-		# Auto-formatted: {}-{}-{} {}:{}:{}.{}
-		return str(datetime.datetime.now()) if self.run_begin_timestamp is None else self.run_begin_timestamp
-
-	@property
-	def run_end_timestamp_(self):
-		return str(datetime.datetime.now()) if self.run_end_timestamp is None else self.run_end_timestamp
 
 
 

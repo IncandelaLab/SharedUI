@@ -1,7 +1,13 @@
-from filemanager import fm, supplies, tools#, parts
+from filemanager import fm, supplies, tools, parts
 import pytest # NEW
 import shutil
 import os
+
+# Script that runs some automated tests on all object (part, assembly step, etc) classes.
+# Run all tests automatically with `pytest test_objects.py`.
+# `pytest -rP test_objects.py` will send all print() output to the console (useful for debugging).
+# Test XML files will be written to TEST_FILEMANAGER/.
+
 
 # TO TEST:
 # For each base object (incl protomod, mod):
@@ -36,34 +42,89 @@ fm.setup(datadir=datadir)
 print("SETUP RESULT DIR:", fm.DATADIR)
 
 
-objlist = ['baseplate'] #, 'sensor', 'pcb', 'protomodule', 'module']
+partlist = ['baseplate', 'sensor', 'pcb']#, 'protomodule', 'module']
 toollist = ['tool_sensor', 'tool_pcb', 'tray_assembly', 'tray_component_sensor', 'tray_component_pcb']
 suplist = ['batch_araldite', 'batch_wedge', 'batch_sylgard', 'batch_bond_wire']
 
-"""
-@pytest.mark.parametrize("objtype", objlist)
 
-def test_bad_load_part(objtype):
-	test_obj = getattr(parts, objtype)()
-	assert(not test_obj.load("THIS_SHOULD_FAIL"))
+@pytest.mark.parametrize("parttype", partlist)
+def test_bad_load_part(parttype):
+	test_part = getattr(parts, parttype)()
+	assert not test_part.load("THIS_SHOULD_FAIL")
 
-def test_load_save(objtype):
-	test_obj = getattr(parts, objtype)()
-	objname = objtype+"_TEST"
-	test_obj.new(objname)
-	test_obj.institution = "CERN"
-	test_obj.insertion_user = "pmasterson"
-	test_obj.save()
-	test_obj.clear()
-	test_obj.load(objname)
-	assert(test_obj.institution == "CERN" and test_obj.insertion_user == "pmasterson")
-"""
+# Note:  This also generates XML files in TEST_FILEMANAGER for inspection
+@pytest.mark.parametrize("parttype", partlist)
+def test_load_save(parttype):
+	test_part = getattr(parts, parttype)()
+	objname = parttype+"_TEST"
+	test_part.new(objname)
+	test_part.institution = "CERN"
+	test_part.insertion_user = "pmasterson"
+	test_part.save()
+	test_part.clear()
+	test_part.load(objname)
+	assert test_part.institution == "CERN" and test_part.insertion_user == "pmasterson"
+
+@pytest.mark.parametrize("parttype", partlist)
+def test_xml(parttype):
+	test_part = getattr(parts, parttype)()
+	objname = parttype+"_TEST_XML"
+	test_part.new(objname)
+	# Note:  Can't set all attrs, just the common fsobj_part ones
+	# Also can't set kind_of_part, format is part-dependent
+	test_part.record_insertion_user = 'phmaster'
+	test_part.location = 'UCSB'
+	test_part.comment_description.append('comment description')
+	test_part.initiated_by_user = 'phmaster'
+	test_part.flatness = 0.01
+	test_part.thickness = 0.01  # Note - may be a str for sensors, float otherwise
+	test_part.grade = 'A'
+	test_part.comments.extend(['comment_a', 'comment 2'])
+	# part-specific:
+	if parttype == 'baseplate':
+		test_part.manufacturer = 'HQU'
+	elif parttype == 'sensor':
+		test_part.visual_inspection = 'pass'
+		test_part.test_file_name = 'testfile.abc'
+	elif parttype == 'pcb':
+		test_part.test_file_name = 'testfile.def'
+	test_part.generate_xml()
+	assert True # Always passes, must check the output manually
+	# Could maybe automate this someday
+
+@pytest.mark.parametrize("parttype", partlist)()
+def test_kindOfPart(parttype):
+	test_part = getattr(parts, parttype)()
+	objname = parttype+"_TEST_NAME"
+	test_part.new(objname)
+	if parttype == "baseplate":
+		test_part.mat_type = 'CuW/Kapton'
+		test_part.channel_density = 'LD'
+		test_part.geometry = 'Full'
+		target = 'CuW/Kapton Baseplate LD Full'
+		assert test_part.kind_of_part == target, \
+               'kind_of_part assigned incorrectly:  wanted `{}`, got `{}`'.format(target, test_part.kind_of_part)
+	elif parttype == "sensor":
+		test_part.sen_type = '200um'
+		test_part.channel_density = 'LD'
+		test_part.geometry = 'Full'
+		target = '200um Si Sensor LD Full'
+		assert test_part.kind_of_part == target, \
+               'kind_of_part assigned incorrectly:  wanted `{}`, got `{}`'.format(target, test_part.kind_of_part)
+	elif parttype == "pcb":
+		test_part.channel_density = 'LD'
+		test_part.geometry = 'Full'
+		target = 'PCB LD Full'
+		assert test_part.kind_of_part == target, \
+               'kind_of_part assigned incorrectly:  wanted `{}`, got `{}`'.format(target, test_part.kind_of_part)
+	else:
+		assert False, "Proto/mod kindOfPart not implemented"
 
 
 @pytest.mark.parametrize("tooltype", toollist)
 def test_bad_load_tool(tooltype):
 	test_tool = getattr(tools, tooltype)()
-	assert(not test_tool.load("THIS_SHOULD_FAIL", "FAIL"))
+	assert not test_tool.load("THIS_SHOULD_FAIL", "FAIL")
 
 @pytest.mark.parametrize("tooltype", toollist)
 def test_tools(tooltype):
@@ -74,13 +135,13 @@ def test_tools(tooltype):
 	test_tool.save()
 	test_tool.clear()
 	test_tool.load(objname, "UCSBTEST")
-	assert(test_tool.location == "CERN")
+	assert test_tool.location == "CERN"
 
 
 @pytest.mark.parametrize("suptype", suplist)
 def test_bad_load_supply(suptype):
 	test_sup = getattr(supplies, suptype)()
-	assert(not test_sup.load("THIS_SHOULD_FAIL"))
+	assert not test_sup.load("THIS_SHOULD_FAIL")
 
 @pytest.mark.parametrize("suptype", suplist)
 def test_supplies(suptype):
@@ -91,7 +152,7 @@ def test_supplies(suptype):
 	test_sup.save()
 	test_sup.clear()
 	test_sup.load(objname)
-	assert(test_sup.is_empty)
+	assert test_sup.is_empty
 
 
 

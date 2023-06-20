@@ -35,7 +35,8 @@ def site_format_check(sites_string):
 	return True
 
 class func(object):
-	def __init__(self,fm,page,setUIPage,setSwitchingEnabled):
+	def __init__(self,fm,userManager,page,setUIPage,setSwitchingEnabled):
+		self.userManager = userManager
 		self.page      = page
 		self.setUIPage = setUIPage
 		self.setMainSwitchingEnabled = setSwitchingEnabled
@@ -108,17 +109,17 @@ class func(object):
 		self.page.pbDeleteCommentEncap.clicked.connect(self.deleteCommentEncap)
 		self.page.pbAddCommentEncap.clicked.connect(self.addCommentEncap)
 
-		auth_users = fm.userManager.getAuthorizedUsers('wirebonding_back')
+		auth_users = self.userManager.getAuthorizedUsers('wirebonding_back')
 		self.index_users_wb = {auth_users[i]:i for i in range(len(auth_users))}
-		auth_users = fm.userManager.getAuthorizedUsers('wirebonding_front')
+		auth_users = self.userManager.getAuthorizedUsers('wirebonding_front')
 		self.index_users_wf = {auth_users[i]:i for i in range(len(auth_users))}
-		auth_users = fm.userManager.getAuthorizedUsers('encapsulation_back')
+		auth_users = self.userManager.getAuthorizedUsers('encapsulation_back')
 		self.index_users_eb = {auth_users[i]:i for i in range(len(auth_users))}
-		auth_users = fm.userManager.getAuthorizedUsers('encapsulation_front')
+		auth_users = self.userManager.getAuthorizedUsers('encapsulation_front')
 		self.index_users_ef = {auth_users[i]:i for i in range(len(auth_users))}
-		auth_users = fm.userManager.getAuthorizedUsers('test_bonds')
+		auth_users = self.userManager.getAuthorizedUsers('test_bonds')
 		self.index_users_tb = {auth_users[i]:i for i in range(len(auth_users))}
-		auth_users = fm.userManager.getAuthorizedUsers('final_inspection')
+		auth_users = self.userManager.getAuthorizedUsers('final_inspection')
 		self.index_users_fi = {auth_users[i]:i for i in range(len(auth_users))}
 
 		for user in self.index_users_wb.keys():

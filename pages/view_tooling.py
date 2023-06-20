@@ -117,8 +117,9 @@ class simple_fsobj_vc(object):
 
 
 class func(object):
-	def __init__(self,fm,page,setUIPage,setSwitchingEnabled):
+	def __init__(self,fm,userManagerpage,setUIPage,setSwitchingEnabled):
 		self.fm        = fm
+		self.userManager = userManager
 		self.page      = page
 		self.setUIPage = setUIPage
 		self.setMainSwitchingEnabled = setSwitchingEnabled

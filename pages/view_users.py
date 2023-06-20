@@ -10,7 +10,8 @@ DEBUG = False
 
 
 class func(object):
-	def __init__(self,fm,page,setUIPage,setSwitchingEnabled):
+	def __init__(self,fm,userManager,page,setUIPage,setSwitchingEnabled):
+		self.userManager = userManager
 		self.page      = page
 		self.setUIPage = setUIPage
 		self.setMainSwitchingEnabled = setSwitchingEnabled
@@ -93,9 +94,9 @@ class func(object):
 		print("pre username text:", self.currentUser if self.user_exists else "")
 
 		self.page.lwUsers.clear()
-		userlist = fm.userManager.getAllUsers()
+		userlist = self.userManager.getAllUsers()
 		for user in userlist:
-			if fm.userManager.isAdmin(user):
+			if self.userManager.isAdmin(user):
 				self.page.lwUsers.addItem(user + " (admin)")
 			else:
 				self.page.lwUsers.addItem(user)
@@ -103,8 +104,8 @@ class func(object):
 		print("Setting username text:", self.currentUser if self.user_exists else "")
 		self.page.leUsername.setText(self.currentUser if self.user_exists else "")
 
-		self.page.cbAdministrator.setChecked(False if not self.user_exists else fm.userManager.isAdmin(self.currentUser))
-		userperms = fm.userManager.getUserPerms(self.currentUser)
+		self.page.cbAdministrator.setChecked(False if not self.user_exists else self.userManager.isAdmin(self.currentUser))
+		userperms = self.userManager.getUserPerms(self.currentUser)
 		self.page.cbBaseplate  .setChecked(False if userperms is None else userperms[0])
 		self.page.cbSensor     .setChecked(False if userperms is None else userperms[1])
 		self.page.cbPcb        .setChecked(False if userperms is None else userperms[2])
@@ -172,7 +173,7 @@ class func(object):
 	@enforce_mode(['editing'])  #,'creating'])
 	def deleteSelected(self,*args,**kwargs):
 		# NOTE:  Can only call this if currently editing a user
-		fm.userManager.removeUser(self.page.leUsername.text())
+		self.userManager.removeUser(self.page.leUsername.text())
 		self.mode = 'view'
 		self.update_info()
 
@@ -202,10 +203,10 @@ class func(object):
 			]
 		if not self.user_exists:
 			# Create new user
-			fm.userManager.addUser(username, permissions, isAdmin=isAdmin)
+			self.userManager.addUser(username, permissions, isAdmin=isAdmin)
 		else:
 			# Save changes to existing user
-			fm.userManager.updateUser(username, permissions, isAdmin=isAdmin)
+			self.userManager.updateUser(username, permissions, isAdmin=isAdmin)
 
 		self.mode = 'view'
 		self.update_info()

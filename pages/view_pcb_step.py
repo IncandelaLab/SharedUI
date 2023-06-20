@@ -72,7 +72,8 @@ I_NO_TOOL_CHK = "pickup tool feet have not been checked"
 
 
 class func(object):
-	def __init__(self,fm,page,setUIPage,setSwitchingEnabled):
+	def __init__(self,fm,userManager,page,setUIPage,setSwitchingEnabled):
+		self.userManager = userManager
 		self.page      = page
 		self.setUIPage = setUIPage
 		self.setMainSwitchingEnabled = setSwitchingEnabled
@@ -247,7 +248,7 @@ class func(object):
 		self.page.pbRunStartNow     .clicked.connect(self.setRunStartNow)
 		self.page.pbRunStopNow      .clicked.connect(self.setRunStopNow)
 
-		auth_users = fm.userManager.getAuthorizedUsers(PAGE_NAME)
+		auth_users = self.userManager.getAuthorizedUsers(PAGE_NAME)
 		self.index_users = {auth_users[i]:i for i in range(len(auth_users))}
 		for user in self.index_users.keys():
 			self.page.cbUserPerformed.addItem(user)
