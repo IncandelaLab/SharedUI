@@ -109,19 +109,31 @@ class fsobj_part(fm.fsobj):
 
 	@property
 	def run_begin_timestamp_(self):
-		return str(datetime.datetime.now()) if self.run_begin_timestamp is None else self.run_begin_timestamp
+		if getattr(self, 'run_begin_timestamp', None) is None:
+			return str(datetime.datetime.now())
+		else:
+			return self.run_begin_timestamp
 
 	@property
 	def run_end_timestamp_(self):
-		return str(datetime.datetime.now()) if self.run_end_timestamp is None else self.run_end_timestamp
+		if getattr(self, 'run_end_timestamp', None) is None:
+			return str(datetime.datetime.now())
+		else:
+			return self.run_end_timestamp
 
 	@property
 	def run_begin_date_(self):
-		return str(datetime.datetime.now()) if self.run_begin_timestamp is None else self.run_begin_timestamp
+		if getattr(self, 'run_begin_date', None) is None:
+			return str(datetime.datetime.now())
+		else:
+			return self.run_begin_date
 
 	@property
 	def run_end_date_(self):
-		return str(datetime.date.today()) if self.run_end_timestamp is None else self.run_end_timestamp
+		if getattr(self, 'run_end_date', None) is None:
+			return str(datetime.datetime.now())
+		else:
+			return self.run_end_date
 
 
 ###############################################
@@ -243,9 +255,14 @@ class sensor(fsobj_part):
 	}
 
 
+	# Returns sensor thickness in mm
 	@property  # Note: not a measured value
 	def thickness_float(self):
-		return float(self.sen_type.split('um')[0])/1000
+		thkns = self.sen_type.split('um')[0]
+		if thkns == "None":
+			return None
+		else:
+			return float(thkns)/1000
 
 	@property
 	def sen_type(self):
@@ -283,7 +300,7 @@ class sensor(fsobj_part):
 
 	@property
 	def test_date_(self):
-		return str(datetime.datetime.now()) if self.test_date is None else self.test_date
+		return str(datetime.date.today())
 
 	# Should not be passing any of these params yet
 	def ready_step_sensor(self, step_sensor = None, max_flatness = None):
@@ -329,7 +346,6 @@ class pcb(fsobj_part):
 		# build_upload file:
 		# build_cond file:
 		# run_begin_date_ is a property
-		#'test_date',  # not used, just set to today for now
 		'test_file_name',
 		# other:
 		'module',
@@ -363,8 +379,7 @@ class pcb(fsobj_part):
 		self.kind_of_part = " ".join(splt)
 
 	@property
-	def test_date(self):
-		#return str(datetime.date.today()) if self.test_date is None else self.test_date
+	def test_date_(self):
 		return str(datetime.date.today())
 
 	def ready_step_pcb(self, step_pcb = None):

@@ -26,14 +26,6 @@ class fsobj_supply(fm.fsobj):
 		'is_empty',
 	]
 
-	#XML_STRUCT_DICT = {'BATCH':{
-	#	'ID':'ID',
-	#	'RECEIVE_DATE':'date_received',
-	#	'EXPIRE_DATE':'date_expires',
-	#	'IS_EMPTY':'is_empty',
-	#	'COMMENTS':'comments'
-	#}}
-
 
 ######################
 ### SUPPLY CLASSES ###

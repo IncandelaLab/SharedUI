@@ -125,8 +125,7 @@ def connectOracle():
 	print("Connected")
 """
 
-# moved to mainUI: (must call after tunnel)
-#connectOracle()
+
 
 
 ###############################################
@@ -159,8 +158,6 @@ class UserManager:
 			json.dump(self.userList, opfl)
 
 	def addUser(self, username, permList, isAdmin=False):
-		print("perm list:", len(permList))
-		print("pageList:", len(self.pageList))
 		assert len(permList) == len(self.pageList), "ERROR:  permissions list length does not equal page list length!"
 		if isAdmin:
 			permList = [True for p in self.pageList]
@@ -226,26 +223,16 @@ class UserManager:
 ###############################################
 
 class fsobj(object):
+	OBJECTNAME = "fsobj"
 	# Var for storing all obj properties:
 	PROPERTIES = []
 	DEFAULTS = {}
 
 	# List containing locations of all xml template files to write
-	# If non-empty, read each and write
 	XML_TEMPLATES = []
 
-	OBJECTNAME = "fsobj"
-
-	# MAYBE:
-	# First table is the basic table; second table is the cond info
-	#CONDS_DICT = {'step_sensor': ['c4220', 'c4260'],
-	#			  'step_pcb':    ['c4240', 'c4280']
-	#			 }
-
-	# NEW
-	XML_STRUCT_DICT = None  # Should not use the base class!
-
 	# True if assembly step (multiple DATA_SETs per output file), else False
+	# TBD
 	MULTIPART_CLASS = False
 
 	def __init__(self):
@@ -274,9 +261,8 @@ class fsobj(object):
 	# NEW:  For search page
 	def add_part_to_list(self, ID=None, date=None):
 		# NOTE:  Date must have format {m}-{d}-{y}
-		# ID param is for tooling:  self.ID is NOT the key that must be saved!
+		# ID param is for tools:  self.ID is NOT the key that must be saved!
 		# Instead, "ID_institution" is used.
-		# self.ID -> id_
 		id_ = self.ID if ID is None else ID
 
 		part_name = self.__class__.__name__
@@ -286,7 +272,6 @@ class fsobj(object):
 			if not id_ in data.keys():
 				# Note creation date and pass it to the dict
 				dcreated = time.localtime()
-				if id_ == None:  print("ERROR:  id_ in add_part_to_list is None!!!")
 				if date:
 					dc = date
 				else:
@@ -297,8 +282,7 @@ class fsobj(object):
 
 
 	def load(self, ID):
-		print("Attempting to load", ID)
-		if ID == -1:
+		if ID == -1 or ID == None:
 			self.clear()
 			return False
 
@@ -308,11 +292,9 @@ class fsobj(object):
 		self.partlistfile = os.sep.join([ DATADIR, 'partlist', part_name+'s.json' ])
 		with open(self.partlistfile, 'r') as opfl:
 			data = json.load(opfl)
-			print("Keys:", data.keys())
 			if not str(ID) in data.keys():
 				self.clear()
 				return False
-		print("Found in partlistfile")
 
 		filedir, filename = self.get_filedir_filename(ID)
 		xml_file = os.sep.join([filedir, filename])
@@ -320,24 +302,17 @@ class fsobj(object):
 		if not os.path.exists(xml_file):
 			self.clear()
 			return False
-		print("Found xml file", xml_file)
 
 		with open(xml_file, 'r') as opfl:
 			data = json.load(opfl)
 
 		self.ID = ID
 		data_keys = data.keys()
-		#PROPERTIES = self.PROPERTIES
-		#DEFAULTS = #getattr(self, 'DEFAULTS', {})
-
 		props_in_data = [prop in data_keys for prop in self.PROPERTIES]
-		print("data_keys:", data_keys)
-		print("Properties:", self.PROPERTIES)
-		print("props in data", props_in_data)
 
+		# for each property stored in xml file, load:
 		for i,prop in enumerate(self.PROPERTIES):
 			prop_in_data = props_in_data[i]
-
 			if prop_in_data:
 				setattr(self, prop, data[prop])
 			else:
@@ -346,32 +321,18 @@ class fsobj(object):
 		return True
 
 
-
 	def new(self, ID):
-		# NOTE:  Should never be called on an existing object.
-		# The only person you can blame for doing this is yourself.
 		self.ID = ID
-		#PROPERTIES = self.PROPERTIES + self.PROPERTIES_COMMON
-		#DEFAULTS = {**self.DEFAULTS_COMMON, **getattr(self, 'DEFAULTS', {})}
-		print("Defaults are:", self.DEFAULTS)
 		for prop in self.PROPERTIES:
-			print("Setting property {} to {}".format(prop, self.DEFAULTS[prop] if prop in self.DEFAULTS.keys() else None))
 			setattr(self, prop, self.DEFAULTS[prop] if prop in self.DEFAULTS.keys() else None)
 
 
 	def clear(self):
 		self.ID = None
-		#PROPERTIES = self.PROPERTIES + self.PROPERTIES_COMMON
-		#DEFAULTS   = {**self.DEFAULTS, **self.DEFAULTS_COMMON}
 		for prop in self.PROPERTIES:
 			setattr(self, prop, self.DEFAULTS.get(prop, None))
-		# For clearing, we don't check or set defaults
-		# All properties, including ID, are set to None
-		# Attempts to use an object when it has been cleared are meant to produce errors
 
 
-
-	# NOT fully general--db-involving parts need more code to handle files-to-upload.
 	def save(self):
 		# NOTE:  Can't check item existence via filepath existence, bc filepath isn't known until after item creation!
 		# Instead, go into partlist dict and check to see whether item exists:
@@ -380,7 +341,7 @@ class fsobj(object):
 		with open(self.partlistfile, 'r') as opfl:
 			data = json.load(opfl)
 			if not str(self.ID) in data.keys():
-				# Object does not exist, so can't get filedir from get_filedir_filename()...
+				# Can't get filedir from get_filedir_filename()...
 				# ...until the date has been set via add_part_to_list.  Do that now.
 				self.add_part_to_list()
 
@@ -393,6 +354,28 @@ class fsobj(object):
 			json.dump(vars(self), opfl, indent=4)
 
 
+	# utility for generate_xml():
+	# create dict of all attrs and values for this object,
+	# INCLUDING attrs/@properties of all parent classes.
+	# {'thickness': 0.01, 'comments_concat': 'comment1;;comment2', ...}
+	def dump_all_attrs(self):
+		prop_dict = {}
+		# Add all ordinary object attributes:
+		for prop in self.PROPERTIES:
+			prop_dict[prop] = getattr(self, prop, None)
+		# now get managed attributes/@properties of that class:
+		# (must also do recursively, for all parent classes)
+		parents = type(self).__bases__  # tuple of parent classes
+		classes = [type(self)]
+		for p in parents:
+			classes.append(p)
+		# Now, for each class:  get all @properties and add to prop_dict
+		for cl in classes:
+			for name, var in vars(cl).items():
+				if isinstance(var, property):
+					prop_dict[name] = getattr(self, name)
+		return prop_dict
+
 	# NEW:  If obj has XML template files, write them.
 	def generate_xml(self):
 		# save():  Required for add_part_to_list (for filedir_filename)
@@ -400,15 +383,14 @@ class fsobj(object):
 		filedir, filename = self.get_filedir_filename()
 		for template in self.XML_TEMPLATES:
 			template_file = os.sep.join([TEMPLATEDIR, self.OBJECTNAME, template])
-			print("DEBUG:  Opening template file", template_file)
 			with open(template_file, 'r') as file:
 				template_content = file.read()
 			template = Template(template_content)
-			rendered = template.render()
+			# render on dict of all attributes + properties:
+			rendered = template.render(self.dump_all_attrs())
 			# outfile name:  [outfilename]_[templatename].xml
 			template_file_name = os.path.basename(template_file)
-			outfile = filename.replace(".xml", "") + "_" + template_file_name
-			print("TEMP:  Writing to XML output file", os.sep.join([filedir, outfile]))
+			outfile = filename.replace(".json", "") + "_" + template_file_name
 			with open(os.sep.join([filedir, outfile]), 'w') as file:
 				file.write(rendered)
 
@@ -424,21 +406,13 @@ class fsobj(object):
 		return upFiles
 
 
-	# Return a list of all files to be uploaded to the DB
-	# (i.e. all files in the object's storage dir with "upload" in the filename)
-	#def filesToUpload(self):
-	#	fdir, fname = self.get_filedir_filename()
-	#	# Grab all files in that directory
-	#	print("Found files to upload:", glob.glob(fdir + "/*upload*"))
-	#	return glob.glob(fdir + "/*upload*")
-
-	# NEW:  All parts/assembly steps use this, bc can't write multiple XML tags w/ same name
+	# join all comments into a single ;;-separated string, max 4k chars
 	@property
 	def comments_concat(self):
 		cmts = ';;'.join(self.comments)
 		# Impose len reqt of 4000 chars (for DB; actual limit unknown/TBD)
 		if len(cmts) > 4000:
-			print("WARNING:  Total combined comments length exceeds 4000 chars - excess chars truncated")
+			print("WARNING:  Total combined comments length for {} exceeds 4000 chars - last {} chars truncated".format(self.ID, len(cmts)-4000))
 			cmts = cmts[:4000]
 		return cmts
 
