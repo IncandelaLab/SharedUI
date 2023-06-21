@@ -42,7 +42,7 @@ fm.setup(datadir=datadir)
 print("SETUP RESULT DIR:", fm.DATADIR)
 
 
-partlist = ['baseplate', 'sensor', 'pcb']#, 'protomodule', 'module']
+partlist = ['baseplate', 'sensor', 'pcb', 'protomodule', 'module']
 toollist = ['tool_sensor', 'tool_pcb', 'tray_assembly', 'tray_component_sensor', 'tray_component_pcb']
 suplist = ['batch_araldite', 'batch_wedge', 'batch_sylgard', 'batch_bond_wire']
 

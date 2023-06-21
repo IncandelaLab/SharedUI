@@ -390,25 +390,44 @@ class pcb(fsobj_part):
 
 
 
-"""
 class protomodule(fsobj_part):
 	OBJECTNAME = "protomodule"
 	FILEDIR = os.sep.join(['protomodules','{date}'])
-	FILENAME = 'protomodule_{ID}.json'
+	FILENAME = "protomodule_{ID}.json"
+
+	XML_TEMPLATES = [
+		'build_upload.xml',
+		'cond_upload.xml',
+		'assembly_upload.xml',
+	]
 
 	# Note:  serial_number == self.ID
-	COND_PROPERTIES = [
+
+	# NEW:  All common PROPERTIES are set in parent class, inherited
+	# Specify only baseplate-specific properties
+	EXTRA_PROPERTIES = [
+		# build_upload file:
+		# build_cond file:
+		# run_begin_date_ is a property
+		'test_file_name',
+		# other:
+		'baseplate', # serial
+		'sensor',
+		'module',
+		'step_sensor',
+		'step_pcb',
+		# Properties for assembly data:
 		# Read/write from cond:
 		"asmbl_tray_name",
 		"plt_ser_num",
-		"plt_asm_row",
-		"plt_asm_col",
+		#"plt_asm_row", # property
+		#"plt_asm_col", # property
 		"plt_fltnes_mm",
 		"plt_thknes_mm",
 		"comp_tray_name",
 		"snsr_ser_num",
-		"snsr_cmp_row",
-		"snsr_cmp_col",
+		#"snsr_cmp_row", # property
+		#"snsr_cmp_col", # property
 		"snsr_x_offst",
 		"snsr_y_offst",
 		"snsr_ang_offset",
@@ -419,147 +438,104 @@ class protomodule(fsobj_part):
 		"glue_batch_num",
 		"slvr_epxy_type",
 		"slvr_epxy_batch_num",
-		"plt_grade",
+		"grade",
 		"snsr_tool_feet_chk",
-		"snsr_step"
+		"sensor_step",
+		# for cond page:
+		"curing_time_hrs",
+		"time_start",
+		"time_stop",
+		"temp_degc",
+		"humidity_prcnt",
 	]
 
-	LOCAL_PROPERTIES = [
-		# Locally-saved, not part of DB:
-		"location",  # location at institution
-		#"protomodule",  # TBD
-		"module",
-	]
-
-	# Derived properties:
-	# material (from display_name)
-	# geometry
-	# channel density
-
-	DEFAULTS = {
-		"size":     '8', # This should not be changed!
-		"display_name": "None None Si ProtoModule None None"
+	EXTRA_DEFAULTS = {
+		"kind_of_part": "None None Si ProtoModule None None",
 	}
 
 
-	XML_COND_TEMPLATE = {
-		"HEADER":fsobj_db.COND_HEADER_DICT,
-		"DATA_SET":{
-			"COMMENT_DESCRIPTION":"comment_description",
-			"VERSION":"VNUM",
-			"PART":{
-				"SERIAL_NUMBER":"ID",
-				"KIND_OF_PART":"kind_of_part",
-			},
-			"DATA":{
-				"ASMBL_TRAY_NAME":"asmbl_tray_name",
-				"PLT_SER_NUM":"plt_ser_num",
-				"PLT_ASM_ROW":"plt_asm_row",
-				"PLT_ASM_COL":"plt_asm_col",
-				"PLT_FLTNS_MM":"plt_fltns_mm",
-				"PLT_CHKNES_MM":"plt_thknes_mm",
-				"COMP_TRAY_NAME":"comp_tray_name",
-				"SNSR_SER_NUM":"snsr_ser_num",
-				"SNSR_COMP_ROW":"snsr_cmp_row",
-				"SNSR_X_OFFST":"snsr_x_offst",
-				"SNSR_T_OFFST":"snsr_y_offst",
-				"SNSR_ANG_OFFSET":"snsr_ang_offset",
-				"SNSR_TOOL_NAME":"snsr_tool_name",
-				"SNSR_TOOL_HT_SET":"snsr_tool_ht_set",
-				"SNSR_TOOL_HT_CHK":"snsr_tool_ht_chk",
-				"GLUE_TYPE":"glue_type",
-				"GLUE_BATCH_NUM":"glue_batch_num",
-				"SLVR_EPXY_TYPE":"slvr_epxy_type",
-				"SLVR_EPXY_BATCH_NUM":"slvr_epxy_batch_num",
-				"PLT_GRADE":"plt_grade",
-				"SNSR_TOOL_FEET_CHK":"snsr_tool_feet_chk",
-				"SNSR_STEP":"snsr_step"
 
-			}
-		}
-	}
-
-	# for HEADER_DICT
-	COND_TABLE = "HGC_PRTO_MOD_ASMBLY"
-	TABLE_DESC = "HGC Six Inch Proto Module Assembly"
-
-	# List of vars that should NOT be edited in the GUI and are only loaded from DB
-	# (And some info would be redundant w/ other constants, eg KIND_OF_PART and self.size)
-	XML_CONSTS = [
-		'size',
-	]
-
-
-	# Note:  auto-complete this if part is created from baseplate/sensor/etc
-	@property
-	def kind_of_part(self):
-		return self.display_name
-		#"{} Baseplate {} {}".format(self.material, self.channel_density, self.shape)
 
 	# TODO : name this, decide whether to auto-set or manually set type
 	@property
 	def calorimeter_type(self):
-		# 'EM' if self.baseplate.material=='CuW' else 'HAD'	
-		return self.display_name.split()[0]
-	@calorimeter_type.setter  # eventually, these will not be used
+		if self.kind_of_part == "None None Si ProtoModule None None":  return None
+		return self.kind_of_part.split()[0]
+	@calorimeter_type.setter
 	def calorimeter_type(self, value):
-		# Cannot replace bc of case w/ multiple Nones
-		# split, then change and recombine
-		print("CALORIMETER_TYPE SETTER")
-		splt = self.display_name.split(" ")
+		splt = self.kind_of_part.split(" ")
 		splt[0] = str(value)
-		self.display_name = " ".join(splt)
+		self.kind_of_part = " ".join(splt)
+
+	# Note:  baseplate_material determines calorimeter_type!
+	@property
+	def baseplate_material(self):
+		if self.kind_of_part == "None None Si ProtoModule None None":  return None
+		em_or_had = self.kind_of_part.split()[0]
+		return 'CuW/Kapton' if value == 'EM' else 'PCB/Kapton'
+	@baseplate_material.setter
+	def baseplate_material(self, value):
+		# CuW -> EM, PCB -> HAD
+		splt = self.kind_of_part.split(" ")
+		splt[0] = 'EM' if value == 'CuW/Kapton' else 'HAD'
+		self.kind_of_part = " ".join(splt)
+
 
 	@property
 	def sen_type(self):
-		return self.display_name.split()[1]
-	@sen_type.setter  # eventually, these will not be used
+		if self.kind_of_part == "None None Si ProtoModule None None":  return None
+		return self.kind_of_part.split()[1]
+	@sen_type.setter
 	def sen_type(self, value):
-		# Cannot replace bc of case w/ multiple Nones
-		# split, then change and recombine
-		print("SEN_TYPE SETTER")
-		splt = self.display_name.split(" ")
+		splt = self.kind_of_part.split(" ")
 		splt[1] = str(value)
-		self.display_name = " ".join(splt)
+		self.kind_of_part = " ".join(splt)
 
 	@property
 	def channel_density(self):
-		if self.display_name is None:  return None
-		return self.display_name.split()[4]
+		if self.kind_of_part == "None None Si ProtoModule None None":  return None
+		return self.kind_of_part.split()[4]
 	@channel_density.setter
 	def channel_density(self, value):
-		splt = self.display_name.split(" ")
+		splt = self.kind_of_part.split(" ")
 		splt[4] = str(value)
-		self.display_name = " ".join(splt)
+		self.kind_of_part = " ".join(splt)
 
 	@property
 	def geometry(self):
-		if self.display_name is None:  return None
-		return self.display_name.split()[5]
+		if self.kind_of_part == "None None Si ProtoModule None None":  return None
+		return self.kind_of_part.split()[5]
 	@geometry.setter
 	def geometry(self, value):
-		splt = self.display_name.split(" ")
+		splt = self.kind_of_part.split(" ")
 		splt[5] = str(value)
-		self.display_name = " ".join(splt)
-
+		self.kind_of_part = " ".join(splt)
 
 	@property  # Note: not a measured value
 	def thickness(self):
 		return float(self.sen_type.split('um')[1])/1000
-	@thickness.setter
-	def thickness(self, value):
-		pass
+
+	# def thickness_physical(self):  return actual net thickness of part?
 
 
 	@property
-	def assem_tray_pos(self):
-		return 
-		#return "TRPOSN_{}{}".format(self.tray_row, tray_col)
+	def kind_of_part_baseplate(self):
+		tmp_baseplate = baseplate()
+		assert tmp_baseplate.load(self.baseplate), "Failed to load baseplate {} for protomod {}".format(self.baseplate, self.ID)
+		return tmp_baseplate.kind_of_part
 
 	@property
-	def comp_tray_pos(self):
-		return "CMPOSN_{}{}".format(self.tray_row, tray_col)
+	def kind_of_part_sensor(self):
+		tmp_sensor = sensor()
+		assert tmp_sensor.load(self.sensor), "Failed to load sensor {} for protomod {}".format(sel     f.sensor, self.ID)
+		return tmp_sensor.kind_of_part
 
+
+
+	## Assembly data properties:
+
+
+	# return position in GUI, 0-5
 	@property
 	def tray_posn(self):
 		# If has a sensor step, grab the position of this sensor and return it here...
@@ -576,49 +552,72 @@ class protomodule(fsobj_part):
 			return position
 
 	@property
-	def tray_row(self):
+	def plt_asm_row(self):
 		posn = self.tray_posn()
 		if posn == "None":  return posn
 		else:  return posn%2+1
 
 	@property
-	def tray_col(self):
+	def plt_asm_col(self):
 		posn = self.tray_posn()
 		if posn == "None": return posn
 		else:  return posn//3+1
-	
-	@property
-	def baseplate_type(self):
-		if self.baseplate is None:
-			print("In baseplate_type:  protomod has no baseplate!")
-			return None
-		temp_baseplate = baseplate()
-		if not temp_baseplate.load(self.baseplate):
-			print("ERROR:  failed to load baseplate {} in baseplate_type!".format(self.baseplate))
-			return None
-		return temp_baseplate.description
 
 	@property
-	def sensor_type(self):
-		if self.sensor is None:
-			print("In sensor_type:  protomod has no sensor!")
-			return None
-		temp_sensor = sensor()
-		if not temp_sensor.load(self.sensor):
-			print("ERROR:  failed to load sensor {} in sensor_type!".format(self.sensor))
-			return None
-		return temp_sensor.description
+	def snsr_cmp_row(self):
+		posn = self.tray_posn()
+		if posn == "None":  return posn
+		else:  return posn%2+1
 
 	@property
-	def resolution(self):
-		if self.sensor is None:
-			print("ERROR in module resolution:  sensor is None!")
-			return None
-		temp_sensor = sensor()
-		if not temp_sensor.load(self.sensor):
-			print("ERROR:  Could not find child sensor {}!".format(self.sensor))
-			return None
-		return temp_sensor.resolution
+	def snsr_cmp_col(self):
+		posn = self.tray_posn()
+		if posn == "None": return posn
+		else:  return posn//3+1
+
+
+	## Functions
+
+	# new():  Optionally, create proto from baseplate and sensor objects
+	# Note:  baseplate and sensor must be the actual objects, not IDs
+	# NOTE:  Must also set sensor step ID!  (Implement into this?)
+	def new(self, ID, baseplate=None, sensor=None):
+		super(protomodule, self).new(ID)
+		# if no sensor/baseplate, create and return normally
+		if not baseplate and not sensor:  return
+		# if one of sensor or baseplate, throw error
+		assert baseplate or sensor, "Error creating protomodule: baseplate is {}, sensor is {}".format(baseplate, sensor)
+
+		# Perform some checks
+		errs = []
+		if baseplate.geometry != sensor.geometry:
+			errs.append("Baseplate geometry {} does not match sensor geometry {}".format(baseplate.geometry, sensor.geometry))
+		if baseplate.channel_density != sensor.channel_density:
+			errs.append("Baseplate channel density {} does not match sensor channel density {}".format(baseplate.channel_density, sensor.channel_density))
+		if not baseplate.ready_step_sensor():
+			errs.append("Baseplate is already mounted on protomodule {}, sensor step {}!".format(baseplate.protomodule, baseplate.step_sensor))
+		if not sensor.ready_step_sensor():
+			errs.append("Sensor is already mounted on protomodule {}, sensor step {}!".format(sensor.protomodule, sensor.step_sensor))
+
+		if len(errs) > 0:
+			self.clear()
+			print("ERROR:  Protomodule {} not created from baseplate {} and sensor {}!  Errors:".format(self.ID, baseplate.ID, sensor.ID))
+			print("\n".join(errs))
+			return
+
+		# if baseplate and sensor, auto-fill protomodule type, plus baseplate, sensor fields:
+		self.baseplate = baseplate.ID
+		self.geometry = baseplate.geometry
+		self.channel_density = baseplate.channel_density
+		self.baseplate_material = baseplate.material
+		self.sensor = sensor.ID
+		self.sen_type = sensor.sen_type
+
+
+	def generate_xml(self):
+		# Make sure that all required info is present
+		# if step_sensor.is_complete (or something similar)...
+		super(protomodule, self).generate_xml()
 
 
 	def ready_step_pcb(self, step_pcb = None):
@@ -629,25 +628,36 @@ class protomodule(fsobj_part):
 		
 
 
-
 class module(fsobj_part):
 	OBJECTNAME = "module"
-	FILEDIR    = os.sep.join(['modules','{date}','module_{ID}'])
-	FILENAME   = 'module_{ID}.json'
+	FILEDIR = os.sep.join(['modules','{date}'])
+	FILENAME = "module_{ID}.json"
+
+	XML_TEMPLATES = [
+		'build_upload.xml',
+		'cond_upload.xml',
+		'assembly_upload.xml',
+		'wirebond_upload.xml',
+	]
 
 	# Note:  serial_number == self.ID
-	COND_PROPERTIES = [
-		# Read/write from cond:
+
+	# NEW:  All common PROPERTIES are set in parent class, inherited
+	# Specify only baseplate-specific properties
+	EXTRA_PROPERTIES = [
+		# general:
+		"pcb",  # add baseplate, etc?
+		"protomodule",
+		"step_pcb",
+
+		# for assembly page:
 		"asmbl_tray_name",
-		"prto_ser_num",
-		"prto_asm_row",
-		"prto_asm_col",
 		"comp_tray_name",
 		"pcb_ser_num",
 		"pcb_fltnes_mm",
 		"pcb_thknes_mm",
-		"pcb_cmp_row",
-		"pcb_cmp_col",
+		#"pcb_cmp_row", # property
+		#"pcb_cmp_col", # property
 		"pcb_tool_name",
 		"pcb_tool_ht_set",
 		"pcb_tool_ht_chk",
@@ -661,6 +671,13 @@ class module(fsobj_part):
 		"pcb_plcment_ang_offset",
 		"mod_thkns_mm",
 		"mod_fltns_mm",
+
+		# for cond page:
+		"curing_time_hrs",
+		"time_start",
+		"time_stop",
+		"temp_degc",
+		"humidity_prcnt",
 
 		# wirebonding:
 		"bond_wire_batch_num",
@@ -691,7 +708,7 @@ class module(fsobj_part):
 		"front_encap_cure_stop",
 		"front_encap_inspxn",
 		"is_test_bond_module",
-		"bond_iull_user",  # typo in DB.......
+		"bond_pull_user",
 		"bond_pull_avg",
 		"bond_pull_stddev",
 		"final_inspxn_user",
@@ -699,135 +716,10 @@ class module(fsobj_part):
 		"wirebond_comments"
 	]
 
-	LOCAL_PROPERTIES = [
-		# Locally-saved, not part of DB:
-		"location",  # location at institution
-		#"protomodule",  # TBD
-	]
-
-	# Derived properties:
-	# material (from display_name)
-	# geometry
-	# channel density
-
-	DEFAULTS = {
-		"size":     '8', # This should not be changed!
-		"display_name": "None None Si ProtoModule None None"
+	EXTRA_DEFAULTS = {
+		"kind_of_part": "None None Si ProtoModule None None",
 	}
 
-
-	XML_COND_TEMPLATE = {
-		"HEADER":fsobj_db.COND_HEADER_DICT,
-		"DATA_SET":{
-			"COMMENT_DESCRIPTION":"comment_description",
-			"VERSION":"VNUM",
-			"PART":{
-				"SERIAL_NUMBER":"ID",
-				"KIND_OF_PART":"kind_of_part",
-			},
-			"DATA":{
-				"ASMBL_TRAY_NAME":"asmbl_tray_name",
-				"PRTO_SER_NUM":"prto_ser_num",
-				"PRTO_ASM_ROW":"prto_asm_row",
-				"PRTO_ASM_COL":"prto_asm_col",
-				"COMP_TRAY_NAME":"comp_tray_name",
-				"PCB_SER_NUM":"pcb_ser_num",
-				"PCB_FLTNES_MM":"pcb_fltnes_mm",
-				"PCB_THKNES_MM":"pcb_thknes_mm",
-				"PCB_CMP_ROW":"pcb_cmp_row",
-				"PCB_CMP_COL":"pcb_cmp_col",
-				"PCB_TOOL_NAME":"pcb_tool_name",
-				"PCB_TOOL_HT_SET":"pcb_tool_ht_set",
-				"PCB_TOOL_HT_CHK":"pcb_tool_ht_chk",
-				"GLUE_TYPE":"glue_type",
-				"GLUE_BATCH_NUM":"glue_batch_num",
-				"PCB_TOOL_FEET_CHK":"pcb_tool_feet_chk",
-				"MOD_GRADE":"mod_grade",
-				"PCB_STEP":"pcb_step",
-				"PCB_PLCMENT_X_OFFST":"pcb_plcment_x_offst",
-				"PCB_PLCMENT_Y_OFFST":"pcb_plcment_y_offst",
-				"SNSR_ANG_OFFSET":"snsr_ang_offset",
-				"MOD_FLTNS_MM":"mod_fltns_mm",
-				"MOD_FLTNS_MM":"mod_fltns_mm"
-			}
-		}
-	}
-
-	# Wirebonding-specific:
-	WIREBOND_TABLE_NAME = "HGC_MOD_WIREBOND_TEST"
-	WIREBOND_HEADER_DICT = {
-		'TYPE':{
-			'EXTENSION_TABLE_NAME':'WIREBOND_TABLE_NAME',
-			'NAME':'TABLE_DESC',
-		},
-		'RUN':{
-			'RUN_NAME':'RUN_TYPE',
-			'RUN_BEGIN_TIMESTAMP':'run_begin_timestamp_',  # Format:  2018-03-26 00:00:00
-			'RUN_END_TIMESTAMP':'run_end_timestamp_',
-			'INITIATED_BY_USER':'initiated_by_user',
-			'LOCATION':'location',
-			'COMMENT_DESCRIPTION':'comment_description',
-		}
-	}
-	XML_WIREBOND_TEMPLATE = {
-		"HEADER":fsobj_db.COND_HEADER_DICT,
-		"DATA_SET":{
-			"COMMENT_DESCRIPTION":"comment_description",
-			"VERSION":"VNUM",
-			"PART":{
-				"SERIAL_NUMBER":"ID",
-				"KIND_OF_PART":"kind_of_part",
-			},
-			"DATA":{
-				"BOND_WIRE_BATCH_NUM":"bond_wire_batch_num",
-				"PRE_INSPECTION":"pre_inspection",
-				"SYLGARD_BATCH":"sylgard_batch",
-				"WEDGE_BATCH":"wedge_batch",
-				"BACK_BONDS":"back_bonds",
-				"BACK_BONDS_DATE":"back_bonds_date",
-				"BACK_BONDS_USER":"back_bonds_user",
-				"BACK_UNBONDED":"back_unbonded",
-				"BACK_BOND_INSPXN":"back_bond_inspxn",
-				"BACK_REPAIR_USER":"back_repair_user",
-				"FRONT_BONDS":"front_bonds",
-				"FRONT_BONDS_DATE":"front_bonds_date",
-				"FRONT_BONDS_USER":"front_bonds_user",
-				"FRONT_SKIP":"front_skip",
-				"FRONT_UNBONDED":"front_unbonded",
-				"FRONT_BOND_INSPXN":"front_bond_inspxn",
-				"FRONT_REPAIR_USER":"front_repair_user",
-				"BACK_ENCAP":"back_encap",
-				"BACK_ENCAP_USER":"back_encap_user",
-				"BACK_ENCAP_CURE_START":"back_encap_cure_start",
-				"BACK_ENCAP_CURE_STOP":"back_encap_cure_stop",
-				"BACK_ENCAP_INSPXN":"back_encap_inspxn",
-				"FRONT_ENCAP":"front_encap",
-				"FRONT_ENCAP_USER":"front_encap_user",
-				"FRONT_ENCAP_CURE_START":"front_encap_cure_start",
-				"FRONT_ENCAP_CURE_STOP":"front_encap_cure_stop",
-				"FRONT_ENCAP_INSPXN":"front_encap_inspxn",
-				"IS_TEST_BOND_MODULE":"is_test_bond_module",
-				"BOND_IULL_USER":"bond_iull_user",  # typo in DB.......
-				"BOND_PULL_AVG":"bond_pull_avg",
-				"BOND_PULL_STDDEV":"bond_pull_stddev",
-				"FINAL_INSPXN_USER":"final_inspxn_user",
-				"FINAL_INSPXN_OK":"final_inspxn_ok",
-				"WIREBOND_COMMENTS":"wirebond_comments"
-
-			}
-		}
-	}
-
-
-	# for HEADER_DICT
-	COND_TABLE = "HGC_MOD_ASMBLY"
-	TABLE_DESC = "HGC Six Inch Module Assembly"
-
-	# List of vars that should NOT be edited in the GUI and are only loaded from DB
-	# (And some info would be redundant w/ other constants, eg KIND_OF_PART and self.size)
-	XML_CONSTS = [
-		'size',
-	]
 
 
 	# Properties are same as protomodule's
@@ -835,6 +727,18 @@ class module(fsobj_part):
 	@property
 	def kind_of_part(self):
 		return self.display_name
+
+	@property
+	def kind_of_part_pcb(self):
+		tmp_pcb = pcb()
+		assert tmp_pcb.load(self.pcb), "Failed to load pcb {} for mod {}".format(self.pcb, self.ID)
+		return tmp_pcb.kind_of_part
+
+	@property
+	def kind_of_part_protomodule(self):
+		tmp_proto = protomodule()
+		assert tmp_proto.load(self.protomodule), "Failed to load protomodule {} for mod {}".format(self.protomodule, self.ID)
+		return tmp_proto.kind_of_part
 
 	# TODO : name this, decide whether to auto-set or manually set type
 	@property
@@ -938,97 +842,16 @@ class module(fsobj_part):
 		if posn == "None": return posn
 		else:  return posn//3+1
 
-	# NEW:  Need to add an additional file/etc to handle wirebonding
-
-	def save(self):
-		# This one handles the json files
-		super(module, self).save()
-
-		# Additionally:  Write wirebonding XML file
-		filedir, filename = self.get_filedir_filename()
-		fname_wirebond = filename.replace('.json', '_wirebonding_upload.xml')
-
-		xml_tree = self.generate_xml(self.XML_WIREBOND_TEMPLATE)
-		root = xml_tree.getroot()
-		xmlstr = minidom.parseString(tostring(root)).toprettyxml(indent = '    ')  #tostring imported from xml.etree.ElementTree
-		xmlstr = xmlstr.replace("version=\"1.0\" ", "version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"")
-		with open(filedir+'/'+fname_wirebond, 'w') as f:
-			f.write(xmlstr)
 
 
-	# Revamped
-	def load(self, ID, on_property_missing = "warn"):
-		if ID == "" or ID == -1 or ID == None:
-			self.clear()
-			return False
 
-		part_name = self.__class__.__name__
-		self.partlistfile = os.sep.join([ DATADIR, 'partlist', part_name+'s.json' ])
-		data = None
-		with open(self.partlistfile, 'r') as opfl:
-			data = json.load(opfl)
-		if str(ID) in data.keys():
-			print("      FOUND in partlistfile, can quick load")
-			dt = data[str(ID)]
-			super(fsobj_part, self).load(ID)
+	def generate_xml(self):
+		# Make sure that all required info is present
+		# if step_sensor.is_complete (or something similar)...
+		# ALSO, check wirebonding finished
+		super(protomodule, self).generate_xml()
 
-		else:
-			if not ENABLE_DB_COMMUNICATION:
-				print("**TEMPORARY:  Object not found, and downloading disabled for testing!**")
-				return False
 
-			# Use DB_CURSOR and self.SQL_REQUEST to find XML files
-			# Data from part table
-			print("Requesting part data")
-			DB_CURSOR.execute(self.sql_request_part(ID))
-			# Reformat
-			columns = [col[0] for col in DB_CURSOR.description]
-			DB_CURSOR.rowfactory = lambda *args: dict(zip(columns, args))
-			data_part = DB_CURSOR.fetchone()
-			if data_part is None:
-				# Part not found
-				print("SQL query found nothing")
-				return False
 
-			# Data from cond table
-			print("Requesting cond data")
-			print("QUERY:")
-			print(self.sql_request_cond(ID))
-			DB_CURSOR.execute(self.sql_request_cond(ID))
-			# Reformat
-			columns = [col[0] for col in DB_CURSOR.description]
-			DB_CURSOR.rowfactory = lambda *args: dict(zip(columns, args))
-			data_cond = DB_CURSOR.fetchone()
-			# data_* is now a dict:  {"SERIAL_NUMBER":"xyz", "THICKNESS":"0.01", ...}
-
-			# Load all data into self.
-			# DB col names are [local var name].upper()
-			print("Downloaded part data:")
-			print(data_part)
-			print("Downloaded cond data:")
-			print(data_cond)
-
-			def fill_self(data_x):
-				for colname, var in data_x.items():
-					# NOTE:  datetime objs cannot be stored as json, or simply sent to xml...so stringify
-					if type(var) == datetime.datetime:
-						dstring = "{}-{}-{} {:02d}:{:02d}:{:02d}".format(var.year, var.month, var.day, var.hour, var.minute, var.second)
-						setattr(self, colname.lower(), dstring)
-					elif type(var) == datetime.date:
-						dstring = "{}-{}-{}".format(var.year, var.month, var.day)
-						setattr(self, colname.lower(), dstring)
-					else:
-						setattr(self, colname.lower(), var)
-			fill_self(data_part)
-			fill_self(data_cond)
-
-			# Data is now in python obj.  Ensure save:
-			self.ID = ID
-			self.save()
-
-		#self.ID = ID
-		return True
-
-"""
 
 

@@ -298,18 +298,15 @@ class fsobj(object):
 
 		filedir, filename = self.get_filedir_filename(ID)
 		xml_file = os.sep.join([filedir, filename])
-
 		if not os.path.exists(xml_file):
 			self.clear()
 			return False
-
 		with open(xml_file, 'r') as opfl:
 			data = json.load(opfl)
 
 		self.ID = ID
 		data_keys = data.keys()
 		props_in_data = [prop in data_keys for prop in self.PROPERTIES]
-
 		# for each property stored in xml file, load:
 		for i,prop in enumerate(self.PROPERTIES):
 			prop_in_data = props_in_data[i]
@@ -317,7 +314,6 @@ class fsobj(object):
 				setattr(self, prop, data[prop])
 			else:
 				prop_default = self.DEFAULTS[prop] if prop in self.DEFAULTS.keys() else None
-
 		return True
 
 
@@ -378,7 +374,7 @@ class fsobj(object):
 
 	# NEW:  If obj has XML template files, write them.
 	def generate_xml(self):
-		# save():  Required for add_part_to_list (for filedir_filename)
+		# save():  Required so it calls add_part_to_list (for filedir_filename)
 		self.save()
 		filedir, filename = self.get_filedir_filename()
 		for template in self.XML_TEMPLATES:
