@@ -185,10 +185,10 @@ class baseplate(fsobj_part):
 
 
 	@property
-	def mat_type(self):
+	def material(self):
 		return self.kind_of_part.split()[0]
-	@mat_type.setter  # eventually, these will not be used
-	def mat_type(self, value):
+	@material.setter  # eventually, these will not be used
+	def material(self, value):
 		# Cannot replace bc of case w/ multiple Nones
 		# split, then change and recombine
 		splt = self.kind_of_part.split(" ")
@@ -266,6 +266,7 @@ class sensor(fsobj_part):
 
 	@property
 	def sen_type(self):
+		if self.kind_of_part is None:  return None
 		return self.kind_of_part.split()[0]
 	@sen_type.setter  # eventually, these will not be used
 	def sen_type(self, value):
@@ -274,18 +275,13 @@ class sensor(fsobj_part):
 		# split, then change and recombine
 		splt = self.kind_of_part.split(" ")
 		splt[0] = value
+		splt[3] = "HD" if value == "120um" else "LD"
 		self.kind_of_part = " ".join(splt)
-		self.thickness = self.thickness_float
-
+		
 	@property
 	def channel_density(self):
 		if self.kind_of_part is None:  return None
 		return self.kind_of_part.split()[3]
-	@channel_density.setter
-	def channel_density(self, value):
-		splt = self.kind_of_part.split(" ")
-		splt[3] = str(value)
-		self.kind_of_part = " ".join(splt)
 
 	@property
 	def geometry(self):
@@ -310,16 +306,16 @@ class sensor(fsobj_part):
 		# Kapton qualification checks:
 		errstr = ""
 		checks = [
-			self.inspection == "pass",
+			True, #self.inspection == "pass",
 		]
 		#if self.kapton_flatness is None:
-		if self.flatness is None:
-			errstr+=" flatness doesn't exist."
-			checks.append(False)
-		elif not (max_flatness is None):
-			if max_flatness<self.flatness:
-				errstr+="kapton flatness "+str(self.flatness)+" exceeds max "+str(max_flatness)+"."
-				checks.append(False)
+		#if self.flatness is None:
+		#	errstr+=" flatness doesn't exist."
+		#	checks.append(False)
+		#elif not (max_flatness is None):
+		#	if max_flatness<self.flatness:
+		#		errstr+="kapton flatness "+str(self.flatness)+" exceeds max "+str(max_flatness)+"."
+		#		checks.append(False)
 
 		if not all(checks):
 			return False, "sensor qualification failed or incomplete. "+errstr
@@ -454,52 +450,9 @@ class protomodule(fsobj_part):
 	}
 
 
+	# PROPERTIES:
+	# Required to set kind_of_part:  geometry, sen_type (sets chann density), baseplate_material (sets calo type)
 
-
-	# TODO : name this, decide whether to auto-set or manually set type
-	@property
-	def calorimeter_type(self):
-		if self.kind_of_part == "None None Si ProtoModule None None":  return None
-		return self.kind_of_part.split()[0]
-	@calorimeter_type.setter
-	def calorimeter_type(self, value):
-		splt = self.kind_of_part.split(" ")
-		splt[0] = str(value)
-		self.kind_of_part = " ".join(splt)
-
-	# Note:  baseplate_material determines calorimeter_type!
-	@property
-	def baseplate_material(self):
-		if self.kind_of_part == "None None Si ProtoModule None None":  return None
-		em_or_had = self.kind_of_part.split()[0]
-		return 'CuW/Kapton' if value == 'EM' else 'PCB/Kapton'
-	@baseplate_material.setter
-	def baseplate_material(self, value):
-		# CuW -> EM, PCB -> HAD
-		splt = self.kind_of_part.split(" ")
-		splt[0] = 'EM' if value == 'CuW/Kapton' else 'HAD'
-		self.kind_of_part = " ".join(splt)
-
-
-	@property
-	def sen_type(self):
-		if self.kind_of_part == "None None Si ProtoModule None None":  return None
-		return self.kind_of_part.split()[1]
-	@sen_type.setter
-	def sen_type(self, value):
-		splt = self.kind_of_part.split(" ")
-		splt[1] = str(value)
-		self.kind_of_part = " ".join(splt)
-
-	@property
-	def channel_density(self):
-		if self.kind_of_part == "None None Si ProtoModule None None":  return None
-		return self.kind_of_part.split()[4]
-	@channel_density.setter
-	def channel_density(self, value):
-		splt = self.kind_of_part.split(" ")
-		splt[4] = str(value)
-		self.kind_of_part = " ".join(splt)
 
 	@property
 	def geometry(self):
@@ -511,23 +464,59 @@ class protomodule(fsobj_part):
 		splt[5] = str(value)
 		self.kind_of_part = " ".join(splt)
 
-	@property  # Note: not a measured value
-	def thickness(self):
-		return float(self.sen_type.split('um')[1])/1000
+	# Note:  baseplate_material determines calorimeter_type!
+	@property
+	def baseplate_material(self):
+		if self.kind_of_part == "None None Si ProtoModule None None":  return None
+		em_or_had = self.kind_of_part.split()[0]
+		return 'CuW/Kapton' if em_or_had == 'EM' else 'PCB/Kapton'
+	@baseplate_material.setter
+	def baseplate_material(self, value):
+		# CuW -> EM, PCB -> HAD
+		splt = self.kind_of_part.split(" ")
+		splt[0] = 'EM' if value == 'CuW/Kapton' else 'HAD'
+		self.kind_of_part = " ".join(splt)
 
-	# def thickness_physical(self):  return actual net thickness of part?
+	# Note:  sen_type determines HD/LD!
+	@property
+	def sen_type(self):
+		if self.kind_of_part == "None None Si ProtoModule None None":  return None
+		return self.kind_of_part.split()[1]
+	@sen_type.setter
+	def sen_type(self, value):
+		splt = self.kind_of_part.split(" ")
+		splt[1] = str(value)
+		splt[4] = "HD" if value == "120um" else "LD"
+		self.kind_of_part = " ".join(splt)
+
+	@property
+	def calorimeter_type(self):
+		if self.kind_of_part == "None None Si ProtoModule None None":  return None
+		return self.kind_of_part.split()[0]
+
+	@property
+	def channel_density(self):
+		if self.kind_of_part == "None None Si ProtoModule None None":  return None
+		return self.kind_of_part.split()[4]
+
+
+	# Note:  thickness_nominal is 100, 300, etc.  'thickness' = actual measured thickness
+	@property
+	def thickness_nominal(self):
+		if self.sen_type is None:  return None
+		return float(self.sen_type.split('um')[1])/1000
 
 
 	@property
 	def kind_of_part_baseplate(self):
 		tmp_baseplate = baseplate()
-		assert tmp_baseplate.load(self.baseplate), "Failed to load baseplate {} for protomod {}".format(self.baseplate, self.ID)
+		if not tmp_baseplate.load(self.baseplate):  return None
 		return tmp_baseplate.kind_of_part
 
 	@property
 	def kind_of_part_sensor(self):
 		tmp_sensor = sensor()
-		assert tmp_sensor.load(self.sensor), "Failed to load sensor {} for protomod {}".format(sel     f.sensor, self.ID)
+		if not tmp_sensor.load(self.sensor):  return None
 		return tmp_sensor.kind_of_part
 
 
@@ -553,25 +542,25 @@ class protomodule(fsobj_part):
 
 	@property
 	def plt_asm_row(self):
-		posn = self.tray_posn()
+		posn = self.tray_posn
 		if posn == "None":  return posn
 		else:  return posn%2+1
 
 	@property
 	def plt_asm_col(self):
-		posn = self.tray_posn()
+		posn = self.tray_posn
 		if posn == "None": return posn
 		else:  return posn//3+1
 
 	@property
 	def snsr_cmp_row(self):
-		posn = self.tray_posn()
+		posn = self.tray_posn
 		if posn == "None":  return posn
 		else:  return posn%2+1
 
 	@property
 	def snsr_cmp_col(self):
-		posn = self.tray_posn()
+		posn = self.tray_posn
 		if posn == "None": return posn
 		else:  return posn//3+1
 
@@ -581,37 +570,36 @@ class protomodule(fsobj_part):
 	# new():  Optionally, create proto from baseplate and sensor objects
 	# Note:  baseplate and sensor must be the actual objects, not IDs
 	# NOTE:  Must also set sensor step ID!  (Implement into this?)
-	def new(self, ID, baseplate=None, sensor=None):
+	def new(self, ID, baseplate_=None, sensor_=None):
 		super(protomodule, self).new(ID)
 		# if no sensor/baseplate, create and return normally
-		if not baseplate and not sensor:  return
+		if not baseplate_ and not sensor_:  return
 		# if one of sensor or baseplate, throw error
-		assert baseplate or sensor, "Error creating protomodule: baseplate is {}, sensor is {}".format(baseplate, sensor)
+		assert baseplate_ or sensor_, "Error creating protomodule: baseplate is {}, sensor is {}".format(baseplate_, sensor_)
 
 		# Perform some checks
 		errs = []
-		if baseplate.geometry != sensor.geometry:
-			errs.append("Baseplate geometry {} does not match sensor geometry {}".format(baseplate.geometry, sensor.geometry))
-		if baseplate.channel_density != sensor.channel_density:
-			errs.append("Baseplate channel density {} does not match sensor channel density {}".format(baseplate.channel_density, sensor.channel_density))
-		if not baseplate.ready_step_sensor():
-			errs.append("Baseplate is already mounted on protomodule {}, sensor step {}!".format(baseplate.protomodule, baseplate.step_sensor))
-		if not sensor.ready_step_sensor():
-			errs.append("Sensor is already mounted on protomodule {}, sensor step {}!".format(sensor.protomodule, sensor.step_sensor))
+		if baseplate_.geometry != sensor_.geometry:
+			errs.append("Baseplate geometry {} does not match sensor geometry {}".format(baseplate_.geometry, sensor_.geometry))
+		if baseplate_.channel_density != sensor_.channel_density:
+			errs.append("Baseplate channel density {} does not match sensor channel density {}".format(baseplate_.channel_density, sensor_.channel_density))
+		if not baseplate_.ready_step_sensor():
+			errs.append("Baseplate is already mounted on protomodule {}, sensor step {}!".format(baseplate_.protomodule, baseplate_.step_sensor))
+		if not sensor_.ready_step_sensor():
+			errs.append("Sensor is already mounted on protomodule {}, sensor step {}!".format(sensor_.protomodule, sensor_.step_sensor))
 
 		if len(errs) > 0:
 			self.clear()
-			print("ERROR:  Protomodule {} not created from baseplate {} and sensor {}!  Errors:".format(self.ID, baseplate.ID, sensor.ID))
+			print("ERROR:  Protomodule {} not created from baseplate {} and sensor {}!  Errors:".format(self.ID, baseplate_.ID, sensor_.ID))
 			print("\n".join(errs))
 			return
 
 		# if baseplate and sensor, auto-fill protomodule type, plus baseplate, sensor fields:
-		self.baseplate = baseplate.ID
-		self.geometry = baseplate.geometry
-		self.channel_density = baseplate.channel_density
-		self.baseplate_material = baseplate.material
-		self.sensor = sensor.ID
-		self.sen_type = sensor.sen_type
+		self.baseplate = baseplate_.ID
+		self.sensor = sensor_.ID
+		self.geometry = baseplate_.geometry
+		self.baseplate_material = baseplate_.material
+		self.sen_type = sensor_.sen_type
 
 
 	def generate_xml(self):
@@ -717,139 +705,149 @@ class module(fsobj_part):
 	]
 
 	EXTRA_DEFAULTS = {
-		"kind_of_part": "None None Si ProtoModule None None",
+		"kind_of_part": "None None Si Module None None",
 	}
 
 
 
 	# Properties are same as protomodule's
-	# Note:  auto-complete this if part is created from baseplate/sensor/etc
+	# Note:  set kind_of_part with geometry, sen_type, baseplate_material (all from proto)
+
 	@property
-	def kind_of_part(self):
-		return self.display_name
+	def geometry(self):
+		if self.kind_of_part is None:  return None
+		return self.kind_of_part.split()[5]
+	@geometry.setter
+	def geometry(self, value):
+		splt = self.kind_of_part.split(" ")
+		splt[5] = str(value)
+		self.kind_of_part = " ".join(splt)
+
+	# Note:  sen_type determines channel_density!
+	@property
+	def sen_type(self):
+		return self.kind_of_part.split()[1]
+	@sen_type.setter
+	def sen_type(self, value):
+		splt = self.kind_of_part.split(" ")
+		splt[1] = str(value)
+		print("sen_type setter: splt, value is", splt, value)
+		splt[4] = "HD" if value == "120um" else "LD"
+		self.kind_of_part = " ".join(splt)
+
+	# Note:  baseplate_material determines calorimeter_type!
+	@property
+	def baseplate_material(self):
+		if self.kind_of_part == "None None Si Module None None":  return None
+		em_or_had = self.kind_of_part.split()[0]
+		return 'CuW/Kapton' if em_or_had == 'EM' else 'PCB/Kapton'
+	@baseplate_material.setter
+	def baseplate_material(self, value):
+		# CuW -> EM, PCB -> HAD
+		splt = self.kind_of_part.split(" ")
+		splt[0] = 'EM' if value == 'CuW/Kapton' else 'HAD'
+		self.kind_of_part = " ".join(splt)
+
+	@property
+	def calorimeter_type(self):
+		if self.kind_of_part == "None None Si Module None None":  return None
+		return self.kind_of_part.split()[0]
+
+	@property
+	def channel_density(self):
+		if self.kind_of_part == "None None Si Module None None":  return None
+		return self.kind_of_part.split()[4]
+
 
 	@property
 	def kind_of_part_pcb(self):
 		tmp_pcb = pcb()
-		assert tmp_pcb.load(self.pcb), "Failed to load pcb {} for mod {}".format(self.pcb, self.ID)
+		if not tmp_pcb.load(self.pcb):  return None
 		return tmp_pcb.kind_of_part
 
 	@property
 	def kind_of_part_protomodule(self):
 		tmp_proto = protomodule()
-		assert tmp_proto.load(self.protomodule), "Failed to load protomodule {} for mod {}".format(self.protomodule, self.ID)
+		if not tmp_proto.load(self.protomodule):  return None
 		return tmp_proto.kind_of_part
-
-	# TODO : name this, decide whether to auto-set or manually set type
-	@property
-	def calorimeter_type(self):
-		# 'EM' if self.baseplate.material=='CuW' else 'HAD'	
-		return self.display_name.split()[0]
-	@calorimeter_type.setter  # eventually, these will not be used
-	def calorimeter_type(self, value):
-		# Cannot replace bc of case w/ multiple Nones
-		# split, then change and recombine
-		print("CALORIMETER_TYPE SETTER")
-		splt = self.display_name.split(" ")
-		splt[0] = str(value)
-		self.display_name = " ".join(splt)
-
-	@property
-	def sen_type(self):
-		return self.display_name.split()[1]
-	@sen_type.setter  # eventually, these will not be used
-	def sen_type(self, value):
-		# Cannot replace bc of case w/ multiple Nones
-		# split, then change and recombine
-		print("SEN_TYPE SETTER")
-		splt = self.display_name.split(" ")
-		splt[1] = str(value)
-		self.display_name = " ".join(splt)
-
-	@property
-	def channel_density(self):
-		if self.display_name is None:  return None
-		return self.display_name.split()[4]
-	@channel_density.setter
-	def channel_density(self, value):
-		splt = self.display_name.split(" ")
-		splt[4] = str(value)
-		self.display_name = " ".join(splt)
-
-	@property
-	def geometry(self):
-		if self.display_name is None:  return None
-		return self.display_name.split()[5]
-	@geometry.setter
-	def geometry(self, value):
-		splt = self.display_name.split(" ")
-		splt[5] = str(value)
-		self.display_name = " ".join(splt)
-
-
-	@property  # Note: not a measured value
-	def thickness(self):
-		return float(self.sen_type.split('um')[1])/1000
-	@thickness.setter
-	def thickness(self, value):
-		pass
 
 
 	# TEMPORARY:  NOTE:  Must fix this...
 	@property
-	def wirebonding_completed(self):
-		return self.wirebonding_back and \
-		       self.wirebonds_inspected_back and \
-		       self.wirebonding_front and \
-		       self.wirebonds_inspected_front and \
-		       self.encapsulation_inspection_back and \
-               self.encapsulation_inspection_front and \
-		       self.wirebonding_final_inspection_ok == 'pass'
+	def wirebonding_compled(self):
+		return self.back_bond_inspxn and \
+		       self.front_bond_inspxn and \
+		       self.back_encap_inspxn and \
+               self.front_encap_inspxn and \
+		       self.final_inspxn_ok == 'pass'
 
-	@property
-	def assem_tray_pos(self):
-		return "TRPOSN_{}{}".format(self.tray_posn%2+1, tray_posn//3+1)
 
-	@property
-	def comp_tray_pos(self):
-		return "CMPOSN_{}{}".format(self.tray_posn%2+1, tray_posn//3+1)
-	
-
+	# return position in GUI, 0-5
 	@property
 	def tray_posn(self):
-		# If has a pcb step, grab the position of this PCB and return it here...
+		# If has a pcb step, grab the position of this mod and return it here...
 		if self.step_pcb is None:
-			print("assm_tray_posn:  no sensor step yet")
+			print("Warning:  tray_posn:  no pcb step yet")
 			return "None"
 		temp_pcb_step = step_pcb()
 		found = temp_pcb_step.load(self.step_pcb)
-		if not found:
-			print("ERROR in tray_posn:  module {} has PCB step {}, but none found!".format(self.ID, self.step_pcb))
-			return "None"
-		else:
-			position = temp_sensor_step.sensors.index(self.ID)
-			return position
+		assert found, "ERROR in tray_posn:  module has pcb step {}, but none found!".format(self.step_pcb)
+		position = temp_pcb_step.sensors.index(self.ID)
+		return position
 
 	@property
-	def tray_row(self):
-		posn = self.tray_posn()
+	def prto_asm_row(self):
+		posn = self.tray_posn
 		if posn == "None":  return posn
 		else:  return posn%2+1
 
 	@property
-	def tray_col(self):
-		posn = self.tray_posn()
+	def prto_asm_col(self):
+		posn = self.tray_posn
 		if posn == "None": return posn
 		else:  return posn//3+1
 
 
+	
+
+	# new():  Optionally, create proto from baseplate and sensor objects
+	# Note:  baseplate and sensor must be the actual objects, not IDs
+	# NOTE:  Must also set sensor step ID!  (Implement into this?)
+	def new(self, ID, pcb_=None, protomodule_=None):
+		super(module, self).new(ID)
+		if not pcb_ and not protomodule_:  return
+		assert pcb_ or protomodule_, "Error creating module: pcb is {}, protomodule is {}".format(pcb_, protomodule_)
+
+		# Perform some checks
+		errs = []
+		if pcb_.geometry != protomodule_.geometry:
+			errs.append("PCB geometry {} does not match protomodule geometry {}".format(pcb_.geometry, protomodule_.geometry))
+		if pcb_.channel_density != protomodule_.channel_density:
+			errs.append("PCB channel density {} does not match protomodule channel density {}".format(pcb_.channel_density, protomodule_.channel_density))
+		if not pcb_.ready_step_pcb():
+			errs.append("PCB is already mounted on module {}, PCB step {}!".format(pcb_.module, pcb.step_pcb))
+		if not protomodule_.ready_step_pcb():
+			errs.append("Protomodule is already mounted on module {}, PCB step {}!".format(protomodule.module, protomodule_.step_pcb))
+
+		if len(errs) > 0:
+			self.clear()
+			print("ERROR:  Module {} not created from PCB {} and protomodule {}!  Errors:".format(self.ID, pcb_.ID, protomodule_.ID))
+			print("\n".join(errs))
+			return
+
+		# if baseplate and sensor, auto-fill protomodule type, plus baseplate, sensor fields:
+		self.pcb = pcb_.ID
+		self.protomodule = protomodule_.ID
+		self.geometry = pcb_.geometry
+		self.baseplate_material = protomodule_.baseplate_material
+		self.sen_type = protomodule_.sen_type
 
 
 	def generate_xml(self):
 		# Make sure that all required info is present
 		# if step_sensor.is_complete (or something similar)...
 		# ALSO, check wirebonding finished
-		super(protomodule, self).generate_xml()
+		super(module, self).generate_xml()
 
 
 

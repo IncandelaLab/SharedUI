@@ -98,7 +98,7 @@ def test_kindOfPart(parttype):
 	objname = parttype+"_TEST_NAME"
 	test_part.new(objname)
 	if parttype == "baseplate":
-		test_part.mat_type = 'CuW/Kapton'
+		test_part.material = 'CuW/Kapton'
 		test_part.channel_density = 'LD'
 		test_part.geometry = 'Full'
 		target = 'CuW/Kapton Baseplate LD Full'
@@ -106,7 +106,6 @@ def test_kindOfPart(parttype):
                'kind_of_part assigned incorrectly:  wanted `{}`, got `{}`'.format(target, test_part.kind_of_part)
 	elif parttype == "sensor":
 		test_part.sen_type = '200um'
-		test_part.channel_density = 'LD'
 		test_part.geometry = 'Full'
 		target = '200um Si Sensor LD Full'
 		assert test_part.kind_of_part == target, \
@@ -117,8 +116,7 @@ def test_kindOfPart(parttype):
 		target = 'PCB LD Full'
 		assert test_part.kind_of_part == target, \
                'kind_of_part assigned incorrectly:  wanted `{}`, got `{}`'.format(target, test_part.kind_of_part)
-	else:
-		assert False, "Proto/mod kindOfPart not implemented"
+	# Note:  proto/mod kind_of_part tested separately
 
 
 @pytest.mark.parametrize("tooltype", toollist)
@@ -153,6 +151,38 @@ def test_supplies(suptype):
 	test_sup.clear()
 	test_sup.load(objname)
 	assert test_sup.is_empty
+
+def test_new_protomodule():
+	# create baseplate, sensor, set type...
+	# ...then create protomodule and check type.
+	baseplate = parts.baseplate()
+	baseplate.new("TEST_PRTO_PLT")
+	baseplate.material = "CuW/Kapton"
+	baseplate.channel_density = "HD"
+	baseplate.geometry = "Full"
+	sensor = parts.sensor()
+	sensor.new("TEST_PRTO_SEN")
+	sensor.sen_type = "120um"
+	sensor.geometry = "Full"
+	protomodule = parts.protomodule()
+	protomodule.new("TEST_PRTO", baseplate_=baseplate, sensor_=sensor)
+	assert protomodule.kind_of_part == "EM 120um Si ProtoModule HD Full"
+
+def test_new_module():
+	pcb = parts.pcb()
+	pcb.new("TEST_PRTO_PCB")
+	pcb.channel_density = "HD"
+	pcb.geometry = "Full"
+	print("pcb type:", pcb.kind_of_part)
+	protomodule = parts.protomodule()
+	protomodule.new("TEST_PRTOMOD")
+	protomodule.baseplate_material = "CuW/Kapton"
+	protomodule.sen_type = "120um"
+	protomodule.geometry = "Full"
+	print("Proto type:", protomodule.kind_of_part)
+	module = parts.module()
+	module.new("TEST_MOD", pcb_=pcb, protomodule_=protomodule)
+	assert module.kind_of_part == "EM 120um Si Module HD Full"
 
 
 
