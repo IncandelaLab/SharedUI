@@ -370,6 +370,8 @@ class fsobj(object):
 			for name, var in vars(cl).items():
 				if isinstance(var, property):
 					prop_dict[name] = getattr(self, name)
+		# ID:  Not stored in PROPERTIEs, so...
+		prop_dict["ID"] = self.ID
 		return prop_dict
 
 	# NEW:  If obj has XML template files, write them.

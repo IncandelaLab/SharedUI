@@ -83,11 +83,15 @@ def test_xml(parttype):
 	# part-specific:
 	if parttype == 'baseplate':
 		test_part.manufacturer = 'HQU'
+		test_part.material = "CuW/Kapton"
+		test_part.channel_density = "HD"
+		test_part.geometry = "Full"
 	elif parttype == 'sensor':
 		test_part.visual_inspection = 'pass'
 		test_part.test_file_name = 'testfile.abc'
 	elif parttype == 'pcb':
 		test_part.test_file_name = 'testfile.def'
+	print("TEST ATTRS: ID {}, kind {}".format(test_part.ID, test_part.kind_of_part))
 	test_part.generate_xml()
 	assert True # Always passes, must check the output manually
 	# Could maybe automate this someday
