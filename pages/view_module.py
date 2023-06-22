@@ -1,4 +1,4 @@
-from filemanager import fm
+from filemanager import parts
 import os
 import shutil
 import glob
@@ -64,7 +64,7 @@ class func(object):
 		self.setUIPage = setUIPage
 		self.setMainSwitchingEnabled = setSwitchingEnabled
 
-		self.module = fm.module()
+		self.module = parts.module()
 		self.module_exists = None
 		self.mode = 'setup'
 
@@ -156,8 +156,8 @@ class func(object):
 			self.index_users[self.module.record_insertion_user] = max(self.index_users.values()) + 1
 			self.page.cbInsertUser.addItem(self.module.initiated_by_user)
 		self.page.cbInsertUser.setCurrentIndex(self.index_users.get(self.module.record_insertion_user, -1))
-		self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.module.location_name, -1))
-		self.page.leLocation.setText("" if self.module.institution_location is None else self.module.institution_location)
+		self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.module.location, -1))
+		#self.page.leLocation.setText("" if self.module.institution_location is None else self.module.institution_location)
 
 		# characteristics
 		self.page.cbShape.setCurrentIndex(      INDEX_SHAPE.get(      self.module.geometry    , -1)  )
@@ -183,8 +183,8 @@ class func(object):
 		# NOTE - TBD - may have to remove/comment
 		self.page.leBaseplate.setText(    "" if self.module.baseplate     is None else self.module.baseplate     )
 		self.page.leSensor.setText(       "" if self.module.sensor        is None else self.module.sensor        )
-		self.page.lePcb.setText(          "" if self.module.pcb_ser_num           is None else self.module.pcb_ser_num           )
-		self.page.leProtomodule.setText(  "" if self.module.prto_ser_num   is None else self.module.prto_ser_num   )
+		self.page.lePcb.setText(          "" if self.module.pcb           is None else self.module.pcb_ser_num           )
+		self.page.leProtomodule.setText(  "" if self.module.protomodule   is None else self.module.prto_ser_num   )
 		if self.page.sbStepSensor.value()  == -1:  self.page.sbStepSensor.clear()
 		if self.page.sbStepPcb.value()     == -1:  self.page.sbStepPcb.clear()
 		if self.page.leBaseplate.text()    == -1:  self.page.leBaseplate.clear()
@@ -198,7 +198,7 @@ class func(object):
 		# comments
 		self.page.listComments.clear()
 		if self.module.comments:
-			for comment in self.module.comments.split(";;"):
+			for comment in self.module.comments:
 				self.page.listComments.addItem(comment)
 		self.page.pteWriteComment.clear()
 
@@ -211,8 +211,8 @@ class func(object):
 		self.page.dsbOffsetTranslationX.setValue( -1 if self.module.pcb_plcment_x_offset is None else self.module.pcb_plcment_x_offst )
 		self.page.dsbOffsetTranslationY.setValue( -1 if self.module.pcb_plcment_y_offset is None else self.module.pcb_plcment_y_offst )
 		self.page.dsbOffsetRotation.setValue(    -1 if self.module.pcb_plcment_ang_offset    is None else self.module.pcb_plcment_ang_offset )
-		self.page.dsbThickness.setValue(-1 if self.module.mod_thkns_mm   is None else self.module.mod_thkns_mm  )
-		self.page.dsbFlatness.setValue( -1 if self.module.mod_fltns_mm   is None else self.module.mod_fltns_mm   )
+		self.page.dsbThickness.setValue(-1 if self.module.thickness   is None else self.module.thickness  )
+		self.page.dsbFlatness.setValue( -1 if self.module.flatness  is None else self.module.flatness   )
 		if self.page.dsbOffsetTranslationX.value() == -1: self.page.dsbOffsetTranslationX.clear()
 		if self.page.dsbOffsetTranslationY.value() == -1: self.page.dsbOffsetTranslationY.clear()
 		if self.page.dsbOffsetRotation.value() == -1: self.page.dsbOffsetRotation.clear()
@@ -252,7 +252,7 @@ class func(object):
 
 		# characteristics
 		# Note: most non-editable b/c either fixed or filled in w/ assembly pages
-		self.page.leLocation.setReadOnly(   not mode_editing )
+		#self.page.leLocation.setReadOnly(   not mode_editing )
 		self.page.cbInstitution.setEnabled(     mode_editing )
 		self.page.cbInsertUser.setEnabled(      mode_editing )
 		self.page.cbInspection.setEnabled(      mode_editing )
@@ -281,7 +281,7 @@ class func(object):
 			self.page.leStatus.setText("input an ID")
 			return
 		# Check whether baseplate exists:
-		tmp_module = fm.module()
+		tmp_module = parts.module()
 		tmp_ID = self.page.leID.text()
 		tmp_exists = tmp_module.load(tmp_ID)
 		if not tmp_exists:  # DNE; good to create
@@ -295,7 +295,7 @@ class func(object):
 
 	@enforce_mode('view')
 	def startEditing(self,*args,**kwargs):
-		tmp_module = fm.module()
+		tmp_module = parts.module()
 		tmp_ID = self.page.leID.text()
 		tmp_exists = tmp_module.load(tmp_ID)
 		if not tmp_exists:
@@ -314,8 +314,8 @@ class func(object):
 	def saveEditing(self,*args,**kwargs):
 		# characteristics
 		self.module.record_insertion_user  = str(self.page.cbInsertUser.currentText())  if str(self.page.cbInsertUser.currentText())  else None
-		self.module.institution_location        = str(self.page.leLocation.text()        ) if str(self.page.leLocation.text())             else None
-		self.module.location_name     = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
+		#self.module.institution_location        = str(self.page.leLocation.text()        ) if str(self.page.leLocation.text())             else None
+		self.module.location     = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
 		self.module.final_inspxn_ok      = str(self.page.cbInspection.currentText())  if str(self.page.cbInspection.currentText())  else None
 
 		# comments
@@ -326,6 +326,8 @@ class func(object):
 		self.module.pcb_plcment_x_offst = self.page.dsbOffsetTranslationX.value() if self.page.dsbOffsetTranslationX.value() >=0 else None
 		self.module.pcb_plcment_y_offst = self.page.dsbOffsetTranslationY.value() if self.page.dsbOffsetTranslationY.value() >=0 else None
 		self.module.offset_rotation      = self.page.dsbOffsetRotation.value()    if self.page.dsbOffsetRotation.value()    >=0 else None
+		self.module.flatness = self.page.dsbOffsetFlatness.value()    if self.page.dsbFlatness.value()    >=0 else None
+		self.module.thickness = self.page.dsbOffsetThickness.value()    if self.page.dsbThickness.value()    >=0 else None
 
 		self.module.save()
 		self.mode = 'view'

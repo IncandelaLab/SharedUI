@@ -6,13 +6,13 @@ import time
 import os
 
 # FOR DATABASE COMMUNICATION:
-from cmsdbldr_client import LoaderClient
-import atexit  # Close ssh tunnel upon exiting the GUI
+#from cmsdbldr_client import LoaderClient
+#import atexit  # Close ssh tunnel upon exiting the GUI
 import glob
 
 # For uploading XML files in background
-import threading
-import subprocess
+#import threading
+#import subprocess
 
 
 # Import page functionality classes
@@ -272,8 +272,8 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		self.page_view_baseplate   = widget_view_baseplate(None)   ; self.swPages.addWidget(self.page_view_baseplate)
 		self.page_view_sensor      = widget_view_sensor(None)      ; self.swPages.addWidget(self.page_view_sensor)
 		self.page_view_PCB         = widget_view_PCB(None)         ; self.swPages.addWidget(self.page_view_PCB)
-		#self.page_view_protomodule = widget_view_protomodule(None) ; self.swPages.addWidget(self.page_view_protomodule)
-		#self.page_view_module      = widget_view_module(None)      ; self.swPages.addWidget(self.page_view_module)
+		self.page_view_protomodule = widget_view_protomodule(None) ; self.swPages.addWidget(self.page_view_protomodule)
+		self.page_view_module      = widget_view_module(None)      ; self.swPages.addWidget(self.page_view_module)
 		self.page_view_tooling     = widget_view_tooling(None)     ; self.swPages.addWidget(self.page_view_tooling)
 		self.page_view_supplies    = widget_view_supplies(None)    ; self.swPages.addWidget(self.page_view_supplies)
 
@@ -289,21 +289,21 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 	def initPages(self):
 		self.func_view_users       = cls_func_view_users(            fm, self.userManager, self.page_view_users      , self.setUIPage, self.setSwitchingEnabled)
 
-		self.func_search           = cls_func_search(                fm, self.userManager, self.page_search          , self.setUIPage, self.setSwitchingEnabled)
+		self.func_search           = cls_func_search(                fm, self.page_search          , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_baseplate   = cls_func_view_baseplate(        fm, self.userManager, self.page_view_baseplate  , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_sensor      = cls_func_view_sensor(           fm, self.userManager, self.page_view_sensor     , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_PCB         = cls_func_view_PCB(              fm, self.userManager, self.page_view_PCB        , self.setUIPage, self.setSwitchingEnabled)
-		#self.func_view_protomodule = cls_func_view_protomodule(      fm, self.userManager, self.page_view_protomodule, self.setUIPage, self.setSwitchingEnabled)
-		#self.func_view_module      = cls_func_view_module(           fm, self.userManager, self.page_view_module     , self.setUIPage, self.setSwitchingEnabled)
-		self.func_view_tooling     = cls_func_view_tooling(          fm, self.userManager, self.page_view_tooling    , self.setUIPage, self.setSwitchingEnabled)
-		self.func_view_supplies    = cls_func_view_supplies(         fm, self.userManager, self.page_view_supplies   , self.setUIPage, self.setSwitchingEnabled)
+		self.func_view_protomodule = cls_func_view_protomodule(      fm, self.userManager, self.page_view_protomodule, self.setUIPage, self.setSwitchingEnabled)
+		self.func_view_module      = cls_func_view_module(           fm, self.userManager, self.page_view_module     , self.setUIPage, self.setSwitchingEnabled)
+		self.func_view_tooling     = cls_func_view_tooling(          fm, self.page_view_tooling    , self.setUIPage, self.setSwitchingEnabled)
+		self.func_view_supplies    = cls_func_view_supplies(         fm, self.page_view_supplies   , self.setUIPage, self.setSwitchingEnabled)
 
-		#self.func_view_sensor_step = cls_func_view_sensor_step(      fm, self.userManager, self.page_view_sensor_step, self.setUIPage, self.setSwitchingEnabled)
-		#self.func_view_sensor_post = cls_func_view_sensor_post(      fm, self.userManager, self.page_view_sensor_post, self.setUIPage, self.setSwitchingEnabled)
-		#self.func_view_pcb_step    = cls_func_view_pcb_step(         fm, self.userManager, self.page_view_pcb_step   , self.setUIPage, self.setSwitchingEnabled)
-		#self.func_view_pcb_post    = cls_func_view_pcb_post(         fm, self.userManager, self.page_view_pcb_post   , self.setUIPage, self.setSwitchingEnabled)
-		#self.func_view_wirebonding = cls_func_view_wirebonding(      fm, self.userManager, self.page_view_wirebonding, self.setUIPage, self.setSwitchingEnabled)
-		self.func_view_plots       = cls_func_view_plots(            fm, self.userManager, self.page_view_plots,       self.setUIPage, self.setSwitchingEnabled)
+		self.func_view_sensor_step = None#cls_func_view_sensor_step(      fm, self.userManager, self.page_view_sensor_step, self.setUIPage, self.setSwitchingEnabled)
+		self.func_view_sensor_post = None#cls_func_view_sensor_post(      fm, self.userManager, self.page_view_sensor_post, self.setUIPage, self.setSwitchingEnabled)
+		self.func_view_pcb_step    = None#cls_func_view_pcb_step(         fm, self.userManager, self.page_view_pcb_step   , self.setUIPage, self.setSwitchingEnabled)
+		self.func_view_pcb_post    = None#cls_func_view_pcb_post(         fm, self.userManager, self.page_view_pcb_post   , self.setUIPage, self.setSwitchingEnabled)
+		self.func_view_wirebonding = None#cls_func_view_wirebonding(      fm, self.userManager, self.page_view_wirebonding, self.setUIPage, self.setSwitchingEnabled)
+		self.func_view_plots       = cls_func_view_plots(            fm, self.page_view_plots,       self.setUIPage, self.setSwitchingEnabled)
 
 		# This list must be in the same order that the pages are in in the stackedWidget in the main UI file.
 		# This is the same order as in the dict PAGE_IDS
@@ -314,17 +314,17 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 			self.func_view_baseplate,
 			self.func_view_sensor,
 			self.func_view_PCB,
-			#self.func_view_protomodule,
-			#self.func_view_module,
+			self.func_view_protomodule,
+			self.func_view_module,
 			self.func_view_tooling,
 			self.func_view_supplies,
 
-			#self.func_view_sensor_step,
-			#self.func_view_sensor_post,
-			#self.func_view_pcb_step,
-			#self.func_view_pcb_post,
-			#self.func_view_wirebonding,
-			#self.func_view_plots,
+			self.func_view_sensor_step,
+			self.func_view_sensor_post,
+			self.func_view_pcb_step,
+			self.func_view_pcb_post,
+			self.func_view_wirebonding,
+			self.func_view_plots,
 			]
 
 
@@ -348,7 +348,7 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 
 	def setUIPage(self, which_page, switch_to_page=True, **kwargs):
 		if which_page in PAGE_IDS.keys():
-
+			print("setUIPage:  page", which_page)
 			if self.func_list[PAGE_IDS[which_page]].mode == 'setup':
 				print("page {} not yet setup; doing setup".format(which_page))
 				self.func_list[PAGE_IDS[which_page]].setup()

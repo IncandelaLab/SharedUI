@@ -3,7 +3,7 @@ import time
 import datetime
 import os
 import json
-from filemanager import fm
+from filemanager import fm, parts
 
 PAGE_NAME = "search"
 DEBUG = False
@@ -19,11 +19,11 @@ PAGE_NAME_DICT = {
 }
 
 PART_DICT = {
-	'Baseplate':   fm.baseplate,
-	'Sensor':      fm.sensor,
-	'PCB':         fm.pcb,
-	#'Protomodule': fm.protomodule,
-	#'Module':      fm.module,
+	'Baseplate':   parts.baseplate,
+	'Sensor':      parts.sensor,
+	'PCB':         parts.pcb,
+	#'Protomodule': parts.protomodule,
+	#'Module':      parts.module,
 }
 
 PART_NAME_DICT = {
@@ -103,8 +103,8 @@ class func(object):
 	def search(self, *args, **kwargs):  # WIP WIP WIP
 		self.clearResults()
 
-		search_dict = { self.page.cbInstitution:'location_name', self.page.cbShape:'geometry',
-						self.page.cbMaterial:'mat_type', self.page.cbThickness:'sen_type',
+		search_dict = { self.page.cbInstitution:'location', self.page.cbShape:'geometry',
+						self.page.cbMaterial:'material', self.page.cbThickness:'sen_type',
 						self.page.cbChannelDensity:'channel_density', #self.page.cbPCBType:'pcb_type',
 						self.page.cbAssmRow:'tray_row', self.page.cbAssmCol:'tray_col' }
 		# Treat dCreated separately
@@ -140,10 +140,11 @@ class func(object):
 				if str(getattr(part_temp, qty, None)) != value:
 					print("Mismatch:", qty, str(getattr(part_temp, qty, None)), value)
 					found = False
-			if found:  found_local_parts[part_id] = part_temp.display_name
+			if found:  found_local_parts[part_id] = part_temp.kind_of_part
 
 		# Search for parts in DB:
 		found_remote_parts = {}  # serial:type
+		"""
 		if fm.ENABLE_DB_COMMUNICATION:
 			# In general:  Assemble sql query w/ items from search_dict
 			# pt_template:  should be %_%_NAME_HD_% etc - % is a wildcard for anything not specified
@@ -155,14 +156,14 @@ class func(object):
 			#						      sen_type=search_criteria['sen_type'],
 			#						      channel_density=search_criteria['channel_density'],
 			#						      geometry=search_criteria['geometry'], )
-			sql_query = """select p.SERIAL_NUMBER, kp.DISPLAY_NAME
+			sql_query = "*"*"select p.SERIAL_NUMBER, kp.DISPLAY_NAME
 from CMS_HGC_CORE_CONSTRUCT.PARTS p
 inner join CMS_HGC_CORE_CONSTRUCT.KINDS_OF_PARTS kp
 on p.KIND_OF_PART_ID = kp.KIND_OF_PART_ID
 inner join CMS_HGC_CORE_MANAGEMNT.LOCATIONS l
 on p.LOCATION_ID = l.LOCATION_ID
 where kp.DISPLAY_NAME like \'{}\'
-and l.LOCATION_NAME like \'{}\'""".format(pt_query, search_criteria['location_name']) + pt_filter
+and l.LOCATION_NAME like \'{}\'"*"*".format(pt_query, search_criteria['location_name']) + pt_filter
 
 			print("Executing query:\n", sql_query)
 			fm.DB_CURSOR.execute(sql_query)
@@ -176,6 +177,7 @@ and l.LOCATION_NAME like \'{}\'""".format(pt_query, search_criteria['location_na
 			# results:   [{'SERIAL_NUMBER': 'serial'}, ...]
 			for el in data_part:
 				found_remote_parts[el['SERIAL_NUMBER']] = el['DISPLAY_NAME']
+		"""
 
 		# If both in local and remote DB, remove from local list:
 		for rp in found_remote_parts.keys():

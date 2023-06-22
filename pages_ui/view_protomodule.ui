@@ -19,7 +19,7 @@
      <x>10</x>
      <y>160</y>
      <width>261</width>
-     <height>451</height>
+     <height>421</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -35,6 +35,9 @@
     <number>2</number>
    </property>
    <widget class="QLineEdit" name="lineEdit_9">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>1</x>
@@ -51,6 +54,9 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="leLocation">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>120</x>
@@ -70,7 +76,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>130</y>
+      <y>110</y>
       <width>181</width>
       <height>21</height>
      </rect>
@@ -82,46 +88,11 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QSpinBox" name="sbChannels">
-    <property name="geometry">
-     <rect>
-      <x>180</x>
-      <y>109</y>
-      <width>81</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-    <property name="minimum">
-     <number>-1</number>
-    </property>
-    <property name="maximum">
-     <number>2147483647</number>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEdit_6">
-    <property name="geometry">
-     <rect>
-      <x>1</x>
-      <y>110</y>
-      <width>181</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Channels</string>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
    <widget class="QPushButton" name="pbAddComment">
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>430</y>
+      <y>400</y>
       <width>101</width>
       <height>21</height>
      </rect>
@@ -134,7 +105,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>210</y>
+      <y>180</y>
       <width>141</width>
       <height>21</height>
      </rect>
@@ -150,7 +121,7 @@
     <property name="geometry">
      <rect>
       <x>140</x>
-      <y>210</y>
+      <y>180</y>
       <width>121</width>
       <height>21</height>
      </rect>
@@ -163,7 +134,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>360</y>
+      <y>330</y>
       <width>261</width>
       <height>71</height>
      </rect>
@@ -173,7 +144,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>230</y>
+      <y>200</y>
       <width>261</width>
       <height>121</height>
      </rect>
@@ -234,7 +205,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>150</y>
+      <y>130</y>
       <width>181</width>
       <height>21</height>
      </rect>
@@ -253,7 +224,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>130</y>
+      <y>110</y>
       <width>81</width>
       <height>20</height>
      </rect>
@@ -351,7 +322,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>150</y>
+      <y>130</y>
       <width>81</width>
       <height>21</height>
      </rect>
@@ -451,25 +422,6 @@
      </property>
     </item>
    </widget>
-   <zorder>lineEdit_9</zorder>
-   <zorder>leLocation</zorder>
-   <zorder>lineEdit_10</zorder>
-   <zorder>lineEdit_6</zorder>
-   <zorder>pbAddComment</zorder>
-   <zorder>lineEdit_14</zorder>
-   <zorder>pbDeleteComment</zorder>
-   <zorder>pteWriteComment</zorder>
-   <zorder>listComments</zorder>
-   <zorder>sbChannels</zorder>
-   <zorder>lineEdit_52</zorder>
-   <zorder>lineEdit_38</zorder>
-   <zorder>cbInsertUser</zorder>
-   <zorder>lineEdit_22</zorder>
-   <zorder>cbShape</zorder>
-   <zorder>lineEdit_23</zorder>
-   <zorder>cbType</zorder>
-   <zorder>cbGrade</zorder>
-   <zorder>cbInstitution</zorder>
   </widget>
   <widget class="QFrame" name="frame_3">
    <property name="geometry">

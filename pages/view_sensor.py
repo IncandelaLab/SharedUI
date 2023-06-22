@@ -1,4 +1,4 @@
-from filemanager import fm
+from filemanager import parts
 
 PAGE_NAME = "view_sensor"
 OBJECTTYPE = "sensor"
@@ -62,7 +62,7 @@ class func(object):
 		self.setUIPage = setUIPage
 		self.setMainSwitchingEnabled = setSwitchingEnabled
 
-		self.sensor = fm.sensor()
+		self.sensor = parts.sensor()
 		self.sensor_exists = False
 
 		self.mode = 'setup'
@@ -149,8 +149,8 @@ class func(object):
 			self.page.cbInsertUser.addItem(self.sensor.record_insertion_user)
 		self.page.cbInsertUser.setCurrentIndex(self.index_users.get(self.sensor.record_insertion_user, -1))
 
-		self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.sensor.location_name, -1))
-		self.page.leLocation.setText(    "" if self.sensor.institution_location     is None else self.sensor.institution_location    )
+		self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.sensor.location, -1))
+		#self.page.leLocation.setText(    "" if self.sensor.institution_location     is None else self.sensor.institution_location    )
 
 		self.page.leBarcode.setText(   "" if self.sensor.barcode     is None else self.sensor.barcode     )
 		self.page.cbType.setCurrentIndex(       INDEX_TYPE.get(       self.sensor.sen_type,            -1))
@@ -163,7 +163,7 @@ class func(object):
 
 		self.page.listComments.clear()
 		if self.sensor.comments:
-			for comment in self.sensor.comments.split(";;"):
+			for comment in self.sensor.comments:
 				self.page.listComments.addItem(comment)
 		self.page.pteWriteComment.clear()
 
@@ -208,7 +208,7 @@ class func(object):
 
 		self.page.cbInsertUser.setEnabled(         mode_creating or mode_editing  )
 		self.page.cbInstitution.setEnabled(        mode_creating or mode_editing  )
-		self.page.leLocation.setReadOnly(     not (mode_creating or mode_editing) )
+		#self.page.leLocation.setReadOnly(     not (mode_creating or mode_editing) )
 
 		self.page.leBarcode.setReadOnly(      not (mode_creating or mode_editing) )
 		self.page.cbType.setEnabled(               mode_creating or mode_editing  )
@@ -237,7 +237,7 @@ class func(object):
 			self.page.leStatus.setText("input an ID")
 			return
 		# Check whether baseplate exists:
-		tmp_sensor = fm.sensor()
+		tmp_sensor = parts.sensor()
 		tmp_ID = self.page.leID.text()
 		tmp_exists = tmp_sensor.load(tmp_ID)
 		if not tmp_exists:  # DNE; good to create
@@ -255,7 +255,7 @@ class func(object):
 		if self.page.leID.text() == "":
 			self.page.leStatus.setText("input an ID")
 			return
-		tmp_sensor = fm.sensor()
+		tmp_sensor = parts.sensor()
 		tmp_ID = self.page.leID.text()
 		tmp_exists = tmp_sensor.load(tmp_ID)
 
@@ -269,7 +269,7 @@ class func(object):
 
 	@enforce_mode('view')
 	def startEditing(self,*args,**kwargs):
-		tmp_sensor = fm.sensor()
+		tmp_sensor = parts.sensor()
 		tmp_ID = self.page.leID.text()
 		tmp_exists = tmp_sensor.load(tmp_ID)
 		if not tmp_exists:
@@ -288,25 +288,24 @@ class func(object):
 	@enforce_mode(['editing','creating'])
 	def saveEditing(self,*args,**kwargs):
 
-		self.sensor.institution_location        = str(self.page.leLocation.text()          )    if str(self.page.leLocation.text()    )       else None
+		self.sensor.record_insertion_user  = str(self.page.cbInsertUser.currentText())     if str(self.page.cbInsertUser.currentText())  else None
+		self.sensor.location     = str(self.page.cbInstitution.currentText())    if str(self.page.cbInstitution.currentText()) else None
+		#self.sensor.institution_location        = str(self.page.leLocation.text()          )    if str(self.page.leLocation.text()    )       else None
 		self.sensor.barcode         = str(self.page.leBarcode.text()           )    if str(self.page.leBarcode.text()     )       else None
 		self.sensor.sen_type            = str(self.page.cbType.currentText()       )    if str(self.page.cbType.currentText() )       else None
 		self.sensor.geometry           = str(self.page.cbShape.currentText()      )    if str(self.page.cbShape.currentText())       else None
-		self.sensor.location_name     = str(self.page.cbInstitution.currentText())    if str(self.page.cbInstitution.currentText()) else None
-		self.sensor.record_insertion_user  = str(self.page.cbInsertUser.currentText())     if str(self.page.cbInsertUser.currentText())  else None
-		self.sensor.channel_density = str(self.page.cbChannelDensity.currentText()) if str(self.page.cbChannelDensity.currentText()) else None
+		# NOTE:  channel_density is no longer auto-set
+		#self.sensor.channel_density = str(self.page.cbChannelDensity.currentText()) if str(self.page.cbChannelDensity.currentText()) else None
 		self.sensor.flatness        = self.page.dsbFlatness.value()          if self.page.dsbFlatness.value() >= 0         else None
 		self.sensor.grade           = str(self.page.cbGrade.currentText())          if str(self.page.cbGrade.currentText())       else None
 
 		num_comments = self.page.listComments.count()
-		self.sensor.comments = ';;'.join([self.page.listComments.item(i).text() for i in range(num_comments)])
-		if num_comments == 0:  self.sensor.comments = ';;'
+		self.sensor.comments = [self.page.listComments.item(i).text() for i in range(num_comments)]
 
 		self.sensor.visual_inspection = str(self.page.cbInspection.currentText()) if str(self.page.cbInspection.currentText()) else None
 		self.sensor.flatness = self.page.dsbFlatness.value() if self.page.dsbFlatness.value() else None
 
 		self.sensor.save()
-		#self.sensor.clear()
 		self.mode = 'view'
 		self.update_info()
 

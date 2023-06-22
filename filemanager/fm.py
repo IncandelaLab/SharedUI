@@ -370,7 +370,7 @@ class fsobj(object):
 			for name, var in vars(cl).items():
 				if isinstance(var, property):
 					prop_dict[name] = getattr(self, name)
-		# ID:  Not stored in PROPERTIEs, so...
+		# Since ID is treated separately...
 		prop_dict["ID"] = self.ID
 		return prop_dict
 

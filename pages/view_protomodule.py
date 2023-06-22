@@ -1,4 +1,4 @@
-from filemanager import fm
+from filemanager import parts
 
 PAGE_NAME = "view_protomodule"
 OBJECTTYPE = "protomodule"
@@ -44,7 +44,7 @@ class func(object):
 		self.setUIPage = setUIPage
 		self.setMainSwitchingEnabled = setSwitchingEnabled
 
-		self.protomodule        = fm.protomodule()
+		self.protomodule        = parts.protomodule()
 		self.protomodule_exists = None
 
 		self.mode = 'setup'
@@ -130,8 +130,8 @@ class func(object):
 			self.page.cbInsertUser.addItem(self.protomodule.record_insertion_user)
 		self.page.cbInsertUser.setCurrentIndex(self.index_users.get(self.protomodule.record_insertion_user, -1))
 
-		self.page.cbInstitution.setCurrentIndex(   INDEX_INSTITUTION.get(self.protomodule.location_name, -1)    )
-		self.page.leLocation.setText(    "" if self.protomodule.institution_location     is None else     self.protomodule.institution_location    )
+		self.page.cbInstitution.setCurrentIndex(   INDEX_INSTITUTION.get(self.protomodule.location, -1)    )
+		#self.page.leLocation.setText(    "" if self.protomodule.institution_location     is None else     self.protomodule.institution_location    )
 
 		self.page.cbShape.setCurrentIndex(    INDEX_SHAPE.get(    self.protomodule.geometry    ,-1))
 		self.page.cbGrade.setCurrentIndex(    INDEX_GRADE.get(    self.protomodule.grade    ,-1))
@@ -140,7 +140,7 @@ class func(object):
 
 		self.page.listComments.clear()
 		if self.protomodule.comments:
-			for comment in self.protomodule.comments.split(";;"):
+			for comment in self.protomodule.comments:
 				self.page.listComments.addItem(comment)
 		self.page.pteWriteComment.clear()
 
@@ -205,12 +205,11 @@ class func(object):
 		self.page.pbSave.setEnabled(    mode_editing )
 		self.page.pbCancel.setEnabled(  mode_editing )
 
-		self.page.leLocation.setReadOnly(  not mode_editing )
+		#self.page.leLocation.setReadOnly(  not mode_editing )
 		self.page.cbShape.setEnabled(          mode_editing )
 		self.page.cbInstitution.setEnabled(    mode_editing )
 		self.page.cbInsertUser.setEnabled(     mode_editing )
 		self.page.dsbThickness.setReadOnly(not mode_editing )
-		#self.page.sbChannels.setReadOnly(  not mode_editing )
 
 		self.page.pbDeleteComment.setEnabled(mode_editing)
 		self.page.pbAddComment.setEnabled(   mode_editing)
@@ -237,7 +236,7 @@ class func(object):
 			self.page.leStatus.setText("input an ID")
 			return
 		# Check whether baseplate exists:
-		tmp_protomodule = fm.protomodule()
+		tmp_protomodule = parts.protomodule()
 		tmp_ID = self.page.leID.text()
 		tmp_exists = tmp_protomodule.load(tmp_ID)
 		if not tmp_exists:  # DNE; good to create
@@ -252,7 +251,7 @@ class func(object):
 
 	@enforce_mode('view')
 	def startEditing(self,*args,**kwargs):
-		tmp_protomodule = fm.protomodule()
+		tmp_protomodule = parts.protomodule()
 		tmp_ID = self.page.leID.text()
 		tmp_exists = tmp_protomodule.load(tmp_ID)
 		if not tmp_exists:
@@ -271,16 +270,15 @@ class func(object):
 	def saveEditing(self,*args,**kwargs):
 
 		self.protomodule.record_insertion_user = str(self.page.cbInsertUser.currentText() ) if str(self.page.cbInsertUser.currentText())  else None
-		self.protomodule.institution_location       = str(self.page.leLocation.text()          ) if str(self.page.leLocation.text()        ) else None
+		self.protomodule.location    = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
+		#self.protomodule.institution_location       = str(self.page.leLocation.text()          ) if str(self.page.leLocation.text()        ) else None
 		self.protomodule.geometry          = str(self.page.cbShape.currentText()      ) if str(self.page.cbShape.currentText()    ) else None
 		self.protomodule.grade          = str(self.page.cbGrade.currentText()      ) if str(self.page.cbGrade.currentText()    ) else None
-		self.protomodule.location_name    = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
 		self.protomodule.thickness      =     self.page.dsbThickness.value()         if self.page.dsbThickness.value() >=0 else None
 		#self.protomodule.channels       =     self.page.sbChannels.value()           if self.page.sbChannels.value()   >=0 else None
 
 		num_comments = self.page.listComments.count()
-		self.protomodule.comments = ';;'.join(self.page.listComments.item(i).text() for i in range(num_comments))
-		if num_comments == 0:  self.protomodule.comments = ';;'
+		self.protomodule.comments = [self.page.listComments.item(i).text() for i in range(num_comments)]
 
 		self.protomodule.save()
 		self.mode = 'view'

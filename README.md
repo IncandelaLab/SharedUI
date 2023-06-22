@@ -8,13 +8,13 @@ NOTE:  This is a beta version of the module assembly GUI.  Pages for the module 
 
 This GUI requires Python 3.  It's been tested thoroughly with Python 3.7 and less thoroughly with Python 3.6; versions 3.4 and earlier are incompatible with PyQt5.
 
-Currently, the GUI is designed to run on a Mac machine, and may run into issues on other operating systems.  To install the GUI, simply download and clone the git repository, then run the script `install_dependencies.sh` with the following command:
+Currently, the GUI is designed to run on a Mac machine, and may run into issues on other operating systems.  To install the GUI, simply download and clone the git repository, then install the required python packages with:
 
 ```
-bash install_dependencies.sh path/to/software//dir
+python -m pip install numpy PyQt5 jinja2 pytest
 ```
 
-The script will install all software prerequisites in `path/to/software/dir`; this can be any location.  The installation script should work on linux as well, but has not been tested thoroughly, and will not work on Windows at present.
+An installation script `install_dependencies.sh` may be required in the future for installing software required for DB communication, but is still WIP and should not be used.
 
 Additionally, all users will need a lxplus account.  You will need to add yourself to the cms-hgcal-assemblyOperators [E-group](https://e-groups.cern.ch/e-groups/EgroupsSearchForm.do) in order to get permission to upload to the DB.
 

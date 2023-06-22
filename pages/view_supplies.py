@@ -1,4 +1,5 @@
 from PyQt5 import QtCore
+from filemanager import supplies
 
 PAGE_NAME = "view_tooling"
 #OBJECTTYPE = "sensor_step"
@@ -84,11 +85,13 @@ class simple_fsobj_vc(object):
 			self.pteWriteComment.clear()
 
 	def start_editing(self,*args,**kwargs):
+		if self.sbID.text() == '':  return False
 		if not self.fsobj_exists:
 			if type(self.sbID).__name__ == 'QLineEdit':
 				self.fsobj.new(self.sbID.text())
 			else:
 				self.fsobj.new(self.sbID.value())
+		return True
 
 	def cancel_editing(self,*args,**kwargs):
 		self.update_info()
@@ -126,14 +129,13 @@ class simple_fsobj_vc(object):
 
 
 class func(object):
-	def __init__(self,fm,userManager,page,setUIPage,setSwitchingEnabled):
-		self.userManager = userManager
+	def __init__(self,fm,page,setUIPage,setSwitchingEnabled):
 		self.page      = page
 		self.setUIPage = setUIPage
 		self.setMainSwitchingEnabled = setSwitchingEnabled
 
 		self.batch_araldite = simple_fsobj_vc(
-			fm.batch_araldite(),
+			supplies.batch_araldite(),
 			self.page.leAralditeID,
 			self.page.dAralditeReceived,
 			self.page.dAralditeExpires,
@@ -148,7 +150,7 @@ class func(object):
 			)
 		
 		self.batch_wedge = simple_fsobj_vc(
-			fm.batch_wedge(),
+			supplies.batch_wedge(),
 			self.page.leWedgeID,
 			self.page.dWedgeReceived,
 			self.page.dWedgeExpires,
@@ -163,7 +165,7 @@ class func(object):
 			)
 
 		self.batch_sylgard = simple_fsobj_vc(
-			fm.batch_sylgard(),
+			supplies.batch_sylgard(),
 			self.page.leSylgardID,
 			self.page.dSylgardReceived,
 			self.page.dSylgardExpires,
@@ -179,7 +181,7 @@ class func(object):
 			)
 
 		self.batch_bond_wire = simple_fsobj_vc(
-			fm.batch_bond_wire(),
+			supplies.batch_bond_wire(),
 			self.page.leBondWireID,
 			self.page.dBondWireReceived,
 			self.page.dBondWireExpires,
@@ -363,8 +365,8 @@ class func(object):
 
 	@enforce_mode('view')
 	def start_editing_batch_araldite(self,*args,**kwargs):
+		if not self.batch_araldite.start_editing():  return
 		self.mode = 'editing_batch_araldite'
-		self.batch_araldite.start_editing()
 		self.update_elements()
 
 	@enforce_mode('editing_batch_araldite')
@@ -390,8 +392,8 @@ class func(object):
 	
 	@enforce_mode('view')
 	def start_editing_batch_wedge(self,*args,**kwargs):
+		if not self.batch_wedge.start_editing():  return
 		self.mode = 'editing_batch_wedge'
-		self.batch_wedge.start_editing()
 		self.update_elements()
 
 	@enforce_mode('editing_batch_wedge')
@@ -417,8 +419,8 @@ class func(object):
 
 	@enforce_mode('view')
 	def start_editing_batch_sylgard(self,*args,**kwargs):
+		if not self.batch_araldite.start_editing():  return
 		self.mode = 'editing_batch_sylgard'
-		self.batch_sylgard.start_editing()
 		self.update_elements()
 
 	@enforce_mode('editing_batch_sylgard')
@@ -443,8 +445,8 @@ class func(object):
 
 	@enforce_mode('view')
 	def start_editing_batch_bond_wire(self,*args,**kwargs):
+		if not self.batch_bond_wire.start_editing():  return
 		self.mode = 'editing_batch_bond_wire'
-		self.batch_bond_wire.start_editing()
 		self.update_elements()
 
 	@enforce_mode('editing_batch_bond_wire')

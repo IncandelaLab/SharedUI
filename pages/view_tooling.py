@@ -1,3 +1,5 @@
+from filemanager import tools
+
 PAGE_NAME = "view_tooling"
 #OBJECTTYPE = "sensor_step"
 DEBUG = False
@@ -117,15 +119,13 @@ class simple_fsobj_vc(object):
 
 
 class func(object):
-	def __init__(self,fm,userManagerpage,setUIPage,setSwitchingEnabled):
-		self.fm        = fm
-		self.userManager = userManager
+	def __init__(self,fm,page,setUIPage,setSwitchingEnabled):
 		self.page      = page
 		self.setUIPage = setUIPage
 		self.setMainSwitchingEnabled = setSwitchingEnabled
 
 		self.tool_sensor = simple_fsobj_vc(
-			self.fm.tool_sensor(),
+			tools.tool_sensor(),
 			self.page.sbSensorToolID,
 			self.page.cbSensorToolInstitution,
 			self.page.leSensorToolLocation,
@@ -139,7 +139,7 @@ class func(object):
 			)
 
 		self.tool_pcb = simple_fsobj_vc(
-			self.fm.tool_pcb(),
+			tools.tool_pcb(),
 			self.page.sbPcbToolID,
 			self.page.cbPcbToolInstitution,
 			self.page.lePcbToolLocation,
@@ -153,7 +153,7 @@ class func(object):
 			)
 
 		self.tray_component_sensor = simple_fsobj_vc(
-			self.fm.tray_component_sensor(),
+			tools.tray_component_sensor(),
 			self.page.sbSensorTrayID,
 			self.page.cbSensorTrayInstitution,
 			self.page.leSensorTrayLocation,
@@ -167,7 +167,7 @@ class func(object):
 			)
 
 		self.tray_component_pcb = simple_fsobj_vc(
-			self.fm.tray_component_pcb(),
+			tools.tray_component_pcb(),
 			self.page.sbPcbTrayID,
 			self.page.cbPcbTrayInstitution,
 			self.page.lePcbTrayLocation,
@@ -181,7 +181,7 @@ class func(object):
 			)
 
 		self.tray_assembly = simple_fsobj_vc(
-			self.fm.tray_assembly(),
+			tools.tray_assembly(),
 			self.page.sbAssemblyTrayID,
 			self.page.cbAssemblyTrayInstitution,
 			self.page.leAssemblyTrayLocation,

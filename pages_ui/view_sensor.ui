@@ -35,6 +35,9 @@
     <number>2</number>
    </property>
    <widget class="QLineEdit" name="lineEdit_9">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>1</x>
@@ -51,6 +54,9 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="leLocation">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>120</x>
@@ -282,6 +288,9 @@
     </property>
    </widget>
    <widget class="QComboBox" name="cbChannelDensity">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>180</x>

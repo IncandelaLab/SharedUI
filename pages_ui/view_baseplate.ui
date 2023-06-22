@@ -179,6 +179,9 @@
     <enum>QFrame::Plain</enum>
    </property>
    <widget class="QLineEdit" name="lineEdit_11">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>1</x>
@@ -211,6 +214,9 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="leLocation">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>119</x>

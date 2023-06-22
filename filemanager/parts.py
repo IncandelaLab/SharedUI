@@ -161,6 +161,8 @@ class baseplate(fsobj_part):
 		# other:
 		'protomodule',
 		'step_sensor',
+		# GUI-only:
+		'barcode',
 	]
 
 	EXTRA_DEFAULTS = {
@@ -179,10 +181,19 @@ class baseplate(fsobj_part):
 
 
 	# Derived properties:
-	# material (from display_name)
-	# geometry
+    # geometry (from display_name)
+	# material
 	# channel density
 
+	@property
+	def geometry(self):
+		if self.kind_of_part == "None Baseplate None None":  return None
+		return self.kind_of_part.split()[3]
+	@geometry.setter
+	def geometry(self, value):
+		splt = self.kind_of_part.split(" ")
+		splt[3] = str(value)
+		self.kind_of_part = " ".join(splt)
 
 	@property
 	def material(self):
@@ -205,15 +216,6 @@ class baseplate(fsobj_part):
 		splt[2] = str(value)
 		self.kind_of_part = " ".join(splt)
 
-	@property
-	def geometry(self):
-		if self.kind_of_part == "None Baseplate None None":  return None
-		return self.kind_of_part.split()[3]
-	@geometry.setter
-	def geometry(self, value):
-		splt = self.kind_of_part.split(" ")
-		splt[3] = str(value)
-		self.kind_of_part = " ".join(splt)
 
 	def ready_step_sensor(self, step_sensor = None, max_flatness = None):
 		# POSSIBLE:  Query DB to check for sensors?
@@ -247,6 +249,8 @@ class sensor(fsobj_part):
 		# other:
 		'protomodule',
 		'step_sensor',
+		# GUI only:
+		'barcode',
 	]
 
 	EXTRA_DEFAULTS = {
@@ -277,11 +281,6 @@ class sensor(fsobj_part):
 		splt[0] = value
 		splt[3] = "HD" if value == "120um" else "LD"
 		self.kind_of_part = " ".join(splt)
-		
-	@property
-	def channel_density(self):
-		if self.kind_of_part is None:  return None
-		return self.kind_of_part.split()[3]
 
 	@property
 	def geometry(self):
@@ -293,6 +292,11 @@ class sensor(fsobj_part):
 		splt[4] = str(value)
 		self.kind_of_part = " ".join(splt)
 
+
+	@property
+	def channel_density(self):
+		if self.kind_of_part is None:  return None
+		return self.kind_of_part.split()[3]
 
 	@property
 	def test_date_(self):
@@ -346,6 +350,8 @@ class pcb(fsobj_part):
 		# other:
 		'module',
 		'step_pcb',
+		# GUI only:
+		'barcode',
 	]
 
 	EXTRA_DEFAULTS = {

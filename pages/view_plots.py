@@ -1,4 +1,4 @@
-from filemanager import fm
+from filemanager import fm, parts
 from PyQt5 import QtCore
 import time
 import os
@@ -174,7 +174,7 @@ class func(object):
 		self.setMainSwitchingEnabled = setSwitchingEnabled
 
 		self.pcb_obj = simple_fsobj_pt(
-			fm.pcb(),
+			parts.pcb(),
 			self.page.leIDPCB,
 			self.page.leStatusPCB,
 			self.page.pbLoadPCB,
@@ -191,7 +191,7 @@ class func(object):
 			self.page.pbAddCommentPCB
 			)
 		self.module_obj = simple_fsobj_pt(
-			fm.module(),
+			parts.module(),
 			self.page.leIDMod,
 			self.page.leStatusMod,
 			self.page.pbLoadMod,

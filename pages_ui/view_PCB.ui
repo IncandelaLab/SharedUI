@@ -61,7 +61,7 @@
      <x>20</x>
      <y>160</y>
      <width>261</width>
-     <height>471</height>
+     <height>411</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -74,7 +74,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>200</y>
+      <y>140</y>
       <width>81</width>
       <height>20</height>
      </rect>
@@ -123,60 +123,6 @@
      </property>
     </item>
    </widget>
-   <widget class="QComboBox" name="cbType">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>140</y>
-      <width>131</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="currentText">
-     <string/>
-    </property>
-    <property name="currentIndex">
-     <number>-1</number>
-    </property>
-    <item>
-     <property name="text">
-      <string>HGCROCV1</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>HGCROCV2</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>HGCROCV3</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>SKIROCV1</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>SKIROCV2</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>SKIROCV3</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>HGCROC dummy</string>
-     </property>
-    </item>
-   </widget>
    <widget class="QLineEdit" name="leManufacturer">
     <property name="enabled">
      <bool>false</bool>
@@ -212,33 +158,11 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QSpinBox" name="sbChannels">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>180</x>
-      <y>180</y>
-      <width>81</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-    <property name="minimum">
-     <number>-1</number>
-    </property>
-    <property name="maximum">
-     <number>2147483647</number>
-    </property>
-   </widget>
    <widget class="QLineEdit" name="lineEdit_15">
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>200</y>
+      <y>140</y>
       <width>181</width>
       <height>21</height>
      </rect>
@@ -283,6 +207,9 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="leLocation">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>120</x>
@@ -314,47 +241,6 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QSpinBox" name="sbNumRocs">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>180</x>
-      <y>160</y>
-      <width>81</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-    <property name="minimum">
-     <number>0</number>
-    </property>
-    <property name="maximum">
-     <number>2147483647</number>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEdit_6">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>180</y>
-      <width>181</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Channels</string>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
    <widget class="QLineEdit" name="lineEdit_20">
     <property name="geometry">
      <rect>
@@ -372,6 +258,9 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="lineEdit_11">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -382,44 +271,6 @@
     </property>
     <property name="text">
      <string>Location</string>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEdit_21">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>140</y>
-      <width>131</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>ROC type</string>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEdit_16">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>160</y>
-      <width>181</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Number of ROCs</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -490,7 +341,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>450</y>
+      <y>390</y>
       <width>111</width>
       <height>21</height>
      </rect>
@@ -503,7 +354,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>240</y>
+      <y>180</y>
       <width>141</width>
       <height>21</height>
      </rect>
@@ -519,7 +370,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>260</y>
+      <y>200</y>
       <width>261</width>
       <height>111</height>
      </rect>
@@ -529,7 +380,7 @@
     <property name="geometry">
      <rect>
       <x>140</x>
-      <y>240</y>
+      <y>180</y>
       <width>121</width>
       <height>21</height>
      </rect>
@@ -542,7 +393,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>380</y>
+      <y>320</y>
       <width>261</width>
       <height>71</height>
      </rect>
