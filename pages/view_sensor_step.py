@@ -4,7 +4,7 @@ import datetime
 import os
 import json
 
-from filemanager import fm
+from filemanager import fm, parts, tools, supplies, assembly
 
 NO_DATE = [2022,1,1]
 
@@ -42,6 +42,7 @@ I_PART_NOT_READY  = "{}(s) in position(s) {} is not ready for sensor application
 
 # baseplate-sensor incompatibility
 I_BASEPLATE_SENSOR_SHAPE = "baseplate {} has shape {} but sensor {} has shape {}"
+I_BASEPLATE_SENSOR_CHANNEL = "baseplate {} has channel density {} but sensor {} has channel density {}"
 
 # rows / positions
 I_NO_PARTS_SELECTED     = "no parts have been selected"
@@ -58,10 +59,6 @@ I_PROTOMODULE_COPY      = "protomodule has already been created: {}"
 I_SIZE_MISMATCH = "size mismatch between some selected objects"
 I_SIZE_MISMATCH_8 = "* list of 8-inch objects selected: {}"
 
-# location
-I_INSTITUTION = "some selected objects are not at this institution: {}"
-I_INSTITUTION_NOT_SELECTED = "no institution selected"
-
 # Missing user
 I_USER_DNE = "no sensor step user selected"
 
@@ -77,14 +74,14 @@ class func(object):
 		self.setUIPage = setUIPage
 		self.setMainSwitchingEnabled = setSwitchingEnabled
 
-		self.tools_sensor = [fm.tool_sensor() for _ in range(6)]
-		self.baseplates   = [fm.baseplate()   for _ in range(6)]
-		self.sensors      = [fm.sensor()      for _ in range(6)]
-		self.tray_component_sensor = fm.tray_component_sensor()
-		self.tray_assembly         = fm.tray_assembly()
-		self.batch_araldite        = fm.batch_araldite()
+		self.tools_sensor = [tools.tool_sensor() for _ in range(6)]
+		self.baseplates   = [parts.baseplate()   for _ in range(6)]
+		self.sensors      = [parts.sensor()      for _ in range(6)]
+		self.tray_component_sensor = tools.tray_component_sensor()
+		self.tray_assembly         = tools.tray_assembly()
+		self.batch_araldite        = supplies.batch_araldite()
 
-		self.step_sensor = fm.step_sensor()
+		self.step_sensor = assembly.step_sensor()
 		self.step_sensor_exists = None
 
 		self.mode = 'setup'
@@ -261,7 +258,7 @@ class func(object):
 			tmp_inst = self.page.cbInstitution.currentText()
 			ID = "{}_{}".format(tmp_inst, tmp_id)
 		else:
-			tmp_id, tmp_inst = ID.split("_")
+			tmp_id, tmpartsinst = ID.split("_")
 			self.page.sbID.setValue(int(tmp_id))
 			self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(tmp_inst, -1))
 
@@ -274,17 +271,16 @@ class func(object):
 
 		if self.step_sensor_exists:
 
-			if not self.step_sensor.user_performed in self.index_users.keys() and not self.step_sensor.user_performed is None:
+			if not self.step_sensor.record_insertion_user in self.index_users.keys() and not self.step_sensor.record_insertion_user is None:
 				# Insertion user was deleted from user page...just add user to the dropdown
-				self.index_users[self.step_sensor.user_performed] = max(self.index_users.values()) + 1
-				self.page.cbUserPerformed.addItem(self.step_sensor.user_performed)
-			self.page.cbUserPerformed.setCurrentIndex(self.index_users.get(self.step_sensor.user_performed, -1))
-			self.page.leLocation.setText(self.step_sensor.location)
+				self.index_users[self.step_sensor.record_insertion_user] = max(self.index_users.values()) + 1
+				self.page.cbUserPerformed.addItem(self.step_sensor.record_insertion_user)
+			self.page.cbUserPerformed.setCurrentIndex(self.index_users.get(self.step_sensor.record_insertion_user, -1))
 
-			# New
-			
-			times_to_set = [(self.step_sensor.run_start,  self.page.dtRunStart),
-							(self.step_sensor.run_stop,   self.page.dtRunStop)]
+
+			# Set vars:
+			times_to_set = [(self.step_sensor.run_begin_timestamp,  self.page.dtRunStart),
+							(self.step_sensor.run_end_timestamp,   self.page.dtRunStop)]
 			for st, dt in times_to_set:
 				if st is None:
 					dt.setDate(QtCore.QDate(*NO_DATE))
@@ -293,16 +289,15 @@ class func(object):
 					localtime = list(time.localtime(st))
 					dt.setDate(QtCore.QDate(*localtime[0:3]))
 					dt.setTime(QtCore.QTime(*localtime[3:6]))
-			
 
-
-			self.page.leBatchAraldite.setText(self.step_sensor.batch_araldite if not (self.step_sensor.batch_araldite is None) else "")
-			self.page.sbTrayAssembly.setValue( self.step_sensor.tray_assembly  if not (self.step_sensor.tray_assembly  is None) else -1)
-			self.page.sbTrayComponent.setValue(self.step_sensor.tray_component_sensor if not (self.step_sensor.tray_component_sensor is None) else -1)
+			self.page.leBatchAraldite.setText(self.step_sensor.glue_batch_num if not (self.step_sensor.glue_batch_num is None) else "")
+			self.page.sbTrayAssembly.setValue( self.step_sensor.asmbl_tray_name  if not (self.step_sensor.asmbl_tray_name  is None) else -1)
+			self.page.sbTrayComponent.setValue(self.step_sensor.comp_tray_name if not (self.step_sensor.comp_tray_name is None) else -1)
 
 			if not (self.step_sensor.tools is None):
+				tools = self.step_sensor.snsr_tool_names
 				for i in range(6):
-					self.sb_tools[i].setValue(self.step_sensor.tools[i] if not (self.step_sensor.tools[i] is None) else -1)
+					self.sb_tools[i].setValue(tools[i] if tools[i] != None else -1)
 			else:
 				for i in range(6):
 					self.sb_tools[i].setValue(-1)
@@ -333,7 +328,6 @@ class func(object):
 
 		else:
 			self.page.cbUserPerformed.setCurrentIndex(-1)
-			self.page.leLocation.setText("")
 			self.page.dtRunStart.setDate(QtCore.QDate(*NO_DATE))
 			self.page.dtRunStart.setTime(QtCore.QTime(0,0,0))
 			self.page.dtRunStop.setDate(QtCore.QDate(*NO_DATE))
@@ -358,6 +352,7 @@ class func(object):
 
 		self.updateElements()
 
+
 	@enforce_mode(['view','editing','creating','searching'])
 	def updateElements(self,use_info=False):
 		mode_view      = self.mode == 'view'
@@ -378,7 +373,6 @@ class func(object):
 		self.page.pbRunStopNow      .setEnabled(mode_creating or mode_editing)
 
 		self.page.cbUserPerformed  .setEnabled( mode_creating or mode_editing)
-		self.page.leLocation       .setReadOnly(mode_view or mode_searching)
 		self.page.dtRunStart       .setReadOnly(mode_view or mode_searching)
 		self.page.dtRunStop        .setReadOnly(mode_view or mode_searching)
 		self.page.sbTrayComponent  .setReadOnly(mode_view or mode_searching)
@@ -510,10 +504,11 @@ class func(object):
 		issues = []
 		objects = []
 
+		# Insertion user:
 		if self.page.cbUserPerformed.currentText() == "":
 			issues.append(I_USER_DNE)
 
-		# tooling and supplies--copied over
+		# Tooling and supplies:
 		if self.tray_component_sensor.ID is None:
 			issues.append(I_TRAY_COMPONENT_DNE)
 		else:
@@ -537,7 +532,7 @@ class func(object):
 				issues.append(I_BATCH_ARALDITE_EMPTY)
 
 
-		# rows
+		# Now, loop over each row and check for missing/bad input
 		sensor_tools_selected = [_.value() for _ in self.sb_tools     ]
 		baseplates_selected   = [_.text() for _ in self.le_baseplates  ]
 		sensors_selected      = [_.text() for _ in self.le_sensors     ]
@@ -563,7 +558,7 @@ class func(object):
 
 		for i in range(6):
 			num_parts = 0
-			tmp_id = "{}_{}".format(self.page.cbInstitution.currentText(), self.page.sbID.value())
+			tmp_id = self.step_sensor.ID
 
 			if sensor_tools_selected[i] >= 0:
 				num_parts += 1
@@ -591,12 +586,17 @@ class func(object):
 					if not ready:
 						issues.append(I_PART_NOT_READY.format('sensor',i,reason))
 
+
+			# NOTE:  TODO:  geometry, channel_density must match
 			if baseplates_selected[i] != "" and sensors_selected[i] != "" \
 					and not self.baseplates[i].ID is None and not self.sensors[i].ID is None:
 				# Check for compatibility bw two objects:
-				if self.baseplates[i].shape != self.sensors[i].shape:
-					issues.append(I_BASEPLATE_SENSOR_SHAPE.format(self.baseplates[i].ID,    self.baseplates[i].shape, \
-																  self.sensors[i].ID, self.sensors[i].shape))
+				if self.baseplates[i].geometry != self.sensors[i].geometry:
+					issues.append(I_BASEPLATE_SENSOR_SHAPE.format(self.baseplates[i].ID,    self.baseplates[i].geometry, \
+																  self.sensors[i].ID, self.sensors[i].geometry))
+				if self.baseplates[i].channel_density != self.sensors[i].channel_density:
+					issues.append(I_BASEPLATE_SENSOR_CHANNEL.format(self.baseplates[i].ID,    self.baseplates[i].channel_density, \
+																  self.sensors[i].ID, self.sensors[i].channel_density))
 
 			if num_parts == 0:
 				rows_empty.append(i)
@@ -608,51 +608,33 @@ class func(object):
 
 		if not (len(rows_full) or len(rows_incomplete)):
 			issues.append(I_NO_PARTS_SELECTED)
-
 		if rows_incomplete:
 			issues.append(I_ROWS_INCOMPLETE.format(', '.join(map(str,rows_incomplete))))
-
-
 		if rows_baseplate_dne:
 			issues.append(I_BASEPLATE_DNE.format(', '.join([str(_+1) for _ in rows_baseplate_dne])))
 		if rows_tool_sensor_dne:
 			issues.append(I_TOOL_SENSOR_DNE.format(', '.join([str(_+1) for _ in rows_tool_sensor_dne])))
 		if rows_sensor_dne:
 			issues.append(I_SENSOR_DNE.format(', '.join([str(_+1) for _ in rows_sensor_dne])))
-
-
-		objects_not_here = []
-
-		for obj in objects:
-
-			institution = getattr(obj, "institution", None)
-			if not (institution in [None, self.page.cbInstitution.currentText()]):
-				objects_not_here.append(obj)
-
-		if objects_not_here:
-			issues.append(I_INSTITUTION.format([str(_) for _ in objects_not_here]))
-
 		if not self.page.ckCheckFeet.isChecked():
 			issues.append(I_NO_TOOL_CHK)
-
 
 		self.page.listIssues.clear()
 		for issue in issues:
 			self.page.listIssues.addItem(issue)
-
 		if issues:
 			self.page.leStatus.setText(STATUS_ISSUES)
 			self.page.pbSave.setEnabled(False)
-
 		else:
 			self.page.leStatus.setText(STATUS_NO_ISSUES)
 			self.page.pbSave.setEnabled(True)
+
 
 	@enforce_mode('view')
 	def loadStep(self,*args,**kwargs):
 		if self.page.sbID.value() == -1:  return
 		if self.page.cbInstitution.currentText() == "":  return
-		tmp_step = fm.step_sensor()
+		tmp_step = assembly.step_sensor()
 		tmp_ID = self.page.sbID.value()
 		tmp_inst = self.page.cbInstitution.currentText()
 		tmp_exists = tmp_step.load("{}_{}".format(tmp_inst, tmp_ID))
@@ -666,7 +648,7 @@ class func(object):
 	def startCreating(self,*args,**kwargs):
 		if self.page.sbID.value() == -1:  return
 		if self.page.cbInstitution.currentText() == "":  return
-		tmp_step = fm.step_sensor()
+		tmp_step = assembly.step_sensor()
 		tmp_ID = self.page.sbID.value()
 		tmp_inst = self.page.cbInstitution.currentText()
 		tmp_exists = tmp_step.load("{}_{}".format(tmp_inst, tmp_ID))
@@ -677,7 +659,7 @@ class func(object):
 
 	@enforce_mode('view')
 	def startEditing(self,*args,**kwargs):
-		tmp_step = fm.step_sensor()
+		tmp_step = assembly.step_sensor()
 		tmp_ID = self.page.sbID.value()
 		tmp_inst = self.page.cbInstitution.currentText()
 		tmp_exists = tmp_step.load("{}_{}".format(tmp_inst, tmp_ID))
@@ -697,14 +679,6 @@ class func(object):
 	@enforce_mode(['editing','creating'])
 	def saveEditing(self,*args,**kwargs):
 
-		self.step_sensor.institution = self.page.cbInstitution.currentText()
-
-		self.step_sensor.user_performed = str(self.page.cbUserPerformed.currentText()) if self.page.cbUserPerformed.currentText()!='' else None
-		self.step_sensor.location = str( self.page.leLocation.text() )
-
-		self.step_sensor.run_start  = self.page.dtRunStart.dateTime().toTime_t()
-		self.step_sensor.run_stop   = self.page.dtRunStop.dateTime().toTime_t()
-
 		tools = []
 		sensors = []
 		baseplates = []
@@ -722,41 +696,17 @@ class func(object):
 		self.step_sensor.baseplates   = baseplates
 		self.step_sensor.protomodules = protomodules
 
-		self.step_sensor.tray_component_sensor = self.page.sbTrayComponent.value() if self.page.sbTrayComponent.value() >= 0 else None
-		self.step_sensor.tray_assembly         = self.page.sbTrayAssembly.value()  if self.page.sbTrayAssembly.value()  >= 0 else None
-		self.step_sensor.batch_araldite        = self.page.leBatchAraldite.text() if self.page.leBatchAraldite.text() else None
-
 
 		# Add protomodule ID to baseplate, sensor lists; create protomodule if it doesn't exist:
 		for i in range(6):
 			if baseplates[i] is None:
-				# Row is empty; ignore
 				continue
-			temp_protomodule = fm.protomodule()
-			# Moved to active check (ensure no duplicates)
-			temp_protomodule.new(protomodules[i])
-			# Thickness = sum of baseplate and sensor, plus glue gaps
-			temp_plt = fm.baseplate()
-			temp_plt.load(baseplates[i])
-			temp_sensor = fm.sensor()
-			temp_sensor.load(sensors[i])
+			temp_plt = self.baseplates[i]
+			temp_sensor = self.sensors[i]
+			temp_protomodule = parts.protomodule()
 
-			temp_protomodule.institution    = self.step_sensor.institution
-			temp_protomodule.location       = self.step_sensor.location
-			temp_protomodule.insertion_user = self.step_sensor.user_performed
-			temp_protomodule.thickness  = temp_plt.thickness + temp_sensor.thickness + 0.1 # 100um=1 glue layer
-			if temp_plt.material == 'PCB':
-				temp_protomodule.thickness += 0.5
-			temp_protomodule.thickness      = temp_plt.thickness + temp_sensor.thickness + 0.1 # 100um=1 glue layer
-			temp_protomodule.channels       = 192 if temp_sensor.channel_density == 'LD' else 432
-			temp_protomodule.size           = temp_sensor.size
-			temp_protomodule.shape          = temp_sensor.shape
-
+			temp_protomodule.new(protomodules[i], baseplate_=temp_plt, sensor_=temp_sensor)
 			temp_protomodule.step_sensor    = self.step_sensor.ID
-			temp_protomodule.baseplate      = temp_plt.ID
-			temp_protomodule.sensor         = temp_sensor.ID
-
-			# PROBLEM HERE:  Does not check for existing protomodule w/ same ID/different date before saving!!
 			temp_protomodule.save()
 
 			self.baseplates[i].step_sensor = self.step_sensor.ID
@@ -766,6 +716,24 @@ class func(object):
 			self.sensors[i].protomodule = temp_protomodule.ID
 			self.sensors[i].save()
 
+		# set sensor step properties (which implicitly set the protomodule vars):
+		# since these call protomodule.save(), must be called second
+		self.sensor_step.record_insertion_user = str(self.page.cbUserPerformed.currentText()) \
+		    if self.page.cbUserPerformed.currentText()!='' else None
+		# Save all times as UTC
+		pydt = self.page.dtRunStart.dateTime().toPyDateTime()
+		self.step_sensor.run_begin_timestamp = pydt.toPyDateTime(datetime.timezone.utc) # sec UTC
+		pydt = self.page.dtRunStop.dateTime().toPyDateTime()
+		self.step_sensor.run_end_timestamp   = pydt.toPyDateTime(datetime.timezone.utc)
+		
+		self.step_sensor.glue_batch_num = self.page.leBatchAraldite.text() \
+		    if self.page.leBatchAraldite.text() else None
+		self.step_sensor.asmbl_tray_name = self.page.sbTrayAssembly.value() \
+		    if self.page.sbTrayAssembly.value() >= 0 else None
+		self.step_sensor.comp_tray_name = self.page.sbTrayComponent.value() \
+		    if self.page.sbTrayComponent.value() >= 0 else None
+
+		self.step_sensor.snsr_tool_names = tools
 		self.step_sensor.check_tool_feet = self.page.ckCheckFeet.isChecked()
 
 		self.step_sensor.save()
@@ -775,6 +743,7 @@ class func(object):
 
 		# NEW:
 		self.xmlModList.append(self.step_sensor.ID)
+
 
 	def xmlModified(self):
 		return self.xmlModList
@@ -793,7 +762,7 @@ class func(object):
 	# NEW
 	def doSearch(self,*args,**kwargs):
 		SEARCH_DB = False
-		tmp_part = getattr(fm, self.search_part)()
+		tmp_part = getattr(parts, self.search_part)()
 		# Perform part search:
 		if SEARCH_DB:
 			pass  # TO IMPLEMENT LATER

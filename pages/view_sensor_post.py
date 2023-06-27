@@ -6,7 +6,7 @@ import csv
 from xml.etree.ElementTree import parse
 import glob
 
-from filemanager import fm
+from filemanager import fm, parts, assembly
 
 from PyQt5.QtWidgets import QFileDialog, QWidget
 
@@ -52,9 +52,6 @@ I_SIZE_MISMATCH_8 = "* list of 8-inch objects selected: {}"
 I_INSTITUTION = "some selected objects are not at this institution: {}"
 I_INSTITUTION_NOT_SELECTED = "no institution selected"
 
-# Missing user
-I_USER_DNE = "no sensor step user selected"
-
 class Filewindow(QWidget):
 	def __init__(self):
 		super(Filewindow, self).__init__()
@@ -75,9 +72,9 @@ class func(object):
 		self.setUIPage = setUIPage
 		self.setMainSwitchingEnabled = setSwitchingEnabled
 
-		self.protomodules = [fm.protomodule() for _ in range(6)]
+		self.protomodules = [parts.protomodule() for _ in range(6)]
 
-		self.step_sensor = fm.step_sensor()
+		self.step_sensor = assembly.step_sensor()
 		self.step_sensor_exists = None
 
 		self.mode = 'setup'
@@ -238,8 +235,8 @@ class func(object):
 
 		if self.step_sensor_exists:
 
-			times_to_set = [(self.step_sensor.cure_start, self.page.dtCureStart),
-							(self.step_sensor.cure_stop,  self.page.dtCureStop)]
+			times_to_set = [(self.step_sensor.cure_begin_timestamp, self.page.dtCureStart),
+							(self.step_sensor.cure_end_timestamp,  self.page.dtCureStop)]
 			for st, dt in times_to_set:
 				if st is None:
 					dt.setDate(QtCore.QDate(*NO_DATE))
@@ -252,7 +249,7 @@ class func(object):
 			self.page.dsbCureTemperature.setValue(self.step_sensor.cure_temperature if self.step_sensor.cure_temperature else 70)
 			self.page.sbCureHumidity    .setValue(self.step_sensor.cure_humidity    if self.step_sensor.cure_humidity    else 10)
 
-			self.page.leXML.setText(self.step_sensor.xml_data_file if self.step_sensor.xml_data_file else "")
+			self.page.leXML.setText(self.step_sensor.test_file_name if self.step_sensor.test_file_name else "")
 
 			if not (self.step_sensor.protomodules is None):
 				for i in range(6):
@@ -406,32 +403,22 @@ class func(object):
 	@enforce_mode('editing')
 	def saveEditing(self,*args,**kwargs):
 
-		self.step_sensor.cure_start = self.page.dtCureStart.dateTime().toTime_t()
-		self.step_sensor.cure_stop  = self.page.dtCureStop.dateTime().toTime_t()
+		pydt = self.page.dtCureStart.dateTime().toPyDateTime()
+		self.step_sensor.cure_begin_timestamp = pydt.toPyDateTime(datetime.timezone.utc)
+		pydt = self.page.dtCureStop.dateTime().toPyDateTime()
+		self.step_sensor.cure_end_timestamp  = pydt.toPyDateTime(datetime.timezone.utc)
 
-		self.step_sensor.cure_humidity = self.page.sbCureHumidity.value()
-		self.step_sensor.cure_temperature = self.page.dsbCureTemperature.value()
+		self.step_sensor.temp_degc = self.page.sbCureHumidity.value()
+		self.step_sensor.humidity_prcnt = self.page.dsbCureTemperature.value()
 
-		self.step_sensor.xml_data_file = self.page.leXML.text()
+		self.step_sensor.test_file_name = self.page.leXML.text()
 
-		for i in range(6):
-			if self.step_sensor.protomodules[i] is None:  continue
-
-			proto = fm.protomodule()
-			if not proto.load(self.step_sensor.protomodules[i]):
-				print("FATAL ERROR:  post assembly step tried to load nonexistent protomod {}".format(self.step_sensor.protomodules[i]))
-				assert(False)
-
-			# Set protomodule vars/quantities here
-			proto.offset_translation_x = self.dsb_offsets_x[i].value()
-			proto.offset_translation_y = self.dsb_offsets_y[i].value()
-			proto.offset_rotation      = self.dsb_offsets_rot[i].value()
-			proto.flatness             = self.dsb_flatness[i].value()
-			proto.thickness            = self.dsb_thickness[i].value()
-			proto.grade = str(self.cb_grades[i].currentText()) if self.cb_grades[i].currentText() else None
-
-			proto.save()
-
+		self.step_sensor.snsr_x_offsts = [self.dsb_offsets_x[i].value() for i in range(6)]
+		self.step_sensor.snsr_y_offsts = [self.dsb_offsets_y[i].value() for i in range(6)]
+		self.step_sensor.snsr_ang_offsts = [self.dsb_offsets_rot[i].value() for i in range(6)]
+		self.step_sensor.flatnesses = [self.dsb_flatness[i].value() for i in range(6)]
+		self.step_sensor.thicknesses = [self.dsb_thickness[i].value() for i in range(6)]
+		self.step_sensor.grades = [str(self.cb_grades[i].currentText()) if self.cb_grades[i].currentText() else None for i in range(6)]
 
 		self.step_sensor.save()
 		self.unloadAllObjects()

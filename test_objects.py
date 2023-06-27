@@ -30,7 +30,9 @@ import os
 #    - TEST:  verify thickness/type have been passed to new object correctly
 #
 # Assembly step testing:
-# - TBD - test UI pages, not just fm objects?  Might be tough to implement...
+# - create step w/ basic info, save
+# - fn that returns child objects (loaded, w/ type)??
+# - 
 
 # Pass in temp dir for file storage
 

@@ -157,7 +157,7 @@ class func(object):
 
 		self.page.dsbOffsetTranslationX.setValue(-1 if self.protomodule.snsr_x_offst is None else self.protomodule.snsr_x_offst )
 		self.page.dsbOffsetTranslationY.setValue(-1 if self.protomodule.snsr_y_offst is None else self.protomodule.snsr_y_offst )
-		self.page.dsbOffsetRotation.setValue(    -1 if self.protomodule.snsr_ang_offset    is None else self.protomodule.snsr_ang_offset    )
+		self.page.dsbOffsetRotation.setValue(    -1 if self.protomodule.snsr_ang_offst    is None else self.protomodule.snsr_ang_offst    )
 		self.page.dsbFlatness.setValue(          -1 if self.protomodule.flatness           is None else self.protomodule.plt_fltnes_mm           )
 		self.page.dsbThickness.setValue( -1 if self.protomodule.thickness is None else self.protomodule.plt_thknes_mm )
 		if self.page.dsbOffsetTranslationX.value() == -1: self.page.dsbOffsetTranslationX.clear()

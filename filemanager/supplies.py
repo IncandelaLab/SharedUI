@@ -24,6 +24,7 @@ class fsobj_supply(fm.fsobj):
 		'date_received',
 		'date_expires',
 		'is_empty',
+		'comments',
 	]
 
 

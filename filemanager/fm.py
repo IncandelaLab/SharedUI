@@ -6,28 +6,17 @@ import sys
 
 from PyQt5 import QtCore
 import datetime
-#NEW for xml file generation:
-import xml.etree.ElementTree as etree
-from xml.etree.ElementTree import ElementTree
-from xml.etree.ElementTree import Element
-from xml.etree.ElementTree import parse
-from xml.etree.ElementTree import tostring
-from xml.etree.ElementTree import fromstring
-import csv
 
-# Possible improvement:
 from jinja2 import Template
 
 #import rhapi_nolock as rh
 # For DB requests:
 import cx_Oracle
-from xml.dom import minidom
 
 # IMPORTANT NOTE:  Setting this to false disables DB communication.  Purely for debugging.
 ENABLE_DB_COMMUNICATION = False
 
 
-# NEW
 INSTITUTION_DICT = {  # For loading from/to LOCATION_ID XML tag
 	1780: "FNAL",
 	1781: "UMN",
@@ -282,8 +271,8 @@ class fsobj(object):
 
 
 	def load(self, ID):
+		self.clear()
 		if ID == -1 or ID == None:
-			self.clear()
 			return False
 
 		# First, check partlistfile to confirm existence.
@@ -293,13 +282,11 @@ class fsobj(object):
 		with open(self.partlistfile, 'r') as opfl:
 			data = json.load(opfl)
 			if not str(ID) in data.keys():
-				self.clear()
 				return False
 
 		filedir, filename = self.get_filedir_filename(ID)
 		xml_file = os.sep.join([filedir, filename])
 		if not os.path.exists(xml_file):
-			self.clear()
 			return False
 		with open(xml_file, 'r') as opfl:
 			data = json.load(opfl)

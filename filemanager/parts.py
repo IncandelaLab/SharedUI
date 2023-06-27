@@ -217,7 +217,7 @@ class baseplate(fsobj_part):
 		self.kind_of_part = " ".join(splt)
 
 
-	def ready_step_sensor(self, step_sensor = None, max_flatness = None):
+	def ready_step_sensor(self, step_sensor = None):
 		# POSSIBLE:  Query DB to check for sensors?
 		# unless this is already done via goto/etc...
 		if self.step_sensor and self.step_sensor != step_sensor:
@@ -411,13 +411,15 @@ class protomodule(fsobj_part):
 		# build_upload file:
 		# build_cond file:
 		# run_begin_date_ is a property
-		'test_file_name',
+		'run_begin_timestamp',  # note:  start/end of assembly run, not curing
+		'run_end_timestamp',
 		# other:
-		'baseplate', # serial
+		'baseplate', # serial, not actual object
 		'sensor',
 		'module',
 		'step_sensor',
 		'step_pcb',
+
 		# Properties for assembly data:
 		# Read/write from cond:
 		"asmbl_tray_name",
@@ -432,33 +434,40 @@ class protomodule(fsobj_part):
 		#"snsr_cmp_col", # property
 		"snsr_x_offst",
 		"snsr_y_offst",
-		"snsr_ang_offset",
+		"snsr_ang_offst",
 		"snsr_tool_name",
 		"snsr_tool_ht_set",
 		"snsr_tool_ht_chk",
-		"glue_type",
+		"glue_type", # araldite
 		"glue_batch_num",
 		"slvr_epxy_type",
 		"slvr_epxy_batch_num",
 		"grade",
 		"snsr_tool_feet_chk",
 		"sensor_step",
+
 		# for cond page:
-		"curing_time_hrs",
-		"time_start",
-		"time_stop",
+		#"curing_time_hrs",  # property
+		"cure_begin_timestamp",
+		"cure_end_timestamp",
 		"temp_degc",
 		"humidity_prcnt",
+		'test_file_name',
 	]
 
 	EXTRA_DEFAULTS = {
 		"kind_of_part": "None None Si ProtoModule None None",
+		"glue_type": "Araldite",
 	}
+
+
+	@property
+	def curing_time_hrs(self):
+		return 
 
 
 	# PROPERTIES:
 	# Required to set kind_of_part:  geometry, sen_type (sets chann density), baseplate_material (sets calo type)
-
 
 	@property
 	def geometry(self):
@@ -575,38 +584,27 @@ class protomodule(fsobj_part):
 
 	# new():  Optionally, create proto from baseplate and sensor objects
 	# Note:  baseplate and sensor must be the actual objects, not IDs
-	# NOTE:  Must also set sensor step ID!  (Implement into this?)
-	def new(self, ID, baseplate_=None, sensor_=None):
+	def new(self, ID, baseplate_=None, sensor_=None, step_sensor_=None):
 		super(protomodule, self).new(ID)
 		# if no sensor/baseplate, create and return normally
 		if not baseplate_ and not sensor_:  return
-		# if one of sensor or baseplate, throw error
-		assert baseplate_ or sensor_, "Error creating protomodule: baseplate is {}, sensor is {}".format(baseplate_, sensor_)
-
-		# Perform some checks
-		errs = []
-		if baseplate_.geometry != sensor_.geometry:
-			errs.append("Baseplate geometry {} does not match sensor geometry {}".format(baseplate_.geometry, sensor_.geometry))
-		if baseplate_.channel_density != sensor_.channel_density:
-			errs.append("Baseplate channel density {} does not match sensor channel density {}".format(baseplate_.channel_density, sensor_.channel_density))
-		if not baseplate_.ready_step_sensor():
-			errs.append("Baseplate is already mounted on protomodule {}, sensor step {}!".format(baseplate_.protomodule, baseplate_.step_sensor))
-		if not sensor_.ready_step_sensor():
-			errs.append("Sensor is already mounted on protomodule {}, sensor step {}!".format(sensor_.protomodule, sensor_.step_sensor))
-
-		if len(errs) > 0:
-			self.clear()
-			print("ERROR:  Protomodule {} not created from baseplate {} and sensor {}!  Errors:".format(self.ID, baseplate_.ID, sensor_.ID))
-			print("\n".join(errs))
-			return
+		# if not all of the above, throw error
+		assert baseplate_ and sensor_, "Error creating protomodule: baseplate is {}, sensor is {}, sensor step is {}".format(baseplate_, sensor_, sensor_step_)
 
 		# if baseplate and sensor, auto-fill protomodule type, plus baseplate, sensor fields:
 		self.baseplate = baseplate_.ID
 		self.sensor = sensor_.ID
+		self.location = baseplate.location
 		self.geometry = baseplate_.geometry
 		self.baseplate_material = baseplate_.material
 		self.sen_type = sensor_.sen_type
-
+		# Finally, add proto as parent to baseplate/sensor
+		baseplate_.protomodule = self.ID
+		baseplate_.step_sensor = sensor_step_.ID
+		baseplate_.save()
+		sensor_.protomodule = self.ID
+		sensor_.step_sensor = sensor_step_.ID
+		sensor_.save()
 
 	def generate_xml(self):
 		# Make sure that all required info is present
@@ -668,8 +666,8 @@ class module(fsobj_part):
 
 		# for cond page:
 		"curing_time_hrs",
-		"time_start",
-		"time_stop",
+		#"time_start",  # run_begin_timestamp?
+		#"time_stop",
 		"temp_degc",
 		"humidity_prcnt",
 
@@ -854,7 +852,6 @@ class module(fsobj_part):
 		# if step_sensor.is_complete (or something similar)...
 		# ALSO, check wirebonding finished
 		super(module, self).generate_xml()
-
 
 
 

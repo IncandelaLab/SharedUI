@@ -27,9 +27,9 @@ from pages.search           import func as cls_func_search
 #from pages.view_kapton_step import func as cls_func_view_kapton_step
 from pages.view_sensor_step import func as cls_func_view_sensor_step
 from pages.view_sensor_post import func as cls_func_view_sensor_post
-from pages.view_pcb_step    import func as cls_func_view_pcb_step
-from pages.view_pcb_post    import func as cls_func_view_pcb_post
-from pages.view_wirebonding import func as cls_func_view_wirebonding
+#from pages.view_pcb_step    import func as cls_func_view_pcb_step
+#from pages.view_pcb_post    import func as cls_func_view_pcb_post
+#from pages.view_wirebonding import func as cls_func_view_wirebonding
 from pages.view_plots       import func as cls_func_view_plots
 
 from pages.view_tooling     import func as cls_func_view_tooling
@@ -143,13 +143,13 @@ PAGE_IDS = {
 	'Baseplates'             : 2,
 	'Sensors'                : 3,
 	'PCBs'                   : 4,
-	#'Protomodules'           : 5,
-	#'Modules'                : 6,
+	'Protomodules'           : 5,
+	'Modules'                : 6,
 	'Tooling'                : 7,
 	'Supplies'               : 8,
 
-	#'1. Sensor - pre-assembly' : 9,
-	#'2. Sensor - post-assembly': 10,
+	'1. Sensor - pre-assembly' : 9,
+	'2. Sensor - post-assembly': 10,
 	#'3. PCB - pre-assembly'    : 11,
 	#'4. PCB - post-assembly'    : 12,
 	#'5. Wirebonding & encapsulating' : 13,
@@ -162,9 +162,9 @@ UPLOAD_ENABLED_PAGES = [
 	'Baseplates',  # In theory, should never have to upload these
 	'Sensors',
 	'PCBs',
-	#'Protomodules',
-	#'Modules',
-	#'2. Sensor - post-assembly',
+	'Protomodules',
+	'Modules',
+	'2. Sensor - post-assembly',
 	#'4. PCB - post-assembly'
 ]
 
@@ -241,29 +241,6 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		# After tunnel established, :
 		fm.connectOracle()
 
-		# NEW:  If not already present, create new ssh key for user
-		# Enables scp without password prompt every time
-		"""
-		ssh_dir = os.path.expanduser('~/.ssh/hgcal_gui')
-		if not os.path.isfile(ssh_dir+'/id_rsa_'.format(self.username)):
-			# generate new ssh key at ~/.ssh/hgcal_gui/id_rsa_USERNAME
-			print("NOTE:  Existing ssh key for DB loader not found.  Generating new ssh key (mandatory)...")
-			if not os.path.exists(ssh_dir):
-				os.mkdir(ssh_dir)
-			keygen_result = subprocess.run(['ssh-keygen', '-f', ssh_dir+'/id_rsa_'+self.username, '-t', 'rsa', '-N', '\'\''])
-			if keygen_result.returncode != 0:
-				print("ERROR:  Problem occurred during ssh-keygen: status {}".format(keygen_result.returncode))
-				print(keygen_result.stderr)
-				exit()
-			copy_result = subprocess.run(['ssh-copy-id', '-i', ssh_dir+'/id_rsa_'+self.username, self.username+'@dbloader-hgcal.cern.ch'])
-			if copy_result.returncode != 0:
-				print("ERROR:  Problem occurred during ssh-copy-id: status {}".format(copy_result.returncode))
-				print(copy_result.stderr)
-				exit()
-		else:
-			print("Existing ssh key found at {}/id_rsa_{}".format(ssh_dir, self.username))
-		"""
-
 
 	def setupPagesUI(self):
 		self.page_view_users       = widget_view_users(None)       ; self.swPages.addWidget(self.page_view_users)
@@ -277,8 +254,8 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		self.page_view_tooling     = widget_view_tooling(None)     ; self.swPages.addWidget(self.page_view_tooling)
 		self.page_view_supplies    = widget_view_supplies(None)    ; self.swPages.addWidget(self.page_view_supplies)
 
-		#self.page_view_sensor_step = widget_view_sensor_step(None) ; self.swPages.addWidget(self.page_view_sensor_step)
-		#self.page_view_sensor_post = widget_view_sensor_post(None) ; self.swPages.addWidget(self.page_view_sensor_post)
+		self.page_view_sensor_step = widget_view_sensor_step(None) ; self.swPages.addWidget(self.page_view_sensor_step)
+		self.page_view_sensor_post = widget_view_sensor_post(None) ; self.swPages.addWidget(self.page_view_sensor_post)
 		#self.page_view_pcb_step    = widget_view_pcb_step(None)    ; self.swPages.addWidget(self.page_view_pcb_step)
 		#self.page_view_pcb_post    = widget_view_pcb_post(None)    ; self.swPages.addWidget(self.page_view_pcb_post)
 		#self.page_view_wirebonding = widget_view_wirebonding(None) ; self.swPages.addWidget(self.page_view_wirebonding)
@@ -298,8 +275,8 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		self.func_view_tooling     = cls_func_view_tooling(          fm, self.page_view_tooling    , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_supplies    = cls_func_view_supplies(         fm, self.page_view_supplies   , self.setUIPage, self.setSwitchingEnabled)
 
-		self.func_view_sensor_step = None#cls_func_view_sensor_step(      fm, self.userManager, self.page_view_sensor_step, self.setUIPage, self.setSwitchingEnabled)
-		self.func_view_sensor_post = None#cls_func_view_sensor_post(      fm, self.userManager, self.page_view_sensor_post, self.setUIPage, self.setSwitchingEnabled)
+		self.func_view_sensor_step = cls_func_view_sensor_step(      fm, self.userManager, self.page_view_sensor_step, self.setUIPage, self.setSwitchingEnabled)
+		self.func_view_sensor_post = cls_func_view_sensor_post(      fm, self.userManager, self.page_view_sensor_post, self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_pcb_step    = None#cls_func_view_pcb_step(         fm, self.userManager, self.page_view_pcb_step   , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_pcb_post    = None#cls_func_view_pcb_post(         fm, self.userManager, self.page_view_pcb_post   , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_wirebonding = None#cls_func_view_wirebonding(      fm, self.userManager, self.page_view_wirebonding, self.setUIPage, self.setSwitchingEnabled)
@@ -321,8 +298,8 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 
 			self.func_view_sensor_step,
 			self.func_view_sensor_post,
-			self.func_view_pcb_step,
-			self.func_view_pcb_post,
+			None, #self.func_view_pcb_step,
+			None, #self.func_view_pcb_post,
 			self.func_view_wirebonding,
 			self.func_view_plots,
 			]
@@ -332,7 +309,6 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		self.listUsers.itemActivated.connect(self.changeUIPage)
 		self.listInformation.itemActivated.connect(self.changeUIPage)
 		self.listAssembly.itemActivated.connect(self.changeUIPage)
-		#self.listShippingAndReceiving.itemActivated.connect(self.changeUIPage)
 		self.swPages.currentChanged.connect(self.pageChanged)
 
 		self.pbUploadObject.clicked.connect(self.goUploadObject)
@@ -375,7 +351,6 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		self.listUsers.setEnabled(enabled)
 		self.listInformation.setEnabled(enabled)
 		self.listAssembly.setEnabled(enabled)
-		#self.listShippingAndReceiving.setEnabled(enabled)
 
 
 	# New, sort of experimental
@@ -564,18 +539,6 @@ class LoginDialog(wdgt.QDialog):
 		print("Got username {}, password {}".format(username, password))
 		print("TEMP:  May need to authenticate in terminal")
 
-		# PERFORM ATTEMPTED UPLOAD
-		# If all good, then:
-		#for f in :
-		#	lc = LoaderClient(["--url", "https://cmsdca.cern.ch/hgc_loader/hgc/int2r", "--login", "--verbose", f])
-		#	load_status = lc.run()
-
-		#if load_status == 0:
-		#	self.accept()
-
-		#self.accept()
-		# Otherwise...
-		# self.reject()
 
 	def handleCancel(self):
 		print("Login canceled")
