@@ -286,8 +286,7 @@ class fsobj(object):
 
 		filedir, filename = self.get_filedir_filename(ID)
 		xml_file = os.sep.join([filedir, filename])
-		if not os.path.exists(xml_file):
-			return False
+		assert os.path.exists(xml_file), "Part {} in partlist has no json file {}!".format(ID, xml_file)
 		with open(xml_file, 'r') as opfl:
 			data = json.load(opfl)
 
@@ -301,6 +300,7 @@ class fsobj(object):
 				setattr(self, prop, data[prop])
 			else:
 				prop_default = self.DEFAULTS[prop] if prop in self.DEFAULTS.keys() else None
+
 		return True
 
 

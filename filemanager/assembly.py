@@ -53,12 +53,19 @@ class fsobj_step(fm.fsobj):
 	# - TBD
 
 
-	def __init__(self):
-		# protomods start None, get filled only once they're known to exist
-		self.protomodules = [None for i in range(6)]
+	# Properties unique to class
+	EXTRA_PROPERTIES = []
+	EXTRA_DEFAULTS = {}
 
-	def load(self):
-		super(fsobj_step, self).save()
+	def __init__(self):
+		self.PROPERTIES = self.EXTRA_PROPERTIES
+		self.DEFAULTS = self.EXTRA_DEFAULTS  # | == incl or
+		super(fsobj_step, self).__init__()
+
+
+
+	def load(self, ID):
+		return super(fsobj_step, self).load(ID)
 		# NOTE:  This will have to do work.
 		# Query DB, then download all relevant parts for this step...
 		# ...THEN load step.
@@ -129,9 +136,11 @@ class step_sensor(fsobj_step):
 		tmp_proto = parts.protomodule()
 		data = []
 		for i in range(6):
-			if not self.protomodules[i]:  continue
-			tmp_proto.load(self.protomodules[i])
-			data.append(getattr(tmp_proto, var, None))
+			if not self.protomodules[i]:
+				data.append(None)
+			else:
+				tmp_proto.load(self.protomodules[i])
+				data.append(getattr(tmp_proto, var, None))
 		return data
 	
 	def set_vars_from_proto(self, var, data):

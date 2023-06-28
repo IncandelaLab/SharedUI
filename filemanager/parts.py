@@ -584,26 +584,24 @@ class protomodule(fsobj_part):
 
 	# new():  Optionally, create proto from baseplate and sensor objects
 	# Note:  baseplate and sensor must be the actual objects, not IDs
-	def new(self, ID, baseplate_=None, sensor_=None, step_sensor_=None):
+	def new(self, ID, baseplate_=None, sensor_=None):
 		super(protomodule, self).new(ID)
 		# if no sensor/baseplate, create and return normally
 		if not baseplate_ and not sensor_:  return
 		# if not all of the above, throw error
-		assert baseplate_ and sensor_, "Error creating protomodule: baseplate is {}, sensor is {}, sensor step is {}".format(baseplate_, sensor_, sensor_step_)
+		assert baseplate_ and sensor_, "Error creating protomodule: baseplate is {}, sensor is {}, sensor step is {}".format(baseplate_, sensor_)
 
 		# if baseplate and sensor, auto-fill protomodule type, plus baseplate, sensor fields:
 		self.baseplate = baseplate_.ID
 		self.sensor = sensor_.ID
-		self.location = baseplate.location
+		self.location = baseplate_.location
 		self.geometry = baseplate_.geometry
 		self.baseplate_material = baseplate_.material
 		self.sen_type = sensor_.sen_type
 		# Finally, add proto as parent to baseplate/sensor
 		baseplate_.protomodule = self.ID
-		baseplate_.step_sensor = sensor_step_.ID
 		baseplate_.save()
 		sensor_.protomodule = self.ID
-		sensor_.step_sensor = sensor_step_.ID
 		sensor_.save()
 
 	def generate_xml(self):

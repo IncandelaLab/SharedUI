@@ -91,6 +91,7 @@ class simple_fsobj_vc(object):
 				self.fsobj.new(self.sbID.text())
 			else:
 				self.fsobj.new(self.sbID.value())
+
 		return True
 
 	def cancel_editing(self,*args,**kwargs):
@@ -419,7 +420,7 @@ class func(object):
 
 	@enforce_mode('view')
 	def start_editing_batch_sylgard(self,*args,**kwargs):
-		if not self.batch_araldite.start_editing():  return
+		if not self.batch_sylgard.start_editing():  return
 		self.mode = 'editing_batch_sylgard'
 		self.update_elements()
 

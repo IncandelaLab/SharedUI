@@ -22,15 +22,15 @@ PART_DICT = {
 	'Baseplate':   parts.baseplate,
 	'Sensor':      parts.sensor,
 	'PCB':         parts.pcb,
-	#'Protomodule': parts.protomodule,
-	#'Module':      parts.module,
+	'Protomodule': parts.protomodule,
+	'Module':      parts.module,
 }
 
 PART_NAME_DICT = {
 	'Baseplate':  '{mat_type} Baseplate {channel_density} {geometry}',
 	'Sensor':     '{sen_type} Si Sensor {channel_density} {geometry}',
 	'PCB':        'PCB {channel_density} {geometry}',
-	'Protomdule': '% {sen_type} ProtoModule {channel_density} {geometry}',
+	'Protomodule': '% {sen_type} ProtoModule {channel_density} {geometry}',
 	'Module':     '% {sen_type} Si Module {channel_density} {geometry}'
 }
 
@@ -238,12 +238,13 @@ and l.LOCATION_NAME like \'{}\'"*"*".format(pt_query, search_criteria['location_
 		name = self.page.lwPartList.currentItem().text().replace(" (not uploaded to DB)", "") #.text().split()
 		# find corresponding part type
 		typ = self.page.lwTypeList.item(self.page.lwPartList.currentRow()).text()
+		pageName = None
 		for pttype in PAGE_NAME_DICT:
 			# note:  "module" in "protomodule", but module is last -> self-correcting.
-			print(pttype.lower(), typ.lower())
+			#print(pttype.lower(), typ.lower())
 			if pttype.lower() in typ.lower():
 				pageName = PAGE_NAME_DICT[pttype]
-
+				break
 		self.setUIPage(pageName, ID=name)
 
 

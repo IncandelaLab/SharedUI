@@ -30,6 +30,11 @@ INDEX_SHAPE = {
 	'Three':7
 }
 
+INDEX_TYPE = {
+	'HD':0,
+	'LD':1,
+}
+
 INDEX_GRADE = {
 	'Green':0,
 	'Yellow':1,
@@ -133,6 +138,7 @@ class func(object):
 		self.page.cbInstitution.setCurrentIndex(   INDEX_INSTITUTION.get(self.protomodule.location, -1)    )
 		#self.page.leLocation.setText(    "" if self.protomodule.institution_location     is None else     self.protomodule.institution_location    )
 
+		self.page.cbType.setCurrentIndex(     INDEX_TYPE.get(     self.protomodule.channel_density, -1))
 		self.page.cbShape.setCurrentIndex(    INDEX_SHAPE.get(    self.protomodule.geometry    ,-1))
 		self.page.cbGrade.setCurrentIndex(    INDEX_GRADE.get(    self.protomodule.grade    ,-1))
 		#self.page.sbChannels.setValue(   -1 if self.protomodule.channels  is None else self.protomodule.channels  )
@@ -206,6 +212,7 @@ class func(object):
 		self.page.pbCancel.setEnabled(  mode_editing )
 
 		#self.page.leLocation.setReadOnly(  not mode_editing )
+		self.page.cbType.setEnabled(           mode_editing )
 		self.page.cbShape.setEnabled(          mode_editing )
 		self.page.cbInstitution.setEnabled(    mode_editing )
 		self.page.cbInsertUser.setEnabled(     mode_editing )
@@ -269,12 +276,13 @@ class func(object):
 	@enforce_mode('editing')
 	def saveEditing(self,*args,**kwargs):
 
-		self.protomodule.record_insertion_user = str(self.page.cbInsertUser.currentText() ) if str(self.page.cbInsertUser.currentText())  else None
-		self.protomodule.location    = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
-		#self.protomodule.institution_location       = str(self.page.leLocation.text()          ) if str(self.page.leLocation.text()        ) else None
-		self.protomodule.geometry          = str(self.page.cbShape.currentText()      ) if str(self.page.cbShape.currentText()    ) else None
-		self.protomodule.grade          = str(self.page.cbGrade.currentText()      ) if str(self.page.cbGrade.currentText()    ) else None
-		self.protomodule.thickness      =     self.page.dsbThickness.value()         if self.page.dsbThickness.value() >=0 else None
+		# NOTE:  None of these should be edited
+		#self.protomodule.record_insertion_user = str(self.page.cbInsertUser.currentText() ) if str(self.page.cbInsertUser.currentText())  else None
+		#self.protomodule.location    = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
+		#self.protomodule.channel_density   = str(self.page.cbType.currentText()      ) if str(self.page.cbType.currentText()    ) e    lse None
+		#self.protomodule.geometry          = str(self.page.cbShape.currentText()      ) if str(self.page.cbShape.currentText()    ) else None
+		#self.protomodule.grade          = str(self.page.cbGrade.currentText()      ) if str(self.page.cbGrade.currentText()    ) else None
+		#self.protomodule.thickness      =     self.page.dsbThickness.value()         if self.page.dsbThickness.value() >=0 else None
 		#self.protomodule.channels       =     self.page.sbChannels.value()           if self.page.sbChannels.value()   >=0 else None
 
 		num_comments = self.page.listComments.count()

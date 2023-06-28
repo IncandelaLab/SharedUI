@@ -286,22 +286,28 @@ class func(object):
 					dt.setDate(QtCore.QDate(*NO_DATE))
 					dt.setTime(QtCore.QTime(0,0,0))
 				else:
-					localtime = list(time.localtime(st))
-					dt.setDate(QtCore.QDate(*localtime[0:3]))
-					dt.setTime(QtCore.QTime(*localtime[3:6]))
+					tm = datetime.datetime.strptime(st, "%Y-%m-%d %H:%M:%S%z")
+					localtime = tm.replace(tzinfo=datetime.timezone.utc).astimezone(tz=None)
+					#dt.setDate(QtCore.QDate(*localtime[0:3]))
+					#dt.setTime(QtCore.QTime(*localtime[3:6]))
+					dat = QtCore.QDate(localtime.year, localtime.month, localtime.day)
+					tim = QtCore.QTime(localtime.hour, localtime.minute, localtime.second)
+					dt.setDate(dat)
+					dt.setTime(tim)
 
 			self.page.leBatchAraldite.setText(self.step_sensor.glue_batch_num if not (self.step_sensor.glue_batch_num is None) else "")
 			self.page.sbTrayAssembly.setValue( self.step_sensor.asmbl_tray_name  if not (self.step_sensor.asmbl_tray_name  is None) else -1)
 			self.page.sbTrayComponent.setValue(self.step_sensor.comp_tray_name if not (self.step_sensor.comp_tray_name is None) else -1)
 
-			if not (self.step_sensor.tools is None):
+			if not (self.step_sensor.snsr_tool_names is None):
 				tools = self.step_sensor.snsr_tool_names
+				print("snsr tool names is", self.step_sensor.snsr_tool_names)
 				for i in range(6):
 					self.sb_tools[i].setValue(tools[i] if tools[i] != None else -1)
 			else:
 				for i in range(6):
 					self.sb_tools[i].setValue(-1)
-
+			print("getting sensors for", self.step_sensor.ID)
 			if not (self.step_sensor.sensors is None):
 				for i in range(6):
 					self.le_sensors[i].setText(str(self.step_sensor.sensors[i]) if not (self.step_sensor.sensors[i] is None) else "")
@@ -462,24 +468,24 @@ class func(object):
 		result = self.tools_sensor[which].load(self.sb_tools[which].value(), self.page.cbInstitution.currentText())
 		self.updateIssues()
 
-	@enforce_mode(['editing','creating'])
+	@enforce_mode(['editing','creating', 'searching'])
 	def loadBaseplate(self, *args, **kwargs):
 		if 'row' in kwargs.keys():
 			which = kwargs['row']
 		else:
 			sender_name = str(self.page.sender().objectName())
 			which = int(sender_name[-1]) - 1
-		self.baseplates[which].load(self.le_baseplates[which].text(), query_db=False)
+		self.baseplates[which].load(self.le_baseplates[which].text())
 		self.updateIssues()
 
-	@enforce_mode(['editing','creating'])
+	@enforce_mode(['editing','creating', 'searching'])
 	def loadSensor(self, *args, **kwargs):
 		if 'row' in kwargs.keys():
 			which = kwargs['row']
 		else:
 			sender_name = str(self.page.sender().objectName())
 			which = int(sender_name[-1]) - 1
-		self.sensors[which].load(self.le_sensors[which].text(), query_db=False)
+		self.sensors[which].load(self.le_sensors[which].text())
 		self.updateIssues()
 
 	@enforce_mode(['editing','creating'])
@@ -718,13 +724,13 @@ class func(object):
 
 		# set sensor step properties (which implicitly set the protomodule vars):
 		# since these call protomodule.save(), must be called second
-		self.sensor_step.record_insertion_user = str(self.page.cbUserPerformed.currentText()) \
+		self.step_sensor.record_insertion_user = str(self.page.cbUserPerformed.currentText()) \
 		    if self.page.cbUserPerformed.currentText()!='' else None
 		# Save all times as UTC
-		pydt = self.page.dtRunStart.dateTime().toPyDateTime()
-		self.step_sensor.run_begin_timestamp = pydt.toPyDateTime(datetime.timezone.utc) # sec UTC
-		pydt = self.page.dtRunStop.dateTime().toPyDateTime()
-		self.step_sensor.run_end_timestamp   = pydt.toPyDateTime(datetime.timezone.utc)
+		pydt = self.page.dtRunStart.dateTime().toPyDateTime().astimezone(datetime.timezone.utc)
+		self.step_sensor.run_begin_timestamp = str(pydt) # sec UTC
+		pydt = self.page.dtRunStop.dateTime().toPyDateTime().astimezone(datetime.timezone.utc)
+		self.step_sensor.run_end_timestamp   = str(pydt)
 		
 		self.step_sensor.glue_batch_num = self.page.leBatchAraldite.text() \
 		    if self.page.leBatchAraldite.text() else None
@@ -761,11 +767,7 @@ class func(object):
 
 	# NEW
 	def doSearch(self,*args,**kwargs):
-		SEARCH_DB = False
 		tmp_part = getattr(parts, self.search_part)()
-		# Perform part search:
-		if SEARCH_DB:
-			pass  # TO IMPLEMENT LATER
 
 		# Search local-only parts:  open part file
 		part_file_name = os.sep.join([ fm.DATADIR, 'partlist', self.search_part+'s.json' ])
@@ -779,13 +781,15 @@ class func(object):
 				continue
 			if self.search_part in ['baseplate', 'sensor']:
 				# Search for one thing:  NOT already assigned to a protomod
-				tmp_part.load(part_id, query_db=False)  # db query already done
+				tmp_part.load(part_id)
 				if tmp_part.protomodule is None:
 					self.page.lwPartList.addItem("{} {}".format(self.search_part, part_id))
 			else:  # araldite, no restrictions
 				self.page.lwPartList.addItem("{} {}".format(self.search_part, part_id))
 
 		self.page.leSearchStatus.setText('{}: row {}'.format(self.search_part, self.search_row))
+		self.loadBaseplate()
+		self.loadSensor()
 		self.mode = 'searching'
 		self.updateElements()
 

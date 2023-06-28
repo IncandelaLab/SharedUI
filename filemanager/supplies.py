@@ -36,7 +36,6 @@ class batch_araldite(fsobj_supply):
 	OBJECTNAME = "araldite batch"
 	FILEDIR = os.sep.join(['supplies','batch_araldite','{date}'])
 	FILENAME = 'batch_araldite_{ID:0>5}.xml'
-	# Dates should have the format "{}-{}-{} {}:{}:{}".  NOT a property; the UI pages handle the loading.
 
 
 class batch_wedge(fsobj_supply):
@@ -54,6 +53,7 @@ class batch_sylgard(fsobj_supply):  # was sylgar_thick
 		'date_expires',
 		'is_empty',
 		'curing_agent',
+		'comments'
 	]
 
 
