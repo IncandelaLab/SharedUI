@@ -16,8 +16,12 @@ INDEX_SHAPE = {
 	'Left':3,
 	'Right':4,
 	'Five':5,
-	'Full':6,
-	'Three':7
+	'Full+Three':6,
+}
+
+INDEX_TYPE = {
+	'HD':0,
+	'LD':1,
 }
 
 INDEX_INSPECTION = {
@@ -161,6 +165,7 @@ class func(object):
 
 		# characteristics
 		self.page.cbShape.setCurrentIndex(      INDEX_SHAPE.get(      self.module.geometry    , -1)  )
+		self.page.cbResolution.setCurrentIndex( INDEX_TYPE.get(       self.module.channel_density, -1))
 		self.page.cbGrade.setCurrentIndex(      INDEX_GRADE.get(      self.module.grade    , -1)  )
 		self.page.cbInspection.setCurrentIndex( INDEX_INSPECTION.get( self.module.pre_inspection,  -1))
 
@@ -183,8 +188,8 @@ class func(object):
 		# NOTE - TBD - may have to remove/comment
 		self.page.leBaseplate.setText(    "" if self.module.baseplate     is None else self.module.baseplate     )
 		self.page.leSensor.setText(       "" if self.module.sensor        is None else self.module.sensor        )
-		self.page.lePcb.setText(          "" if self.module.pcb           is None else self.module.pcb_ser_num           )
-		self.page.leProtomodule.setText(  "" if self.module.protomodule   is None else self.module.prto_ser_num   )
+		self.page.lePcb.setText(          "" if self.module.pcb           is None else self.module.pcb           )
+		self.page.leProtomodule.setText(  "" if self.module.protomodule   is None else self.module.protomodule   )
 		if self.page.sbStepSensor.value()  == -1:  self.page.sbStepSensor.clear()
 		if self.page.sbStepPcb.value()     == -1:  self.page.sbStepPcb.clear()
 		if self.page.leBaseplate.text()    == -1:  self.page.leBaseplate.clear()
@@ -204,12 +209,12 @@ class func(object):
 
 
 		self.page.listFiles.clear()
-		for f in self.module.test_files:
+		for f in self.module.test_files if self.module.test_files else []:
 			name = os.path.split(f)[1]
 			self.page.listFiles.addItem(name)
 
-		self.page.dsbOffsetTranslationX.setValue( -1 if self.module.pcb_plcment_x_offset is None else self.module.pcb_plcment_x_offst )
-		self.page.dsbOffsetTranslationY.setValue( -1 if self.module.pcb_plcment_y_offset is None else self.module.pcb_plcment_y_offst )
+		self.page.dsbOffsetTranslationX.setValue( -1 if self.module.pcb_plcment_x_offset is None else self.module.pcb_plcment_x_offset )
+		self.page.dsbOffsetTranslationY.setValue( -1 if self.module.pcb_plcment_y_offset is None else self.module.pcb_plcment_y_offset )
 		self.page.dsbOffsetRotation.setValue(    -1 if self.module.pcb_plcment_ang_offset    is None else self.module.pcb_plcment_ang_offset )
 		self.page.dsbThickness.setValue(-1 if self.module.thickness   is None else self.module.thickness  )
 		self.page.dsbFlatness.setValue( -1 if self.module.flatness  is None else self.module.flatness   )
@@ -323,8 +328,8 @@ class func(object):
 		self.module.comments = ';;'.join([self.page.listComments.item(i).text() for i in range(num_comments)])
 		if num_comments == 0:  self.module.comments = ';;'
 
-		self.module.pcb_plcment_x_offst = self.page.dsbOffsetTranslationX.value() if self.page.dsbOffsetTranslationX.value() >=0 else None
-		self.module.pcb_plcment_y_offst = self.page.dsbOffsetTranslationY.value() if self.page.dsbOffsetTranslationY.value() >=0 else None
+		self.module.pcb_plcment_x_offset = self.page.dsbOffsetTranslationX.value() if self.page.dsbOffsetTranslationX.value() >=0 else None
+		self.module.pcb_plcment_y_offset = self.page.dsbOffsetTranslationY.value() if self.page.dsbOffsetTranslationY.value() >=0 else None
 		self.module.offset_rotation      = self.page.dsbOffsetRotation.value()    if self.page.dsbOffsetRotation.value()    >=0 else None
 		self.module.flatness = self.page.dsbOffsetFlatness.value()    if self.page.dsbFlatness.value()    >=0 else None
 		self.module.thickness = self.page.dsbOffsetThickness.value()    if self.page.dsbThickness.value()    >=0 else None

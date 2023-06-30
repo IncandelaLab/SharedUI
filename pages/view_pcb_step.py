@@ -4,7 +4,7 @@ import datetime
 import os
 import json
 
-from filemanager import fm
+from filemanager import fm, parts, tools, supplies, assembly
 
 NO_DATE = [2022,1,1]
 
@@ -37,6 +37,9 @@ I_BATCH_ARALDITE_EXPIRED = "araldite batch has expired"
 
 # parts
 I_PART_NOT_READY    = "{}(s) in position(s) {} is not ready for pcb application. reason: {}"
+
+I_PCB_PROTOMODULE_SHAPE = "pcb {} has shape {} but protomodule {} has shape {}"
+I_PCB_PROTOMODULE_CHANNEL = "pcb {} has channel density {} but protomodule {} has channel density {}"
 
 # rows / positions
 I_NO_PARTS_SELECTED     = "no parts have been selected"
@@ -79,15 +82,15 @@ class func(object):
 		self.setMainSwitchingEnabled = setSwitchingEnabled
 
 		#New stuff
-		self.tools_pcb    = [fm.tool_pcb()    for _ in range(6)]
-		self.pcbs         = [fm.pcb()         for _ in range(6)]
-		self.protomodules = [fm.protomodule() for _ in range(6)]
-		self.modules      = [fm.module()      for _ in range(6)]
-		self.tray_component_pcb = fm.tray_component_pcb()
-		self.tray_assembly      = fm.tray_assembly()
-		self.batch_araldite     = fm.batch_araldite()
+		self.tools_pcb    = [tools.tool_pcb()    for _ in range(6)]
+		self.pcbs         = [parts.pcb()         for _ in range(6)]
+		self.protomodules = [parts.protomodule() for _ in range(6)]
+		self.modules      = [parts.module()      for _ in range(6)]
+		self.tray_component_pcb = tools.tray_component_pcb()
+		self.tray_assembly      = tools.tray_assembly()
+		self.batch_araldite     = supplies.batch_araldite()
 
-		self.step_pcb = fm.step_pcb()
+		self.step_pcb = assembly.step_pcb()
 		self.step_pcb_exists = False
 
 		self.mode = 'setup'
@@ -274,32 +277,35 @@ class func(object):
 
 		if self.step_pcb_exists:
 
-			if not self.step_pcb.user_performed in self.index_users.keys() and not self.step_pcb.user_performed is None:
+			if not self.step_pcb.record_insertion_user in self.index_users.keys() and not self.step_pcb.record_insertion_user is None:
 				# Insertion user was deleted from user page...just add user to the dropdown
-				self.index_users[self.step_pcb.user_performed] = max(self.index_users.values()) + 1
-				self.page.cbUserPerformed.addItem(self.step_pcb.user_performed)
-			self.page.cbUserPerformed.setCurrentIndex(self.index_users.get(self.step_pcb.user_performed, -1))
-			self.page.leLocation.setText(self.step_pcb.location)
+				self.index_users[self.step_pcb.record_insertion_user] = max(self.index_users.values()) + 1
+				self.page.cbUserPerformed.addItem(self.step_pcb.record_insertion_user)
+			self.page.cbUserPerformed.setCurrentIndex(self.index_users.get(self.step_pcb.record_insertion_user, -1))
 
-			times_to_set = [(self.step_pcb.run_start,  self.page.dtRunStart),
-			                (self.step_pcb.run_stop,   self.page.dtRunStop)]
+			times_to_set = [(self.step_pcb.run_begin_timestamp,  self.page.dtRunStart),
+			                (self.step_pcb.run_end_timestamp,   self.page.dtRunStop)]
 			for st, dt in times_to_set:
 				if st is None:
 					dt.setDate(QtCore.QDate(*NO_DATE))
 					dt.setTime(QtCore.QTime(0,0,0))
 				else:
-					localtime = list(time.localtime(st))
-					dt.setDate(QtCore.QDate(*localtime[0:3]))
-					dt.setTime(QtCore.QTime(*localtime[3:6]))
+					tm = datetime.datetime.strptime(st, "%Y-%m-%d %H:%M:%S%z")
+					localtime = tm.replace(tzinfo=datetime.timezone.utc).astimezone(tz=None)
+					dat = QtCore.QDate(localtime.year, localtime.month, localtime.day)
+					tim = QtCore.QTime(localtime.hour, localtime.minute, localtime.second)
+					dt.setDate(dat)
+					dt.setTime(tim)
 
 
-			self.page.leBatchAraldite.setText(self.step_pcb.batch_araldite if not (self.step_pcb.batch_araldite is None) else -1)
-			self.page.sbTrayAssembly.setValue( self.step_pcb.tray_assembly  if not (self.step_pcb.tray_assembly  is None) else -1)
-			self.page.sbTrayComponent.setValue(self.step_pcb.tray_component_pcb if not (self.step_pcb.tray_component_pcb is None) else -1)
+			self.page.leBatchAraldite.setText(self.step_pcb.glue_batch_num if not (self.step_pcb.glue_batch_num is None) else "")
+			self.page.sbTrayAssembly.setValue( self.step_pcb.asmbl_tray_name if not (self.step_pcb.asmbl_tray_name  is None) else -1)
+			self.page.sbTrayComponent.setValue(self.step_pcb.comp_tray_name if not (self.step_pcb.comp_tray_name is None) else -1)
 
-			if not (self.step_pcb.tools is None):
+			if not (self.step_pcb.pcb_tool_names is None):
+				tools = self.step_pcb.pcb_tool_names
 				for i in range(6):
-					self.sb_tools[i].setValue(self.step_pcb.tools[i] if not (self.step_pcb.tools[i] is None) else -1)
+					self.sb_tools[i].setValue(tools[i] if not (tools[i] is None) else -1)
 			else:
 				for i in range(6):
 					self.sb_tools[i].setValue(-1)
@@ -329,7 +335,6 @@ class func(object):
 
 		else:
 			self.page.cbUserPerformed.setCurrentIndex(-1)
-			self.page.leLocation.setText("")
 			self.page.dtRunStart.setDate(QtCore.QDate(*NO_DATE))
 			self.page.dtRunStart.setTime(QtCore.QTime(0,0,0))
 			self.page.dtRunStop.setDate(QtCore.QDate(*NO_DATE))
@@ -374,7 +379,6 @@ class func(object):
 		self.page.pbRunStopNow      .setEnabled(mode_creating or mode_editing)
 
 		self.page.cbUserPerformed  .setEnabled( mode_creating or mode_editing)
-		self.page.leLocation       .setReadOnly(mode_view or mode_searching)
 		self.page.dtRunStart       .setReadOnly(mode_view or mode_searching)
 		self.page.dtRunStop        .setReadOnly(mode_view or mode_searching)
 		self.page.sbTrayComponent  .setReadOnly(mode_view or mode_searching)
@@ -465,35 +469,35 @@ class func(object):
 	def loadBaseplate(self, *args, **kwargs):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
-		self.baseplates[which].load(self.le_baseplates[which].text(), query_db=False)
+		self.baseplates[which].load(self.le_baseplates[which].text())
 		self.updateIssues()
 
-	@enforce_mode(['editing','creating'])
+	@enforce_mode(['editing','creating', 'searching'])
 	def loadPcb(self, *args, **kwargs):
 		if 'row' in kwargs.keys():
 			which = kwargs['row']
 		else:
 			sender_name = str(self.page.sender().objectName())
 			which = int(sender_name[-1]) - 1
-		self.pcbs[which].load(self.le_pcbs[which].text(), query_db=False)
+		self.pcbs[which].load(self.le_pcbs[which].text())
 		self.updateIssues()
 
 	#New
-	@enforce_mode(['editing','creating'])
+	@enforce_mode(['editing','creating', 'searching'])
 	def loadProtomodule(self, *args, **kwargs):
 		if 'row' in kwargs.keys():
 			which = kwargs['row']
 		else:
 			sender_name = str(self.page.sender().objectName())
 			which = int(sender_name[-1]) - 1
-		self.protomodules[which].load(self.le_protomodules[which].text(), query_db=False)
+		self.protomodules[which].load(self.le_protomodules[which].text())
 		self.updateIssues()
 
 	@enforce_mode(['editing','creating'])
 	def loadModule(self, *args, **kwargs):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
-		self.modules[which].load(self.le_modules[which].text(), query_db=False)
+		self.modules[which].load(self.le_modules[which].text())
 		self.updateIssues()
 
 
@@ -576,7 +580,7 @@ class func(object):
 
 		for i in range(6):
 			num_parts = 0
-			tmp_id = "{}_{}".format(self.page.cbInstitution.currentText(), self.page.sbID.value())
+			tmp_id = self.step_pcb.ID
 
 			if pcb_tools_selected[i] >= 0:
 				num_parts += 1
@@ -607,6 +611,17 @@ class func(object):
 			if modules_selected[i] != "":
 				num_parts += 1
 
+			# NOTE:  TODO:  geometry, channel_density must match
+			if pcbs_selected[i] != "" and protomodules_selected[i] != "" \
+			        and not self.pcbs[i].ID is None and not self.protomodules[i].ID is None:
+				# Check for compatibility bw two objects:
+				if self.pcbs[i].geometry != self.protomodules[i].geometry:
+					issues.append(I_PCB_PROTOMODULE_SHAPE.format(self.pcbs[i].ID, self.pcbs[i].geometry, \
+                                                                  self.protomodules[i].ID, self.protomodules[i].geometry))
+				if self.pcbs[i].channel_density != self.protomodules[i].channel_density:
+					issues.append(I_PCB_PROTOMODULE_CHANNEL.format(self.pcbs[i].ID, self.protomodules[i].channel_density, \
+                                                                    self.pcbs[i].ID, self.protomodules[i].channel_density))
+
 			if num_parts == 0:
 				rows_empty.append(i)
 			elif num_parts == 4:
@@ -616,38 +631,21 @@ class func(object):
 
 		if not (len(rows_full) or len(rows_incomplete)):
 			issues.append(I_NO_PARTS_SELECTED)
-
 		if rows_incomplete:
 			issues.append(I_ROWS_INCOMPLETE.format(', '.join(map(str,rows_incomplete))))
-
-
 		if rows_pcb_dne:
 			issues.append(I_PCB_DNE.format(        ', '.join([str(_+1) for _ in rows_pcb_dne])))
 		if rows_protomodule_dne:
 			issues.append(I_PROTO_DNE.format(      ', '.join([str(_+1) for _ in rows_protomodule_dne])))
-
-		objects_not_here = []
-
-		for obj in objects:
-
-			institution = getattr(obj, "institution", None)
-			if not (institution in [None, self.page.cbInstitution.currentText()]):
-				objects_not_here.append(obj)
-
-		if objects_not_here:
-			issues.append(I_INSTITUTION.format([str(_) for _ in objects_not_here]))
-
 		if not self.page.ckCheckFeet.isChecked():
 			issues.append(I_NO_TOOL_CHK)
 
 		self.page.listIssues.clear()
 		for issue in issues:
 			self.page.listIssues.addItem(issue)
-
 		if issues:
 			self.page.leStatus.setText(STATUS_ISSUES)
 			self.page.pbSave.setEnabled(False)
-
 		else:
 			self.page.leStatus.setText(STATUS_NO_ISSUES)
 			self.page.pbSave.setEnabled(True)
@@ -657,7 +655,7 @@ class func(object):
 	def loadStep(self,*args,**kwargs):
 		if self.page.sbID.value() == -1:  return
 		if self.page.cbInstitution.currentText() == "":  return
-		tmp_step = fm.step_pcb()
+		tmp_step = assembly.step_pcb()
 		tmp_ID = self.page.sbID.value()
 		tmp_inst = self.page.cbInstitution.currentText()
 		tmp_exists = tmp_step.load("{}_{}".format(tmp_inst, tmp_ID))
@@ -671,7 +669,7 @@ class func(object):
 	def startCreating(self,*args,**kwargs):
 		if self.page.sbID.value() == -1:  return
 		if self.page.cbInstitution.currentText() == "":  return
-		tmp_step = fm.step_pcb()
+		tmp_step = assembly.step_pcb()
 		tmp_ID = self.page.sbID.value()
 		tmp_inst = self.page.cbInstitution.currentText()
 		tmp_exists = tmp_step.load("{}_{}".format(tmp_inst, tmp_ID))
@@ -683,7 +681,7 @@ class func(object):
 
 	@enforce_mode('view')
 	def startEditing(self,*args,**kwargs):
-		tmp_step = fm.step_pcb()
+		tmp_step = assembly.step_pcb()
 		tmp_ID = self.page.sbID.value()
 		tmp_inst = self.page.cbInstitution.currentText()
 		tmp_exists = tmp_step.load("{}_{}".format(tmp_inst, tmp_ID))
@@ -702,14 +700,6 @@ class func(object):
 
 	@enforce_mode(['editing','creating'])
 	def saveEditing(self,*args,**kwargs):
-		self.step_pcb.institution = self.page.cbInstitution.currentText()
-
-		self.step_pcb.user_performed = str(self.page.cbUserPerformed.currentText()) if str(self.page.cbUserPerformed.currentText()) else None
-		self.step_pcb.location = str( self.page.leLocation.text() )
-
-		self.step_pcb.run_start  = self.page.dtRunStart.dateTime().toTime_t()
-		self.step_pcb.run_stop   = self.page.dtRunStop.dateTime().toTime_t()
-
 		tools        = []
 		pcbs         = []
 		protomodules = []
@@ -725,46 +715,45 @@ class func(object):
 		self.step_pcb.protomodules = protomodules
 		self.step_pcb.modules      = modules
 
-		self.step_pcb.tray_component_pcb    = self.page.sbTrayComponent.value() if self.page.sbTrayComponent.value() >= 0 else None
-		self.step_pcb.tray_assembly         = self.page.sbTrayAssembly.value()  if self.page.sbTrayAssembly.value()  >= 0 else None
-		self.step_pcb.batch_araldite        = self.page.leBatchAraldite.text() if self.page.leBatchAraldite.text() != "" else None
-
 
 		for i in range(6):
-			if modules[i] is None:
+			if pcbs[i] is None:
 				# Row is empty, continue
 				continue
-			temp_module = fm.module()
-			module_exists = temp_module.load(protomodules[i])
-			if not modules[i] is None:
-				temp_module.new(modules[i])
-				temp_module.new(modules[i])
-				# Pull data from current step, PCB, protomodule:
-				temp_module.institution    = self.step_pcb.institution
-				temp_module.location       = self.step_pcb.location
-				temp_module.insertion_user = self.step_pcb.user_performed
-				temp_module.thickness      = self.protomodules[i].thickness + self.pcbs[i].thickness + 0.1
-				temp_module.channels       = self.protomodules[i].channels
-				temp_module.size           = self.protomodules[i].size
-				temp_module.shape          = self.protomodules[i].shape
-				temp_module.grade          = self.protomodules[i].grade
+			temp_pcb = self.pcbs[i]
+			temp_proto = self.protomodules[i]
+			temp_module = parts.module()
 
-				temp_module.baseplate      = self.protomodules[i].baseplate
-				temp_module.sensor         = self.protomodules[i].sensor
-				temp_module.protomodule    = self.protomodules[i].ID
-				temp_module.pcb            = self.pcbs[i].ID
-				temp_module.step_sensor    = self.protomodules[i].step_sensor
-				temp_module.step_pcb       = self.step_pcb.ID
-
-				temp_module.save()
+			temp_module.new(modules[i], pcb_=temp_pcb, protomodule_=temp_proto)
+			temp_module.baseplate = self.protomodule.baseplate
+			temp_module.sensor = self.protomodule.sensor
+			temp_module.step_sensor = self.protomodule.step_sensor
+			temp_module.step_pcb = self.step_pcb.ID
+			temp_module.save()
 
 			self.pcbs[i].step_pcb = self.step_pcb.ID
-			self.pcbs[i].module = modules[i]
+			self.pcbs[i].module = temp_module.ID
 			self.pcbs[i].save()
 			self.protomodules[i].step_pcb = self.step_pcb.ID
-			self.protomodules[i].module = modules[i]
+			self.protomodules[i].module = temp_module.ID
 			self.protomodules[i].save()
 
+		self.step_pcb.record_insertion_user = str(self.page.cbUserPerformed.currentText()) \
+			if self.page.cbUserPerformed.currentText()!='' else None
+		# Save all times as UTC	
+		pydt = self.page.dtRunStart.dateTime().toPyDateTime().astimezone(datetime.timezone.utc)
+		self.step_pcb.run_begin_timestamp = str(pydt) # sec UTC
+		pydt = self.page.dtRunStop.dateTime().toPyDateTime().astimezone(datetime.timezone.utc)
+		self.step_pcb.run_end_timestamp   = str(pydt)
+
+		self.step_pcb.glue_batch_num = self.page.leBatchAraldite.text() \
+			if self.page.leBatchAraldite.text() else None
+		self.step_pcb.asmbl_tray_name = self.page.sbTrayAssembly.value() \
+			if self.page.sbTrayAssembly.value() >= 0 else None
+		self.step_pcb.comp_tray_name = self.page.sbTrayComponent.value() \
+			if self.page.sbTrayComponent.value() >= 0 else None
+
+		self.step_pcb.pcb_tool_names = tools
 		self.step_pcb.check_tool_feet = self.page.ckCheckFeet.isChecked()
 
 		self.step_pcb.save()
@@ -783,11 +772,7 @@ class func(object):
 
 	# NEW
 	def doSearch(self,*args,**kwargs):
-		SEARCH_DB = False
-		tmp_part = getattr(fm, self.search_part)()
-		# Perform part search:
-		if SEARCH_DB:
-			pass  # TO IMPLEMENT LATER
+		tmp_part = getattr(parts, self.search_part)()
 
 		# Search local-only parts:  open part file
 		part_file_name = os.sep.join([ fm.DATADIR, 'partlist', self.search_part+'s.json' ])
@@ -799,22 +784,24 @@ class func(object):
 			if len(self.page.lwPartList.findItems("{} {}".format(self.search_part, part_id), \
 			                                      QtCore.Qt.MatchExactly)) > 0:
 				continue
-			if self.search_part in ['baseplate', 'sensor']:
+			if self.search_part in ['pcb', 'protomodule']:
 				# Search for one thing:  NOT already assigned to a mod
-				tmp_part.load(part_id, query_db=False)  # db query already done
+				tmp_part.load(part_id)  # db query already done
 				if tmp_part.module is None:
 					self.page.lwPartList.addItem("{} {}".format(self.search_part, part_id))
 			else:
 				self.page.lwPartList.addItem("{} {}".format(self.search_part, part_id))
 
 		self.page.leSearchStatus.setText('{}: row {}'.format(self.search_part, self.search_row))
+		self.loadPcb()
+		self.loadProtomodule()
 		self.mode = 'searching'
 		self.updateElements()
 
 	def finishSearch(self,*args,**kwargs):
 		row = self.page.lwPartList.currentRow()
 		name = self.page.lwPartList.item(row).text().split()[1]
-		if self.search_part in ['baseplate', 'sensor']:
+		if self.search_part in ['pcb', 'protomodule']:
 			le_to_fill = getattr(self, 'le_{}s'.format(self.search_part))[self.search_row]
 		else:  # araldite
 			le_to_fill = self.page.leBatchAraldite

@@ -421,12 +421,7 @@
     </item>
     <item>
      <property name="text">
-      <string>Full</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Three</string>
+      <string>Full+Three</string>
      </property>
     </item>
    </widget>

@@ -39,29 +39,17 @@ INSTITUTION_DICT = {  # For loading from/to LOCATION_ID XML tag
 
 
 class fsobj_step(fm.fsobj):
-	# Note:  fsobj_db is currently minimalistic, only really contains cond header
-	# Could very feasibly remove at this point?
-
-	# Goals:
-	# Init arr of 6 protomodules
-	# Upon load:
-	# - sql query for protomod IDs matching step name
-	# - Download all into local protomodules
-	# GUI:
-	# - Access all step-specific info via attrs that get info from child protomods
-	# Upon save:
-	# - TBD
-
-
 	# Properties unique to class
 	EXTRA_PROPERTIES = []
 	EXTRA_DEFAULTS = {}
 
+	PART_CLASS = None # protomodule or module
+	PART = None # "protomodule", etc
+
 	def __init__(self):
 		self.PROPERTIES = self.EXTRA_PROPERTIES
-		self.DEFAULTS = self.EXTRA_DEFAULTS  # | == incl or
+		self.DEFAULTS = self.EXTRA_DEFAULTS
 		super(fsobj_step, self).__init__()
-
 
 
 	def load(self, ID):
@@ -71,10 +59,168 @@ class fsobj_step(fm.fsobj):
 		# ...THEN load step.
 
 
-	#def save(self):
-	#	super(fsobj_part, self).save()
+	def save(self):
+		super(fsobj_step, self).save()
 	# MAYBE:  Update step ID of child parts + save?
 	# - no, need to manually assign part info anyway
+
+	def generate_xml(self):
+		tmp_part = self.PART_CLASS()
+		parts = getattr(self, self.PART+"s", None)
+		for i in range(6):
+			if not parts[i]:  continue
+			tmp_part.load(parts[i])
+			tmp_part.generate_xml()
+
+
+	# Helper fn - get var from parts:
+	# - find the first non-None part
+	# - get the var and return it
+	def get_var_from_part(self, var):
+		tmp_part_ID = None
+		parts = getattr(self, self.PART+"s", None)
+		for i in range(6):
+			if parts[i]:
+				tmp_part_ID = parts[i]
+				break
+		if tmp_part_ID is None:  return None
+		tmp_part = self.PART_CLASS()
+		assert tmp_part.load(tmp_part_ID), "Could not load {} {} in sensor step {}".format(self.PART, tmp_part_ID, self.ID)
+		return getattr(tmp_part, var, None)
+
+	# utility:  given var, set var for all parts
+	def set_var_from_part(self, var, data):
+		tmp_part = self.PART_CLASS()
+		parts = getattr(self, self.PART+"s", None)
+		for i in range(6):
+			if parts[i]:
+				tmp_part.load(parts[i])
+				setattr(tmp_part, var, data)
+				tmp_part.save()
+
+
+	# get a list of vars from parts (snsr_tool_names, etc)
+	def get_vars_from_part(self, var):
+		parts = getattr(self, self.PART+"s", None)
+		tmp_part = self.PART_CLASS()
+		data = []
+		for i in range(6):
+			if not parts[i]:
+				data.append(None)
+			else:
+				tmp_part.load(parts[i])
+				data.append(getattr(tmp_part, var, None))
+		return data
+	
+	def set_vars_from_part(self, var, data):
+		parts = getattr(self, self.PART+"s", None)
+		tmp_part = self.PART_CLASS()
+		for i in range(6):
+			if not parts[i]:  continue
+			tmp_part.load(parts[i])
+			setattr(tmp_part, var, data[i])
+			tmp_part.save()
+
+
+	# properties for both sensor+pcb steps:
+
+	# pre-assembly properties
+	@property
+	def record_insertion_user(self):
+		return self.get_var_from_part("record_insertion_user")
+	@record_insertion_user.setter
+	def record_insertion_user(self, value):
+		self.set_var_from_part("record_insertion_user", value)
+
+	@property
+	def run_begin_timestamp(self):
+		return self.get_var_from_part("run_begin_timestamp")
+	@run_begin_timestamp.setter
+	def run_begin_timestamp(self, value):
+		self.set_var_from_part("run_begin_timestamp", value)
+
+	@property
+	def run_end_timestamp(self):
+		return self.get_var_from_part("run_end_timestamp")
+	@run_end_timestamp.setter
+	def run_end_timestamp(self, value):
+		self.set_var_from_part("run_end_timestamp", value)
+
+	@property
+	def glue_batch_num(self):
+		return self.get_var_from_part("glue_batch_num")
+	@glue_batch_num.setter
+	def glue_batch_num(self, value):
+		self.set_var_from_part("glue_batch_num", value)
+
+	@property
+	def asmbl_tray_name(self):
+		return self.get_var_from_part("asmbl_tray_name")
+	@asmbl_tray_name.setter
+	def asmbl_tray_name(self, value):
+		self.set_var_from_part("asmbl_tray_name", value)
+
+	@property
+	def comp_tray_name(self):
+		return self.get_var_from_part("comp_tray_name")
+	@comp_tray_name.setter
+	def comp_tray_name(self, value):
+		self.set_var_from_part("comp_tray_name", value)
+
+	# post-assembly properties
+	@property
+	def cure_begin_timestamp(self):
+		return self.get_var_from_part("cure_begin_timestamp")
+	@cure_begin_timestamp.setter
+	def cure_begin_timestamp(self, value):
+		self.set_var_from_part("cure_begin_timestamp", value)
+
+	@property
+	def cure_end_timestamp(self):
+		return self.get_var_from_part("cure_end_timestamp")
+	@cure_end_timestamp.setter
+	def cure_end_timestamp(self, value):
+		self.set_var_from_part("cure_end_timestamp", value)
+
+	@property
+	def temp_degc(self):
+		return self.get_var_from_part("temp_degc")
+	@temp_degc.setter
+	def temp_degc(self, value):
+		self.set_var_from_part("temp_degc", value)
+
+	@property
+	def humidity_prcnt(self):
+		return self.get_var_from_part("humidity_prcnt")
+	@humidity_prcnt.setter
+	def humidity_prcnt(self, value):
+		self.set_var_from_part("humidity_prcnt", value)
+
+	@property
+	def grades(self):
+		return self.get_vars_from_part("grade")
+	@grades.setter
+	def grades(self, value):
+		self.set_vars_from_part("grade", value)
+
+	@property
+	def thicknesses(self):
+		return self.get_vars_from_part("thickness")
+	@thicknesses.setter
+	def thicknesses(self, value):
+		self.set_vars_from_part("thickness", value)
+
+	@property
+	def flatnesses(self):
+		return self.get_vars_from_part("flatness")
+	@flatnesses.setter
+	def flatnesses(self, value):
+		self.set_vars_from_part("flatness", value)
+
+
+
+
+
 
 
 class step_sensor(fsobj_step):
@@ -82,12 +228,16 @@ class step_sensor(fsobj_step):
 	FILEDIR    = os.sep.join(['steps','sensor','{date}'])
 	FILENAME   = 'sensor_step_{ID:0>5}.json'
 
+	PART_CLASS = parts.protomodule
+	PART = "protomodule"
+
 	EXTRA_PROPERTIES = [
 		'baseplates',
 		'sensors',
 		'protomodules',
 		# run_begin/end_timestamp:  inherited
 		'check_tool_feet',
+		'xml_file_name', # was test_file_name
 	]
 	
 	EXTRA_DEFAULTS = {
@@ -107,177 +257,36 @@ class step_sensor(fsobj_step):
 	# NOTE:  All taken from protomodule properties
 	# NO vars needed for proto XML are stored here.
 
-	# Helper fn - get var from protomodules:
-	# - find the first non-None proto
-	# - get the var and return it
-	def get_var_from_proto(self, var):
-		tmp_proto_ID = None
-		for i in range(6):
-			if self.protomodules[i]:
-				tmp_proto_ID = self.protomodules[i]
-				break
-		if tmp_proto_ID is None:  return None
-		tmp_proto = parts.protomodule()
-		assert tmp_proto.load(tmp_proto_ID), "Could not load protomodule {} in sensor step {}".format(tmp_proto_ID, self.ID)
-		return getattr(tmp_proto, var, None)
-
-	# utility:  given var, set var for all protomodules
-	def set_var_from_proto(self, var, data):
-		tmp_proto = parts.protomodule()
-		for i in range(6):
-			if self.protomodules[i]:
-				tmp_proto.load(self.protomodules[i])
-				setattr(tmp_proto, var, data)
-				tmp_proto.save()
-
-
-	# get a list of vars from protomodules (shsr_tool_names, etc)
-	def get_vars_from_proto(self, var):
-		tmp_proto = parts.protomodule()
-		data = []
-		for i in range(6):
-			if not self.protomodules[i]:
-				data.append(None)
-			else:
-				tmp_proto.load(self.protomodules[i])
-				data.append(getattr(tmp_proto, var, None))
-		return data
-	
-	def set_vars_from_proto(self, var, data):
-		tmp_proto = parts.protomodule()
-		for i in range(6):
-			if not self.protomodules[i]:  continue
-			tmp_proto.load(self.protomodules[i])
-			setattr(tmp_proto, var, data[i])
-			tmp_proto.save()
-
-	# pre-assembly properties
-	@property
-	def record_insertion_user(self):
-		return self.get_var_from_proto("record_insertion_user")
-	@record_insertion_user.setter
-	def record_insertion_user(self, value):
-		self.set_var_from_proto("record_insertion_user", value)
-
-	@property
-	def run_begin_timestamp(self):
-		return self.get_var_from_proto("run_begin_timestamp")
-	@run_begin_timestamp.setter
-	def run_begin_timestamp(self, value):
-		self.set_var_from_proto("run_begin_timestamp", value)
-
-	@property
-	def run_end_timestamp(self):
-		return self.get_var_from_proto("run_end_timestamp")
-	@run_end_timestamp.setter
-	def run_end_timestamp(self, value):
-		self.set_var_from_proto("run_end_timestamp", value)
-
-	@property
-	def glue_batch_num(self):
-		return self.get_var_from_proto("glue_batch_num")
-	@glue_batch_num.setter
-	def glue_batch_num(self, value):
-		self.set_var_from_proto("glue_batch_numo", value)
-
-	@property
-	def asmbl_tray_name(self):
-		return self.get_var_from_proto("asmbl_tray_name")
-	@asmbl_tray_name.setter
-	def asmbl_tray_name(self, value):
-		self.set_var_from_proto("asmbl_tray_name", value)
-
-	@property
-	def comp_tray_name(self):
-		return self.get_var_from_proto("comp_tray_name")
-	@comp_tray_name.setter
-	def comp_tray_name(self, value):
-		self.set_var_from_proto("comp_tray_name", value)
-
+	# pre-assembly
 	@property
 	def snsr_tool_names(self):
-		return self.get_vars_from_proto("snsr_tool_name")
+		return self.get_vars_from_part("snsr_tool_name")
 	@snsr_tool_names.setter
 	def snsr_tool_names(self, value):
-		self.set_vars_from_proto("snsr_tool_name", value)
+		self.set_vars_from_part("snsr_tool_name", value)
 
-	# post-assembly properties
-	@property
-	def cure_begin_timestamp(self):
-		return self.get_var_from_proto("cure_begin_timestamp")
-	@cure_begin_timestamp.setter
-	def cure_begin_timestamp(self, value):
-		self.set_var_from_proto("cure_begin_timestamp", value)
-
-	@property
-	def cure_end_timestamp(self):
-		return self.get_var_from_proto("cure_end_timestamp")
-	@cure_end_timestamp.setter
-	def cure_end_timestamp(self, value):
-		self.set_var_from_proto("cure_end_timestamp", value)
-
-	@property
-	def temp_degc(self):
-		return self.get_var_from_proto("temp_degc")
-	@temp_degc.setter
-	def temp_degc(self, value):
-		self.set_var_from_proto("temp_degc", value)
-
-	@property
-	def humidity_prcnt(self):
-		return self.get_var_from_proto("humidity_prcnt")
-	@humidity_prcnt.setter
-	def humidity_prcnt(self, value):
-		self.set_var_from_proto("humidity_prcnt", value)
-
-	@property
-	def test_file_name(self):
-		return self.get_var_from_proto("test_file_name")
-	@test_file_name.setter
-	def test_file_name(self, value):
-		self.set_var_from_proto("test_file_name", value)
-
-	@property
-	def grades(self):
-		return self.get_vars_from_proto("grade")
-	@grades.setter
-	def grades(self, value):
-		self.set_vars_from_proto("grade", value)
-
+	# post-assembly
 	@property
 	def snsr_x_offsts(self):
-		return self.get_vars_from_proto("snsr_x_offst")
+		return self.get_vars_from_part("snsr_x_offst")
 	@snsr_x_offsts.setter
 	def snsr_x_offsts(self, value):
-		self.set_vars_from_proto("snsr_x_offst", value)
+		self.set_vars_from_part("snsr_x_offst", value)
 
 	@property
 	def snsr_y_offsts(self):
-		return self.get_vars_from_proto("snsr_y_offst")
+		return self.get_vars_from_part("snsr_y_offst")
 	@snsr_y_offsts.setter
 	def snsr_y_offsts(self, value):
-		self.set_vars_from_proto("snsr_y_offst", value)
+		self.set_vars_from_part("snsr_y_offst", value)
 
 	@property
 	def snsr_ang_offsts(self):
-		return self.get_vars_from_proto("snsr_ang_offst")
+		return self.get_vars_from_part("snsr_ang_offst")
 	@snsr_ang_offsts.setter
 	def snsr_ang_offsts(self, value):
-		self.set_vars_from_proto("snsr_ang_offst", value)
+		self.set_vars_from_part("snsr_ang_offst", value)
 
-	@property
-	def thicknesses(self):
-		return self.get_vars_from_proto("thickness")
-	@thicknesses.setter
-	def thicknesses(self, value):
-		self.set_vars_from_proto("thickness", value)
-
-	@property
-	def flatnesses(self):
-		return self.get_vars_from_proto("flatness")
-	@flatnesses.setter
-	def flatnesses(self, value):
-		self.set_vars_from_proto("flatness", value)
 
 
 class step_pcb(fsobj_step):
@@ -285,10 +294,15 @@ class step_pcb(fsobj_step):
 	FILEDIR = os.sep.join(['steps','pcb','{date}'])
 	FILENAME = 'pcb_step_{ID:0>5}.json'
 
+	PART_CLASS = parts.module
+	PART = "module"
+
 	EXTRA_PROPERTIES = [
 		'pcbs',
 		'protomodules',
 		'modules',
+		'check_tool_feet',
+		'xml_file_name',
 	]
 	
 	EXTRA_DEFAULTS = {
@@ -297,6 +311,35 @@ class step_pcb(fsobj_step):
 		'modules': [None for i in range(6)],
 	}
 
+	# pre-assembly
+	@property
+	def pcb_tool_names(self):
+		return self.get_vars_from_part("pcb_tool_name")
+	@pcb_tool_names.setter
+	def pcb_tool_names(self, value):
+		self.set_vars_from_part("pcb_tool_name", value)
+
+	# post-assembly
+	@property
+	def pcb_x_offsts(self):
+		return self.get_vars_from_part("pcb_plcment_x_offset")
+	@pcb_x_offsts.setter
+	def pcb_x_offsts(self, value):
+		self.set_vars_from_part("pcb_plcment_x_offset", value)
+
+	@property
+	def pcb_y_offsts(self):
+		return self.get_vars_from_part("pcb_plcment_y_offset")
+	@pcb_y_offsts.setter
+	def pcb_y_offsts(self, value):
+		self.set_vars_from_part("pcb_plcment_y_offset", value)
+
+	@property
+	def pcb_ang_offsts(self):
+		return self.get_vars_from_part("pcb_plcment_ang_offset")
+	@pcb_ang_offsts.setter
+	def pcb_ang_offsts(self, value):
+		self.set_vars_from_part("pcb_plcment_ang_offset", value)
 
 
 

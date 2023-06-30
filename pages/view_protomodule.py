@@ -26,8 +26,7 @@ INDEX_SHAPE = {
 	'Left':3,
 	'Right':4,
 	'Five':5,
-	'Full':6,
-	'Three':7
+	'Full+Three':6,
 }
 
 INDEX_TYPE = {
@@ -164,8 +163,8 @@ class func(object):
 		self.page.dsbOffsetTranslationX.setValue(-1 if self.protomodule.snsr_x_offst is None else self.protomodule.snsr_x_offst )
 		self.page.dsbOffsetTranslationY.setValue(-1 if self.protomodule.snsr_y_offst is None else self.protomodule.snsr_y_offst )
 		self.page.dsbOffsetRotation.setValue(    -1 if self.protomodule.snsr_ang_offst    is None else self.protomodule.snsr_ang_offst    )
-		self.page.dsbFlatness.setValue(          -1 if self.protomodule.flatness           is None else self.protomodule.plt_fltnes_mm           )
-		self.page.dsbThickness.setValue( -1 if self.protomodule.thickness is None else self.protomodule.plt_thknes_mm )
+		self.page.dsbFlatness.setValue(          -1 if self.protomodule.flatness           is None else self.protomodule.flatness           )
+		self.page.dsbThickness.setValue( -1 if self.protomodule.thickness is None else self.protomodule.thickness )
 		if self.page.dsbOffsetTranslationX.value() == -1: self.page.dsbOffsetTranslationX.clear()
 		if self.page.dsbOffsetTranslationY.value() == -1: self.page.dsbOffsetTranslationY.clear()
 		if self.page.dsbOffsetRotation.value() == -1: self.page.dsbOffsetRotation.clear()

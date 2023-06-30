@@ -288,8 +288,6 @@ class func(object):
 				else:
 					tm = datetime.datetime.strptime(st, "%Y-%m-%d %H:%M:%S%z")
 					localtime = tm.replace(tzinfo=datetime.timezone.utc).astimezone(tz=None)
-					#dt.setDate(QtCore.QDate(*localtime[0:3]))
-					#dt.setTime(QtCore.QTime(*localtime[3:6]))
 					dat = QtCore.QDate(localtime.year, localtime.month, localtime.day)
 					tim = QtCore.QTime(localtime.hour, localtime.minute, localtime.second)
 					dt.setDate(dat)
@@ -301,13 +299,11 @@ class func(object):
 
 			if not (self.step_sensor.snsr_tool_names is None):
 				tools = self.step_sensor.snsr_tool_names
-				print("snsr tool names is", self.step_sensor.snsr_tool_names)
 				for i in range(6):
 					self.sb_tools[i].setValue(tools[i] if tools[i] != None else -1)
 			else:
 				for i in range(6):
 					self.sb_tools[i].setValue(-1)
-			print("getting sensors for", self.step_sensor.ID)
 			if not (self.step_sensor.sensors is None):
 				for i in range(6):
 					self.le_sensors[i].setText(str(self.step_sensor.sensors[i]) if not (self.step_sensor.sensors[i] is None) else "")
@@ -351,7 +347,6 @@ class func(object):
 
 		for i in range(6):
 			if self.sb_tools[i].value()        == -1:  self.sb_tools[i].clear()
-		
 
 		if self.page.sbTrayComponent.value() == -1:  self.page.sbTrayComponent.clear()
 		if self.page.sbTrayAssembly.value()  == -1:  self.page.sbTrayAssembly.clear()
@@ -684,7 +679,6 @@ class func(object):
 
 	@enforce_mode(['editing','creating'])
 	def saveEditing(self,*args,**kwargs):
-
 		tools = []
 		sensors = []
 		baseplates = []

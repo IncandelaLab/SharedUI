@@ -411,8 +411,6 @@ class protomodule(fsobj_part):
 		# build_upload file:
 		# build_cond file:
 		# run_begin_date_ is a property
-		'run_begin_timestamp',  # note:  start/end of assembly run, not curing
-		'run_end_timestamp',
 		# other:
 		'baseplate', # serial, not actual object
 		'sensor',
@@ -422,12 +420,12 @@ class protomodule(fsobj_part):
 
 		# Properties for assembly data:
 		# Read/write from cond:
+		'run_begin_timestamp',  # note:  start/end of assembly run, not curing
+		'run_end_timestamp',
 		"asmbl_tray_name",
 		"plt_ser_num",
 		#"plt_asm_row", # property
 		#"plt_asm_col", # property
-		"plt_fltnes_mm",
-		"plt_thknes_mm",
 		"comp_tray_name",
 		"snsr_ser_num",
 		#"snsr_cmp_row", # property
@@ -444,7 +442,6 @@ class protomodule(fsobj_part):
 		"slvr_epxy_batch_num",
 		"grade",
 		"snsr_tool_feet_chk",
-		"sensor_step",
 
 		# for cond page:
 		#"curing_time_hrs",  # property
@@ -452,7 +449,7 @@ class protomodule(fsobj_part):
 		"cure_end_timestamp",
 		"temp_degc",
 		"humidity_prcnt",
-		'test_file_name',
+		#'test_file_name',  # now 'xml_file_name' in step only
 	]
 
 	EXTRA_DEFAULTS = {
@@ -496,6 +493,7 @@ class protomodule(fsobj_part):
 	@property
 	def sen_type(self):
 		if self.kind_of_part == "None None Si ProtoModule None None":  return None
+		print("SEN_TYPE: type is", self.kind_of_part)
 		return self.kind_of_part.split()[1]
 	@sen_type.setter
 	def sen_type(self, value):
@@ -519,7 +517,8 @@ class protomodule(fsobj_part):
 	@property
 	def thickness_nominal(self):
 		if self.sen_type is None:  return None
-		return float(self.sen_type.split('um')[1])/1000
+		print("thickness_nom:  split sen type is", self.sen_type.split('um'))
+		return float(self.sen_type.split('um')[0])/1000
 
 
 	@property
@@ -546,14 +545,12 @@ class protomodule(fsobj_part):
 		if self.step_sensor is None:
 			print("Warning:  assm_tray_posn:  no sensor step yet")
 			return "None"
-		temp_sensor_step = step_sensor()
+		from filemanager import assembly # avoid circular import
+		temp_sensor_step = assembly.step_sensor()
 		found = temp_sensor_step.load(self.step_sensor)
-		if not found:
-			print("ERROR in tray_posn:  protomodule has sensor step {}, but none found!".format(self.step_sensor))
-			return "None"
-		else:
-			position = temp_sensor_step.sensors.index(self.ID)
-			return position
+		assert found, "ERROR in tray_posn:  module has pcb step {}, but none found!".format(self.step_pcb)
+		position = temp_sensor_step.protomodules.index(self.ID)
+		return position
 
 	@property
 	def plt_asm_row(self):
@@ -636,16 +633,22 @@ class module(fsobj_part):
 	# Specify only baseplate-specific properties
 	EXTRA_PROPERTIES = [
 		# general:
+		"baseplate",
+		"sensor",
 		"pcb",  # add baseplate, etc?
 		"protomodule",
+		"step_sensor",
 		"step_pcb",
 
+		# Currently not used in XML/uploading
+		"test_files",
+
 		# for assembly page:
+		"run_begin_timestamp",
+		"run_end_timestamp",
 		"asmbl_tray_name",
 		"comp_tray_name",
 		"pcb_ser_num",
-		"pcb_fltnes_mm",
-		"pcb_thknes_mm",
 		#"pcb_cmp_row", # property
 		#"pcb_cmp_col", # property
 		"pcb_tool_name",
@@ -655,14 +658,13 @@ class module(fsobj_part):
 		"glue_batch_num",
 		"pcb_tool_feet_chk",
 		"mod_grade",
-		"pcb_step",
 		"pcb_plcment_x_offset",
 		"pcb_plcment_y_offset",
 		"pcb_plcment_ang_offset",
-		"mod_thkns_mm",
-		"mod_fltns_mm",
 
 		# for cond page:
+		"cure_begin_timestamp",
+		"cure_end_timestamp",
 		"curing_time_hrs",
 		#"time_start",  # run_begin_timestamp?
 		#"time_stop",
@@ -791,10 +793,11 @@ class module(fsobj_part):
 		if self.step_pcb is None:
 			print("Warning:  tray_posn:  no pcb step yet")
 			return "None"
-		temp_pcb_step = step_pcb()
+		from filemanager import assembly
+		temp_pcb_step = assembly.step_pcb()
 		found = temp_pcb_step.load(self.step_pcb)
 		assert found, "ERROR in tray_posn:  module has pcb step {}, but none found!".format(self.step_pcb)
-		position = temp_pcb_step.sensors.index(self.ID)
+		position = temp_pcb_step.modules.index(self.ID)
 		return position
 
 	@property
@@ -809,6 +812,9 @@ class module(fsobj_part):
 		if posn == "None": return posn
 		else:  return posn//3+1
 
+	@property
+	def pcb_thickness(self):
+		return None
 
 	
 
@@ -838,8 +844,11 @@ class module(fsobj_part):
 			return
 
 		# if baseplate and sensor, auto-fill protomodule type, plus baseplate, sensor fields:
+		self.baseplate = protomodule_.baseplate
+		self.sensor = protomodule.sensor
 		self.pcb = pcb_.ID
 		self.protomodule = protomodule_.ID
+		self.location = protomodule_.location
 		self.geometry = pcb_.geometry
 		self.baseplate_material = protomodule_.baseplate_material
 		self.sen_type = protomodule_.sen_type
@@ -850,7 +859,5 @@ class module(fsobj_part):
 		# if step_sensor.is_complete (or something similar)...
 		# ALSO, check wirebonding finished
 		super(module, self).generate_xml()
-
-
 
 

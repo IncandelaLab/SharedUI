@@ -4,7 +4,6 @@ import datetime
 # for xml loading:
 import csv
 from xml.etree.ElementTree import parse
-import glob
 
 from filemanager import fm, parts, assembly
 
@@ -228,7 +227,7 @@ class func(object):
 
 		self.step_sensor_exists = False
 		if getattr(self.step_sensor, 'ID', None) != None:
-			self.step_sensor_exists = (ID == self.step_sensor.ID) #self.step_sensor.load(ID)
+			self.step_sensor_exists = (ID == self.step_sensor.ID)
 
 		self.page.listIssues.clear()
 		self.page.leStatus.clear()
@@ -242,27 +241,35 @@ class func(object):
 					dt.setDate(QtCore.QDate(*NO_DATE))
 					dt.setTime(QtCore.QTime(0,0,0))
 				else:
-					localtime = list(time.localtime(st))
-					dt.setDate(QtCore.QDate(*localtime[0:3]))
-					dt.setTime(QtCore.QTime(*localtime[3:6]))
+					tm = datetime.datetime.strptime(st, "%Y-%m-%d %H:%M:%S%z")
+					localtime = tm.replace(tzinfo=datetime.timezone.utc).astimezone(tz=None)
+					dat = QtCore.QDate(localtime.year, localtime.month, localtime.day)
+					tim = QtCore.QTime(localtime.hour, localtime.minute, localtime.second)
+					dt.setDate(dat)
+					dt.setTime(tim)
 
-			self.page.dsbCureTemperature.setValue(self.step_sensor.cure_temperature if self.step_sensor.cure_temperature else 70)
-			self.page.sbCureHumidity    .setValue(self.step_sensor.cure_humidity    if self.step_sensor.cure_humidity    else 10)
 
-			self.page.leXML.setText(self.step_sensor.test_file_name if self.step_sensor.test_file_name else "")
+			self.page.dsbCureTemperature.setValue(self.step_sensor.temp_degc if self.step_sensor.temp_degc else 70)
+			self.page.sbCureHumidity    .setValue(self.step_sensor.humidity_prcnt    if self.step_sensor.humidity_prcnt else 10)
+
+			self.page.leXML.setText(self.step_sensor.xml_file_name if self.step_sensor.xml_file_name else "")
 
 			if not (self.step_sensor.protomodules is None):
+				protos = self.step_sensor.protomodules
+				x_off = self.step_sensor.snsr_x_offsts
+				y_off = self.step_sensor.snsr_y_offsts
+				ang_off = self.step_sensor.snsr_ang_offsts
+				thicks = self.step_sensor.thicknesses
+				flats = self.step_sensor.flatnesses
+				grades = self.step_sensor.grades
 				for i in range(6):
-					proto = fm.protomodule()
-					proto.load(self.step_sensor.protomodules[i])
-
-					self.le_protomodules[i].setText(proto.ID if not (proto is None) else "")
-					self.dsb_offsets_x[i]  .setValue(proto.offset_translation_x if not (proto.offset_translation_x is None) else 0)
-					self.dsb_offsets_y[i]  .setValue(proto.offset_translation_y if not (proto.offset_translation_y is None) else 0)
-					self.dsb_offsets_rot[i].setValue(proto.offset_rotation     if not (proto.offset_rotation      is None) else 0)
-					self.dsb_thickness[i]  .setValue(proto.thickness            if not (proto.thickness            is None) else 0)
-					self.dsb_flatness[i]   .setValue(proto.flatness             if not (proto.flatness             is None) else 0)
-					self.cb_grades[i]      .setCurrentIndex(INDEX_GRADE.get(proto.grade, -1))
+					self.le_protomodules[i].setText(protos[i] if protos[i] else "")
+					self.dsb_offsets_x[i]  .setValue(x_off[i] if x_off[i] else 0)
+					self.dsb_offsets_y[i]  .setValue(y_off[i] if y_off[i] else 0)
+					self.dsb_offsets_rot[i].setValue(ang_off[i] if ang_off[i] else 0)
+					self.dsb_thickness[i]  .setValue(thicks[i] if thicks[i] else 0)
+					self.dsb_flatness[i]   .setValue(flats[i] if flats[i] else 0)
+					self.cb_grades[i]      .setCurrentIndex(INDEX_GRADE.get(grades[i], -1))
 
 			else:
 				for i in range(6):
@@ -270,7 +277,7 @@ class func(object):
 					self.dsb_offsets_x[i].setValue(0)
 					self.dsb_offsets_y[i].setValue(0)
 					self.dsb_offsets_rot[i].setValue(0)
-					self.dsb_thickness[i].setValue(-1)
+					self.dsb_thickness[i].setValue(0)
 					self.dsb_flatness[i].setValue(0)
 					self.cb_grades[i].setCurrentIndex(-1)
 
@@ -352,8 +359,7 @@ class func(object):
 		issues = []
 		objects = []
 
-		if self.step_sensor.institution is None:
-			issues.append(I_INSTITUTION_NOT_SELECTED)
+		# TBD - expand this, maybe check for nonzero entries?
 
 		self.page.listIssues.clear()
 		for issue in issues:
@@ -372,7 +378,7 @@ class func(object):
 	def loadStep(self,*args,**kwargs):
 		if self.page.sbID.value() == -1:  return
 		if self.page.cbInstitution.currentText() == "":  return
-		tmp_step = fm.step_sensor()
+		tmp_step = assembly.step_sensor()
 		tmp_ID = self.page.sbID.value()
 		tmp_inst = self.page.cbInstitution.currentText()
 		tmp_exists = tmp_step.load("{}_{}".format(tmp_inst, tmp_ID))
@@ -384,7 +390,7 @@ class func(object):
 
 	@enforce_mode('view')
 	def startEditing(self,*args,**kwargs):
-		tmp_step = fm.step_sensor()
+		tmp_step = assembly.step_sensor()
 		tmp_ID = self.page.sbID.value()
 		tmp_inst = self.page.cbInstitution.currentText()
 		tmp_exists = tmp_step.load("{}_{}".format(tmp_inst, tmp_ID))
@@ -403,15 +409,16 @@ class func(object):
 	@enforce_mode('editing')
 	def saveEditing(self,*args,**kwargs):
 
-		pydt = self.page.dtCureStart.dateTime().toPyDateTime()
-		self.step_sensor.cure_begin_timestamp = pydt.toPyDateTime(datetime.timezone.utc)
-		pydt = self.page.dtCureStop.dateTime().toPyDateTime()
-		self.step_sensor.cure_end_timestamp  = pydt.toPyDateTime(datetime.timezone.utc)
+		# Save all times as UTC
+		pydt = self.page.dtCureStart.dateTime().toPyDateTime().astimezone(datetime.timezone.utc)
+		self.step_sensor.cure_begin_timestamp = str(pydt) # sec UTC
+		pydt = self.page.dtCureStop.dateTime().toPyDateTime().astimezone(datetime.timezone.utc)
+		self.step_sensor.cure_end_timestamp   = str(pydt)
 
 		self.step_sensor.temp_degc = self.page.sbCureHumidity.value()
 		self.step_sensor.humidity_prcnt = self.page.dsbCureTemperature.value()
 
-		self.step_sensor.test_file_name = self.page.leXML.text()
+		self.step_sensor.xml_file_name = self.page.leXML.text()
 
 		self.step_sensor.snsr_x_offsts = [self.dsb_offsets_x[i].value() for i in range(6)]
 		self.step_sensor.snsr_y_offsts = [self.dsb_offsets_y[i].value() for i in range(6)]
@@ -421,6 +428,9 @@ class func(object):
 		self.step_sensor.grades = [str(self.cb_grades[i].currentText()) if self.cb_grades[i].currentText() else None for i in range(6)]
 
 		self.step_sensor.save()
+		# TEMPORARY, but need to do this somewhere
+		self.step_sensor.generate_xml()
+
 		self.unloadAllObjects()
 		self.mode = 'view'
 		self.update_info()
@@ -468,15 +478,6 @@ class func(object):
 		# (update_info is not called during editing until after save() is called.)
 
 		if filename == '':  return
-		#if dirname == '':  return
-		#if len(glob.glob(dirname+'/*.xml')) > 6:
-		#	print("WARNING:  Attempted to load from directory containing >6 .xml files!")
-		#for f in glob.glob(dirname+'/*.xml'):
-		#	# parse filename, then link to corresp part
-		#	i = ...  # TBD, will depend on jupyter notebook+file format
-		#	xml_tree = parse(f)
-		#	# (paste below code here--can't generalize, need to process elements differently)
-		#self.page.leXML.setText(dirname)
 
 		# FOR NOW:  Only load data into the first row.
 		xml_tree = parse(filename)  # elementtree object
