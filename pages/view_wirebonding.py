@@ -1,6 +1,7 @@
-from filemanager import fm
+from filemanager import fm, supplies, parts
 from PyQt5 import QtCore
 import time
+import datetime
 
 # - Loads a MODULE.  All wirebonding info will be stored in the corresp module object.
 
@@ -41,7 +42,7 @@ class func(object):
 		self.setUIPage = setUIPage
 		self.setMainSwitchingEnabled = setSwitchingEnabled
 
-		self.module = fm.module()
+		self.module = parts.module()
 		self.module_exists = None
 		self.mode = 'setup'
 
@@ -150,122 +151,111 @@ class func(object):
 			self.module_exists = (ID == self.module.ID)
 
 		# characteristics
-		if not self.module.wirebonding_date_back is None:
-			date = self.module.wirebonding_date_back.split('-') # m d y format
-			self.page.dWirebondingBack.setDate(QtCore.QDate(int(date[2]), int(date[0]), int(date[1]))) # y m d
-		if not self.module.wirebonding_date_front is None:
-			date = self.module.wirebonding_date_front.split('-') # m d y format
-			self.page.dWirebondingFront.setDate(QtCore.QDate(int(date[2]), int(date[0]), int(date[1]))) # y m d
+		dates_to_set = [(self.module.back_bonds_date,  self.page.dWirebondingBack),
+						(self.module.front_bonds_date, self.page.dWirebondingFront)]
+		for st, dt in dates_to_set:
+			if st is None:
+				dt.setDate(QtCore.QDate(*NO_DATE))
+			else:
+				tm = datetime.datetime.strptime(st, "%Y-%m-%d")
+				dat = QtCore.QDate(tm.year, tm.month, tm.day)
+				dt.setDate(dat)
 
 		# comments
 		self.page.listComments.clear()
-		for comment in self.module.wirebonding_comments:
+		for comment in self.module.wirebond_comments:
 			self.page.listComments.addItem(comment)
 		self.page.pteWriteComment.clear()
 
-		self.page.listCommentsEncap.clear()
-		for comment in self.module.encapsulation_comments:
-			self.page.listCommentsEncap.addItem(comment)
-		self.page.pteWriteCommentEncap.clear()
+		# Not in DB, maybe ignore?
+		#self.page.listCommentsEncap.clear()
+		#for comment in self.module.encapsulation_comments:
+		#	self.page.listCommentsEncap.addItem(comment)
+		#self.page.pteWriteCommentEncap.clear()
 
 
 		# pre-wirebonding qualification
-		self.page.cbPreinspection.setCurrentIndex(  INDEX_INSPECTION.get(self.module.preinspection  , -1))
-		self.page.leBatchSylgard .setText(self.module.wirebonding_sylgard   if self.module.wirebonding_sylgard   != None else "")
-		self.page.leBatchBondWire.setText(self.module.wirebonding_bond_wire if self.module.wirebonding_bond_wire != None else "")
-		self.page.leBatchWedge   .setText(self.module.wirebonding_wedge     if self.module.wirebonding_wedge     != None else "")
+		self.page.cbPreinspection.setCurrentIndex(  INDEX_INSPECTION.get(self.module.pre_inspection  , -1))
+		self.page.leBatchSylgard .setText(self.module.sylgard_batch   if self.module.sylgard_batch   != None else "")
+		self.page.leBatchBondWire.setText(self.module.bond_wire_batch_num if self.module.bond_wire_batch_num != None else "")
+		self.page.leBatchWedge   .setText(self.module.wedge_batch     if self.module.wedge_batch     != None else "")
 
 		# Back wirebonding
-		self.page.ckWirebondingBack.setChecked(       False if self.module.wirebonding_back          is None else self.module.wirebonding_back         )
-		self.page.ckWirebondsInspectedBack.setChecked(False if self.module.wirebonds_inspected_back  is None else self.module.wirebonds_inspected_back )
-		if not self.module.wirebonding_user_back in self.index_users_wb.keys() and not self.module.wirebonding_user_back is None:
+		self.page.ckWirebondingBack.setChecked(       False if self.module.back_bonds          is None else self.module.back_bonds         )
+		self.page.ckWirebondsInspectedBack.setChecked(False if self.module.back_bond_inspxn  is None else self.module.back_bond_inspxn )
+		if not self.module.back_bonds_user in self.index_users_wb.keys() and not self.module.back_bonds_user is None:
 			# Insertion user was deleted from user page...just add user to the dropdown
-			self.index_users[self.module.wirebonding_user_back] = max(self.index_users_wb.values()) + 1
-			self.page.cbWirebondingUserBack.addItem(self.module.wirebonding_user_back)
-		self.page.cbWirebondingUserBack.setCurrentIndex(self.index_users_wb.get(self.module.wirebonding_user_back, -1))
-		if not self.module.wirebonds_repaired_user_back in self.index_users_wb.keys() and not self.module.wirebonds_repaired_user_back is None:
-			self.index_users[self.module.wirebonds_repaired_user_back] = max(self.index_users_wb.values()) + 1
-			self.page.cbWirebondsRepairedUserBack.addItem(self.module.wirebonds_repaired_user_back)
-		self.page.cbWirebondsRepairedUserBack.setCurrentIndex(self.index_users_wb.get(self.module.wirebonds_repaired_user_back, -1))
+			self.index_users[self.module.back_bonds_user] = max(self.index_users_wb.values()) + 1
+			self.page.cbWirebondingUserBack.addItem(self.module.back_bonds_user)
+		self.page.cbWirebondingUserBack.setCurrentIndex(self.index_users_wb.get(self.module.back_bonds_user, -1))
+		if not self.module.back_repair_user in self.index_users_wb.keys() and not self.module.back_repair_user is None:
+			self.index_users[self.module.back_repair_user] = max(self.index_users_wb.values()) + 1
+			self.page.cbWirebondsRepairedUserBack.addItem(self.module.back_repair_user)
+		self.page.cbWirebondsRepairedUserBack.setCurrentIndex(self.index_users_wb.get(self.module.back_repair_user, -1))
 
-		self.page.sbUnbondedChannelsBack.setValue(self.module.wirebonding_unbonded_channels_back if self.module.wirebonding_unbonded_channels_back else 0)
+		self.page.sbUnbondedChannelsBack.setValue(self.module.back_unbonded if self.module.back_unbonded else 0)
 
 		# Back encapsulation
-		self.page.ckEncapsulationBack.setChecked(False if self.module.encapsulation_back    is None else self.module.encapsulation_back)
-		if not self.module.encapsulation_user_back in self.index_users_eb.keys() and not self.module.encapsulation_user_back is None:
-			self.index_users[self.module.encapsulation_user_back] = max(self.index_users_eb.values()) + 1
-			self.page.cbEncapsulationUserBack.addItem(self.module.encapsulation_user_back)
-		self.page.cbEncapsulationUserBack.setCurrentIndex(self.index_users_eb.get(self.module.encapsulation_user_back, -1))
-		self.page.cbEncapsulationInspectionBack.setCurrentIndex(INDEX_INSPECTION.get(self.module.encapsulation_inspection_back,-1))
-		if self.module.encapsulation_cure_start_back is None:
-			self.page.dtCureStartBack.setDate(QtCore.QDate(*NO_DATE))
-			self.page.dtCureStartBack.setTime(QtCore.QTime(0,0,0))
-		else:
-			localtime = list(time.localtime(self.module.encapsulation_cure_start_back))
-			self.page.dtCureStartBack.setDate(QtCore.QDate(*localtime[0:3]))
-			self.page.dtCureStartBack.setTime(QtCore.QTime(*localtime[3:6]))
-
-		if self.module.encapsulation_cure_stop_back is None:
-			self.page.dtCureStopBack.setDate(QtCore.QDate(*NO_DATE))
-			self.page.dtCureStopBack.setTime(QtCore.QTime(0,0,0))
-		else:
-			localtime = list(time.localtime(self.module.encapsulation_cure_stop_back))
-			self.page.dtCureStopBack.setDate(QtCore.QDate(*localtime[0:3]))
-			self.page.dtCureStopBack.setTime(QtCore.QTime(*localtime[3:6]))
+		self.page.ckEncapsulationBack.setChecked(False if self.module.back_encap    is None else self.module.back_encap)
+		if not self.module.back_encap_user in self.index_users_eb.keys() and not self.module.back_encap_user is None:
+			self.index_users[self.module.back_encap_user] = max(self.index_users_eb.values()) + 1
+			self.page.cbEncapsulationUserBack.addItem(self.module.back_encap_user)
+		self.page.cbEncapsulationUserBack.setCurrentIndex(self.index_users_eb.get(self.module.back_encap_user, -1))
+		self.page.cbEncapsulationInspectionBack.setCurrentIndex(INDEX_INSPECTION.get(self.module.back_encap_inspxn,-1))
+		times_to_set = [(self.module.back_encap_cure_start, self.page.dtCureStartBack),
+						(self.module.back_encap_cure_stop,  self.page.dtCureStopBack),
+						(self.module.front_encap_cure_start,self.page.dtCureStartFront),
+						(self.module.front_encap_cure_stop, self.page.dtCureStopFront)]
+		for st, dt in times_to_set:
+			if st is None:
+				dt.setDate(QtCore.QDate(*NO_DATE))
+				dt.setTime(QtCore.QTime(0,0,0))
+			else:
+				tm = datetime.datetime.strptime(st, "%Y-%m-%d %H:%M:%S%z")
+				localtime = tm.replace(tzinfo=datetime.timezone.utc).astimezone(tz=None)
+				dat = QtCore.QDate(localtime.year, localtime.month, localtime.day)
+				tim = QtCore.QTime(localtime.hour, localtime.minute, localtime.second)
+				dt.setDate(dat)
+				dt.setTime(tim)
 
 		# test bonds
-		self.page.ckTestBonds.setChecked(         False if self.module.test_bonds           is None else self.module.test_bonds          )
-		if not self.module.test_bonds_pulled_user in self.index_users_tb.keys() and not self.module.test_bonds_pulled_user is None:
-			self.index_users[self.module.test_bonds_pulled_user] = max(self.index_users_tb.values()) + 1
-			self.page.cbTestBondsPulledUser.addItem(self.module.test_bonds_pulled_user)
-		self.page.cbTestBondsPulledUser.setCurrentIndex(self.index_users_tb.get(self.module.test_bonds_pulled_user, -1))
-		self.page.dsbBondPullAvg.setValue( -1 if self.module.test_bonds_pull_avg is None else self.module.test_bonds_pull_avg )
-		self.page.dsbBondPullStd.setValue( -1 if self.module.test_bonds_pull_std is None else self.module.test_bonds_pull_std )
+		self.page.ckTestBonds.setChecked(False if self.module.is_test_bond_module is None else self.module.is_test_bond_module)
+		if not self.module.bond_pull_user in self.index_users_tb.keys() and not self.module.bond_pull_user is None:
+			self.index_users[self.module.bond_pull_user] = max(self.index_users_tb.values()) + 1
+			self.page.cbTestBondsPulledUser.addItem(self.module.bond_pull_user)
+		self.page.cbTestBondsPulledUser.setCurrentIndex(self.index_users_tb.get(self.module.bond_pull_user, -1))
+		self.page.dsbBondPullAvg.setValue( -1 if self.module.bond_pull_avg is None else self.module.bond_pull_avg )
+		self.page.dsbBondPullStd.setValue( -1 if self.module.bond_pull_stddev is None else self.module.bond_pull_stddev )
 
 		# Front wirebonding
-		self.page.ckWirebondingFront.setChecked(       False if self.module.wirebonding_front           is None else self.module.wirebonding_front         )
-		self.page.ckWirebondsInspectedFront.setChecked(False if self.module.wirebonds_inspected_front   is None else self.module.wirebonds_inspected_front )
-		self.page.pteUnbondedChannelsFront.setPlainText(        "" if self.module.wirebonding_unbonded_channels_front is None \
-		                                   else SITE_SEP.join([str(c) for c in self.module.wirebonding_unbonded_channels_front]))
-		if not self.module.wirebonding_user_front in self.index_users_wf.keys() and not self.module.wirebonding_user_front is None:
-			self.index_users[self.module.wirebonding_user_front] = max(self.index_users_wf.values()) + 1
-			self.page.cbWirebondingUserFront.addItem(self.module.wirebonding_user_front)
-		self.page.cbWirebondingUserFront.setCurrentIndex(self.index_users_wf.get(self.module.wirebonding_user_front, -1))
-		if not self.module.wirebonds_repaired_user_front in self.index_users_wf.keys() and not self.module.wirebonds_repaired_user_front is None:
+		self.page.ckWirebondingFront.setChecked(       False if self.module.front_bonds           is None else self.module.front_bonds)
+		self.page.ckWirebondsInspectedFront.setChecked(False if self.module.front_bond_inspxn is None else self.module.front_bond_inspxn )
+		self.page.pteUnbondedChannelsFront.setPlainText(        "" if self.module.front_unbonded is None \
+		                                   else SITE_SEP.join([str(c) for c in self.module.front_unbonded]))
+		if not self.module.front_bonds_user in self.index_users_wf.keys() and not self.module.front_bonds_user is None:
+			self.index_users[self.module.front_bonds_user] = max(self.index_users_wf.values()) + 1
+			self.page.cbWirebondingUserFront.addItem(self.module.front_bonds_user)
+		self.page.cbWirebondingUserFront.setCurrentIndex(self.index_users_wf.get(self.module.front_bonds_user, -1))
+		if not self.module.front_repair_user in self.index_users_wf.keys() and not self.module.front_repair_user is None:
 			self.index_users[self.module.wirebons_repaired_user_front] = max(self.index_users_wf.values()) + 1
-			self.page.cbWirebondsRepairedUserFront.addItem(self.module.wirebonds_repaired_user_front)
-		self.page.cbWirebondsRepairedUserFront.setCurrentIndex(self.index_users_wf.get(self.module.wirebonds_repaired_user_front, -1))
+			self.page.cbWirebondsRepairedUserFront.addItem(self.module.front_repair_user)
+		self.page.cbWirebondsRepairedUserFront.setCurrentIndex(self.index_users_wf.get(self.module.front_repair_user, -1))
 
 		# Front encapsulation
-		self.page.ckEncapsulationFront.setChecked(False if self.module.encapsulation_front    is None else self.module.encapsulation_front)
-		if not self.module.encapsulation_user_front in self.index_users_ef.keys() and not self.module.encapsulation_user_front is None:
-			self.index_users[self.module.encapsulation_user_front] = max(self.index_users_ef.values()) + 1
-			self.page.cbEncapsulationUserFront.addItem(self.module.encapsulation_user_front)
-		self.page.cbEncapsulationUserFront.setCurrentIndex(self.index_users_ef.get(self.module.encapsulation_user_front, -1))
-		self.page.cbEncapsulationInspectionFront.setCurrentIndex(INDEX_INSPECTION.get(self.module.encapsulation_inspection_front,-1))
-		if self.module.encapsulation_cure_start_front is None:
-			self.page.dtCureStartFront.setDate(QtCore.QDate(*NO_DATE))
-			self.page.dtCureStartFront.setTime(QtCore.QTime(0,0,0))
-		else:
-			localtime = list(time.localtime(self.module.encapsulation_cure_start_front))
-			self.page.dtCureStartFront.setDate(QtCore.QDate(*localtime[0:3]))
-			self.page.dtCureStartFront.setTime(QtCore.QTime(*localtime[3:6]))
-
-		if self.module.encapsulation_cure_stop_front is None:
-			self.page.dtCureStopFront.setDate(QtCore.QDate(*NO_DATE))
-			self.page.dtCureStopFront.setTime(QtCore.QTime(0,0,0))
-		else:
-			localtime = list(time.localtime(self.module.encapsulation_cure_stop_front))
-			self.page.dtCureStopFront.setDate(QtCore.QDate(*localtime[0:3]))
-			self.page.dtCureStopFront.setTime(QtCore.QTime(*localtime[3:6]))
-
+		self.page.ckEncapsulationFront.setChecked(False if self.module.front_encap    is None else self.module.front_encap)
+		if not self.module.front_encap_user in self.index_users_ef.keys() and not self.module.front_encap_user is None:
+			self.index_users[self.module.front_encap_user] = max(self.index_users_ef.values()) + 1
+			self.page.cbEncapsulationUserFront.addItem(self.module.front_encap_user)
+		self.page.cbEncapsulationUserFront.setCurrentIndex(self.index_users_ef.get(self.module.front_encap_user, -1))
+		self.page.cbEncapsulationInspectionFront.setCurrentIndex(INDEX_INSPECTION.get(self.module.front_encap_inspxn,-1))
+		# NOTE:  Times covered above
 
 		#CuringAgent wirebonding qualification
-		if not self.module.wirebonding_final_inspection_user in self.index_users_fi.keys() and not self.module.wirebonding_final_inspection_user is None:
-			self.index_users[self.module.wirebonding_final_inspection_user] = max(self.index_users_fi.values()) + 1
-			self.page.cbWirebondingFinalInspectionUser.addItem(self.module.wirebonding_final_inspection_user)
-		self.page.cbWirebondingFinalInspectionUser.setCurrentIndex(self.index_users_fi.get(self.module.wirebonding_final_inspection_user, -1))
-		self.page.cbWirebondingFinalInspectionOK.setCurrentIndex(INDEX_INSPECTION.get(self.module.wirebonding_final_inspection_ok,-1))
+		if not self.module.final_inspxn_user in self.index_users_fi.keys() and not self.module.final_inspxn_user is None:
+			self.index_users[self.module.final_inspxn_user] = max(self.index_users_fi.values()) + 1
+			self.page.cbWirebondingFinalInspectionUser.addItem(self.module.final_inspxn_user)
+		self.page.cbWirebondingFinalInspectionUser.setCurrentIndex(self.index_users_fi.get(self.module.final_inspxn_user, -1))
+		self.page.cbWirebondingFinalInspectionOK.setCurrentIndex(INDEX_INSPECTION.get(self.module.final_inspxn_ok,-1))
 
 		self.updateElements()
 
@@ -350,7 +340,7 @@ class func(object):
 
 	@enforce_mode('view')
 	def startEditing(self,*args,**kwargs):
-		tmp_module = fm.module()
+		tmp_module = parts.module()
 		tmp_ID = self.page.leID.text()
 		tmp_exists = tmp_module.load(tmp_ID)
 		if not tmp_exists:
@@ -381,34 +371,22 @@ class func(object):
 			if not site_format_check(pte.toPlainText()):
 				pteErrs.append(name)
 		# Check batch errors:  existence, emptiness, expiration
-		tmp_sylgard = fm.batch_sylgard()
+		tmp_sylgard = supplies.batch_sylgard()
 		if not tmp_sylgard.load(self.page.leBatchSylgard.text()):
 			pteErrs.append("Sylgard DNE")
 		else:
-			#if not (tmp_sylgard.date_expires) is None:
-			#	ydm = tmp_sylgard.date_expires.split('-')
-			#	expires = QtCore.QDate(int(ydm[2]), int(ydm[0]), int(ydm[1]))
-			#	if QtCore.QDate.currentDate() > expires:  pteErrs.append("Sylgard expired")
 			if tmp_sylgard.is_expired:  pteErrs.append("Sylgard expired")
 			if tmp_sylgard.is_empty:    pteErrs.append("Sylgard empty")
-		tmp_bond_wire = fm.batch_bond_wire()
+		tmp_bond_wire = supplies.batch_bond_wire()
 		if not tmp_bond_wire.load(self.page.leBatchBondWire.text()):
 			pteErrs.append("Bond wire DNE")
 		else:
-			#if not (tmp_bond_wire.date_expires) is None:
-			#	ydm = tmp_bond_wire.date_expires.split('-')
-			#	expires = QtCore.QDate(int(ydm[2]), int(ydm[0]), int(ydm[1]))
-			#	if QtCore.QDate.currentDate() > expires:  pteErrs.append("Bond wire expired")
 			if tmp_bond_wire.is_expired:  pteErrs.append("Bond wire expired")
 			if tmp_bond_wire.is_empty:    pteErrs.append("Bond wire empty")
-		tmp_wedge = fm.batch_wedge()
+		tmp_wedge = supplies.batch_wedge()
 		if not tmp_wedge.load(self.page.leBatchWedge.text()):
 			pteErrs.append("Wedge DNE")
 		else:
-			#if not (tmp_wedge.date_expires) is None:
-			#	ydm = tmp_wedge.date_expires.split('-')
-			#	expires = QtCore.QDate(int(ydm[2]), int(ydm[0]), int(ydm[1]))
-			#	if QtCore.QDate.currentDate() > expires:  pteErrs.append("Wedge expired")
 			if tmp_wedge.is_expired:  pteErrs.append("Wedge expired")
 			if tmp_wedge.is_empty:    pteErrs.append("Wedge empty")
 
@@ -419,74 +397,73 @@ class func(object):
 
 		# characteristics
 
-		datew = self.page.dWirebondingBack.date()
-		self.module.wirebonding_date_back  = "{}-{}-{}".format(datew.month(), datew.day(), datew.year())
-		datew = self.page.dWirebondingFront.date()
-		self.module.wirebonding_date_front = "{}-{}-{}".format(datew.month(), datew.day(), datew.year())
+		datew = self.page.dWirebondingBack.date().toPyDate()
+		self.module.wirebonding_date_back  = str(datew)
+		datew = self.page.dWirebondingFront.date().toPyDate()
+		self.module.wirebonding_date_front = str(datew)
 
 		# comments
 		num_comments = self.page.listComments.count()
-		self.module.wirebonding_comments = []
-		for i in range(num_comments):
-			self.module.comments = ';;'.join(self.page.listComments.item(i).text() for i in range(num_comments))
-		if num_comments == 0:  self.module.wirebonding_comments = ';;'
+		self.module.wirebond_comments = [self.page.listComments.item(i).text() for i in range(num_comments)]
 
-		num_comments_encap = self.page.listCommentsEncap.count()
-		self.module.encapsulation_comments = []
-		for i in range(num_comments_encap):
-			self.module.encapsulation_comments.append(str(self.page.listCommentsEncap.item(i).text()))
-		if num_comments_encap == 0:  self.module.encapsulation_comments = ';;'
+		# Commented for now
+		#num_comments_encap = self.page.listCommentsEncap.count()
+		#self.module.encapsulation_comments = [self.page.listComments.item(i).text() for i in range(num_comments_encap)]
 
 		# pre-wirebonding qualification
-		self.module.preinspection        = str(self.page.cbPreinspection.currentText()  ) if str(self.page.cbPreinspection.currentText()  ) else None
-		self.module.wirebonding_sylgard   = self.page.leBatchSylgard.text()  if self.page.sbBatchSylgard.text()  != "" else None
-		self.module.wirebonding_bond_wire = self.page.leBatchBondWire.text() if self.page.sbBatchBondWire.text() != "" else None
-		self.module.wirebonding_wedge     = self.page.leBatchWedge.text()    if self.page.sbBatchWedge.text()    != "" else None
+		self.module.pre_inspection  = str(self.page.cbPreinspection.currentText()  ) if str(self.page.cbPreinspection.currentText()  ) else None
+		self.module.sylgard_batch = self.page.leBatchSylgard.text()  if self.page.leBatchSylgard.text()  != "" else None
+		self.module.bond_wire_batch_num = self.page.leBatchBondWire.text() if self.page.leBatchBondWire.text() != "" else None
+		self.module.wedge_batch = self.page.leBatchWedge.text()    if self.page.leBatchWedge.text()    != "" else None
 
 		# back wirebonding
-		self.module.wirebonding_back              = self.page.ckWirebondingBack.isChecked()
-		self.module.wirebonds_inspected_back      = self.page.ckWirebondsInspectedBack.isChecked()
-		self.module.wirebonding_user_back         = str(self.page.cbWirebondingUserBack.currentText()      ) if str(self.page.cbWirebondingUserBack.currentText()      ) else None
-		self.module.wirebonds_repaired_user_back  = str(self.page.cbWirebondsRepairedUserBack.currentText()) if str(self.page.cbWirebondsRepairedUserBack.currentText()) else None
-		self.module.wirebonding_unbonded_channels_back = self.page.sbUnbondedChannelsBack.value()
+		self.module.back_bonds              = self.page.ckWirebondingBack.isChecked()
+		self.module.back_bond_inspxn      = self.page.ckWirebondsInspectedBack.isChecked()
+		self.module.back_bonds_user         = str(self.page.cbWirebondingUserBack.currentText()      ) if str(self.page.cbWirebondingUserBack.currentText()      ) else None
+		self.module.back_repair_user  = str(self.page.cbWirebondsRepairedUserBack.currentText()) if str(self.page.cbWirebondsRepairedUserBack.currentText()) else None
+		self.module.back_unbonded = self.page.sbUnbondedChannelsBack.value()
 
 		# back encapsulation
-		self.module.encapsulation_back            = self.page.ckEncapsulationBack.isChecked()
-		self.module.encapsulation_user_back       = str(self.page.cbEncapsulationUserBack.currentText()             ) if str(self.page.cbEncapsulationUserBack.currentText()             ) else None
-		self.module.encapsulation_inspection_back = str(self.page.cbEncapsulationInspectionBack.currentText()) if str(self.page.cbEncapsulationInspectionBack.currentText()) else None
+		self.module.back_encap            = self.page.ckEncapsulationBack.isChecked()
+		self.module.back_encap_user       = str(self.page.cbEncapsulationUserBack.currentText()             ) if str(self.page.cbEncapsulationUserBack.currentText()             ) else None
+		self.module.back_encap_inspxn = str(self.page.cbEncapsulationInspectionBack.currentText()) if str(self.page.cbEncapsulationInspectionBack.currentText()) else None
 		if self.page.dtCureStartBack.date().year() == NO_DATE[0]:
-			self.module.encapsulation_cure_start_back = None
+			self.module.back_encap_cure_start = None
 		else:
-			self.module.encapsulation_cure_start_back = self.page.dtCureStartBack.dateTime().toTime_t()
+			pydt = self.page.dtCureStartBack.dateTime().toPyDateTime().astimezone(datetime.timezone.utc)
+			self.module.back_encap_cure_start = str(pydt)
 		if self.page.dtCureStopBack.date().year() == NO_DATE[0]:
-			self.module.encapsulation_cure_stop_back = None
+			self.module.back_encap_cure_stop = None
 		else:
-			self.module.encapsulation_cure_stop_back = self.page.dtCureStopBack.dateTime().toTime_t()
+			pydt = self.page.dtCureStopBack.dateTime().toPyDateTime().astimezone(datetime.timezone.utc)
+			self.module.back_encap_cure_stop = str(pydt)
 
 		# test bonds
-		self.module.test_bonds             = self.page.ckTestBonds.isChecked()
-		self.module.test_bonds_pulled_user = str(self.page.cbTestBondsPulledUser.currentText()      ) if str(self.page.cbTestBondsPulledUser.currentText()      ) else None
-		self.module.test_bond_pull_avg = self.page.dsbBondPullAvg.value() if self.page.dsbBondPullAvg.value() >= 0 else None
-		self.module.test_bond_pull_std = self.page.dsbBondPullStd.value() if self.page.dsbBondPullStd.value() >= 0 else None
+		self.module.is_test_bond_module             = self.page.ckTestBonds.isChecked()
+		self.module.bond_pull_user = str(self.page.cbTestBondsPulledUser.currentText()      ) if str(self.page.cbTestBondsPulledUser.currentText()      ) else None
+		self.module.bond_pull_avg = self.page.dsbBondPullAvg.value() if self.page.dsbBondPullAvg.value() >= 0 else None
+		self.module.bond_pull_stddev = self.page.dsbBondPullStd.value() if self.page.dsbBondPullStd.value() >= 0 else None
 
 		# front wirebonding
-		self.module.wirebonding_front              = self.page.ckWirebondingFront.isChecked()
-		self.module.wirebonds_inspected_front      = self.page.ckWirebondsInspectedFront.isChecked()
-		self.module.wirebonding_user_front         = str(self.page.cbWirebondingUserFront.currentText()      ) if str(self.page.cbWirebondingUserFront.currentText()      ) else None
-		self.module.wirebonds_repaired_user_front  = str(self.page.cbWirebondsRepairedUserFront.currentText()) if str(self.page.cbWirebondsRepairedUserFront.currentText()) else None
-		self.module.wirebonding_unbonded_channels_front = separate_sites(str(self.page.pteUnbondedChannelsFront.toPlainText()       )) if str(self.page.pteUnbondedChannelsFront.toPlainText())        else None
-		self.module.wirebonds_skip_channels_front       = separate_sites(str(self.page.pteWirebondingChannelsSkipFront.toPlainText())) if str(self.page.pteWirebondingChannelsSkipFront.toPlainText()) else None
+		self.module.front_bonds              = self.page.ckWirebondingFront.isChecked()
+		self.module.front_bond_inspxn      = self.page.ckWirebondsInspectedFront.isChecked()
+		self.module.front_bonds_user         = str(self.page.cbWirebondingUserFront.currentText()      ) if str(self.page.cbWirebondingUserFront.currentText()      ) else None
+		self.module.front_repair_user  = str(self.page.cbWirebondsRepairedUserFront.currentText()) if str(self.page.cbWirebondsRepairedUserFront.currentText()) else None
+		self.module.front_unbonded = separate_sites(str(self.page.pteUnbondedChannelsFront.toPlainText()       )) if self.page.pteUnbondedChannelsFront.toPlainText()        else None
+		self.module.front_skip       = separate_sites(str(self.page.pteWirebondingChannelsSkipFront.toPlainText())) if self.page.pteWirebondingChannelsSkipFront.toPlainText() else None
 
 		# front encapsulation
-		self.module.encapsulation_front            = self.page.ckEncapsulationFront.isChecked()
-		self.module.encapsulation_user_front       = str(self.page.cbEncapsulationUserFront.currentText()             ) if str(self.page.cbEncapsulationUserFront.currentText()             ) else None
-		self.module.encapsulation_inspection_front = str(self.page.cbEncapsulationInspectionFront.currentText()) if str(self.page.cbEncapsulationInspectionFront.currentText()) else None
-		self.module.encapsulation_cure_start_front = self.page.dtCureStartFront.dateTime().toTime_t()
-		self.module.encapsulation_cure_stop_front = self.page.dtCureStopFront.dateTime().toTime_t()
+		self.module.front_encap            = self.page.ckEncapsulationFront.isChecked()
+		self.module.front_encap_user       = str(self.page.cbEncapsulationUserFront.currentText()             ) if str(self.page.cbEncapsulationUserFront.currentText()             ) else None
+		self.module.front_encap_inspxn = str(self.page.cbEncapsulationInspectionFront.currentText()) if str(self.page.cbEncapsulationInspectionFront.currentText()) else None
+		pydt = self.page.dtCureStartFront.dateTime().toPyDateTime().astimezone(datetime.timezone.utc)
+		self.module.front_encap_cure_start = str(pydt)
+		pydt = self.page.dtCureStopFront.dateTime().toPyDateTime().astimezone(datetime.timezone.utc)
+		self.module.front_encap_cure_stop = str(pydt)
 
 		# wirebonding qualification
-		self.module.wirebonding_final_inspection_user = str(self.page.cbWirebondingFinalInspectionUser.currentText()     ) if str(self.page.cbWirebondingFinalInspectionUser.currentText()     ) else None
-		self.module.wirebonding_final_inspection_ok   = str(self.page.cbWirebondingFinalInspectionOK.currentText()) if str(self.page.cbWirebondingFinalInspectionOK.currentText()) else None
+		self.module.final_inspxn_user = str(self.page.cbWirebondingFinalInspectionUser.currentText()     ) if str(self.page.cbWirebondingFinalInspectionUser.currentText()     ) else None
+		self.module.final_inspxn_ok   = str(self.page.cbWirebondingFinalInspectionOK.currentText()) if str(self.page.cbWirebondingFinalInspectionOK.currentText()) else None
 
 		self.module.save()
 		self.mode = 'view'

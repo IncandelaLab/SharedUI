@@ -710,6 +710,7 @@ class module(fsobj_part):
 
 	EXTRA_DEFAULTS = {
 		"kind_of_part": "None None Si Module None None",
+		"wirebond_comments": [],
 	}
 
 
@@ -816,6 +817,9 @@ class module(fsobj_part):
 	def pcb_thickness(self):
 		return None
 
+	@property
+	def wirebond_comments_concat(self):
+		return ";;".join(self.wirebond.comments)
 	
 
 	# new():  Optionally, create proto from baseplate and sensor objects

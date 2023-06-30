@@ -325,7 +325,7 @@ class func(object):
 
 		# comments
 		num_comments = self.page.listComments.count()
-		self.module.comments = ';;'.join([self.page.listComments.item(i).text() for i in range(num_comments)])
+		self.module.comments = [self.page.listComments.item(i).text() for i in range(num_comments)]
 		if num_comments == 0:  self.module.comments = ';;'
 
 		self.module.pcb_plcment_x_offset = self.page.dsbOffsetTranslationX.value() if self.page.dsbOffsetTranslationX.value() >=0 else None

@@ -29,7 +29,7 @@ from pages.view_sensor_step import func as cls_func_view_sensor_step
 from pages.view_sensor_post import func as cls_func_view_sensor_post
 from pages.view_pcb_step    import func as cls_func_view_pcb_step
 from pages.view_pcb_post    import func as cls_func_view_pcb_post
-#from pages.view_wirebonding import func as cls_func_view_wirebonding
+from pages.view_wirebonding import func as cls_func_view_wirebonding
 from pages.view_plots       import func as cls_func_view_plots
 
 from pages.view_tooling     import func as cls_func_view_tooling
@@ -152,7 +152,7 @@ PAGE_IDS = {
 	'2. Sensor - post-assembly': 10,
 	'3. PCB - pre-assembly'    : 11,
 	'4. PCB - post-assembly'    : 12,
-	#'5. Wirebonding & encapsulating' : 13,
+	'5. Wirebonding & encapsulating' : 13,
 	'6. Module testing' : 14,
 
 }
@@ -165,7 +165,8 @@ UPLOAD_ENABLED_PAGES = [
 	'Protomodules',
 	'Modules',
 	'2. Sensor - post-assembly',
-	'4. PCB - post-assembly'
+	'4. PCB - post-assembly',
+	'5. Wirebonding & encapsulating',
 ]
 
 
@@ -258,7 +259,7 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		self.page_view_sensor_post = widget_view_sensor_post(None) ; self.swPages.addWidget(self.page_view_sensor_post)
 		self.page_view_pcb_step    = widget_view_pcb_step(None)    ; self.swPages.addWidget(self.page_view_pcb_step)
 		self.page_view_pcb_post    = widget_view_pcb_post(None)    ; self.swPages.addWidget(self.page_view_pcb_post)
-		#self.page_view_wirebonding = widget_view_wirebonding(None) ; self.swPages.addWidget(self.page_view_wirebonding)
+		self.page_view_wirebonding = widget_view_wirebonding(None) ; self.swPages.addWidget(self.page_view_wirebonding)
 		self.page_view_plots       = widget_view_plots(None)       ; self.swPages.addWidget(self.page_view_plots)
 
 
@@ -279,7 +280,7 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		self.func_view_sensor_post = cls_func_view_sensor_post(      fm, self.userManager, self.page_view_sensor_post, self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_pcb_step    = cls_func_view_pcb_step(         fm, self.userManager, self.page_view_pcb_step   , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_pcb_post    = cls_func_view_pcb_post(         fm, self.userManager, self.page_view_pcb_post   , self.setUIPage, self.setSwitchingEnabled)
-		self.func_view_wirebonding = None#cls_func_view_wirebonding(      fm, self.userManager, self.page_view_wirebonding, self.setUIPage, self.setSwitchingEnabled)
+		self.func_view_wirebonding = cls_func_view_wirebonding(      fm, self.userManager, self.page_view_wirebonding, self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_plots       = cls_func_view_plots(            fm, self.page_view_plots,       self.setUIPage, self.setSwitchingEnabled)
 
 		# This list must be in the same order that the pages are in in the stackedWidget in the main UI file.

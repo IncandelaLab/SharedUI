@@ -414,6 +414,7 @@ class Ui_Form(object):
         self.listComments.setGeometry(QtCore.QRect(0, 20, 281, 91))
         self.listComments.setObjectName("listComments")
         self.frame_13 = QtWidgets.QFrame(Form)
+        self.frame_13.setEnabled(False)
         self.frame_13.setGeometry(QtCore.QRect(690, 380, 281, 201))
         self.frame_13.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_13.setFrameShadow(QtWidgets.QFrame.Raised)

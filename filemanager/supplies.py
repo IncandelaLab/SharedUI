@@ -13,10 +13,11 @@ from filemanager import fm
 ###############################################
 
 class fsobj_supply(fm.fsobj):
+	@property
 	def is_expired(self):
 		if self.date_expires is None or self.date_received is None:
 			return False
-		ydm = tmp_sylgard.date_expires.split('-')
+		ydm = self.date_expires.split('-')
 		expires = QtCore.QDate(int(ydm[2]), int(ydm[0]), int(ydm[1]))
 		return QtCore.QDate.currentDate() > expires
 
