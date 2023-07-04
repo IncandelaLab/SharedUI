@@ -582,6 +582,7 @@ class func(object):
 	@enforce_mode('view')
 	def load_kwargs(self,kwargs):
 		keys = kwargs.keys()
+		print("load_kwargs, tooling:", kwargs)
 		if not "institution" in keys:  return
 		if "tool_sensor" in keys:
 			self.tool_sensor          .update_info(kwargs['tool_sensor'],           kwargs['institution'])

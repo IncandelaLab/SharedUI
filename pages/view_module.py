@@ -197,14 +197,13 @@ class func(object):
 		if self.page.lePcb.text()          == -1:  self.page.lePcb.clear()
 		if self.page.leProtomodule.text()  == -1:  self.page.leProtomodule.clear()
 
-		print("SETTING WIREBONDING CHECKED", self.module.wirebonding_completed)
 		self.page.ckWirebondingCompleted.setChecked(self.module.wirebonding_completed if self.module.wirebonding_completed else False)
 
 
 		# comments
 		self.page.listComments.clear()
 		if self.module.comments:
-			for comment in self.module.comments:
+			for comment in self.module.comments.split(';;'):
 				self.page.listComments.addItem(comment)
 		self.page.pteWriteComment.clear()
 
@@ -332,8 +331,8 @@ class func(object):
 		self.module.pcb_plcment_x_offset = self.page.dsbOffsetTranslationX.value() if self.page.dsbOffsetTranslationX.value() >=0 else None
 		self.module.pcb_plcment_y_offset = self.page.dsbOffsetTranslationY.value() if self.page.dsbOffsetTranslationY.value() >=0 else None
 		self.module.offset_rotation      = self.page.dsbOffsetRotation.value()    if self.page.dsbOffsetRotation.value()    >=0 else None
-		self.module.flatness = self.page.dsbOffsetFlatness.value()    if self.page.dsbFlatness.value()    >=0 else None
-		self.module.thickness = self.page.dsbOffsetThickness.value()    if self.page.dsbThickness.value()    >=0 else None
+		self.module.flatness = self.page.dsbFlatness.value()    if self.page.dsbFlatness.value()    >=0 else None
+		self.module.thickness = self.page.dsbThickness.value()    if self.page.dsbThickness.value()    >=0 else None
 
 		self.module.save()
 		self.mode = 'view'

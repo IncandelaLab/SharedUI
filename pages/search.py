@@ -103,10 +103,20 @@ class func(object):
 	def search(self, *args, **kwargs):  # WIP WIP WIP
 		self.clearResults()
 
+		part_type = self.page.cbPartType.currentText()
+		if not part_type in PART_DICT.keys():
+			print("WARNING: {}s are currently disabled".format(part_type))
+			self.displayResults([], [])
+			return
+		part_temp = PART_DICT[part_type]()  # Constructs instance of searched-for class
+
 		search_dict = { self.page.cbInstitution:'location', self.page.cbShape:'geometry',
 						self.page.cbMaterial:'material', self.page.cbThickness:'sen_type',
 						self.page.cbChannelDensity:'channel_density', #self.page.cbPCBType:'pcb_type',
-						self.page.cbAssmRow:'tray_row', self.page.cbAssmCol:'tray_col' }
+						self.page.cbAssmRow:"asm_row",
+						self.page.cbAssmCol:"asm_col",
+					  }
+
 		# Treat dCreated separately
 		# Search criteria will be a dict:  'var_name':'value'
 		search_criteria = {}
@@ -118,12 +128,6 @@ class func(object):
 		#	d_c = self.page.dCreated.date()
 		#	d_created = "{}-{}-{}".format(d_c.month(), d_c.day(), d_c.year())
 
-		part_type = self.page.cbPartType.currentText()
-		if not part_type in PART_DICT.keys():  # disabled proto/modules
-			print("WARNING: {}s are currently disabled".format(part_type))
-			self.displayResults([], [])
-			return
-		part_temp = PART_DICT[part_type]()  # Constructs instance of searched-for class
 		# Search for locally-stored parts:
 		part_file_name = os.sep.join([ fm.DATADIR, 'partlist', part_type.lower()+'s.json' ])
 		with open(part_file_name, 'r') as opfl:
@@ -132,13 +136,11 @@ class func(object):
 
 		found_local_parts = {}
 		for part_id, date in part_list.items():
-			print("Checking part for match:", part_id)
 			part_temp.load(part_id)
 			found = True
 			for qty, value in search_criteria.items():
 				if value == '%':  continue  # "wildcard" option, ignore this
 				if str(getattr(part_temp, qty, None)) != value:
-					print("Mismatch:", qty, str(getattr(part_temp, qty, None)), value)
 					found = False
 			if found:  found_local_parts[part_id] = part_temp.kind_of_part
 
@@ -198,10 +200,9 @@ and l.LOCATION_NAME like \'{}\'"*"*".format(pt_query, search_criteria['location_
 		self.page.cbMaterial      .setEnabled(part_type == 'Baseplate')
 		self.page.cbThickness     .setEnabled(part_type == 'Sensor')
 		self.page.cbChannelDensity.setEnabled(True)
-		#self.page.cbPCBType       .setEnabled(part_type == 'PCB')
 		self.page.ckUseDate       .setEnabled(part_type == 'Protomodule' or part_type == 'Module')
 		useDate = self.page.ckUseDate.isChecked()
-		self.page.dCreated        .setReadOnly(not useDate or not (part_type == 'Protomodule' or part_type == 'Module'))
+		self.page.dCreated        .setReadOnly(not (part_type == 'Protomodule' or part_type == 'Module'))
 		self.page.cbAssmRow       .setEnabled(part_type == 'Protomodule' or part_type == 'Module')
 		self.page.cbAssmCol       .setEnabled(part_type == 'Protomodule' or part_type == 'Module')
 

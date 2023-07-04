@@ -553,25 +553,14 @@ class protomodule(fsobj_part):
 		return position
 
 	@property
-	def plt_asm_row(self):
+	def asm_row(self):
 		posn = self.tray_posn
+		print("in plt_asm_row: tray posn is:", posn)
 		if posn == "None":  return posn
 		else:  return posn%2+1
 
 	@property
-	def plt_asm_col(self):
-		posn = self.tray_posn
-		if posn == "None": return posn
-		else:  return posn//3+1
-
-	@property
-	def snsr_cmp_row(self):
-		posn = self.tray_posn
-		if posn == "None":  return posn
-		else:  return posn%2+1
-
-	@property
-	def snsr_cmp_col(self):
+	def asm_col(self):
 		posn = self.tray_posn
 		if posn == "None": return posn
 		else:  return posn//3+1
@@ -802,13 +791,13 @@ class module(fsobj_part):
 		return position
 
 	@property
-	def prto_asm_row(self):
+	def asm_row(self):
 		posn = self.tray_posn
 		if posn == "None":  return posn
 		else:  return posn%2+1
 
 	@property
-	def prto_asm_col(self):
+	def asm_col(self):
 		posn = self.tray_posn
 		if posn == "None": return posn
 		else:  return posn//3+1

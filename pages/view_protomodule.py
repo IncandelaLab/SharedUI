@@ -145,7 +145,7 @@ class func(object):
 
 		self.page.listComments.clear()
 		if self.protomodule.comments:
-			for comment in self.protomodule.comments:
+			for comment in self.protomodule.comments.split(';;'):
 				self.page.listComments.addItem(comment)
 		self.page.pteWriteComment.clear()
 

@@ -11,6 +11,7 @@ class fsobj_tool(fm.fsobj):
 	# Moved from tool classes
 	PROPERTIES = [
 		'location',
+		'comments',
 	]
 
 	#def add_part_to_list(self):

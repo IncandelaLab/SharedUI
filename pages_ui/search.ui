@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>110</x>
-     <y>300</y>
+     <y>280</y>
      <width>81</width>
      <height>41</height>
     </rect>
@@ -30,7 +30,7 @@
    <property name="geometry">
     <rect>
      <x>220</x>
-     <y>310</y>
+     <y>290</y>
      <width>111</width>
      <height>21</height>
     </rect>
@@ -45,7 +45,7 @@
      <x>40</x>
      <y>120</y>
      <width>381</width>
-     <height>161</height>
+     <height>141</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -56,12 +56,12 @@
    </property>
    <widget class="QCheckBox" name="ckUseDate">
     <property name="enabled">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
     <property name="geometry">
      <rect>
       <x>300</x>
-      <y>120</y>
+      <y>100</y>
       <width>71</width>
       <height>21</height>
      </rect>
@@ -178,15 +178,18 @@
    </widget>
    <widget class="QDateEdit" name="dCreated">
     <property name="enabled">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
     <property name="geometry">
      <rect>
       <x>220</x>
-      <y>120</y>
+      <y>100</y>
       <width>81</width>
       <height>21</height>
      </rect>
+    </property>
+    <property name="mouseTracking">
+     <bool>true</bool>
     </property>
     <property name="calendarPopup">
      <bool>true</bool>
@@ -270,7 +273,7 @@
     <property name="geometry">
      <rect>
       <x>330</x>
-      <y>140</y>
+      <y>120</y>
       <width>51</width>
       <height>21</height>
      </rect>
@@ -301,7 +304,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>120</y>
+      <y>100</y>
       <width>221</width>
       <height>20</height>
      </rect>
@@ -312,65 +315,6 @@
     <property name="readOnly">
      <bool>true</bool>
     </property>
-   </widget>
-   <widget class="QComboBox" name="cbPCBType">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>220</x>
-      <y>100</y>
-      <width>161</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="currentText">
-     <string/>
-    </property>
-    <property name="currentIndex">
-     <number>0</number>
-    </property>
-    <item>
-     <property name="text">
-      <string/>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>HGCROCV1</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>HGCROCV2</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>HGCROCV3</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>SKIROCV1</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>SKIROCV2</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>SKIROCV3</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>HGCROC dummy</string>
-     </property>
-    </item>
    </widget>
    <widget class="QComboBox" name="cbShape">
     <property name="geometry">
@@ -432,7 +376,7 @@
     <property name="geometry">
      <rect>
       <x>250</x>
-      <y>140</y>
+      <y>120</y>
       <width>51</width>
       <height>21</height>
      </rect>
@@ -466,12 +410,12 @@
    </widget>
    <widget class="QLineEdit" name="lineEdit_22">
     <property name="enabled">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
     <property name="geometry">
      <rect>
       <x>300</x>
-      <y>140</y>
+      <y>120</y>
       <width>31</width>
       <height>20</height>
      </rect>
@@ -532,27 +476,11 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit_19">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>100</y>
-      <width>221</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>PCB ROC type</string>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
    <widget class="QLineEdit" name="lineEdit_20">
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>140</y>
+      <y>120</y>
       <width>221</width>
       <height>20</height>
      </rect>
@@ -566,12 +494,12 @@
    </widget>
    <widget class="QLineEdit" name="lineEdit_21">
     <property name="enabled">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
     <property name="geometry">
      <rect>
       <x>220</x>
-      <y>140</y>
+      <y>120</y>
       <width>31</width>
       <height>20</height>
      </rect>
@@ -628,7 +556,7 @@
   <widget class="QComboBox" name="cbPartType">
    <property name="geometry">
     <rect>
-     <x>40</x>
+     <x>30</x>
      <y>60</y>
      <width>121</width>
      <height>21</height>

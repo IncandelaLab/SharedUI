@@ -866,11 +866,11 @@ class func(object):
 
 	def goTrayComponent(self,*args,**kwargs):
 		tray_component_sensor = self.page.sbTrayComponent.value()
-		self.setUIPage('Tooling',tray_component_sensor=tray_component_sensor)
+		self.setUIPage('Tooling',tray_component_sensor=tray_component_sensor,institution=self.page.cbInstitution.currentText())
 
 	def goTrayAssembly(self,*args,**kwargs):
 		tray_assembly = self.page.sbTrayAssembly.value()
-		self.setUIPage('Tooling',tray_assembly=tray_assembly)
+		self.setUIPage('Tooling',tray_assembly=tray_assembly,institution=self.page.cbInstitution.currentText())
 
 	def setRunStartNow(self, *args, **kwargs):
 		localtime = time.localtime()

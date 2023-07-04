@@ -476,6 +476,7 @@ class func(object):
 	@enforce_mode('view')
 	def load_kwargs(self,kwargs):
 		keys = kwargs.keys()
+		print("load_kwargs (supp):  got", kwargs)
 
 		if "batch_araldite" in keys:
 			self.update_info_batch_araldite(kwargs['batch_araldite'])
