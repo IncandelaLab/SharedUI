@@ -64,7 +64,7 @@
      <x>10</x>
      <y>160</y>
      <width>301</width>
-     <height>521</height>
+     <height>481</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -80,7 +80,7 @@
     <property name="geometry">
      <rect>
       <x>160</x>
-      <y>60</y>
+      <y>40</y>
       <width>141</width>
       <height>20</height>
      </rect>
@@ -103,7 +103,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>60</y>
+      <y>40</y>
       <width>161</width>
       <height>21</height>
      </rect>
@@ -122,7 +122,7 @@
     <property name="geometry">
      <rect>
       <x>160</x>
-      <y>80</y>
+      <y>60</y>
       <width>141</width>
       <height>20</height>
      </rect>
@@ -170,7 +170,7 @@
     <property name="geometry">
      <rect>
       <x>250</x>
-      <y>220</y>
+      <y>199</y>
       <width>51</width>
       <height>21</height>
      </rect>
@@ -183,7 +183,7 @@
     <property name="geometry">
      <rect>
       <x>200</x>
-      <y>220</y>
+      <y>199</y>
       <width>51</width>
       <height>21</height>
      </rect>
@@ -202,7 +202,7 @@
     <property name="geometry">
      <rect>
       <x>250</x>
-      <y>201</y>
+      <y>180</y>
       <width>51</width>
       <height>21</height>
      </rect>
@@ -211,30 +211,11 @@
      <string>Go to</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit_14">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>40</y>
-      <width>161</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>location</string>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
    <widget class="QLineEdit" name="leProtomodule">
     <property name="geometry">
      <rect>
       <x>120</x>
-      <y>201</y>
+      <y>180</y>
       <width>131</width>
       <height>20</height>
      </rect>
@@ -247,7 +228,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>140</y>
+      <y>119</y>
       <width>121</width>
       <height>21</height>
      </rect>
@@ -263,7 +244,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>79</y>
+      <y>59</y>
       <width>161</width>
       <height>21</height>
      </rect>
@@ -279,7 +260,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>340</y>
+      <y>300</y>
       <width>301</width>
       <height>91</height>
      </rect>
@@ -289,7 +270,7 @@
     <property name="geometry">
      <rect>
       <x>250</x>
-      <y>181</y>
+      <y>160</y>
       <width>51</width>
       <height>21</height>
      </rect>
@@ -302,7 +283,7 @@
     <property name="geometry">
      <rect>
       <x>200</x>
-      <y>240</y>
+      <y>219</y>
       <width>51</width>
       <height>21</height>
      </rect>
@@ -321,7 +302,7 @@
     <property name="geometry">
      <rect>
       <x>250</x>
-      <y>141</y>
+      <y>120</y>
       <width>51</width>
       <height>21</height>
      </rect>
@@ -330,30 +311,11 @@
      <string>Go to</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="leLocation">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>160</x>
-      <y>40</y>
-      <width>141</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
    <widget class="QPlainTextEdit" name="pteWriteComment">
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>440</y>
+      <y>400</y>
       <width>301</width>
       <height>61</height>
      </rect>
@@ -366,7 +328,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>160</y>
+      <y>139</y>
       <width>121</width>
       <height>21</height>
      </rect>
@@ -417,7 +379,7 @@
     <property name="geometry">
      <rect>
       <x>120</x>
-      <y>141</y>
+      <y>120</y>
       <width>131</width>
       <height>20</height>
      </rect>
@@ -430,7 +392,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>240</y>
+      <y>219</y>
       <width>121</width>
       <height>21</height>
      </rect>
@@ -446,7 +408,7 @@
     <property name="geometry">
      <rect>
       <x>250</x>
-      <y>161</y>
+      <y>140</y>
       <width>51</width>
       <height>21</height>
      </rect>
@@ -459,7 +421,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>500</y>
+      <y>460</y>
       <width>111</width>
       <height>21</height>
      </rect>
@@ -472,7 +434,7 @@
     <property name="geometry">
      <rect>
       <x>120</x>
-      <y>161</y>
+      <y>140</y>
       <width>131</width>
       <height>20</height>
      </rect>
@@ -485,7 +447,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>320</y>
+      <y>280</y>
       <width>121</width>
       <height>21</height>
      </rect>
@@ -498,7 +460,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>220</y>
+      <y>199</y>
       <width>121</width>
       <height>21</height>
      </rect>
@@ -514,7 +476,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>200</y>
+      <y>179</y>
       <width>121</width>
       <height>21</height>
      </rect>
@@ -546,7 +508,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>180</y>
+      <y>159</y>
       <width>121</width>
       <height>21</height>
      </rect>
@@ -562,7 +524,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>320</y>
+      <y>280</y>
       <width>181</width>
       <height>21</height>
      </rect>
@@ -578,7 +540,7 @@
     <property name="geometry">
      <rect>
       <x>120</x>
-      <y>181</y>
+      <y>160</y>
       <width>131</width>
       <height>20</height>
      </rect>
@@ -591,7 +553,7 @@
     <property name="geometry">
      <rect>
       <x>250</x>
-      <y>240</y>
+      <y>219</y>
       <width>51</width>
       <height>21</height>
      </rect>
@@ -607,7 +569,7 @@
     <property name="geometry">
      <rect>
       <x>120</x>
-      <y>220</y>
+      <y>199</y>
       <width>81</width>
       <height>21</height>
      </rect>
@@ -653,7 +615,7 @@
     <property name="geometry">
      <rect>
       <x>120</x>
-      <y>240</y>
+      <y>219</y>
       <width>81</width>
       <height>21</height>
      </rect>
@@ -767,6 +729,19 @@
       <string>FSU</string>
      </property>
     </item>
+   </widget>
+   <widget class="QLabel" name="label_9">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>100</y>
+      <width>151</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Component information</string>
+    </property>
    </widget>
   </widget>
   <widget class="QFrame" name="frame_2">
@@ -975,19 +950,22 @@
     </property>
    </widget>
    <widget class="QCheckBox" name="ckWirebondingCompleted">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>10</x>
       <y>140</y>
-      <width>201</width>
+      <width>241</width>
       <height>23</height>
      </rect>
     </property>
     <property name="text">
-     <string>Wirebonding completed</string>
+     <string>Wirebonding complete w/ no issues</string>
     </property>
     <property name="checkable">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QComboBox" name="cbGrade">
@@ -1001,6 +979,9 @@
       <width>81</width>
       <height>21</height>
      </rect>
+    </property>
+    <property name="editable">
+     <bool>false</bool>
     </property>
     <property name="currentIndex">
      <number>-1</number>

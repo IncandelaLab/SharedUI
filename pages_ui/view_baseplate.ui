@@ -169,7 +169,7 @@
      <x>20</x>
      <y>160</y>
      <width>261</width>
-     <height>441</height>
+     <height>421</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -178,30 +178,11 @@
    <property name="frameShadow">
     <enum>QFrame::Plain</enum>
    </property>
-   <widget class="QLineEdit" name="lineEdit_11">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>1</x>
-      <y>41</y>
-      <width>121</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Location</string>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
    <widget class="QLineEdit" name="lineEdit_3">
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>99</y>
+      <y>79</y>
       <width>161</width>
       <height>21</height>
      </rect>
@@ -213,30 +194,11 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QLineEdit" name="leLocation">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>119</x>
-      <y>41</y>
-      <width>141</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
    <widget class="QLineEdit" name="lineEdit_15">
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>120</y>
+      <y>100</y>
       <width>161</width>
       <height>20</height>
      </rect>
@@ -252,7 +214,7 @@
     <property name="geometry">
      <rect>
       <x>160</x>
-      <y>99</y>
+      <y>79</y>
       <width>101</width>
       <height>21</height>
      </rect>
@@ -310,7 +272,7 @@
     <property name="geometry">
      <rect>
       <x>159</x>
-      <y>80</y>
+      <y>60</y>
       <width>101</width>
       <height>20</height>
      </rect>
@@ -326,7 +288,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>80</y>
+      <y>60</y>
       <width>161</width>
       <height>21</height>
      </rect>
@@ -355,13 +317,13 @@
     <property name="geometry">
      <rect>
       <x>160</x>
-      <y>120</y>
+      <y>100</y>
       <width>101</width>
       <height>20</height>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>-1</number>
     </property>
     <item>
      <property name="text">
@@ -403,7 +365,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>420</y>
+      <y>400</y>
       <width>111</width>
       <height>21</height>
      </rect>
@@ -416,7 +378,7 @@
     <property name="geometry">
      <rect>
       <x>140</x>
-      <y>180</y>
+      <y>170</y>
       <width>121</width>
       <height>21</height>
      </rect>
@@ -429,7 +391,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>200</y>
+      <y>190</y>
       <width>261</width>
       <height>141</height>
      </rect>
@@ -439,7 +401,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>180</y>
+      <y>170</y>
       <width>141</width>
       <height>21</height>
      </rect>
@@ -455,7 +417,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>350</y>
+      <y>330</y>
       <width>261</width>
       <height>71</height>
      </rect>
@@ -468,7 +430,7 @@
     <property name="geometry">
      <rect>
       <x>160</x>
-      <y>140</y>
+      <y>120</y>
       <width>101</width>
       <height>20</height>
      </rect>
@@ -491,7 +453,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>140</y>
+      <y>120</y>
       <width>161</width>
       <height>20</height>
      </rect>
@@ -576,9 +538,7 @@
      </property>
     </item>
    </widget>
-   <zorder>lineEdit_11</zorder>
    <zorder>lineEdit_3</zorder>
-   <zorder>leLocation</zorder>
    <zorder>lineEdit_15</zorder>
    <zorder>cbMaterial</zorder>
    <zorder>lineEdit_39</zorder>

@@ -197,7 +197,8 @@ class func(object):
 		if self.page.lePcb.text()          == -1:  self.page.lePcb.clear()
 		if self.page.leProtomodule.text()  == -1:  self.page.leProtomodule.clear()
 
-		self.page.ckWirebondingCompleted.setChecked(False if self.module.final_inspxn_ok is None else self.module.final_inspxn_ok)
+		print("SETTING WIREBONDING CHECKED", self.module.wirebonding_completed)
+		self.page.ckWirebondingCompleted.setChecked(self.module.wirebonding_completed if self.module.wirebonding_completed else False)
 
 
 		# comments

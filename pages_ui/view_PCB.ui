@@ -61,7 +61,7 @@
      <x>20</x>
      <y>160</y>
      <width>261</width>
-     <height>411</height>
+     <height>371</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -74,7 +74,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>140</y>
+      <y>100</y>
       <width>81</width>
       <height>20</height>
      </rect>
@@ -118,30 +118,11 @@
      </property>
     </item>
    </widget>
-   <widget class="QLineEdit" name="leManufacturer">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>180</x>
-      <y>100</y>
-      <width>81</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
    <widget class="QLineEdit" name="lineEdit_23">
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>80</y>
+      <y>60</y>
       <width>181</width>
       <height>21</height>
      </rect>
@@ -157,32 +138,13 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>140</y>
-      <width>181</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Geometry</string>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEdit_7">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>0</x>
       <y>100</y>
       <width>181</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>Manufacturer</string>
+     <string>Geometry</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -201,30 +163,11 @@
      <number>-1</number>
     </property>
    </widget>
-   <widget class="QLineEdit" name="leLocation">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>120</x>
-      <y>40</y>
-      <width>141</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
    <widget class="QLineEdit" name="lineEdit_22">
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>120</y>
+      <y>80</y>
       <width>181</width>
       <height>21</height>
      </rect>
@@ -247,25 +190,6 @@
     </property>
     <property name="text">
      <string>Institution</string>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineEdit_11">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>40</y>
-      <width>121</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Location</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -294,7 +218,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>120</y>
+      <y>80</y>
       <width>81</width>
       <height>21</height>
      </rect>
@@ -320,7 +244,7 @@
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>80</y>
+      <y>60</y>
       <width>80</width>
       <height>20</height>
      </rect>
@@ -336,7 +260,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>390</y>
+      <y>350</y>
       <width>111</width>
       <height>21</height>
      </rect>
@@ -349,7 +273,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>180</y>
+      <y>140</y>
       <width>141</width>
       <height>21</height>
      </rect>
@@ -365,7 +289,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>200</y>
+      <y>160</y>
       <width>261</width>
       <height>111</height>
      </rect>
@@ -375,7 +299,7 @@
     <property name="geometry">
      <rect>
       <x>140</x>
-      <y>180</y>
+      <y>140</y>
       <width>121</width>
       <height>21</height>
      </rect>
@@ -388,7 +312,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>320</y>
+      <y>280</y>
       <width>261</width>
       <height>71</height>
      </rect>
@@ -950,6 +874,9 @@
     </property>
    </widget>
    <widget class="QComboBox" name="cbGrade">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>180</x>

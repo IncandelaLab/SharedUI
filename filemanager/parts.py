@@ -245,7 +245,7 @@ class sensor(fsobj_part):
 		# Note:  'tested_by' = record_insertion_user
 		# run_begin_date_ is a property
 		'visual_inspection',
-		'test_file_name',
+		'test_files' #_name',
 		# other:
 		'protomodule',
 		'step_sensor',
@@ -346,7 +346,7 @@ class pcb(fsobj_part):
 		# build_upload file:
 		# build_cond file:
 		# run_begin_date_ is a property
-		'test_file_name',
+		'test_files',
 		# other:
 		'module',
 		'step_pcb',
@@ -819,8 +819,19 @@ class module(fsobj_part):
 
 	@property
 	def wirebond_comments_concat(self):
-		return ";;".join(self.wirebond.comments)
+		return ";;".join(self.wirebond_comments)
 	
+	@property
+	def wirebonding_completed(self):
+		return self.back_bonds and \
+		self.back_bond_inspxn and \
+		self.front_bonds and \
+		self.front_bond_inspxn and \
+		self.back_encap_inspxn == 'pass' and \
+		self.front_encap_inspxn == 'pass' and \
+		self.final_inspxn_ok == 'pass'
+
+
 
 	# new():  Optionally, create proto from baseplate and sensor objects
 	# Note:  baseplate and sensor must be the actual objects, not IDs
@@ -863,5 +874,6 @@ class module(fsobj_part):
 		# if step_sensor.is_complete (or something similar)...
 		# ALSO, check wirebonding finished
 		super(module, self).generate_xml()
+
 
 

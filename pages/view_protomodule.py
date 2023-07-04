@@ -211,8 +211,8 @@ class func(object):
 		self.page.pbCancel.setEnabled(  mode_editing )
 
 		#self.page.leLocation.setReadOnly(  not mode_editing )
-		self.page.cbType.setEnabled(           mode_editing )
-		self.page.cbShape.setEnabled(          mode_editing )
+		#self.page.cbType.setEnabled(           mode_editing )
+		#self.page.cbShape.setEnabled(          mode_editing )
 		self.page.cbInstitution.setEnabled(    mode_editing )
 		self.page.cbInsertUser.setEnabled(     mode_editing )
 		self.page.dsbThickness.setReadOnly(not mode_editing )

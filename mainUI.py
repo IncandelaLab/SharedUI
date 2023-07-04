@@ -339,7 +339,7 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 
 			# NEW:  Enable/disable uploading accordingly.
 			enableUploading = which_page in UPLOAD_ENABLED_PAGES
-			self.pbUploadObject.setEnabled(enableUploading)
+			#self.pbUploadObject.setEnabled(enableUploading)
 			#self.pbUploadDate.setEnabled(  enableUploading)
 			#self.dUpload.setEnabled(       enableUploading)
 			self.leStatus.setText("")

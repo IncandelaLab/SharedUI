@@ -194,8 +194,8 @@ class func(object):
 		"""
 		# ;;-separated list of files
 		self.page.listFiles.clear()
-		if self.pcb.test_file_name:
-			for f in self.pcb.test_file_name.split(";;"):
+		if self.pcb.test_files:
+			for f in self.pcb.test_files.split(";;"):
 				#name = os.path.split(f)[1]
 				self.page.listFiles.addItem(f)
 
@@ -381,7 +381,10 @@ class func(object):
 				new_filepath = "_upload.".join(tmp_filepath)
 				shutil.copyfile(f, new_filepath)
 				self.page.listComments.addItem(new_filepath)
-				self.pcb.test_file_name.append(new_filepath)
+				if self.fsobj_pt.test_files:
+					self.fsobj_pt.test_files += ';;' + tmp_filename
+				else:
+					self.pcb.test_files = new_filepath
 			self.update_info()
 		else:
 			print("WARNING:  Failed to find root files in chosen directory!")
@@ -397,9 +400,9 @@ class func(object):
 			#new_filepath = fdir + '/' + fname
 			os.remove(fname) #new_filepath)
 			#self.pcb.test_file_name.remove(new_filepath)
-			if self.pcb.test_file_name.replace(fname+";;", "") == fname+";;":
+			if self.pcb.test_files.replace(fname+";;", "") == fname+";;":
 				# if substr;; not found, is probably at the end of the list, so:
-				self.pcb.test_file_name.replace(fname, "")
+				self.pcb.test_files.replace(fname, "")
 			self.update_info()
 
 
