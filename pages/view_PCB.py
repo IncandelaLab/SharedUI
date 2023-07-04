@@ -171,7 +171,7 @@ class func(object):
 
 		self.page.listComments.clear()
 		if self.pcb.comments:
-			for comment in self.pcb.comments:
+			for comment in self.pcb.comments.split(';;'):
 				self.page.listComments.addItem(comment)
 		self.page.pteWriteComment.clear()
 
@@ -232,7 +232,6 @@ class func(object):
 		#self.page.leLocation.setReadOnly(     not (mode_creating or mode_editing) )
 
 		self.page.leBarcode.setReadOnly(      not (mode_creating or mode_editing) )
-		self.page.leManufacturer.setReadOnly( not (mode_creating or mode_editing) )
 		#self.page.cbType.setEnabled(               mode_creating or mode_editing  )
 		self.page.cbResolution.setEnabled(         mode_creating or mode_editing  )
 		self.page.cbShape.setEnabled(              mode_creating or mode_editing  )
@@ -310,7 +309,6 @@ class func(object):
 		#self.pcb.institution_location        = str(self.page.leLocation.text()         )  if str(self.page.leLocation.text()          ) else None
 
 		self.pcb.barcode         = str(self.page.leBarcode.text()          )  if str(self.page.leBarcode.text()           ) else None
-		#self.pcb.manufacturer    = str(self.page.leManufacturer.text()     )  if str(self.page.leManufacturer.text()      ) else None
 		self.pcb.channel_density      = str(self.page.cbResolution.currentText())  if str(self.page.cbResolution.currentText()       ) else None
 		#self.pcb.type            = str(self.page.cbType.currentText()      )  if str(self.page.cbType.currentText()       ) else None
 		#self.pcb.num_rocs        = self.page.sbNumRocs.value()  if self.page.sbNumRocs.value()  >=0 else None
@@ -318,7 +316,7 @@ class func(object):
 		self.pcb.geometry           = str(self.page.cbShape.currentText()     )  if str(self.page.cbShape.currentText()      ) else None
 
 		num_comments = self.page.listComments.count()
-		self.pcb.comments = [self.page.listComments.item(i).text() for i in range(num_comments)]
+		self.pcb.comments = ';;'.join([self.page.listComments.item(i).text() for i in range(num_comments)])
 
 		self.pcb.flatness   =     self.page.dsbFlatness.value()         if     self.page.dsbFlatness.value()  >=0    else None
 		self.pcb.thickness  =     self.page.dsbThickness.value()        if     self.page.dsbThickness.value() >=0    else None
@@ -329,6 +327,8 @@ class func(object):
 		self.update_info()
 
 		self.xmlModList.append(self.pcb.ID)
+
+		self.pcb.generate_xml()
 
 
 	def xmlModified(self):

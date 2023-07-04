@@ -162,7 +162,7 @@ class func(object):
 
 		self.page.listComments.clear()
 		if self.sensor.comments:
-			for comment in self.sensor.comments:
+			for comment in self.sensor.comments.split(';;'):
 				self.page.listComments.addItem(comment)
 		self.page.pteWriteComment.clear()
 
@@ -299,7 +299,7 @@ class func(object):
 		self.sensor.grade           = str(self.page.cbGrade.currentText())          if str(self.page.cbGrade.currentText())       else None
 
 		num_comments = self.page.listComments.count()
-		self.sensor.comments = [self.page.listComments.item(i).text() for i in range(num_comments)]
+		self.sensor.comments = ';;'.join([self.page.listComments.item(i).text() for i in range(num_comments)])
 
 		self.sensor.visual_inspection = str(self.page.cbInspection.currentText()) if str(self.page.cbInspection.currentText()) else None
 		self.sensor.flatness = self.page.dsbFlatness.value() if self.page.dsbFlatness.value() else None
@@ -309,6 +309,8 @@ class func(object):
 		self.update_info()
 
 		self.xmlModList.append(self.sensor.ID)
+
+		self.sensor.generate_xml()
 
 
 	def xmlModified(self):

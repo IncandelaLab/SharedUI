@@ -78,8 +78,8 @@ class fsobj_part(fm.fsobj):
 	]
 
 	PART_DEFAULTS = {
-		'comments': [],
-		'comment_description': [],  # Currently unused
+		'comments': '',
+		'comment_description': '',  # Currently unused
 	}
 
 	# Properties unique to class
@@ -97,15 +97,13 @@ class fsobj_part(fm.fsobj):
 	# property institution_id() - use INSTITUTION_DICT, +setter (set inst from ID)
 
 	# Note:  Comments have max 4k chars
-	@property
-	def comment_description_concat(self):
-		catstr = ';;'.join(self.comment_description)
-		return catstr[:4000] if len(catstr)>4000 else catstr
 
 	@property
-	def comments_concat(self):
-		catstr = ';;'.join(self.comments)
-		return catstr[:4000] if len(catstr)>4000 else catstr
+	def comments_upload(self):
+		# NOTE:  Can't upload empty string, so...
+		if self.comments is None:  return "None"
+		if self.comments == "":  return "None"
+		return self.comments[:4000] if len(self.comments)>4000 else self.comments
 
 	@property
 	def run_begin_timestamp_(self):

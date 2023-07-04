@@ -167,7 +167,7 @@ class func(object):
 
 		self.page.listComments.clear()
 		if self.baseplate.comments:
-			for comment in self.baseplate.comments:
+			for comment in self.baseplate.comments.split(';;'):
 				self.page.listComments.addItem(comment)
 		self.page.pteWriteComment.clear()
 
@@ -309,7 +309,7 @@ class func(object):
 		self.baseplate.grade                = str(self.page.cbGrade.currentText())       if str(self.page.cbGrade.currentText())       else None
 
 		num_comments = self.page.listComments.count()
-		self.baseplate.comments = [self.page.listComments.item(i).text() for i in range(num_comments)]
+		self.baseplate.comments = ';;'.join([self.page.listComments.item(i).text() for i in range(num_comments)])
 
 		self.baseplate.save()
 		self.mode = 'view'
@@ -317,6 +317,7 @@ class func(object):
 
 		self.xmlModList.append(self.baseplate.ID)
 
+		self.baseplate.generate_xml()
 
 	def xmlModified(self):
 		return self.xmlModList

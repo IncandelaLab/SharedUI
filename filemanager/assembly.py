@@ -161,11 +161,21 @@ class fsobj_step(fm.fsobj):
 		self.set_var_from_part("asmbl_tray_name", value)
 
 	@property
+	def asmbl_tray_num(self):
+		if self.asmbl_tray_name is None:  return None
+		else:  return int(self.asmbl_tray_name.split("_")[1])
+
+	@property
 	def comp_tray_name(self):
 		return self.get_var_from_part("comp_tray_name")
 	@comp_tray_name.setter
 	def comp_tray_name(self, value):
 		self.set_var_from_part("comp_tray_name", value)
+
+	@property
+	def comp_tray_num(self):
+		if self.comp_tray_name is None:  return None
+		else:  return int(self.comp_tray_name.split("_")[1])
 
 	# post-assembly properties
 	@property
@@ -220,9 +230,6 @@ class fsobj_step(fm.fsobj):
 
 
 
-
-
-
 class step_sensor(fsobj_step):
 	OBJECTNAME = "sensor step"
 	FILEDIR    = os.sep.join(['steps','sensor','{date}'])
@@ -236,7 +243,6 @@ class step_sensor(fsobj_step):
 		'sensors',
 		'protomodules',
 		# run_begin/end_timestamp:  inherited
-		'check_tool_feet',
 		'xml_file_name', # was test_file_name
 	]
 	
@@ -265,6 +271,17 @@ class step_sensor(fsobj_step):
 	def snsr_tool_names(self, value):
 		self.set_vars_from_part("snsr_tool_name", value)
 
+	@property
+	def snsr_tool_nums(self):
+		names = self.snsr_tool_names
+		nums = []
+		for i in range(6):
+			if names[i] is None:
+				nums.append(None)
+			else:
+				nums.append(int(names[i].split("_")[1]))
+		return nums
+
 	# post-assembly
 	@property
 	def snsr_x_offsts(self):
@@ -287,6 +304,12 @@ class step_sensor(fsobj_step):
 	def snsr_ang_offsts(self, value):
 		self.set_vars_from_part("snsr_ang_offst", value)
 
+	@property
+	def snsr_tool_feet_chk(self):
+		return self.get_var_from_part("snsr_tool_feet_chk")
+	@snsr_tool_feet_chk.setter
+	def snsr_tool_feet_chk(self, value):
+		self.set_var_from_part("snsr_tool_feet_chk", value)
 
 
 class step_pcb(fsobj_step):
@@ -301,7 +324,6 @@ class step_pcb(fsobj_step):
 		'pcbs',
 		'protomodules',
 		'modules',
-		'check_tool_feet',
 		'xml_file_name',
 	]
 	
@@ -318,6 +340,17 @@ class step_pcb(fsobj_step):
 	@pcb_tool_names.setter
 	def pcb_tool_names(self, value):
 		self.set_vars_from_part("pcb_tool_name", value)
+
+	@property
+	def pcb_tool_nums(self):
+		names = self.pcb_tool_names
+		nums = []
+		for i in range(6):
+			if names[i] is None:
+				nums.append(None)
+			else:
+				nums.append(int(names[i].split("_")[1]))
+		return nums
 
 	# post-assembly
 	@property
@@ -340,6 +373,13 @@ class step_pcb(fsobj_step):
 	@pcb_ang_offsts.setter
 	def pcb_ang_offsts(self, value):
 		self.set_vars_from_part("pcb_plcment_ang_offset", value)
+
+	@property
+	def pcb_tool_feet_chk(self):
+		return self.get_var_from_part("pcb_tool_feet_chk")
+	@pcb_tool_feet_chk.setter
+	def pcb_tool_feet_chk(self, value):
+		self.set_var_from_part("pcb_tool_feet_chk", value)
 
 
 

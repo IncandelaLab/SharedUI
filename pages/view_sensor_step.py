@@ -294,11 +294,11 @@ class func(object):
 					dt.setTime(tim)
 
 			self.page.leBatchAraldite.setText(self.step_sensor.glue_batch_num if not (self.step_sensor.glue_batch_num is None) else "")
-			self.page.sbTrayAssembly.setValue( self.step_sensor.asmbl_tray_name  if not (self.step_sensor.asmbl_tray_name  is None) else -1)
-			self.page.sbTrayComponent.setValue(self.step_sensor.comp_tray_name if not (self.step_sensor.comp_tray_name is None) else -1)
+			self.page.sbTrayAssembly.setValue( self.step_sensor.asmbl_tray_num  if not (self.step_sensor.asmbl_tray_num  is None) else -1)
+			self.page.sbTrayComponent.setValue(self.step_sensor.comp_tray_num if not (self.step_sensor.comp_tray_num is None) else -1)
 
 			if not (self.step_sensor.snsr_tool_names is None):
-				tools = self.step_sensor.snsr_tool_names
+				tools = self.step_sensor.snsr_tool_nums
 				for i in range(6):
 					self.sb_tools[i].setValue(tools[i] if tools[i] != None else -1)
 			else:
@@ -326,7 +326,7 @@ class func(object):
 					self.le_protomodules[i].setText("")
 
 			self.page.ckCheckFeet.setChecked(True)
-			self.page.ckCheckFeet.setChecked(self.step_sensor.check_tool_feet if not (self.step_sensor.check_tool_feet is None) else False)
+			self.page.ckCheckFeet.setChecked(self.step_sensor.snsr_tool_feet_chk if not (self.step_sensor.snsr_tool_feet_chk is None) else False)
 
 		else:
 			self.page.cbUserPerformed.setCurrentIndex(-1)
@@ -691,7 +691,7 @@ class func(object):
 				protomodules.append("PROTO_{}_{}".format(self.le_baseplates[i].text(), self.le_sensors[i].text()))
 			else:
 				protomodules.append(None)
-		self.step_sensor.tools        = tools
+		self.step_sensor.snsr_tool_names = tools
 		self.step_sensor.sensors      = sensors
 		self.step_sensor.baseplates   = baseplates
 		self.step_sensor.protomodules = protomodules
@@ -704,8 +704,10 @@ class func(object):
 			temp_plt = self.baseplates[i]
 			temp_sensor = self.sensors[i]
 			temp_protomodule = parts.protomodule()
-
-			temp_protomodule.new(protomodules[i], baseplate_=temp_plt, sensor_=temp_sensor)
+			# Attempt to load.  If fails, create new:
+			print("IN SAVEEDITING:  protomods[i] is", protomodules[i])
+			if not temp_protomodule.load(protomodules[i]):
+				temp_protomodule.new(protomodules[i], baseplate_=temp_plt, sensor_=temp_sensor)
 			temp_protomodule.step_sensor    = self.step_sensor.ID
 			temp_protomodule.save()
 
@@ -726,15 +728,17 @@ class func(object):
 		pydt = self.page.dtRunStop.dateTime().toPyDateTime().astimezone(datetime.timezone.utc)
 		self.step_sensor.run_end_timestamp   = str(pydt)
 		
+		inst = self.page.cbInstitution.currentText()
 		self.step_sensor.glue_batch_num = self.page.leBatchAraldite.text() \
 		    if self.page.leBatchAraldite.text() else None
-		self.step_sensor.asmbl_tray_name = self.page.sbTrayAssembly.value() \
+		self.step_sensor.asmbl_tray_name = "{}_{}".format(inst, self.page.sbTrayAssembly.value()) \
 		    if self.page.sbTrayAssembly.value() >= 0 else None
-		self.step_sensor.comp_tray_name = self.page.sbTrayComponent.value() \
+		self.step_sensor.comp_tray_name = "{}_{}".format(inst, self.page.sbTrayComponent.value()) \
 		    if self.page.sbTrayComponent.value() >= 0 else None
 
-		self.step_sensor.snsr_tool_names = tools
-		self.step_sensor.check_tool_feet = self.page.ckCheckFeet.isChecked()
+		print("TOOLS ARE:", tools)
+		self.step_sensor.snsr_tool_names = [None if tools[i] is None else "{}_{}".format(inst, tools[i]) for i in range(6)]
+		self.step_sensor.snsr_tool_feet_chk = self.page.ckCheckFeet.isChecked()
 
 		self.step_sensor.save()
 		self.unloadAllObjects()

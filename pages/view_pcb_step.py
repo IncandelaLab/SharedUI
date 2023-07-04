@@ -299,11 +299,11 @@ class func(object):
 
 
 			self.page.leBatchAraldite.setText(self.step_pcb.glue_batch_num if not (self.step_pcb.glue_batch_num is None) else "")
-			self.page.sbTrayAssembly.setValue( self.step_pcb.asmbl_tray_name if not (self.step_pcb.asmbl_tray_name  is None) else -1)
-			self.page.sbTrayComponent.setValue(self.step_pcb.comp_tray_name if not (self.step_pcb.comp_tray_name is None) else -1)
+			self.page.sbTrayAssembly.setValue( self.step_pcb.asmbl_tray_num if not (self.step_pcb.asmbl_tray_name  is None) else -1)
+			self.page.sbTrayComponent.setValue(self.step_pcb.comp_tray_num if not (self.step_pcb.comp_tray_num is None) else -1)
 
 			if not (self.step_pcb.pcb_tool_names is None):
-				tools = self.step_pcb.pcb_tool_names
+				tools = self.step_pcb.pcb_tool_nums
 				for i in range(6):
 					self.sb_tools[i].setValue(tools[i] if not (tools[i] is None) else -1)
 			else:
@@ -331,7 +331,7 @@ class func(object):
 				for i  in range(6):
 					self.le_modules[i].setText("")
 
-			self.page.ckCheckFeet.setChecked(self.step_pcb.check_tool_feet if not (self.step_pcb.check_tool_feet is None) else False)
+			self.page.ckCheckFeet.setChecked(self.step_pcb.pcb_tool_feet_chk if not (self.step_pcb.pcb_tool_feet_chk is None) else False)
 
 		else:
 			self.page.cbUserPerformed.setCurrentIndex(-1)
@@ -710,7 +710,7 @@ class func(object):
 			protomodules.append(self.le_protomodules[i].text() if self.le_protomodules[i].text() != "" else None)
 			modules.append(     self.le_modules[i].text()      if self.le_modules[i].text()      != "" else None)
 	
-		self.step_pcb.tools        = tools
+		print("SAVING TOOLS:", tools)
 		self.step_pcb.pcbs         = pcbs
 		self.step_pcb.protomodules = protomodules
 		self.step_pcb.modules      = modules
@@ -723,11 +723,12 @@ class func(object):
 			temp_pcb = self.pcbs[i]
 			temp_proto = self.protomodules[i]
 			temp_module = parts.module()
-
-			temp_module.new(modules[i], pcb_=temp_pcb, protomodule_=temp_proto)
-			temp_module.baseplate = self.protomodule.baseplate
-			temp_module.sensor = self.protomodule.sensor
-			temp_module.step_sensor = self.protomodule.step_sensor
+			# Check for existence
+			if not temp_module.load(modules[i]):
+				temp_module.new(modules[i], pcb_=temp_pcb, protomodule_=temp_proto)
+			temp_module.baseplate = self.protomodules[i].baseplate
+			temp_module.sensor = self.protomodules[i].sensor
+			temp_module.step_sensor = self.protomodules[i].step_sensor
 			temp_module.step_pcb = self.step_pcb.ID
 			temp_module.save()
 
@@ -746,15 +747,16 @@ class func(object):
 		pydt = self.page.dtRunStop.dateTime().toPyDateTime().astimezone(datetime.timezone.utc)
 		self.step_pcb.run_end_timestamp   = str(pydt)
 
+		inst = self.page.cbInstitution.currentText()
 		self.step_pcb.glue_batch_num = self.page.leBatchAraldite.text() \
 			if self.page.leBatchAraldite.text() else None
-		self.step_pcb.asmbl_tray_name = self.page.sbTrayAssembly.value() \
+		self.step_pcb.asmbl_tray_name = "{}_{}".format(inst, self.page.sbTrayAssembly.value()) \
 			if self.page.sbTrayAssembly.value() >= 0 else None
-		self.step_pcb.comp_tray_name = self.page.sbTrayComponent.value() \
+		self.step_pcb.comp_tray_name = "{}_{}".format(inst, self.page.sbTrayComponent.value()) \
 			if self.page.sbTrayComponent.value() >= 0 else None
 
-		self.step_pcb.pcb_tool_names = tools
-		self.step_pcb.check_tool_feet = self.page.ckCheckFeet.isChecked()
+		self.step_pcb.pcb_tool_names = [None if tools[i] is None else "{}_{}".format(inst, tools[i]) for i in range(6)]
+		self.step_pcb.pcb_tool_feet_chk = self.page.ckCheckFeet.isChecked()
 
 		self.step_pcb.save()
 		self.unloadAllObjects()
