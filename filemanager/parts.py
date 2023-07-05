@@ -854,7 +854,7 @@ class module(fsobj_part):
 
 		# if baseplate and sensor, auto-fill protomodule type, plus baseplate, sensor fields:
 		self.baseplate = protomodule_.baseplate
-		self.sensor = protomodule.sensor
+		self.sensor = protomodule_.sensor
 		self.pcb = pcb_.ID
 		self.protomodule = protomodule_.ID
 		self.location = protomodule_.location

@@ -41,6 +41,8 @@ I_PART_NOT_READY    = "{}(s) in position(s) {} is not ready for pcb application.
 I_PCB_PROTOMODULE_SHAPE = "pcb {} has shape {} but protomodule {} has shape {}"
 I_PCB_PROTOMODULE_CHANNEL = "pcb {} has channel density {} but protomodule {} has channel density {}"
 
+I_MOD_EXISTS = "module {} already exists!"
+
 # rows / positions
 I_NO_PARTS_SELECTED     = "no parts have been selected"
 I_ROWS_INCOMPLETE       = "positions {} are partially filled"
@@ -609,6 +611,11 @@ class func(object):
 						issues.append(I_PART_NOT_READY.format('protomodule',i,reason))
 
 			if modules_selected[i] != "":
+				# make sure module DNE, AND is not already part of this step
+				tmp_mod = parts.module()
+				if tmp_mod.load(modules_selected[i]) and tmp_mod.step_pcb != self.step_pcb.ID:
+					issues.append(I_MOD_EXISTS.format(modules_selected[i]))
+				tmp_mod.clear()
 				num_parts += 1
 
 			# NOTE:  TODO:  geometry, channel_density must match
