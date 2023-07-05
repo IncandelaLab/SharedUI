@@ -458,7 +458,9 @@ class protomodule(fsobj_part):
 
 	@property
 	def curing_time_hrs(self):
-		return 
+		t_begin = datetime.datetime.strptime(self.cure_begin_timestamp, "%Y-%m-%d %H:%M:%S%z")
+		t_end   = datetime.datetime.strptime(self.cure_end_timestamp,   "%Y-%m-%d %H:%M:%S%z")
+		return (t_end - t_begin).seconds/(3600.0) + (t_end - t_begin).days * 24
 
 
 	# PROPERTIES:
@@ -652,7 +654,6 @@ class module(fsobj_part):
 		# for cond page:
 		"cure_begin_timestamp",
 		"cure_end_timestamp",
-		"curing_time_hrs",
 		#"time_start",  # run_begin_timestamp?
 		#"time_stop",
 		"temp_degc",
@@ -704,6 +705,12 @@ class module(fsobj_part):
 
 	# Properties are same as protomodule's
 	# Note:  set kind_of_part with geometry, sen_type, baseplate_material (all from proto)
+
+	@property
+	def curing_time_hrs(self):
+		t_begin = datetime.datetime.strptime(self.cure_begin_timestamp, "%Y-%m-%d %H:%M:%S%z")
+		t_end   = datetime.datetime.strptime(self.cure_end_timestamp,   "%Y-%m-%d %H:%M:%S%z")
+		return (t_end - t_begin).seconds/(3600.0) + (t_end - t_begin).days * 24
 
 	@property
 	def geometry(self):
