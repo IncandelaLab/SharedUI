@@ -453,6 +453,8 @@ class protomodule(fsobj_part):
 	EXTRA_DEFAULTS = {
 		"kind_of_part": "None None Si ProtoModule None None",
 		"glue_type": "Araldite",
+		"snsr_tool_ht_set": 0,
+		"snsr_tool_ht_chk": 0,
 	}
 
 
@@ -699,6 +701,8 @@ class module(fsobj_part):
 	EXTRA_DEFAULTS = {
 		"kind_of_part": "None None Si Module None None",
 		"wirebond_comments": [],
+		"snsr_tool_ht_set": 0,
+		"snsr_tool_ht_chk": 0,
 	}
 
 
