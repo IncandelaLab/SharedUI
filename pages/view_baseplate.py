@@ -69,11 +69,6 @@ class func(object):
 		# NEW:  List of all modified XML files
 		self.xmlModList = []
 
-		# NEW:  Fix image location
-		pixmap = QtGui.QPixmap("pages_ui/pages_ui/baseplate_frame_80.png")
-
-		self.page.plt_image.setPixmap(pixmap)
-
 
 	def enforce_mode(mode):
 		if not (type(mode) in [str,list]):
