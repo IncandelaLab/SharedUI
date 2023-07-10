@@ -290,7 +290,7 @@ class Ui_Form(object):
         self.cbInstitution.setItemText(10, _translate("Form", "NTU"))
         self.cbInstitution.setItemText(11, _translate("Form", "FSU"))
         self.pbSave.setText(_translate("Form", "Save"))
-        self.lineEdit.setText(_translate("Form", "PCB ID"))
+        self.lineEdit.setText(_translate("Form", "PCB serial"))
         self.pbCancel.setText(_translate("Form", "Cancel"))
         self.pbNew.setText(_translate("Form", "New"))
         self.pbEdit.setText(_translate("Form", "Edit"))

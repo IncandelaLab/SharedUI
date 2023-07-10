@@ -1196,7 +1196,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Module ID</string>
+     <string>Module serial</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>

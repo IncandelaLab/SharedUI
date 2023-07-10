@@ -355,7 +355,7 @@ class Ui_Form(object):
         self.pbSave.setText(_translate("Form", "Save"))
         self.pbEdit.setText(_translate("Form", "Edit"))
         self.pbCancel.setText(_translate("Form", "Cancel"))
-        self.lineEdit.setText(_translate("Form", "Protomodule ID"))
+        self.lineEdit.setText(_translate("Form", "Protomodule serial"))
         self.pbLoad.setText(_translate("Form", "Load"))
         self.lineEdit_27.setText(_translate("Form", "Status:"))
         self.label.setText(_translate("Form", "PCB placement"))

@@ -444,7 +444,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Protomodule ID</string>
+     <string>Protomodule serial</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>

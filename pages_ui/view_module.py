@@ -429,7 +429,7 @@ class Ui_Form(object):
         self.pbSave.setText(_translate("Form", "Save"))
         self.pbEdit.setText(_translate("Form", "Edit"))
         self.pbCancel.setText(_translate("Form", "Cancel"))
-        self.lineEdit.setText(_translate("Form", "Module ID"))
+        self.lineEdit.setText(_translate("Form", "Module serial"))
         self.pbLoad.setText(_translate("Form", "Load"))
         self.lineEdit_27.setText(_translate("Form", "Status:"))
         self.label_6.setText(_translate("Form", "Standard information"))

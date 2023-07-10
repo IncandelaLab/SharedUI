@@ -433,7 +433,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>PCB ID</string>
+     <string>PCB serial</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>

@@ -19,7 +19,7 @@
      <x>20</x>
      <y>160</y>
      <width>261</width>
-     <height>481</height>
+     <height>461</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -86,7 +86,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>460</y>
+      <y>440</y>
       <width>111</width>
       <height>21</height>
      </rect>
@@ -99,7 +99,7 @@
     <property name="geometry">
      <rect>
       <x>1</x>
-      <y>240</y>
+      <y>220</y>
       <width>141</width>
       <height>21</height>
      </rect>
@@ -115,7 +115,7 @@
     <property name="geometry">
      <rect>
       <x>140</x>
-      <y>240</y>
+      <y>220</y>
       <width>121</width>
       <height>21</height>
      </rect>
@@ -128,7 +128,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>390</y>
+      <y>370</y>
       <width>261</width>
       <height>71</height>
      </rect>
@@ -138,7 +138,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>260</y>
+      <y>240</y>
       <width>261</width>
       <height>121</height>
      </rect>
@@ -279,7 +279,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>210</y>
+      <y>190</y>
       <width>181</width>
       <height>21</height>
      </rect>
@@ -343,55 +343,11 @@
      <string>sensor qualification</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit_16">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>190</y>
-      <width>181</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>height difference between highest and lowers corners</string>
-    </property>
-    <property name="text">
-     <string>Flatness (mm)</string>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QDoubleSpinBox" name="dsbFlatness">
-    <property name="geometry">
-     <rect>
-      <x>180</x>
-      <y>190</y>
-      <width>80</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="readOnly">
-     <bool>false</bool>
-    </property>
-    <property name="decimals">
-     <number>3</number>
-    </property>
-    <property name="minimum">
-     <double>0.000000000000000</double>
-    </property>
-    <property name="maximum">
-     <double>2147483647.000000000000000</double>
-    </property>
-    <property name="singleStep">
-     <double>0.050000000000000</double>
-    </property>
-   </widget>
    <widget class="QComboBox" name="cbGrade">
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>210</y>
+      <y>190</y>
       <width>81</width>
       <height>21</height>
      </rect>
@@ -601,7 +557,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Sensor ID</string>
+     <string>Sensor serial</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>

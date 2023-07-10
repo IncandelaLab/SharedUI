@@ -300,8 +300,7 @@ class sensor(fsobj_part):
 	def test_date_(self):
 		return str(datetime.date.today())
 
-	# Should not be passing any of these params yet
-	def ready_step_sensor(self, step_sensor = None, max_flatness = None):
+	def ready_step_sensor(self, step_sensor = None):
 		if self.step_sensor and self.step_sensor != step_sensor:
 			return False, "already assigned to protomodule {}".format(self.protomodule)
 

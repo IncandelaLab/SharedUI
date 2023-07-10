@@ -155,8 +155,6 @@ class func(object):
 		self.page.cbType.setCurrentIndex(       INDEX_TYPE.get(       self.sensor.sen_type,            -1))
 		self.page.cbShape.setCurrentIndex(      INDEX_SHAPE.get(      self.sensor.geometry,           -1))
 		self.page.cbChannelDensity.setCurrentIndex(INDEX_CHANNEL.get( self.sensor.channel_density, -1))
-		self.page.dsbFlatness.setValue(-1 if self.sensor.flatness is None else self.sensor.flatness )
-		if self.page.dsbFlatness.value() == -1: self.page.dsbFlatness.clear()
 		self.page.cbInspection.setCurrentIndex( INDEX_INSPECTION.get( self.sensor.visual_inspection,      -1))
 		self.page.cbGrade         .setCurrentIndex(INDEX_GRADE      .get(self.sensor.grade          , -1))
 
@@ -215,7 +213,6 @@ class func(object):
 		self.page.cbChannelDensity.setEnabled(     mode_creating or mode_editing  )
 
 		self.page.cbInspection.setEnabled(   mode_creating or mode_editing   )
-		self.page.dsbFlatness.setEnabled(       mode_creating or mode_editing  )
 		self.page.cbGrade.setEnabled(              mode_creating or mode_editing  )
 
 
@@ -295,14 +292,12 @@ class func(object):
 		self.sensor.geometry           = str(self.page.cbShape.currentText()      )    if str(self.page.cbShape.currentText())       else None
 		# NOTE:  channel_density is no longer auto-set
 		#self.sensor.channel_density = str(self.page.cbChannelDensity.currentText()) if str(self.page.cbChannelDensity.currentText()) else None
-		self.sensor.flatness        = self.page.dsbFlatness.value()          if self.page.dsbFlatness.value() >= 0         else None
 		self.sensor.grade           = str(self.page.cbGrade.currentText())          if str(self.page.cbGrade.currentText())       else None
 
 		num_comments = self.page.listComments.count()
 		self.sensor.comments = ';;'.join([self.page.listComments.item(i).text() for i in range(num_comments)])
 
 		self.sensor.visual_inspection = str(self.page.cbInspection.currentText()) if str(self.page.cbInspection.currentText()) else None
-		self.sensor.flatness = self.page.dsbFlatness.value() if self.page.dsbFlatness.value() else None
 
 		self.sensor.save()
 		self.mode = 'view'
