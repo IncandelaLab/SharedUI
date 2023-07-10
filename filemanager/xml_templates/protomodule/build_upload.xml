@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ROOT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<PARTS>
+		<PART mode="auto">
+			<KIND_OF_PART>{{ kind_of_part }}</KIND_OF_PART>
+			<SERIAL_NUMBER>{{ ID }}</SERIAL_NUMBER>
+			<LOCATION>{{ location }}</LOCATION>
+			<RECORD_INSERTION_USER>{{ record_insertion_user }}</RECORD_INSERTION_USER>
+			<CHILDREN>
+				<PART mode="auto">
+					<KIND_OF_PART>{{ kind_of_part_baseplate }}</KIND_OF_PART>
+					<SERIAL_NUMBER>{{ baseplate }}</SERIAL_NUMBER>
+				</PART>
+				<PART mode="auto">
+					<KIND_OF_PART>{{ kind_of_part_sensor }}</KIND_OF_PART>
+					<SERIAL_NUMBER>{{ sensor }}</SERIAL_NUMBER>
+				</PART>
+			</CHILDREN>
+		</PART>
+
+	</PARTS>
+</ROOT>

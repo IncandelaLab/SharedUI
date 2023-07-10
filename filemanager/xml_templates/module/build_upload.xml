@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ROOT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<PARTS>
+		<PART mode="auto">
+			<KIND_OF_PART>{{ kind_of_part }}</KIND_OF_PART>
+			<SERIAL_NUMBER>{{ ID }}</SERIAL_NUMBER>
+			<LOCATION>{{ location }}</LOCATION>
+			<RECORD_INSERTION_USER>{{ record_insertion_user }}</RECORD_INSERTION_USER>
+			<!-- <PREDEFINED_ATTRIBUTES>
+				<ATTRIBUTE>
+					<NAME>AsmTrayPosn</NAME>
+					<VALUE>TRPOSN_11</VALUE>
+				</ATTRIBUTE>
+				<ATTRIBUTE>
+					<NAME>WireBonded</NAME>
+					<VALUE>No</VALUE>
+				</ATTRIBUTE>
+			</PREDEFINED_ATTRIBUTES> -->
+		<CHILDREN>
+		<PART mode="auto">
+			<KIND_OF_PART>{{ kind_of_part_protomodule }}</KIND_OF_PART>
+			<SERIAL_NUMBER>{{ protomodule }}</SERIAL_NUMBER>
+			<!-- <PREDEFINED_ATTRIBUTES>
+				<ATTRIBUTE>
+					<NAME>AsmTrayPosn</NAME>
+					<VALUE>TRPOSN_11</VALUE>
+				</ATTRIBUTE>
+			</PREDEFINED_ATTRIBUTES> -->
+		</PART>
+		<PART mode="auto">
+			<KIND_OF_PART>{{ kind_of_part_pcb }}</KIND_OF_PART>
+			<SERIAL_NUMBER>{{ pcb }}</SERIAL_NUMBER>
+			<!-- <PREDEFINED_ATTRIBUTES>
+				<ATTRIBUTE>
+					<NAME>CmpTrayPosn</NAME>
+					<VALUE>CMPOSN_11</VALUE>
+				</ATTRIBUTE>
+			</PREDEFINED_ATTRIBUTES> -->
+		</PART>
+		</CHILDREN>
+		</PART>
+	</PARTS>
+</ROOT>

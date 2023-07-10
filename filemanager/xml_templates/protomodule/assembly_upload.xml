@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ROOT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<HEADER>
+	<TYPE>
+		<EXTENSION_TABLE_NAME>HGC_PRTO_MOD_ASMBLY</EXTENSION_TABLE_NAME>
+		<NAME>HGC Six Inch Proto Module Assembly</NAME>
+	</TYPE>
+	<RUN>
+		<RUN_NAME>HGC Proto Module Assembly</RUN_NAME>
+		<RUN_BEGIN_TIMESTAMP>{{ run_begin_timestamp_ }}</RUN_BEGIN_TIMESTAMP>
+		<RUN_END_TIMESTAMP>{{ run_end_timestamp_ }}</RUN_END_TIMESTAMP>
+		<INITIATED_BY_USER>{{ initiated_by_user }}</INITIATED_BY_USER>
+		<LOCATION>{{ location }}</LOCATION>
+		<COMMENT_DESCRIPTION>Build Proto Modules</COMMENT_DESCRIPTION>
+	</RUN>
+</HEADER>
+
+	<DATA_SET>
+		<COMMENT_DESCRIPTION>Upload protomodule assembly data</COMMENT_DESCRIPTION>
+		<VERSION>1</VERSION>
+		<PART mode="auto">
+			<KIND_OF_PART>{{ kind_of_part }}</KIND_OF_PART>
+			<SERIAL_NUMBER>{{ ID }}</SERIAL_NUMBER>
+		</PART>
+		<DATA>
+			<ASMBL_TRAY_NAME>{{ asmbl_tray_name }}</ASMBL_TRAY_NAME>
+			<PLT_SER_NUM>{{ baseplate }}</PLT_SER_NUM>
+			<PLT_ASM_ROW>{{ asm_row }}</PLT_ASM_ROW>
+			<PLT_ASM_COL>{{ asm_col }}</PLT_ASM_COL>
+			<PLT_FLTNES_MM>{{ flatness }}</PLT_FLTNES_MM>
+			<PLT_THKNES_MM>{{ thickness }}</PLT_THKNES_MM>
+			<COMP_TRAY_NAME>{{ comp_tray_name }}</COMP_TRAY_NAME>
+			<SNSR_SER_NUM>{{ sensor }}</SNSR_SER_NUM>
+			<SNSR_CMP_ROW>{{ asm_row }}</SNSR_CMP_ROW>
+			<SNSR_CMP_COL>{{ asm_col }}</SNSR_CMP_COL>
+			<SNSR_X_OFFST>{{ snsr_x_offst }}</SNSR_X_OFFST>
+			<SNSR_Y_OFFST>{{ snsr_y_offst }}</SNSR_Y_OFFST>
+			<SNSR_ANG_OFFSET>{{ snsr_ang_offst }}</SNSR_ANG_OFFSET>
+			<SNSR_TOOL_NAME>{{ snsr_tool_name }}</SNSR_TOOL_NAME>
+			<SNSR_TOOL_HT_SET>{{ snsr_tool_ht_set }}</SNSR_TOOL_HT_SET>
+			<SNSR_TOOL_HT_CHK>{{ snsr_tool_ht_chk }}</SNSR_TOOL_HT_CHK>
+			<GLUE_TYPE>Araldite</GLUE_TYPE>
+			<GLUE_BATCH_NUM>{{ glue_batch_num }}</GLUE_BATCH_NUM>
+			<SLVR_EPXY_TYPE>{{ slvr_epxy_type }}</SLVR_EPXY_TYPE>
+			<SLVR_EPXY_BATCH_NUM>{{ slvr_epxy_batch_num }}</SLVR_EPXY_BATCH_NUM>
+			<PLT_GRADE>{{ grade }}</PLT_GRADE>
+			<SNSR_TOOL_FEET_CHK>{{ snsr_tool_feet_chk }}</SNSR_TOOL_FEET_CHK>
+			<SNSR_STEP>{{ step_sensor }}</SNSR_STEP>
+		</DATA>
+	</DATA_SET>
+
+</ROOT>

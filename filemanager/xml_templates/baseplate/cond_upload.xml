@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ROOT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<HEADER>
+    <TYPE>
+        <EXTENSION_TABLE_NAME>SI_MODULE_BASEPLATE</EXTENSION_TABLE_NAME>
+        <NAME>Si Module Baseplate Test Data</NAME>
+    </TYPE>
+    <RUN>
+        <RUN_NAME>Flatness/thickness measurements</RUN_NAME>
+        <RUN_BEGIN_TIMESTAMP>{{ run_begin_timestamp_ }}</RUN_BEGIN_TIMESTAMP>
+        <RUN_END_TIMESTAMP>{{ run_end_timestamp_ }}</RUN_END_TIMESTAMP>
+        <INITIATED_BY_USER>{{ initiated_by_user }}</INITIATED_BY_USER>
+        <LOCATION>{{ location }}</LOCATION>
+        <COMMENT_DESCRIPTION>Measured flatness/thickness data</COMMENT_DESCRIPTION>
+    </RUN>
+
+</HEADER>
+
+    <DATA_SET>
+        <COMMENT_DESCRIPTION>Upload measured data</COMMENT_DESCRIPTION>
+        <VERSION>1</VERSION>
+        <PART mode="auto">
+            <SERIAL_NUMBER>{{ ID }}</SERIAL_NUMBER>
+            <KIND_OF_PART>{{ kind_of_part }}</KIND_OF_PART>
+        </PART>
+        <DATA>
+            <FLATNESS>{{ flatness }}</FLATNESS>
+            <THICKNESS>{{ thickness }}</THICKNESS>
+            <GRADE>{{ grade }}</GRADE>
+            <COMMENTS>{{ comments_upload }}</COMMENTS>
+        </DATA>
+    </DATA_SET>
+</ROOT>
