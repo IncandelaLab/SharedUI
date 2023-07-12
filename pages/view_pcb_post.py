@@ -413,8 +413,8 @@ class func(object):
 		pydt = self.page.dtCureStop.dateTime().toPyDateTime().astimezone(datetime.timezone.utc)
 		self.step_pcb.cure_end_timestamp   = str(pydt)
 
-		self.step_pcb.temp_degc = self.page.sbCureTemperature.value()
-		self.step_pcb.humidity_prcnt = self.page.dsbCureHumidity.value()
+		self.step_pcb.temp_degc = self.page.dsbCureTemperature.value()
+		self.step_pcb.humidity_prcnt = self.page.sbCureHumidity.value()
 
 		self.step_pcb.xml_file_name = self.page.leXML.text()
 

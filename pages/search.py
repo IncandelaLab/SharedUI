@@ -112,7 +112,7 @@ class func(object):
 
 		search_dict = { self.page.cbInstitution:'location', self.page.cbShape:'geometry',
 						self.page.cbMaterial:'material', self.page.cbThickness:'sen_type',
-						self.page.cbChannelDensity:'channel_density', #self.page.cbPCBType:'pcb_type',
+						self.page.cbChannelDensity:'channel_density',
 						self.page.cbAssmRow:"asm_row",
 						self.page.cbAssmCol:"asm_col",
 					  }
@@ -207,9 +207,9 @@ and l.LOCATION_NAME like \'{}\'"*"*".format(pt_query, search_criteria['location_
 		self.page.cbAssmCol       .setEnabled(part_type == 'Protomodule' or part_type == 'Module')
 
 	def clearParams(self,*args,**kwargs):
-		for wdgt in [self.page.cbInstituion,     self.page.cbShape,
+		for wdgt in [self.page.cbInstitution,     self.page.cbShape,
 					 self.page.cbMaterial,       self.page.cbThickness,
-					 self.page.cbChannelDensity, self.page.cbPCBType,
+					 self.page.cbChannelDensity,
 					 self.page.cbAssmRow,        self.page.cbAssmCol
 					]:
 			wdgt.setCurrentIndex(0)

@@ -1,7 +1,7 @@
 from PyQt5 import QtCore
 from filemanager import supplies
 
-PAGE_NAME = "view_tooling"
+PAGE_NAME = "view_supplies"
 #OBJECTTYPE = "sensor_step"
 DEBUG = False
 
@@ -307,7 +307,6 @@ class func(object):
 		mode_editing_batch_wedge         = self.mode == 'editing_batch_wedge'
 		mode_editing_batch_sylgard       = self.mode == 'editing_batch_sylgard'
 		mode_editing_batch_bond_wire     = self.mode == 'editing_batch_bond_wire'
-
 		self.setMainSwitchingEnabled(mode_view)
 
 		self.page.leAralditeID.setEnabled(not mode_editing_batch_araldite)
@@ -476,7 +475,6 @@ class func(object):
 	@enforce_mode('view')
 	def load_kwargs(self,kwargs):
 		keys = kwargs.keys()
-		print("load_kwargs (supp):  got", kwargs)
 
 		if "batch_araldite" in keys:
 			self.update_info_batch_araldite(kwargs['batch_araldite'])

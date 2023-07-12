@@ -822,6 +822,7 @@ class module(fsobj_part):
 	
 	@property
 	def wirebonding_completed(self):
+		print("back {} inspxn {}\nfront {} inspxn {}\nbacken {} fronen {}\nfinal {}".format(self.back_bonds, self.back_bond_inspxn, self.front_bonds, self.front_bond_inspxn, self.back_encap_inspxn, self.front_encap_inspxn, self.final_inspxn_ok))
 		return self.back_bonds and \
 		self.back_bond_inspxn and \
 		self.front_bonds and \

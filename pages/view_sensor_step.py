@@ -866,11 +866,12 @@ class func(object):
 		self.setUIPage('Protomodules',ID=protomodule)
 
 	def goBatchAraldite(self,*args,**kwargs):
-		#batch_araldite = self.page.sbBatchAraldite.value()
 		batch_araldite = self.page.leBatchAraldite.text()
 		if batch_araldite != "":
+			print("SETTING UI PAGE")
 			self.setUIPage('Supplies',batch_araldite=batch_araldite)
 		else:
+			print("DOING SEARCH")
 			self.mode = 'searching'
 			self.search_part = 'batch_araldite'
 			self.search_row = None
