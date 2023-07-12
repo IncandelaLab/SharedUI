@@ -415,8 +415,8 @@ class func(object):
 		pydt = self.page.dtCureStop.dateTime().toPyDateTime().astimezone(datetime.timezone.utc)
 		self.step_sensor.cure_end_timestamp   = str(pydt)
 
-		self.step_sensor.temp_degc = self.page.sbCureHumidity.value()
-		self.step_sensor.humidity_prcnt = self.page.dsbCureTemperature.value()
+		self.step_sensor.temp_degc = self.page.sbCureTemperature.value()
+		self.step_sensor.humidity_prcnt = self.page.dsbCureHumidity.value()
 
 		self.step_sensor.xml_file_name = self.page.leXML.text()
 

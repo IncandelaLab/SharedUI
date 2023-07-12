@@ -787,6 +787,9 @@
     <property name="readOnly">
      <bool>true</bool>
     </property>
+    <property name="decimals">
+     <number>1</number>
+    </property>
     <property name="minimum">
      <double>-1000.000000000000000</double>
     </property>
@@ -857,6 +860,9 @@
     <property name="readOnly">
      <bool>true</bool>
     </property>
+    <property name="decimals">
+     <number>1</number>
+    </property>
     <property name="minimum">
      <double>-1000.000000000000000</double>
     </property>
@@ -879,6 +885,9 @@
     <property name="readOnly">
      <bool>true</bool>
     </property>
+    <property name="decimals">
+     <number>3</number>
+    </property>
     <property name="minimum">
      <double>-180.000000000000000</double>
     </property>
@@ -900,6 +909,9 @@
     </property>
     <property name="readOnly">
      <bool>true</bool>
+    </property>
+    <property name="decimals">
+     <number>3</number>
     </property>
     <property name="minimum">
      <double>-1.000000000000000</double>
@@ -938,6 +950,9 @@
     </property>
     <property name="readOnly">
      <bool>true</bool>
+    </property>
+    <property name="decimals">
+     <number>3</number>
     </property>
     <property name="minimum">
      <double>-10.000000000000000</double>

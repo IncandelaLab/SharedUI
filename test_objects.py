@@ -76,12 +76,12 @@ def test_xml(parttype):
 	# Also can't set kind_of_part, format is part-dependent
 	test_part.record_insertion_user = 'phmaster'
 	test_part.location = 'UCSB'
-	test_part.comment_description.append('comment description')
+	test_part.comment_description = 'comment description'
 	test_part.initiated_by_user = 'phmaster'
 	test_part.flatness = 0.01
 	test_part.thickness = 0.01  # Note - may be a str for sensors, float otherwise
 	test_part.grade = 'A'
-	test_part.comments.extend(['comment_a', 'comment 2'])
+	test_part.comments = 'comment_a;;comment 2'
 	# part-specific:
 	if parttype == 'baseplate':
 		test_part.manufacturer = 'HQU'

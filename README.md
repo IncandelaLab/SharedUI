@@ -48,7 +48,7 @@ Tools and supplies may be created in a similar manner.  Note that protomodules a
 
 Note that protomodules and modules are automatically created by the sensor placement and pcb placement steps, respectively.  They cannot be created manually, but can be edited after creation.  (Some protomodule/module information can't be inherited from their component parts, and has to be entered in manually.)
 
-In the future, all baseplates, sensors, and PCBs should be entered into the DB prior to being shipped to MACs, and they must be downloaded by the GUI before they can be used for assembly.  Creation of those parts with the GUI will be disabled.
+Currently, parts (baseplates, sensors, etc) can only be created locally, as DB communication has not been implemented yet.  After the API is ready, however, all baseplates, sensors, and PCBs should be entered into the DB prior to being shipped to MACs, and they must be downloaded by the GUI before they can be used for assembly.  Creation of those parts with the GUI will be disabled.
 
 ### Production steps and testing routines
 

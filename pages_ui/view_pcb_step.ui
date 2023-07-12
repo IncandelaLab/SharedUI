@@ -638,12 +638,12 @@ before assembly</string>
      <rect>
       <x>490</x>
       <y>0</y>
-      <width>141</width>
+      <width>191</width>
       <height>20</height>
      </rect>
     </property>
     <property name="text">
-     <string>Module ID assigned</string>
+     <string>Module ID (create serial here)</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>

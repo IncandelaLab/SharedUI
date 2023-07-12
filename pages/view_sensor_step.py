@@ -765,7 +765,10 @@ class func(object):
 
 	# NEW
 	def doSearch(self,*args,**kwargs):
-		tmp_part = getattr(parts, self.search_part)()
+		tmp_class = getattr(parts, self.search_part, None)
+		if tmp_class is None:
+			tmp_class = getattr(supplies, self.search_part)
+		tmp_part = tmp_class()
 
 		# Search local-only parts:  open part file
 		part_file_name = os.sep.join([ fm.DATADIR, 'partlist', self.search_part+'s.json' ])
@@ -777,17 +780,23 @@ class func(object):
 			if len(self.page.lwPartList.findItems("{} {}".format(self.search_part, part_id), \
 			                                      QtCore.Qt.MatchExactly)) > 0:
 				continue
-			if self.search_part in ['baseplate', 'sensor']:
+			if self.search_part == 'baseplate':
 				# Search for one thing:  NOT already assigned to a protomod
 				tmp_part.load(part_id)
 				if tmp_part.protomodule is None:
 					self.page.lwPartList.addItem("{} {}".format(self.search_part, part_id))
+				self.loadBaseplate()
+			elif self.search_part == 'sensor':
+				tmp_part.load(part_id)
+				print("Loading part ID:", part_id)
+				if tmp_part.protomodule is None:
+					self.page.lwPartList.addItem("{} {}".format(self.search_part, part_id))
+				self.loadSensor()
 			else:  # araldite, no restrictions
 				self.page.lwPartList.addItem("{} {}".format(self.search_part, part_id))
+				self.loadBatchAraldite()
 
 		self.page.leSearchStatus.setText('{}: row {}'.format(self.search_part, self.search_row))
-		self.loadBaseplate()
-		self.loadSensor()
 		self.mode = 'searching'
 		self.updateElements()
 

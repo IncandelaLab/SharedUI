@@ -243,7 +243,7 @@ class sensor(fsobj_part):
 		# Note:  'tested_by' = record_insertion_user
 		# run_begin_date_ is a property
 		'visual_inspection',
-		'test_files' #_name',
+		'test_files', #_name',
 		# other:
 		'protomodule',
 		'step_sensor',
@@ -459,6 +459,7 @@ class protomodule(fsobj_part):
 
 	@property
 	def curing_time_hrs(self):
+		if self.cure_begin_timestamp is None: return None
 		t_begin = datetime.datetime.strptime(self.cure_begin_timestamp, "%Y-%m-%d %H:%M:%S%z")
 		t_end   = datetime.datetime.strptime(self.cure_end_timestamp,   "%Y-%m-%d %H:%M:%S%z")
 		return (t_end - t_begin).seconds/(3600.0) + (t_end - t_begin).days * 24
@@ -711,6 +712,7 @@ class module(fsobj_part):
 
 	@property
 	def curing_time_hrs(self):
+		if self.cure_begin_timestamp is None: return None
 		t_begin = datetime.datetime.strptime(self.cure_begin_timestamp, "%Y-%m-%d %H:%M:%S%z")
 		t_end   = datetime.datetime.strptime(self.cure_end_timestamp,   "%Y-%m-%d %H:%M:%S%z")
 		return (t_end - t_begin).seconds/(3600.0) + (t_end - t_begin).days * 24

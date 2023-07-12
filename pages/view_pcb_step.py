@@ -781,7 +781,10 @@ class func(object):
 
 	# NEW
 	def doSearch(self,*args,**kwargs):
-		tmp_part = getattr(parts, self.search_part)()
+		tmp_class = getattr(parts, self.search_part, None)
+		if tmp_class is None:
+			tmp_class = getattr(supplies, self.search_part)
+		tmp_part = tmp_class()
 
 		# Search local-only parts:  open part file
 		part_file_name = os.sep.join([ fm.DATADIR, 'partlist', self.search_part+'s.json' ])
@@ -793,17 +796,21 @@ class func(object):
 			if len(self.page.lwPartList.findItems("{} {}".format(self.search_part, part_id), \
 			                                      QtCore.Qt.MatchExactly)) > 0:
 				continue
-			if self.search_part in ['pcb', 'protomodule']:
+			if self.search_part == 'pcb':
 				# Search for one thing:  NOT already assigned to a mod
 				tmp_part.load(part_id)  # db query already done
 				if tmp_part.module is None:
 					self.page.lwPartList.addItem("{} {}".format(self.search_part, part_id))
+				self.loadPcb()
+			elif self.search_part == 'protomodule':
+				tmp_part.load(part_id)  # db query already done
+				if tmp_part.module is None:
+					self.page.lwPartList.addItem("{} {}".format(self.search_part, part_id))
+				self.loadProtomodule()
 			else:
 				self.page.lwPartList.addItem("{} {}".format(self.search_part, part_id))
 
 		self.page.leSearchStatus.setText('{}: row {}'.format(self.search_part, self.search_row))
-		self.loadPcb()
-		self.loadProtomodule()
 		self.mode = 'searching'
 		self.updateElements()
 
