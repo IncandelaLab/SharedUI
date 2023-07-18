@@ -72,6 +72,7 @@ def setup(datadir=None):
 	obj_list = ['baseplate', 'sensor', 'pcb', 'protomodule', 'module',
 				'batch_araldite', 'batch_wedge', 'batch_sylgard',
 				'batch_bond_wire',
+                'batch_tape_50', 'batch_tape_120',
 				'tool_sensor', 'tool_pcb', 'tray_assembly', 'tray_component_sensor', 'tray_component_pcb',
 				'step_sensor', 'step_pcb']  # step_kapton removed
 	for part in obj_list:

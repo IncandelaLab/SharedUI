@@ -64,7 +64,15 @@ class batch_bond_wire(fsobj_supply):
 	FILENAME = 'batch_bond_wire_{ID:0>5}.xml'
 
 
+class batch_tape_50(fsobj_supply):
+	OBJECTNAME = "50um tape batch"
+	FILEDIR = os.sep.join(['supplies','batch_tape_50','{date}'])
+	FILENAME = 'batch_tape_50_{ID:0>5}.xml'
 
+class batch_tape_120(fsobj_supply):
+	OBJECTNAME = "120um tape batch"
+	FILEDIR = os.sep.join(['supplies','batch_tape_120','{date}'])
+	FILENAME = 'batch_tape_120_{ID:0>5}.xml'
 
 
 

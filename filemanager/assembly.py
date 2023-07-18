@@ -153,17 +153,34 @@ class fsobj_step(fm.fsobj):
 	def glue_batch_num(self, value):
 		self.set_var_from_part("glue_batch_num", value)
 
-	@property
-	def asmbl_tray_name(self):
-		return self.get_var_from_part("asmbl_tray_name")
-	@asmbl_tray_name.setter
-	def asmbl_tray_name(self, value):
-		self.set_var_from_part("asmbl_tray_name", value)
+	#@property
+	#def asmbl_tray_name(self):
+	#	return self.get_var_from_part("asmbl_tray_name")
+	#@asmbl_tray_name.setter
+	#def asmbl_tray_name(self, value):
+	#	self.set_var_from_part("asmbl_tray_name", value)
+
+	#@property
+	#def asmbl_tray_num(self):
+	#	if self.asmbl_tray_name is None:  return None
+	#	else:  return int(self.asmbl_tray_name.split("_")[1])
 
 	@property
-	def asmbl_tray_num(self):
-		if self.asmbl_tray_name is None:  return None
-		else:  return int(self.asmbl_tray_name.split("_")[1])
+	def asmbl_tray_names(self):
+		return self.get_vars_from_part("asmbl_tray_name")
+	@asmbl_tray_names.setter
+	def asmbl_tray_names(self, value):
+		self.set_vars_from_part("asmbl_tray_name", value)
+
+	@property
+	def asmbl_tray_nums(self):
+		nums = []
+		for n in self.asmbl_tray_names:
+			if n is None:
+				nums.append(None)
+			else:
+				nums.append(int(n.split("_")[1]))
+		return nums
 
 	@property
 	def comp_tray_name(self):
