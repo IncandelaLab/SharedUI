@@ -32,7 +32,6 @@ STATUS_ISSUES    = "invalid (issues present)"
 
 # tooling and supplies
 I_TRAY_COMPONENT_DNE = "sensor component tray does not exist or is not selected"
-I_TRAY_ASSEMBLY_DNE  = "assembly tray does not exist or is not selected"
 I_BATCH_ARALDITE_DNE     = "araldite batch does not exist or is not selected"
 # NOTE: This is now a warning
 I_BATCH_ARALDITE_EXPIRED = "araldite batch has expired"
@@ -230,7 +229,8 @@ class func(object):
 		]
 
 		for i in range(6):
-			self.sb_tray_assemblys[i].editingFinished.connect(self.loadTrayAssembly)
+			# was editingFinished
+			self.sb_tray_assemblys[i].valueChanged.connect(self.loadTrayAssembly)
 			self.pb_go_tray_assemblys[i].clicked.connect(self.goTrayAssembly)
 
 			self.pb_go_tools[i].clicked.connect(       self.goTool       )
@@ -253,7 +253,8 @@ class func(object):
 		self.page.sbID.valueChanged.connect(self.loadStep)
 		self.page.cbInstitution.currentIndexChanged.connect(self.loadStep)  # self.loadAllTools )
 
-		self.page.sbTrayComponent.editingFinished.connect( self.loadTrayComponentSensor )
+		# was editingFinished
+		self.page.sbTrayComponent.valueChanged.connect( self.loadTrayComponentSensor )
 		#self.page.sbTrayAssembly.editingFinished.connect(  self.loadTrayAssembly        )
 		self.page.leBatchAraldite.textEdited.connect(self.loadBatchAraldite)
 
@@ -437,7 +438,7 @@ class func(object):
 			# - editing (shouldn't want to change parts after step done)
 			# - searching
 			# - view, and part DNE
-			self.pb_go_tray_assemblys[i].setEnabled(mode_creating or (mode_view and self.le_sensors[i].text()    != "") )
+			self.pb_go_tray_assemblys[i].setEnabled(mode_creating or (mode_view and self.sb_tray_assemblys[i].value() > -1) )
 			self.pb_go_sensors[i].setEnabled(     mode_creating or (mode_view and self.le_sensors[i].text()    != "") )
 			self.pb_go_baseplates[i].setEnabled(  mode_creating or (mode_view and self.le_baseplates[i].text() != "") )
 			self.pb_go_protomodules[i].setEnabled(mode_view and protomodules_exist[i])
@@ -654,13 +655,11 @@ class func(object):
 																  self.sensors[i].ID, self.sensors[i].channel_density))
 
 			# note: only count toward filled row if the rest of the row is nonempty
-			if tray_assemblys_selected[i] >= 0:
-				if num_parts != 0:
-					num_parts += 1
-					objects.append(self.tray_assemblys[i])
-					if self.tray_assemblys[i].ID is None:
-						rows_tray_assembly_dne.append(i)
-
+			if tray_assemblys_selected[i] >= 0 and  num_parts != 0:
+				num_parts += 1
+				objects.append(self.tray_assemblys[i])
+				if self.tray_assemblys[i].ID is None:
+					rows_tray_assembly_dne.append(i)
 
 			if num_parts == 0:
 				rows_empty.append(i)
@@ -804,7 +803,6 @@ class func(object):
 		self.step_sensor.comp_tray_name = "{}_{}".format(inst, self.page.sbTrayComponent.value()) \
 		    if self.page.sbTrayComponent.value() >= 0 else None
 
-		print("TOOLS ARE:", tools)
 		self.step_sensor.asmbl_tray_names = [None if trays[i] is None else "{}_{}".format(inst, trays[i]) for i in range(6)]
 		self.step_sensor.snsr_tool_names  = [None if tools[i] is None else "{}_{}".format(inst, tools[i]) for i in range(6)]
 		self.step_sensor.snsr_tool_feet_chk = self.page.ckCheckFeet.isChecked()

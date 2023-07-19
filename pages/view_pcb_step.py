@@ -31,7 +31,6 @@ STATUS_ISSUES    = "invalid (issues present)"
 
 # tooling and supplies
 I_TRAY_COMPONENT_DNE = "sensor component tray does not exist or is not selected"
-I_TRAY_ASSEMBLY_DNE  = "assembly tray does not exist or is not selected"
 I_BATCH_ARALDITE_DNE     = "araldite batch does not exist or is not selected"
 I_BATCH_ARALDITE_EXPIRED = "araldite batch has expired"
 
@@ -46,11 +45,13 @@ I_MOD_EXISTS = "module {} already exists!"
 # rows / positions
 I_NO_PARTS_SELECTED     = "no parts have been selected"
 I_ROWS_INCOMPLETE       = "positions {} are partially filled"
+I_TRAY_ASSEMBLY_DNE     = "assembly tray(s) in position(s) {} do not exist"
 I_TOOL_SENSOR_DNE       = "sensor tool(s) in position(s) {} do not exist"
 I_BASEPLATE_DNE         = "baseplate(s) in position(s) {} do not exist"
 I_SENSOR_DNE            = "sensor(s) in position(s) {} do not exist"
 I_PCB_DNE               = "pcb(s) in position(s) {} do not exist"
 I_PROTO_DNE             = "protomodule(s) in position(s) {} do not exist"
+I_TRAY_ASSEMBLY_DUPLICATE = "same assembly tray is selected on multiple positions: {}"
 I_TOOL_PCB_DUPLICATE    = "same PCB tool is selected on multiple positions: {}"
 I_BASEPLATE_DUPLICATE   = "same baseplate is selected on multiple positions: {}"
 I_SENSOR_DUPLICATE      = "same sensor is selected on multiple positions: {}"
@@ -84,12 +85,12 @@ class func(object):
 		self.setMainSwitchingEnabled = setSwitchingEnabled
 
 		#New stuff
+		self.tray_assemblys = [tools.tray_assembly() for _ in range(6)]
 		self.tools_pcb    = [tools.tool_pcb()    for _ in range(6)]
 		self.pcbs         = [parts.pcb()         for _ in range(6)]
 		self.protomodules = [parts.protomodule() for _ in range(6)]
 		self.modules      = [parts.module()      for _ in range(6)]
 		self.tray_component_pcb = tools.tray_component_pcb()
-		self.tray_assembly      = tools.tray_assembly()
 		self.batch_araldite     = supplies.batch_araldite()
 
 		self.step_pcb = assembly.step_pcb()
@@ -215,7 +216,30 @@ class func(object):
 			self.page.pbClear6,
 		]
 
+		# Giving this a try...
+		self.sb_tray_assemblys = [
+			self.page.sbTrayAssembly1,
+			self.page.sbTrayAssembly1,
+			self.page.sbTrayAssembly2,
+			self.page.sbTrayAssembly2,
+			self.page.sbTrayAssembly3,
+			self.page.sbTrayAssembly3,
+		]
+
+		self.pb_go_tray_assemblys = [
+			self.page.pbGoTrayAssembly1,
+			self.page.pbGoTrayAssembly1,
+			self.page.pbGoTrayAssembly2,
+			self.page.pbGoTrayAssembly2,
+			self.page.pbGoTrayAssembly3,
+			self.page.pbGoTrayAssembly3,
+		]
+
 		for i in range(6):
+			# was editingFinished()
+			self.sb_tray_assemblys[i].valueChanged.connect(self.loadTrayAssembly)
+			self.pb_go_tray_assemblys[i].clicked.connect(self.goTrayAssembly)
+
 			self.pb_go_tools[i].clicked.connect(       self.goTool       )
 			self.pb_go_pcbs[i].clicked.connect(        self.goPcb        )
 			self.pb_go_protomodules[i].clicked.connect(self.goProtomodule)
@@ -237,8 +261,9 @@ class func(object):
 		self.page.sbID.valueChanged.connect(self.loadStep)
 		self.page.cbInstitution.currentIndexChanged.connect(self.loadStep)
 
-		self.page.sbTrayComponent.editingFinished.connect( self.loadTrayComponentPCB )
-		self.page.sbTrayAssembly.editingFinished.connect(  self.loadTrayAssembly        )
+		# was editingFinished
+		self.page.sbTrayComponent.valueChanged.connect( self.loadTrayComponentPCB )
+		#self.page.sbTrayAssembly.editingFinished.connect(  self.loadTrayAssembly        )
 		self.page.leBatchAraldite.textEdited.connect(self.loadBatchAraldite)
 
 		self.page.pbNew.clicked.connect(self.startCreating)
@@ -247,7 +272,7 @@ class func(object):
 		self.page.pbCancel.clicked.connect(self.cancelEditing)
 
 		self.page.pbGoBatchAraldite.clicked.connect(self.goBatchAraldite)
-		self.page.pbGoTrayAssembly.clicked.connect(self.goTrayAssembly)
+		#self.page.pbGoTrayAssembly.clicked.connect(self.goTrayAssembly)
 		self.page.pbGoTrayComponent.clicked.connect(self.goTrayComponent)
 
 		self.page.pbRunStartNow     .clicked.connect(self.setRunStartNow)
@@ -301,9 +326,23 @@ class func(object):
 
 
 			self.page.leBatchAraldite.setText(self.step_pcb.glue_batch_num if not (self.step_pcb.glue_batch_num is None) else "")
-			self.page.sbTrayAssembly.setValue( self.step_pcb.asmbl_tray_num if not (self.step_pcb.asmbl_tray_name  is None) else -1)
+			#self.page.sbTrayAssembly.setValue( self.step_pcb.asmbl_tray_num if not (self.step_pcb.asmbl_tray_name  is None) else -1)
 			self.page.sbTrayComponent.setValue(self.step_pcb.comp_tray_num if not (self.step_pcb.comp_tray_num is None) else -1)
 
+			if not (self.step_pcb.asmbl_tray_names is None):
+				trays = self.step_pcb.asmbl_tray_nums
+				for i in [0, 2, 4]:  # 0/1, 2/3, 4/5
+					# note: if first is filled + second is empty, will erroneously set to     -1 - avoid
+					if trays[i] is None and trays[i+1] is None:
+						self.sb_tray_assemblys[i].setValue(-1)
+					elif trays[i] is None:
+						self.sb_tray_assemblys[i].setValue(trays[i+1])
+					else:
+						self.sb_tray_assemblys[i].setValue(trays[i])
+				#self.sb_tray_assemblys[i].setValue(trays[i] if trays[i] != None else     -1)
+			else:
+				for i in range(6):
+					self.sb_tray_assemblys[i].setValue(-1)
 			if not (self.step_pcb.pcb_tool_names is None):
 				tools = self.step_pcb.pcb_tool_nums
 				for i in range(6):
@@ -344,8 +383,9 @@ class func(object):
 
 			self.page.leBatchAraldite.setText("")
 			self.page.sbTrayComponent.setValue(-1)
-			self.page.sbTrayAssembly.setValue(-1)
+			#self.page.sbTrayAssembly.setValue(-1)
 			for i in range(6):
+				self.sb_tray_assemblys[i].setValue(-1)
 				self.sb_tools[i].setValue(-1)
 				self.le_pcbs[i].setText("")
 				self.le_protomodules[i].setText("")
@@ -354,10 +394,11 @@ class func(object):
 
 		
 		for i in range(6):
+			if self.sb_tray_assemblys[i].value() == -1:  self.sb_tray_assemblys[i].clear()
 			if self.sb_tools[i].value()        == -1:  self.sb_tools[i].clear()
 		
 		if self.page.sbTrayComponent.value() == -1:  self.page.sbTrayComponent.clear()
-		if self.page.sbTrayAssembly.value()  == -1:  self.page.sbTrayAssembly.clear()	
+		#if self.page.sbTrayAssembly.value()  == -1:  self.page.sbTrayAssembly.clear()	
 		
 		self.updateElements()
 
@@ -384,18 +425,20 @@ class func(object):
 		self.page.dtRunStart       .setReadOnly(mode_view or mode_searching)
 		self.page.dtRunStop        .setReadOnly(mode_view or mode_searching)
 		self.page.sbTrayComponent  .setReadOnly(mode_view or mode_searching)
-		self.page.sbTrayAssembly   .setReadOnly(mode_view or mode_searching)
+		#self.page.sbTrayAssembly   .setReadOnly(mode_view or mode_searching)
 		self.page.leBatchAraldite  .setReadOnly(mode_view or mode_searching)
 
 		self.page.pbGoTrayComponent.setEnabled(mode_view and self.page.sbTrayComponent.value() >= 0)
-		self.page.pbGoTrayAssembly .setEnabled(mode_view and self.page.sbTrayAssembly .value() >= 0)
+		#self.page.pbGoTrayAssembly .setEnabled(mode_view and self.page.sbTrayAssembly .value() >= 0)
 		self.page.pbGoBatchAraldite.setEnabled(mode_creating or (mode_view and self.page.leBatchAraldite.text() != ""))
 
 		for i in range(6):
+			self.sb_tray_assemblys[i].setReadOnly(mode_view)
 			self.sb_tools[i].setReadOnly(       mode_view)
 			self.le_pcbs[i].setReadOnly(        mode_view)
 			self.le_protomodules[i].setReadOnly(mode_view)
 			self.le_modules[i].setReadOnly(     mode_view)
+			self.pb_go_tray_assemblys[i].setEnabled(mode_creating or (mode_view and self.sb_tray_assemblys[i].value() != -1) )
 			self.pb_go_tools[i].setEnabled(       mode_view and tools_exist[i]       )
 			self.pb_go_pcbs[i].setEnabled(        mode_creating or (mode_view and self.le_pcbs[i].text()            != "") )
 			self.pb_go_protomodules[i].setEnabled(mode_creating or (mode_view and self.le_protomodules[i].text()    != "") )
@@ -427,13 +470,14 @@ class func(object):
 	@enforce_mode(['editing','creating'])
 	def loadAllObjects(self,*args,**kwargs):
 		for i in range(6):
+			self.tray_assemblys[i].load(self.sb_tray_assemblys[i].value(), self.page.cbInstitution.currentText())
 			self.tools_pcb[i].load(self.sb_tools[i].value(),       self.page.cbInstitution.currentText())
 			self.pcbs[i].load(        self.le_pcbs[i].text()        )
 			self.protomodules[i].load(self.le_protomodules[i].text())
 			self.modules[i].load(     self.le_modules[i].text()     )
 
 		self.tray_component_pcb.load(self.page.sbTrayComponent.value(), self.page.cbInstitution.currentText())
-		self.tray_assembly.load(        self.page.sbTrayAssembly.value(),  self.page.cbInstitution.currentText())
+		#self.tray_assembly.load(        self.page.sbTrayAssembly.value(),  self.page.cbInstitution.currentText())
 		self.batch_araldite.load(       self.page.leBatchAraldite.text())
 		self.updateIssues()
 
@@ -441,9 +485,10 @@ class func(object):
 	def loadAllTools(self,*args,**kwargs):  # Same as above, but load only tools:
 		self.step_pcb.institution = self.page.cbInstitution.currentText()
 		for i in range(6):
+			self.tray_assemblys[i].load(self.sb_tray_assemblys[i].value(), self.page.cbInstitution.currentText())
 			self.tools_pcb[i].load(self.sb_tools[i].value(),       self.page.cbInstitution.currentText())
 		self.tray_component_pcb.load(self.page.sbTrayComponent.value(), self.page.cbInstitution.currentText())
-		self.tray_assembly.load(        self.page.sbTrayAssembly.value(),  self.page.cbInstitution.currentText())
+		#self.tray_assembly.load(        self.page.sbTrayAssembly.value(),  self.page.cbInstitution.currentText())
 		self.batch_araldite.load(       self.page.leBatchAraldite.text())
 		self.updateIssues()
 
@@ -451,13 +496,14 @@ class func(object):
 	@enforce_mode(['editing','creating'])
 	def unloadAllObjects(self,*args,**kwargs):
 		for i in range(6):
+			self.tray_assemblys[i].clear()
 			self.tools_pcb[i].clear()
 			self.pcbs[i].clear()
 			self.protomodules[i].clear()
 			self.modules[i].clear()
 
 		self.tray_component_pcb.clear()
-		self.tray_assembly.clear()
+		#self.tray_assembly.clear()
 		self.batch_araldite.clear()
 
 	@enforce_mode(['editing','creating'])
@@ -510,8 +556,12 @@ class func(object):
 
 	@enforce_mode(['editing','creating'])
 	def loadTrayAssembly(self, *args, **kwargs):
-		self.tray_assembly.load(self.page.sbTrayAssembly.value(), self.page.cbInstitution.currentText())
+		sender_name = str(self.page.sender().objectName())
+		which = int(sender_name[-1]) - 1
+		result = self.tray_assemblys[which].load(self.sb_tray_assemblys[which].value(), self.page.cbInstitution.currentText())
 		self.updateIssues()
+		#self.tray_assembly.load(self.page.sbTrayAssembly.value(), self.page.cbInstitution.currentText())
+		#self.updateIssues()
 
 	@enforce_mode(['editing','creating'])
 	def loadBatchAraldite(self, *args, **kwargs):
@@ -534,10 +584,10 @@ class func(object):
 		else:
 			objects.append(self.tray_component_pcb)
 
-		if self.tray_assembly.ID is None:
-			issues.append(I_TRAY_ASSEMBLY_DNE)
-		else:
-			objects.append(self.tray_assembly)
+		#if self.tray_assembly.ID is None:
+		#	issues.append(I_TRAY_ASSEMBLY_DNE)
+		#else:
+		#	objects.append(self.tray_assembly)
 
 		if self.batch_araldite.ID is None:
 			issues.append(I_BATCH_ARALDITE_DNE)
@@ -553,16 +603,20 @@ class func(object):
 
 		#New
 		#sb_tools and _baseplates are gone...but pcbs, protomodules, modules aren't.
+		tray_assemblys_selected = [_.value() for _ in self.sb_tray_assemblys]
 		pcb_tools_selected    = [_.value() for _ in self.sb_tools       ]
 		pcbs_selected         = [_.text() for _ in self.le_pcbs         ]
 		protomodules_selected = [_.text() for _ in self.le_protomodules ]
 		modules_selected      = [_.text() for _ in self.le_modules      ]
 
+		tray_assembly_duplicates = [_ for _ in range(6) if tray_assemblys_selected[_] >= 0 and tray_assemblys_selected.count(tray_assemblys_selected[_])>2]
 		pcb_tool_duplicates    = [_ for _ in range(6) if pcb_tools_selected[_]    >= 0 and pcb_tools_selected.count(   pcb_tools_selected[_]   )>1]
 		pcb_duplicates         = [_ for _ in range(6) if pcbs_selected[_]         != "" and pcbs_selected.count(        pcbs_selected[_]        )>1]
 		protomodule_duplicates = [_ for _ in range(6) if protomodules_selected[_] != "" and protomodules_selected.count(protomodules_selected[_])>1]
 		module_duplicates      = [_ for _ in range(6) if modules_selected[_]      != "" and modules_selected.count(     modules_selected[_]     )>1]
 
+		if tray_assembly_duplicates:
+			issues.append(I_TRAY_ASSEMBLY_DUPLICATE.format(', '.join([str(_+1) for _ in tray_assembly_duplicates])))
 		if pcb_tool_duplicates:
 			issues.append(I_TOOL_PCB_DUPLICATE.format(', '.join([str(_+1) for _ in pcb_tool_duplicates])))
 		if pcb_duplicates:
@@ -576,6 +630,7 @@ class func(object):
 		rows_full            = []
 		rows_incomplete      = []
 
+		rows_tray_assembly_dne = []
 		rows_tool_dne        = []
 		rows_pcb_dne         = []
 		rows_protomodule_dne = []
@@ -629,17 +684,27 @@ class func(object):
 					issues.append(I_PCB_PROTOMODULE_CHANNEL.format(self.pcbs[i].ID, self.protomodules[i].channel_density, \
                                                                     self.pcbs[i].ID, self.protomodules[i].channel_density))
 
+			# note: only count toward filled row if the rest of the row is nonempty
+			if tray_assemblys_selected[i] >= 0 and num_parts != 0:
+				num_parts += 1
+				objects.append(self.tray_assemblys[i])
+				if self.tray_assemblys[i].ID is None:
+					rows_tray_assembly_dne.append(i)
+
 			if num_parts == 0:
 				rows_empty.append(i)
-			elif num_parts == 4:
+			elif num_parts == 5:
 				rows_full.append(i)
 			else:
 				rows_incomplete.append(i)
+
 
 		if not (len(rows_full) or len(rows_incomplete)):
 			issues.append(I_NO_PARTS_SELECTED)
 		if rows_incomplete:
 			issues.append(I_ROWS_INCOMPLETE.format(', '.join(map(str,rows_incomplete))))
+		if rows_tray_assembly_dne:
+			issues.append(I_TRAY_ASSEMBLY_DNE.format(', '.join([str(_+1) for _ in rows_tray_assembly_dne])))
 		if rows_pcb_dne:
 			issues.append(I_PCB_DNE.format(        ', '.join([str(_+1) for _ in rows_pcb_dne])))
 		if rows_protomodule_dne:
@@ -707,17 +772,18 @@ class func(object):
 
 	@enforce_mode(['editing','creating'])
 	def saveEditing(self,*args,**kwargs):
+		trays        = []
 		tools        = []
 		pcbs         = []
 		protomodules = []
 		modules      = []
 		for i in range(6):
+			trays.append(     self.sb_tray_assemblys[i].value() if self.sb_tray_assemblys[i].value() >= 0 else None)
 			tools.append(       self.sb_tools[i].value()        if self.sb_tools[i].value()        >= 0 else None)
 			pcbs.append(        self.le_pcbs[i].text()         if self.le_pcbs[i].text()         != "" else None)
 			protomodules.append(self.le_protomodules[i].text() if self.le_protomodules[i].text() != "" else None)
 			modules.append(     self.le_modules[i].text()      if self.le_modules[i].text()      != "" else None)
 	
-		print("SAVING TOOLS:", tools)
 		self.step_pcb.pcbs         = pcbs
 		self.step_pcb.protomodules = protomodules
 		self.step_pcb.modules      = modules
@@ -757,11 +823,12 @@ class func(object):
 		inst = self.page.cbInstitution.currentText()
 		self.step_pcb.glue_batch_num = self.page.leBatchAraldite.text() \
 			if self.page.leBatchAraldite.text() else None
-		self.step_pcb.asmbl_tray_name = "{}_{}".format(inst, self.page.sbTrayAssembly.value()) \
-			if self.page.sbTrayAssembly.value() >= 0 else None
+		#self.step_pcb.asmbl_tray_name = "{}_{}".format(inst, self.page.sbTrayAssembly.value()) \
+		#	if self.page.sbTrayAssembly.value() >= 0 else None
 		self.step_pcb.comp_tray_name = "{}_{}".format(inst, self.page.sbTrayComponent.value()) \
 			if self.page.sbTrayComponent.value() >= 0 else None
 
+		self.step_pcb.asmbl_tray_names = [None if trays[i] is None else "{}_{}".format(inst, trays[i]) for i in range(6)]
 		self.step_pcb.pcb_tool_names = [None if tools[i] is None else "{}_{}".format(inst, tools[i]) for i in range(6)]
 		self.step_pcb.pcb_tool_feet_chk = self.page.ckCheckFeet.isChecked()
 
@@ -893,8 +960,12 @@ class func(object):
 		self.setUIPage('Tooling',tray_component_pcb=tray_component_pcb)
 
 	def goTrayAssembly(self,*args,**kwargs):
-		tray_assembly = self.page.sbTrayAssembly.value()
-		self.setUIPage('Tooling',tray_assembly=tray_assembly)
+		#tray_assembly = self.page.sbTrayAssembly.value()
+		#self.setUIPage('Tooling',tray_assembly=tray_assembly)
+		sender_name = str(self.page.sender().objectName())
+		which = int(sender_name[-1]) - 1 # last character of sender name is integer 1 through 6; subtract one for zero index
+		tray = self.sb_tray_assemblys[which].value()
+		self.setUIPage('Tooling',tray_assembly=tray,institution=self.page.cbInstitution.currentText())
 
 	def setRunStartNow(self, *args, **kwargs):
 		localtime = time.localtime()
