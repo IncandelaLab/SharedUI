@@ -76,7 +76,7 @@ before assembly</string>
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>370</y>
+     <y>400</y>
      <width>341</width>
      <height>31</height>
     </rect>
@@ -300,7 +300,7 @@ before assembly</string>
   <widget class="QLabel" name="label_3">
    <property name="geometry">
     <rect>
-     <x>10</x>
+     <x>20</x>
      <y>300</y>
      <width>121</width>
      <height>17</height>
@@ -1276,8 +1276,8 @@ before assembly</string>
     <rect>
      <x>10</x>
      <y>320</y>
-     <width>281</width>
-     <height>41</height>
+     <width>301</width>
+     <height>81</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -1286,20 +1286,10 @@ before assembly</string>
    <property name="frameShadow">
     <enum>QFrame::Raised</enum>
    </property>
-   <widget class="QLineEdit" name="leBatchAraldite">
-    <property name="geometry">
-     <rect>
-      <x>160</x>
-      <y>20</y>
-      <width>71</width>
-      <height>20</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QPushButton" name="pbGoTrayComponent">
     <property name="geometry">
      <rect>
-      <x>230</x>
+      <x>250</x>
       <y>0</y>
       <width>51</width>
       <height>21</height>
@@ -1312,7 +1302,7 @@ before assembly</string>
    <widget class="QSpinBox" name="sbTrayComponent">
     <property name="geometry">
      <rect>
-      <x>160</x>
+      <x>180</x>
       <y>0</y>
       <width>71</width>
       <height>21</height>
@@ -1325,28 +1315,12 @@ before assembly</string>
      <number>999999</number>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit_11">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>20</y>
-      <width>161</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>araldite batch</string>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-   </widget>
    <widget class="QLineEdit" name="lineEdit_24">
     <property name="geometry">
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>161</width>
+      <width>181</width>
       <height>21</height>
      </rect>
     </property>
@@ -1357,10 +1331,153 @@ before assembly</string>
      <bool>true</bool>
     </property>
    </widget>
+   <widget class="QLineEdit" name="leTextAraldite">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>20</y>
+      <width>91</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>araldite batch</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leTape120">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>60</y>
+      <width>71</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leTextTape50">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>40</y>
+      <width>91</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>50um tape</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbGoTape50">
+    <property name="geometry">
+     <rect>
+      <x>250</x>
+      <y>40</y>
+      <width>51</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>go to</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leBatchAraldite">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>20</y>
+      <width>71</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leTape50">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>40</y>
+      <width>71</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbGoTape120">
+    <property name="geometry">
+     <rect>
+      <x>250</x>
+      <y>60</y>
+      <width>51</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>go to</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leTextTape120">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>60</y>
+      <width>91</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>120um tape</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="cbAdhesive">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>45</y>
+      <width>91</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>-1</number>
+    </property>
+    <item>
+     <property name="text">
+      <string>Araldite</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Tape</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_33">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Adhesive?</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
    <widget class="QPushButton" name="pbGoBatchAraldite">
     <property name="geometry">
      <rect>
-      <x>230</x>
+      <x>250</x>
       <y>20</y>
       <width>51</width>
       <height>21</height>

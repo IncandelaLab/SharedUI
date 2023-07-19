@@ -153,6 +153,20 @@ class fsobj_step(fm.fsobj):
 	def glue_batch_num(self, value):
 		self.set_var_from_part("glue_batch_num", value)
 
+	@property
+	def batch_tape_50(self):
+		return self.get_var_from_part("batch_tape_50")
+	@batch_tape_50.setter
+	def batch_tape_50(self, value):
+		self.set_var_from_part("batch_tape_50", value)
+
+	@property
+	def batch_tape_120(self):
+		return self.get_var_from_part("batch_tape_120")
+	@batch_tape_120.setter
+	def batch_tape_120(self, value):
+		self.set_var_from_part("batch_tape_120", value)
+
 	#@property
 	#def asmbl_tray_name(self):
 	#	return self.get_var_from_part("asmbl_tray_name")

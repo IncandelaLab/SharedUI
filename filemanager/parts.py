@@ -439,6 +439,8 @@ class protomodule(fsobj_part):
 		"slvr_epxy_batch_num",
 		"grade",
 		"snsr_tool_feet_chk",
+		"batch_tape_50",
+		"batch_tape_120",
 
 		# for cond page:
 		#"curing_time_hrs",  # property
@@ -652,6 +654,8 @@ class module(fsobj_part):
 		"pcb_plcment_x_offset",
 		"pcb_plcment_y_offset",
 		"pcb_plcment_ang_offset",
+		"batch_tape_50",
+		"batch_tape_120",
 
 		# for cond page:
 		"cure_begin_timestamp",

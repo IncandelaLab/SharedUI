@@ -33,8 +33,11 @@ STATUS_ISSUES    = "invalid (issues present)"
 # tooling and supplies
 I_TRAY_COMPONENT_DNE = "sensor component tray does not exist or is not selected"
 I_BATCH_ARALDITE_DNE     = "araldite batch does not exist or is not selected"
-# NOTE: This is now a warning
 I_BATCH_ARALDITE_EXPIRED = "araldite batch has expired"
+I_TAPE_50_DNE = "50um tape batch does not exist or is not selected"
+I_TAPE_50_EXPIRED = "50um tape batch has expired"
+I_TAPE_120_DNE = "120um tape batch does not exist or is not selected"
+I_TAPE_120_EXPIRED = "120um tape batch has expired"
 
 # baseplates
 I_PART_NOT_READY  = "{}(s) in position(s) {} is not ready for sensor application. reason: {}"
@@ -65,6 +68,8 @@ I_USER_DNE = "no sensor step user selected"
 
 # supply batch empty
 I_BATCH_ARALDITE_EMPTY = "araldite batch is empty"
+I_TAPE_50_EMPTY = "50um tape batch is empty"
+I_TAPE_120_EMPTY = "120um tape batch is empty"
 
 I_NO_TOOL_CHK = "pickup tool feet have not been checked"
 
@@ -81,6 +86,8 @@ class func(object):
 		self.sensors      = [parts.sensor()      for _ in range(6)]
 		self.tray_component_sensor = tools.tray_component_sensor()
 		self.batch_araldite        = supplies.batch_araldite()
+		self.batch_tape_50         = supplies.batch_tape_50()
+		self.batch_tape_120        = supplies.batch_tape_120()
 
 		self.step_sensor = assembly.step_sensor()
 		self.step_sensor_exists = None
@@ -257,13 +264,18 @@ class func(object):
 		self.page.sbTrayComponent.valueChanged.connect( self.loadTrayComponentSensor )
 		#self.page.sbTrayAssembly.editingFinished.connect(  self.loadTrayAssembly        )
 		self.page.leBatchAraldite.textEdited.connect(self.loadBatchAraldite)
+		self.page.leTape50.textEdited.connect( self.loadTape50 )
+		self.page.leTape120.textEdited.connect( self.loadTape120 )
 
 		self.page.pbNew.clicked.connect(self.startCreating)
 		self.page.pbEdit.clicked.connect(self.startEditing)
 		self.page.pbSave.clicked.connect(self.saveEditing)
 		self.page.pbCancel.clicked.connect(self.cancelEditing)
 
+		self.page.cbAdhesive.currentIndexChanged.connect(self.switchAdhesive)
 		self.page.pbGoBatchAraldite.clicked.connect(self.goBatchAraldite)
+		self.page.pbGoTape50.clicked.connect(self.goTape50)
+		self.page.pbGoTape120.clicked.connect(self.goTape120)
 		#self.page.pbGoTrayAssembly.clicked.connect(self.goTrayAssembly)
 		self.page.pbGoTrayComponent.clicked.connect(self.goTrayComponent)
 
@@ -302,9 +314,8 @@ class func(object):
 				self.page.cbUserPerformed.addItem(self.step_sensor.record_insertion_user)
 			self.page.cbUserPerformed.setCurrentIndex(self.index_users.get(self.step_sensor.record_insertion_user, -1))
 
-
 			# Set vars:
-			times_to_set = [(self.step_sensor.run_begin_timestamp,  self.page.dtRunStart),
+			times_to_set = [(self.step_sensor.run_begin_timestamp, self.page.dtRunStart),
 							(self.step_sensor.run_end_timestamp,   self.page.dtRunStop)]
 			for st, dt in times_to_set:
 				if st is None:
@@ -318,7 +329,23 @@ class func(object):
 					dt.setDate(dat)
 					dt.setTime(tim)
 
-			self.page.leBatchAraldite.setText(self.step_sensor.glue_batch_num if not (self.step_sensor.glue_batch_num is None) else "")
+			if self.step_sensor.glue_batch_num is None and self.step_sensor.batch_tape_50 is None:
+				self.page.cbAdhesive.setCurrentIndex(-1)
+				self.page.leBatchAraldite.setText("")
+				self.page.leTape50.setText("")
+				self.page.leTape120.setText("")
+			elif self.step_sensor.glue_batch_num != None:
+				self.page.cbAdhesive.setCurrentIndex(0)
+				self.page.leBatchAraldite.setText(self.step_sensor.glue_batch_num)
+				self.page.leTape50.setText("")
+				self.page.leTape120.setText("")
+			else:
+				self.page.cbAdhesive.setCurrentIndex(1)
+				self.page.leBatchAraldite.setText("")
+				self.page.leTape50.setText(self.step_sensor.batch_tape_50)
+				self.page.leTape120.setText(self.step_sensor.batch_tape_120)
+			#self.page.leBatchAraldite.setText(self.step_sensor.glue_batch_num if not (self.step_sensor.glue_batch_num is None) else "")
+
 			#self.page.sbTrayAssembly.setValue( self.step_sensor.asmbl_tray_num  if not (self.step_sensor.asmbl_tray_num  is None) else -1)
 			self.page.sbTrayComponent.setValue(self.step_sensor.comp_tray_num if not (self.step_sensor.comp_tray_num is None) else -1)
 
@@ -364,7 +391,6 @@ class func(object):
 				for i in range(6):
 					self.le_protomodules[i].setText("")
 
-			self.page.ckCheckFeet.setChecked(True)
 			self.page.ckCheckFeet.setChecked(self.step_sensor.snsr_tool_feet_chk if not (self.step_sensor.snsr_tool_feet_chk is None) else False)
 
 		else:
@@ -374,7 +400,10 @@ class func(object):
 			self.page.dtRunStop.setDate(QtCore.QDate(*NO_DATE))
 			self.page.dtRunStop.setTime(QtCore.QTime(0,0,0))
 
+			self.page.cbAdhesive.setCurrentIndex(-1)
 			self.page.leBatchAraldite.setText("")
+			self.page.leTape50.setText("")
+			self.page.leTape120.setText("")
 			self.page.sbTrayComponent.setValue(-1)
 			#self.page.sbTrayAssembly.setValue(-1)
 			for i in range(6):
@@ -406,6 +435,7 @@ class func(object):
 		baseplates_exist   = [_.text()!="" for _ in self.le_baseplates]
 		protomodules_exist = [_.text()!="" for _ in self.le_protomodules]
 		step_sensor_exists = self.step_sensor_exists
+		adhesive = self.page.cbAdhesive.currentText()
 
 		self.setMainSwitchingEnabled(mode_view)
 		self.page.sbID.setEnabled(mode_view)
@@ -419,11 +449,20 @@ class func(object):
 		self.page.dtRunStop        .setReadOnly(mode_view or mode_searching)
 		self.page.sbTrayComponent  .setReadOnly(mode_view or mode_searching)
 		#self.page.sbTrayAssembly   .setReadOnly(mode_view or mode_searching)
-		self.page.leBatchAraldite  .setReadOnly(mode_view or mode_searching)
+		self.page.cbAdhesive   .setEnabled(not (mode_view or mode_searching))
+
+		self.page.leBatchAraldite  .setReadOnly(mode_view or mode_searching or adhesive!="Araldite")
+		self.page.leTextAraldite.setEnabled(not (mode_view or mode_searching or adhesive!="Araldite"))
+		self.page.leTape50      .setEnabled(not (mode_view or mode_searching or adhesive!="Tape"))
+		self.page.leTextTape50  .setEnabled(not (mode_view or mode_searching or adhesive!="Tape"))
+		self.page.leTape120     .setEnabled(not (mode_view or mode_searching or adhesive!="Tape"))
+		self.page.leTextTape120 .setEnabled(not (mode_view or mode_searching or adhesive!="Tape"))
 
 		self.page.pbGoTrayComponent.setEnabled(mode_view and self.page.sbTrayComponent.value() >= 0)
 		#self.page.pbGoTrayAssembly .setEnabled(mode_view and self.page.sbTrayAssembly .value() >= 0)
 		self.page.pbGoBatchAraldite.setEnabled(mode_creating or (mode_view and self.page.leBatchAraldite.text() != ""))
+		self.page.pbGoTape50.setEnabled(mode_creating or (mode_view and self.page.leTape50.text() != ""))
+		self.page.pbGoTape120.setEnabled(mode_creating or (mode_view and self.page.leTape120.text() != ""))
 
 		for i in range(6):
 			self.sb_tray_assemblys[i].setReadOnly(mode_view)
@@ -451,7 +490,6 @@ class func(object):
 
 		self.page.ckCheckFeet.setEnabled(not mode_view)
 
-
 		self.page.pbAddPart     .setEnabled(mode_searching)
 		self.page.pbCancelSearch.setEnabled(mode_searching)
 		# NEW:  Update pb's based on search result
@@ -463,9 +501,11 @@ class func(object):
 				btn.setText("select" if ledit.text() == "" else "go to")
 		aral = self.page.leBatchAraldite.text()
 		self.page.pbGoBatchAraldite.setText("select" if aral == "" else "go to")
+		t50 = self.page.leTape50.text()
+		self.page.pbGoTape50.setText("select" if t50 == "" else "go to")
+		t120 = self.page.leTape120.text()
+		self.page.pbGoTape120.setText("select" if t120 == "" else "go to")
 
-
-	#NEW:  Add all load() functions
 
 	@enforce_mode(['editing','creating'])
 	def loadAllObjects(self,*args,**kwargs):
@@ -477,7 +517,9 @@ class func(object):
 
 		self.tray_component_sensor.load(self.page.sbTrayComponent.value(), self.page.cbInstitution.currentText())
 		#self.tray_assembly.load(        self.page.sbTrayAssembly.value(),  self.page.cbInstitution.currentText())
-		self.batch_araldite.load(       self.page.leBatchAraldite.text())
+		self.batch_araldite.load(self.page.leBatchAraldite.text())
+		self.batch_tape_50.load(self.page.leTape50.text())
+		self.batch_tape_120.load(self.page.leTape120.text())
 		self.updateIssues()
 
 	@enforce_mode(['editing','creating'])
@@ -501,6 +543,8 @@ class func(object):
 		self.tray_component_sensor.clear()
 		#self.tray_assembly.clear()
 		self.batch_araldite.clear()
+		self.batch_tape_50.clear()
+		self.batch_tape_120.clear()
 
 	@enforce_mode(['editing','creating'])
 	def loadToolSensor(self, *args, **kwargs):
@@ -548,6 +592,27 @@ class func(object):
 		self.batch_araldite.load(self.page.leBatchAraldite.text())
 		self.updateIssues()
 
+	@enforce_mode(['editing','creating'])
+	def loadTape50(self, *args, **kwargs):
+		self.batch_tape_50.load(self.page.leTape50.text())
+		self.updateIssues()
+
+	@enforce_mode(['editing','creating'])
+	def loadTape120(self, *args, **kwargs):
+		self.batch_tape_120.load(self.page.leTape120.text())
+		self.updateIssues()
+
+	@enforce_mode(['editing','creating'])
+	def switchAdhesive(self, *args, **kwargs):
+		adhesive = self.page.cbAdhesive.currentText()
+		if adhesive == "Tape":
+			# clear araldite
+			self.page.leBatchAraldite.clear()
+		else:  # Araldite
+			self.page.leTape50.clear()
+			self.page.leTape120.clear()
+		self.updateElements()
+
 
 	#NEW:  Add updateIssues and modify conditions accordingly
 	@enforce_mode(['editing', 'creating'])
@@ -570,18 +635,43 @@ class func(object):
 		#else:
 		#	objects.append(self.tray_assembly)
 
-		if self.batch_araldite.ID is None:
-			issues.append(I_BATCH_ARALDITE_DNE)
-		else:
-			objects.append(self.batch_araldite)
-			if not (self.batch_araldite.date_expires is None):
-				ydm =  self.batch_araldite.date_expires.split('-')
-				expires = QtCore.QDate(int(ydm[2]), int(ydm[0]), int(ydm[1]))   # ymd format for constructor
-				if QtCore.QDate.currentDate() > expires:
-					issues.append(I_BATCH_ARALDITE_EXPIRED)
-			if self.batch_araldite.is_empty:
-				issues.append(I_BATCH_ARALDITE_EMPTY)
+		if self.page.cbAdhesive.currentText() == "Araldite":
+			if self.batch_araldite.ID is None:
+				issues.append(I_BATCH_ARALDITE_DNE)
+			else:
+				objects.append(self.batch_araldite)
+				if not (self.batch_araldite.date_expires is None):
+					ydm =  self.batch_araldite.date_expires.split('-')
+					expires = QtCore.QDate(int(ydm[2]), int(ydm[0]), int(ydm[1]))   # ymd format for constructor
+					if QtCore.QDate.currentDate() > expires:
+						issues.append(I_BATCH_ARALDITE_EXPIRED)
+				if self.batch_araldite.is_empty:
+					issues.append(I_BATCH_ARALDITE_EMPTY)
 
+		elif self.page.cbAdhesive.currentText() == "Tape":
+			if self.batch_tape_50.ID is None:
+				issues.append(I_TAPE_50_DNE)
+			else:
+				objects.append(self.batch_tape_50)
+				if not (self.batch_tape_50.date_expires is None):
+					ydm =  self.batch_tape_50.date_expires.split('-')
+					expires = QtCore.QDate(int(ydm[2]), int(ydm[0]), int(ydm[1]))   # ymd format for constructor
+					if QtCore.QDate.currentDate() > expires:
+						issues.append(I_TAPE_50_EXPIRED)
+				if self.batch_tape_50.is_empty:
+					issues.append(I_TAPE_50_EMPTY)
+
+			if self.batch_tape_120.ID is None:
+				issues.append(I_TAPE_120_DNE)
+			else:
+				objects.append(self.batch_tape_120)
+				if not (self.batch_tape_120.date_expires is None):
+					ydm =  self.batch_tape_120.date_expires.split('-')
+					expires = QtCore.QDate(int(ydm[2]), int(ydm[0]), int(ydm[1]))   # ymd format for constructor
+					if QtCore.QDate.currentDate() > expires:
+						issues.append(I_TAPE_120_EXPIRED)
+				if self.batch_tape_120.is_empty:
+					issues.append(I_TAPE_120_EMPTY)
 
 		# Now, loop over each row and check for missing/bad input
 		tray_assemblys_selected = [_.value() for _ in self.sb_tray_assemblys]
@@ -798,6 +888,10 @@ class func(object):
 		inst = self.page.cbInstitution.currentText()
 		self.step_sensor.glue_batch_num = self.page.leBatchAraldite.text() \
 		    if self.page.leBatchAraldite.text() else None
+		self.step_sensor.batch_tape_50 = self.page.leTape50.text() \
+            if self.page.leTape50.text() != "" else None
+		self.step_sensor.batch_tape_120 = self.page.leTape120.text() \
+            if self.page.leTape120.text() != "" else None
 		#self.step_sensor.asmbl_tray_name = "{}_{}".format(inst, self.page.sbTrayAssembly.value()) \
 		#    if self.page.sbTrayAssembly.value() >= 0 else None
 		self.step_sensor.comp_tray_name = "{}_{}".format(inst, self.page.sbTrayComponent.value()) \
@@ -830,7 +924,6 @@ class func(object):
 		self.le_baseplates[which].clear()
 		self.update_issues()
 
-	# NEW
 	def doSearch(self,*args,**kwargs):
 		tmp_class = getattr(parts, self.search_part, None)
 		if tmp_class is None:
@@ -859,9 +952,15 @@ class func(object):
 				if tmp_part.protomodule is None:
 					self.page.lwPartList.addItem("{} {}".format(self.search_part, part_id))
 				self.loadSensor()
-			else:  # araldite, no restrictions
+			elif self.search_part == 'batch_araldite':  # araldite, no restrictions
 				self.page.lwPartList.addItem("{} {}".format(self.search_part, part_id))
 				self.loadBatchAraldite()
+			elif self.search_part == 'batch_tape_50':
+				self.page.lwPartList.addItem("{} {}".format(self.search_part, part_id))
+				self.loadTape50()
+			elif self.search_part == 'batch_tape_120':
+				self.page.lwPartList.addItem("{} {}".format(self.search_part, part_id))
+				self.loadTape120()
 
 		self.page.leSearchStatus.setText('{}: row {}'.format(self.search_part, self.search_row))
 		self.mode = 'searching'
@@ -872,8 +971,12 @@ class func(object):
 		name = self.page.lwPartList.item(row).text().split()[1]
 		if self.search_part in ['baseplate', 'sensor']:
 			le_to_fill = getattr(self, 'le_{}s'.format(self.search_part))[self.search_row]
-		else:  # araldite
+		elif search_part == "batch_araldite":  # araldite
 			le_to_fill = self.page.leBatchAraldite
+		elif search_part == "batch_tape_50":  # araldite
+			le_to_fill = self.page.leTape50
+		elif search_part == "batch_tape_120":  # araldite
+			le_to_fill = self.page.leTape120
 		le_to_fill.setText(name)
 
 		self.page.lwPartList.clear()
@@ -881,8 +984,12 @@ class func(object):
 		self.mode = 'creating'
 		if self.search_part in ['baseplate', 'sensor']:
 			getattr(self, 'load'+self.search_part.capitalize())(row=row)  # load part object
-		else:
+		elif search_part == "batch_araldite":
 			self.loadBatchAraldite()
+		elif search_part == "batch_tape_50":
+			self.loadTape50()
+		elif search_part == "batch_tape_120":
+			self.loadTape120()
 		self.updateElements()
 		self.updateIssues()
 
@@ -935,15 +1042,12 @@ class func(object):
 	def goBatchAraldite(self,*args,**kwargs):
 		batch_araldite = self.page.leBatchAraldite.text()
 		if batch_araldite != "":
-			print("SETTING UI PAGE")
 			self.setUIPage('Supplies',batch_araldite=batch_araldite)
 		else:
-			print("DOING SEARCH")
 			self.mode = 'searching'
 			self.search_part = 'batch_araldite'
 			self.search_row = None
 			self.doSearch()
-
 
 	def goTrayComponent(self,*args,**kwargs):
 		tray_component_sensor = self.page.sbTrayComponent.value()
@@ -956,6 +1060,27 @@ class func(object):
 		which = int(sender_name[-1]) - 1 # last character of sender name is integer 1 through 6; subtract one for zero index
 		tray = self.sb_tray_assemblys[which].value()
 		self.setUIPage('Tooling',tray_assembly=tray,institution=self.page.cbInstitution.currentText())
+
+	def goTape50(self,*args,**kwargs):
+		batch_tape_50 = self.page.leTape50.text()
+		if batch_tape_50 != "":
+			self.setUIPage('Supplies',batch_tape_50=batch_tape_50)
+		else:
+			self.mode = 'searching'
+			self.search_part = 'batch_tape_50'
+			self.search_row = None
+			self.doSearch()
+
+	def goTape120(self,*args,**kwargs):
+		batch_tape_120 = self.page.leTape120.text()
+		if batch_tape_120 != "":
+			self.setUIPage('Supplies',batch_tape_120=batch_tape_120)
+		else:
+			self.mode = 'searching'
+			self.search_part = 'batch_tape_120'
+			self.search_row = None
+			self.doSearch()
+
 
 	def setRunStartNow(self, *args, **kwargs):
 		localtime = time.localtime()
