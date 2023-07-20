@@ -40,7 +40,7 @@
 			<SNSR_TOOL_HT_SET>{{ snsr_tool_ht_set }}</SNSR_TOOL_HT_SET>
 			<SNSR_TOOL_HT_CHK>{{ snsr_tool_ht_chk }}</SNSR_TOOL_HT_CHK>
 			<GLUE_TYPE>Araldite</GLUE_TYPE>
-			<GLUE_BATCH_NUM>{{ glue_batch_num }}</GLUE_BATCH_NUM>
+			<GLUE_BATCH_NUM>{{ adhesive_type }}</GLUE_BATCH_NUM>
 			<SLVR_EPXY_TYPE>{{ slvr_epxy_type }}</SLVR_EPXY_TYPE>
 			<SLVR_EPXY_BATCH_NUM>{{ slvr_epxy_batch_num }}</SLVR_EPXY_BATCH_NUM>
 			<PLT_GRADE>{{ grade }}</PLT_GRADE>

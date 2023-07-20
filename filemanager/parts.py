@@ -569,6 +569,13 @@ class protomodule(fsobj_part):
 		if posn == "None": return posn
 		else:  return posn//3+1
 
+	@property
+	def adhesive_type(self):
+		if self.batch_tape_50 != None:
+			return self.batch_tape_50 + ";;" + self.batch_tape_120
+		else:
+			return self.glue_batch_num
+
 
 	## Functions
 
@@ -835,6 +842,12 @@ class module(fsobj_part):
 		self.front_encap_inspxn == 'pass' and \
 		self.final_inspxn_ok == 'pass'
 
+	@property
+	def adhesive_type(self):
+		if self.batch_tape_50 != None:
+			return self.batch_tape_50 + ";;" + self.batch_tape_120
+		else:
+			return self.glue_batch_num
 
 
 	# new():  Optionally, create proto from baseplate and sensor objects

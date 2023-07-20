@@ -37,7 +37,7 @@
 			<PCB_TOOL_HT_CHK>{{ pcb_tool_ht_chk }}</PCB_TOOL_HT_CHK>
 			<PCB_TOOL_FEET_CHK>{{ pcb_tool_feet_chk }}</PCB_TOOL_FEET_CHK>
 			<GLUE_TYPE>Araldite</GLUE_TYPE>
-			<GLUE_BATCH_NUM>{{ glue_batch_num }}</GLUE_BATCH_NUM>
+			<GLUE_BATCH_NUM>{{ adhesive_type }}</GLUE_BATCH_NUM>
 			<MOD_GRADE>{{ grade }}</MOD_GRADE>
 			<PCB_STEP>{{ step_pcb }}</PCB_STEP>
 			<PCB_PLCMENT_X_OFFST>{{ pcb_plcment_x_offset }}</PCB_PLCMENT_X_OFFST>
