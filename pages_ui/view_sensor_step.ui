@@ -18,7 +18,7 @@
     <rect>
      <x>10</x>
      <y>440</y>
-     <width>311</width>
+     <width>301</width>
      <height>171</height>
     </rect>
    </property>
@@ -31,7 +31,7 @@
     <rect>
      <x>60</x>
      <y>610</y>
-     <width>261</width>
+     <width>251</width>
      <height>20</height>
     </rect>
    </property>
@@ -1757,7 +1757,7 @@ before assembly</string>
     <property name="geometry">
      <rect>
       <x>120</x>
-      <y>230</y>
+      <y>220</y>
       <width>101</width>
       <height>21</height>
      </rect>
@@ -1786,7 +1786,7 @@ before assembly</string>
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>230</y>
+      <y>220</y>
       <width>101</width>
       <height>21</height>
      </rect>

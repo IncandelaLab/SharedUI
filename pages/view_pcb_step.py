@@ -469,9 +469,9 @@ class func(object):
 
 		self.page.pbGoTrayComponent.setEnabled(mode_view and self.page.sbTrayComponent.value() >= 0)
 		#self.page.pbGoTrayAssembly .setEnabled(mode_view and self.page.sbTrayAssembly .value() >= 0)
-		self.page.pbGoBatchAraldite.setEnabled(mode_creating or (mode_view and self.page.leBatchAraldite.text() != ""))
-		self.page.pbGoTape50.setEnabled(mode_creating or (mode_view and self.page.leTape50.text() != ""))
-		self.page.pbGoTape120.setEnabled(mode_creating or (mode_view and self.page.leTape120.text() != ""))
+		self.page.pbGoBatchAraldite.setEnabled((mode_creating or (mode_view and self.page.leBatchAraldite.text() != "")) and adhesive == "Araldite")
+		self.page.pbGoTape50.setEnabled((mode_creating or (mode_view and self.page.leTape50.text() != "")) and adhesive == "Tape")
+		self.page.pbGoTape120.setEnabled((mode_creating or (mode_view and self.page.leTape120.text() != "")) and adhesive == "Tape")
 
 		for i in range(6):
 			self.sb_tray_assemblys[i].setReadOnly(mode_view)
@@ -994,9 +994,9 @@ class func(object):
 			le_to_fill = getattr(self, 'le_{}s'.format(self.search_part))[self.search_row]
 		elif self.search_part == "batch_araldite":  # araldite
 			le_to_fill = self.page.leBatchAraldite
-		elif search_part == "batch_tape_50":  # araldite
+		elif self.search_part == "batch_tape_50":  # araldite
 			le_to_fill = self.page.leTape50
-		elif search_part == "batch_tape_120":  # araldite
+		elif self.search_part == "batch_tape_120":  # araldite
 			le_to_fill = self.page.leTape120
 		le_to_fill.setText(name)
 
@@ -1005,11 +1005,11 @@ class func(object):
 		self.mode = 'creating'
 		if self.search_part in ['baseplate', 'sensor']:
 			getattr(self, 'load'+self.search_part.capitalize())(row=row)  # load part object
-		elif search_part == "batch_araldite":
+		elif self.search_part == "batch_araldite":
 			self.loadBatchAraldite()
-		elif search_part == "batch_tape_50":
+		elif self.search_part == "batch_tape_50":
 			self.loadTape50()
-		elif search_part == "batch_tape_120":
+		elif self.search_part == "batch_tape_120":
 			self.loadTape120()
 		self.updateElements()
 		self.updateIssues()

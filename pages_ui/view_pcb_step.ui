@@ -34,7 +34,7 @@
     <rect>
      <x>10</x>
      <y>430</y>
-     <width>291</width>
+     <width>301</width>
      <height>171</height>
     </rect>
    </property>
@@ -47,7 +47,7 @@
     <rect>
      <x>70</x>
      <y>600</y>
-     <width>171</width>
+     <width>241</width>
      <height>20</height>
     </rect>
    </property>
@@ -315,7 +315,7 @@ before assembly</string>
     <rect>
      <x>10</x>
      <y>140</y>
-     <width>801</width>
+     <width>881</width>
      <height>141</height>
     </rect>
    </property>
@@ -328,7 +328,7 @@ before assembly</string>
    <widget class="QPushButton" name="pbClear1">
     <property name="geometry">
      <rect>
-      <x>750</x>
+      <x>830</x>
       <y>20</y>
       <width>51</width>
       <height>21</height>
@@ -341,7 +341,7 @@ before assembly</string>
    <widget class="QPushButton" name="pbGoModule4">
     <property name="geometry">
      <rect>
-      <x>690</x>
+      <x>770</x>
       <y>120</y>
       <width>51</width>
       <height>21</height>
@@ -354,9 +354,9 @@ before assembly</string>
    <widget class="QLineEdit" name="leModule5">
     <property name="geometry">
      <rect>
-      <x>600</x>
+      <x>640</x>
       <y>100</y>
-      <width>91</width>
+      <width>131</width>
       <height>20</height>
      </rect>
     </property>
@@ -380,9 +380,9 @@ before assembly</string>
    <widget class="QLineEdit" name="leModule3">
     <property name="geometry">
      <rect>
-      <x>600</x>
+      <x>640</x>
       <y>60</y>
-      <width>91</width>
+      <width>131</width>
       <height>20</height>
      </rect>
     </property>
@@ -435,7 +435,7 @@ before assembly</string>
    <widget class="QPushButton" name="pbGoModule3">
     <property name="geometry">
      <rect>
-      <x>690</x>
+      <x>770</x>
       <y>60</y>
       <width>51</width>
       <height>21</height>
@@ -458,7 +458,7 @@ before assembly</string>
    <widget class="QPushButton" name="pbGoModule2">
     <property name="geometry">
      <rect>
-      <x>690</x>
+      <x>770</x>
       <y>40</y>
       <width>51</width>
       <height>21</height>
@@ -473,7 +473,7 @@ before assembly</string>
      <rect>
       <x>450</x>
       <y>100</y>
-      <width>91</width>
+      <width>131</width>
       <height>20</height>
      </rect>
     </property>
@@ -526,7 +526,7 @@ before assembly</string>
    <widget class="QPushButton" name="pbGoModule5">
     <property name="geometry">
      <rect>
-      <x>690</x>
+      <x>770</x>
       <y>80</y>
       <width>51</width>
       <height>21</height>
@@ -565,7 +565,7 @@ before assembly</string>
    <widget class="QPushButton" name="pbGoModule1">
     <property name="geometry">
      <rect>
-      <x>690</x>
+      <x>770</x>
       <y>20</y>
       <width>51</width>
       <height>21</height>
@@ -623,7 +623,7 @@ before assembly</string>
    <widget class="QPushButton" name="pbGoProtomodule2">
     <property name="geometry">
      <rect>
-      <x>540</x>
+      <x>580</x>
       <y>40</y>
       <width>51</width>
       <height>21</height>
@@ -636,9 +636,9 @@ before assembly</string>
    <widget class="QLineEdit" name="lineEdit_14">
     <property name="geometry">
      <rect>
-      <x>600</x>
+      <x>640</x>
       <y>0</y>
-      <width>201</width>
+      <width>241</width>
       <height>20</height>
      </rect>
     </property>
@@ -670,7 +670,7 @@ before assembly</string>
      <rect>
       <x>450</x>
       <y>0</y>
-      <width>141</width>
+      <width>181</width>
       <height>20</height>
      </rect>
     </property>
@@ -709,7 +709,7 @@ before assembly</string>
      <rect>
       <x>450</x>
       <y>120</y>
-      <width>91</width>
+      <width>131</width>
       <height>20</height>
      </rect>
     </property>
@@ -717,9 +717,9 @@ before assembly</string>
    <widget class="QLineEdit" name="leModule2">
     <property name="geometry">
      <rect>
-      <x>600</x>
+      <x>640</x>
       <y>40</y>
-      <width>91</width>
+      <width>131</width>
       <height>20</height>
      </rect>
     </property>
@@ -727,7 +727,7 @@ before assembly</string>
    <widget class="QPushButton" name="pbGoProtomodule4">
     <property name="geometry">
      <rect>
-      <x>540</x>
+      <x>580</x>
       <y>80</y>
       <width>51</width>
       <height>21</height>
@@ -766,9 +766,9 @@ before assembly</string>
    <widget class="QLineEdit" name="leModule4">
     <property name="geometry">
      <rect>
-      <x>600</x>
+      <x>640</x>
       <y>80</y>
-      <width>91</width>
+      <width>131</width>
       <height>20</height>
      </rect>
     </property>
@@ -778,7 +778,7 @@ before assembly</string>
      <rect>
       <x>450</x>
       <y>60</y>
-      <width>91</width>
+      <width>131</width>
       <height>20</height>
      </rect>
     </property>
@@ -796,7 +796,7 @@ before assembly</string>
    <widget class="QPushButton" name="pbGoModule6">
     <property name="geometry">
      <rect>
-      <x>690</x>
+      <x>770</x>
       <y>100</y>
       <width>51</width>
       <height>21</height>
@@ -827,7 +827,7 @@ before assembly</string>
      <rect>
       <x>450</x>
       <y>80</y>
-      <width>91</width>
+      <width>131</width>
       <height>20</height>
      </rect>
     </property>
@@ -835,9 +835,9 @@ before assembly</string>
    <widget class="QLineEdit" name="leModule1">
     <property name="geometry">
      <rect>
-      <x>600</x>
+      <x>640</x>
       <y>20</y>
-      <width>91</width>
+      <width>131</width>
       <height>20</height>
      </rect>
     </property>
@@ -845,7 +845,7 @@ before assembly</string>
    <widget class="QPushButton" name="pbClear6">
     <property name="geometry">
      <rect>
-      <x>750</x>
+      <x>830</x>
       <y>120</y>
       <width>51</width>
       <height>21</height>
@@ -858,7 +858,7 @@ before assembly</string>
    <widget class="QPushButton" name="pbGoProtomodule3">
     <property name="geometry">
      <rect>
-      <x>540</x>
+      <x>580</x>
       <y>60</y>
       <width>51</width>
       <height>21</height>
@@ -899,7 +899,7 @@ before assembly</string>
      <rect>
       <x>450</x>
       <y>40</y>
-      <width>91</width>
+      <width>131</width>
       <height>20</height>
      </rect>
     </property>
@@ -920,7 +920,7 @@ before assembly</string>
    <widget class="QPushButton" name="pbClear5">
     <property name="geometry">
      <rect>
-      <x>750</x>
+      <x>830</x>
       <y>100</y>
       <width>51</width>
       <height>21</height>
@@ -933,7 +933,7 @@ before assembly</string>
    <widget class="QPushButton" name="pbGoProtomodule5">
     <property name="geometry">
      <rect>
-      <x>540</x>
+      <x>580</x>
       <y>100</y>
       <width>51</width>
       <height>21</height>
@@ -946,7 +946,7 @@ before assembly</string>
    <widget class="QPushButton" name="pbGoProtomodule6">
     <property name="geometry">
      <rect>
-      <x>540</x>
+      <x>580</x>
       <y>120</y>
       <width>51</width>
       <height>21</height>
@@ -1017,7 +1017,7 @@ before assembly</string>
    <widget class="QPushButton" name="pbClear2">
     <property name="geometry">
      <rect>
-      <x>750</x>
+      <x>830</x>
       <y>40</y>
       <width>51</width>
       <height>21</height>
@@ -1043,9 +1043,9 @@ before assembly</string>
    <widget class="QLineEdit" name="leModule6">
     <property name="geometry">
      <rect>
-      <x>600</x>
+      <x>640</x>
       <y>120</y>
-      <width>91</width>
+      <width>131</width>
       <height>20</height>
      </rect>
     </property>
@@ -1094,7 +1094,7 @@ before assembly</string>
      <rect>
       <x>450</x>
       <y>20</y>
-      <width>91</width>
+      <width>131</width>
       <height>20</height>
      </rect>
     </property>
@@ -1118,7 +1118,7 @@ before assembly</string>
    <widget class="QPushButton" name="pbGoProtomodule1">
     <property name="geometry">
      <rect>
-      <x>540</x>
+      <x>580</x>
       <y>20</y>
       <width>51</width>
       <height>21</height>
@@ -1131,7 +1131,7 @@ before assembly</string>
    <widget class="QPushButton" name="pbClear3">
     <property name="geometry">
      <rect>
-      <x>750</x>
+      <x>830</x>
       <y>60</y>
       <width>51</width>
       <height>21</height>
@@ -1144,7 +1144,7 @@ before assembly</string>
    <widget class="QPushButton" name="pbClear4">
     <property name="geometry">
      <rect>
-      <x>750</x>
+      <x>830</x>
       <y>80</y>
       <width>51</width>
       <height>21</height>
@@ -1670,7 +1670,7 @@ before assembly</string>
     <rect>
      <x>380</x>
      <y>430</y>
-     <width>281</width>
+     <width>331</width>
      <height>251</height>
     </rect>
    </property>
@@ -1684,7 +1684,7 @@ before assembly</string>
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>230</y>
+      <y>220</y>
       <width>101</width>
       <height>21</height>
      </rect>
@@ -1713,7 +1713,7 @@ before assembly</string>
     <property name="geometry">
      <rect>
       <x>120</x>
-      <y>230</y>
+      <y>220</y>
       <width>101</width>
       <height>21</height>
      </rect>
@@ -1727,7 +1727,7 @@ before assembly</string>
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>281</width>
+      <width>331</width>
       <height>201</height>
      </rect>
     </property>
@@ -1737,7 +1737,7 @@ before assembly</string>
      <rect>
       <x>60</x>
       <y>200</y>
-      <width>221</width>
+      <width>271</width>
       <height>20</height>
      </rect>
     </property>
