@@ -62,7 +62,7 @@
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>20</y>
+     <y>70</y>
      <width>331</width>
      <height>41</height>
     </rect>
@@ -1805,6 +1805,22 @@ before assembly</string>
      </rect>
     </property>
    </widget>
+  </widget>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>230</x>
+     <y>10</y>
+     <width>211</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Note:  The next available step ID is chosen automatically.</string>
+   </property>
+   <property name="wordWrap">
+    <bool>true</bool>
+   </property>
   </widget>
  </widget>
  <resources/>

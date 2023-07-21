@@ -486,7 +486,7 @@ class func(object):
 			self.pb_go_modules[i].setEnabled(     mode_view and modules_exist[i]     )
 			self.pb_clears[i].setEnabled(mode_creating or mode_editing)
 
-		self.page.pbNew.setEnabled(    mode_view and not step_pcb_exists )
+		self.page.pbNew.setEnabled(    mode_view)# and not step_pcb_exists )
 		self.page.pbEdit.setEnabled(   mode_view and     step_pcb_exists )
 		self.page.pbSave.setEnabled(   mode_creating or mode_editing     )
 		self.page.pbCancel.setEnabled( mode_creating or mode_editing     )
@@ -833,14 +833,26 @@ class func(object):
 
 	@enforce_mode('view')
 	def startCreating(self,*args,**kwargs):
-		if self.page.sbID.value() == -1:  return
+		# NEW:  Search for all steps at this institution, then create the next in order
 		if self.page.cbInstitution.currentText() == "":  return
-		tmp_step = assembly.step_pcb()
-		tmp_ID = self.page.sbID.value()
+		part_file_name = os.sep.join([ fm.DATADIR, 'partlist', 'step_pcbs.json' ])
+		with open(part_file_name, 'r') as opfl:
+			part_list = json.load(opfl)
 		tmp_inst = self.page.cbInstitution.currentText()
+		ids = []
+		for part_id, date in part_list.items():
+			inst, num = part_id.split("_")
+			if inst == tmp_inst:
+				ids.append(int(num))
+		if ids:
+			tmp_ID = max(ids) + 1
+		else:
+			tmp_ID = 0
+		self.page.sbID.setValue(tmp_ID)
+
+		tmp_step = assembly.step_pcb()
 		tmp_exists = tmp_step.load("{}_{}".format(tmp_inst, tmp_ID))
 		if not tmp_exists:
-			ID = self.page.sbID.value()
 			self.step_pcb.new("{}_{}".format(tmp_inst, tmp_ID))
 			self.mode = 'creating'
 			self.updateElements()
