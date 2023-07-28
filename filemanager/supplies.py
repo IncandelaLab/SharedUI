@@ -69,8 +69,9 @@ class batch_tape_50(fsobj_supply):
 	FILEDIR = os.sep.join(['supplies','batch_tape_50','{date}'])
 	FILENAME = 'batch_tape_50_{ID:0>5}.xml'
 
+# NOTE:  Actually 125um; replacing w/ 120 would be time-consuming (can't do unconditional search+replace)
 class batch_tape_120(fsobj_supply):
-	OBJECTNAME = "120um tape batch"
+	OBJECTNAME = "125um tape batch"
 	FILEDIR = os.sep.join(['supplies','batch_tape_120','{date}'])
 	FILENAME = 'batch_tape_120_{ID:0>5}.xml'
 

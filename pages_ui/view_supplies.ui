@@ -1612,7 +1612,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Transfer tape 120um</string>
+     <string>Transfer tape 125um</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>

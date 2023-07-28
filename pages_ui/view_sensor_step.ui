@@ -16,9 +16,9 @@
   <widget class="QListWidget" name="listIssues">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>440</y>
-     <width>301</width>
+     <x>380</x>
+     <y>450</y>
+     <width>461</width>
      <height>171</height>
     </rect>
    </property>
@@ -29,9 +29,9 @@
   <widget class="QLineEdit" name="leStatus">
    <property name="geometry">
     <rect>
-     <x>60</x>
-     <y>610</y>
-     <width>251</width>
+     <x>430</x>
+     <y>620</y>
+     <width>151</width>
      <height>20</height>
     </rect>
    </property>
@@ -45,8 +45,8 @@
   <widget class="QLineEdit" name="lineEdit_26">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>610</y>
+     <x>380</x>
+     <y>620</y>
      <width>51</width>
      <height>20</height>
     </rect>
@@ -300,8 +300,8 @@ before assembly</string>
   <widget class="QLabel" name="label_4">
    <property name="geometry">
     <rect>
-     <x>380</x>
-     <y>420</y>
+     <x>10</x>
+     <y>430</y>
      <width>191</width>
      <height>16</height>
     </rect>
@@ -1466,7 +1466,7 @@ before assembly</string>
      </rect>
     </property>
     <property name="text">
-     <string>120um tape</string>
+     <string>125um tape</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -1725,8 +1725,8 @@ before assembly</string>
   <widget class="QFrame" name="frame_5">
    <property name="geometry">
     <rect>
-     <x>380</x>
-     <y>440</y>
+     <x>10</x>
+     <y>450</y>
      <width>311</width>
      <height>251</height>
     </rect>

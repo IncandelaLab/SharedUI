@@ -38,13 +38,12 @@ I_TAPE_50_DNE = "50um tape batch does not exist or is not selected"
 I_TAPE_50_EXPIRED = "50um tape batch has expired"
 I_TAPE_120_DNE = "120um tape batch does not exist or is not selected"
 I_TAPE_120_EXPIRED = "120um tape batch has expired"
+I_TAPE_DNE = "at least one tape batch is required"
 
 # parts
 I_PART_NOT_READY    = "{}(s) in position(s) {} is not ready for pcb application. reason: {}"
-
 I_PCB_PROTOMODULE_SHAPE = "pcb {} has shape {} but protomodule {} has shape {}"
 I_PCB_PROTOMODULE_CHANNEL = "pcb {} has channel density {} but protomodule {} has channel density {}"
-
 I_MOD_EXISTS = "module {} already exists!"
 
 # rows / positions
@@ -62,6 +61,7 @@ I_BASEPLATE_DUPLICATE   = "same baseplate is selected on multiple positions: {}"
 I_SENSOR_DUPLICATE      = "same sensor is selected on multiple positions: {}"
 I_PCB_DUPLICATE         = "same PCB is selected on multiple positions: {}"
 I_PROTO_DUPLICATE       = "same protomodule is selected on multiple positions: {}"
+I_LONE_TRAY             = "assembly tray entered, but rows {} and {} are empty"
 
 # compatibility
 I_SIZE_MISMATCH   = "size mismatch between some selected objects"
@@ -604,8 +604,9 @@ class func(object):
 	@enforce_mode(['editing','creating'])
 	def loadTrayAssembly(self, *args, **kwargs):
 		sender_name = str(self.page.sender().objectName())
-		which = int(sender_name[-1]) - 1
+		which = (int(sender_name[-1]) - 1)*2
 		result = self.tray_assemblys[which].load(self.sb_tray_assemblys[which].value(), self.page.cbInstitution.currentText())
+		result = self.tray_assemblys[which+1].load(self.sb_tray_assemblys[which].value(), self.page.cbInstitution.currentText())
 		self.updateIssues()
 		#self.tray_assembly.load(self.page.sbTrayAssembly.value(), self.page.cbInstitution.currentText())
 		#self.updateIssues()
@@ -671,7 +672,11 @@ class func(object):
 					issues.append(I_BATCH_ARALDITE_EMPTY)
 
 		elif self.page.cbAdhesive.currentText() == "Tape":
-			if self.batch_tape_50.ID is None:
+			if self.batch_tape_50.ID is None and self.batch_tape_120.ID is None \
+			  and self.page.leTape50.text() != "" and self.page.leTape120.text() != "":
+				issues.append(I_TAPE_DNE)
+
+			if self.batch_tape_50.ID is None and self.page.leTape50.text() != "":
 				issues.append(I_TAPE_50_DNE)
 			else:
 				objects.append(self.batch_tape_50)
@@ -683,7 +688,7 @@ class func(object):
 				if self.batch_tape_50.is_empty:
 					issues.append(I_TAPE_50_EMPTY)
 
-			if self.batch_tape_120.ID is None:
+			if self.batch_tape_120.ID is None and self.page.leTape120.text() != "":
 				issues.append(I_TAPE_120_DNE)
 			else:
 				objects.append(self.batch_tape_120)
@@ -779,6 +784,14 @@ class func(object):
                                                                     self.pcbs[i].ID, self.protomodules[i].channel_density))
 
 			# note: only count toward filled row if the rest of the row is nonempty
+			# ...unless both rows are empty, in which case throw error
+			if i%2 == 1:  # 1, 3, 5 (posns 2, 4, 6)
+				# check whether both rows are empty
+				if tray_assemblys_selected[i] >=0 \
+				  and i-1 in rows_empty and num_parts == 0:
+					# current and previous rows are both empty
+					issues.append(I_LONE_TRAY.format(i-1, i))
+
 			if tray_assemblys_selected[i] >= 0 and num_parts != 0:
 				num_parts += 1
 				objects.append(self.tray_assemblys[i])
@@ -947,13 +960,25 @@ class func(object):
 		self.mode = 'view'
 		self.update_info()
 
+	def isRowClear(self, row):
+		return (self.sb_tools[row].value() == -1 or self.sb_tools[row].value() is None) \
+		  and self.le_pcbs[row].text() == "" \
+		  and self.le_protomodules[row].text() == ""
 
 	def clearRow(self,*args,**kwargs):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
+		self.sb_tools[which].setValue(-1)
 		self.sb_tools[which].clear()
 		self.le_pcbs[which].clear()
 		self.le_protomodules[which].clear()
+		# clear tray assembly only if current and neighboring rows are clear
+		uprow   = which if which%2==0 else which-1
+		downrow = which if which%2!=0 else which+1
+		#print("Rows {}, {} are clear: {}, {}".format(uprow, downrow, self.isRowClear(uprow), self.isRowClear(downrow)))
+		if self.isRowClear(uprow) and self.isRowClear(downrow):
+			self.sb_tray_assemblys[which].setValue(-1)
+			self.sb_tray_assemblys[which].clear()
 		self.update_info()
 
 	def doSearch(self,*args,**kwargs):

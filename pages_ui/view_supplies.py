@@ -467,5 +467,5 @@ class Ui_Form(object):
         self.lineEdit_31.setText(_translate("Form", "Received"))
         self.pbTape120Save.setText(_translate("Form", "save"))
         self.lineEdit_32.setText(_translate("Form", "Expires"))
-        self.lineEdit_33.setText(_translate("Form", "Transfer tape 120um"))
+        self.lineEdit_33.setText(_translate("Form", "Transfer tape 125um"))
         self.pbTape120EditNew.setText(_translate("Form", "edit/new"))
