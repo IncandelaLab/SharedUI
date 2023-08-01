@@ -668,7 +668,7 @@ class func(object):
 				if self.batch_tape_50.is_empty:
 					issues.append(I_TAPE_50_EMPTY)
 
-			if not self.batch_tape_120.ID is None and self.page.leTape120.text() != "":
+			if self.batch_tape_120.ID is None and self.page.leTape120.text() != "":
 				issues.append(I_TAPE_120_DNE)
 			else:
 				objects.append(self.batch_tape_120)
