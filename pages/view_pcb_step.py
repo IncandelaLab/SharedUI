@@ -39,6 +39,7 @@ I_TAPE_50_EXPIRED = "50um tape batch has expired"
 I_TAPE_120_DNE = "120um tape batch does not exist or is not selected"
 I_TAPE_120_EXPIRED = "120um tape batch has expired"
 I_TAPE_DNE = "at least one tape batch is required"
+I_ADHESIVE_NOT_SELECTED = "no adhesive type is selected"
 
 # parts
 I_PART_NOT_READY    = "{}(s) in position(s) {} is not ready for pcb application. reason: {}"
@@ -636,7 +637,7 @@ class func(object):
 			self.page.leTape50.clear()
 			self.page.leTape120.clear()
 		self.updateElements()
-
+		self.updateIssues()
 
 	#NEW:  Add updateIssues and modify conditions accordingly
 	@enforce_mode(['editing', 'creating'])
@@ -657,6 +658,8 @@ class func(object):
 		#	issues.append(I_TRAY_ASSEMBLY_DNE)
 		#else:
 		#	objects.append(self.tray_assembly)
+		if self.page.cbAdhesive.currentText() == "":
+			issues.append(I_ADHESIVE_NOT_SELECTED)
 
 		if self.page.cbAdhesive.currentText() == "Araldite":
 			if self.batch_araldite.ID is None:
@@ -676,7 +679,7 @@ class func(object):
 			  and self.page.leTape50.text() != "" and self.page.leTape120.text() != "":
 				issues.append(I_TAPE_DNE)
 
-			if self.batch_tape_50.ID is None and self.page.leTape50.text() != "":
+			if self.batch_tape_50.ID is None:
 				issues.append(I_TAPE_50_DNE)
 			else:
 				objects.append(self.batch_tape_50)
@@ -688,7 +691,7 @@ class func(object):
 				if self.batch_tape_50.is_empty:
 					issues.append(I_TAPE_50_EMPTY)
 
-			if self.batch_tape_120.ID is None and self.page.leTape120.text() != "":
+			if self.batch_tape_120.ID is None:
 				issues.append(I_TAPE_120_DNE)
 			else:
 				objects.append(self.batch_tape_120)

@@ -706,7 +706,8 @@ class module(fsobj_part):
 		"bond_pull_stddev",
 		"final_inspxn_user",
 		"final_inspxn_ok",
-		"wirebond_comments"
+		"wirebond_comments",
+		"encapsulation_comments",
 	]
 
 	EXTRA_DEFAULTS = {

@@ -1587,7 +1587,7 @@
   </widget>
   <widget class="QFrame" name="frame_13">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="geometry">
     <rect>
@@ -1604,6 +1604,9 @@
     <enum>QFrame::Raised</enum>
    </property>
    <widget class="QPushButton" name="pbDeleteCommentEncap">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>160</x>
@@ -1617,6 +1620,9 @@
     </property>
    </widget>
    <widget class="QPushButton" name="pbAddCommentEncap">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -1630,6 +1636,9 @@
     </property>
    </widget>
    <widget class="QPlainTextEdit" name="pteWriteCommentEncap">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -1643,6 +1652,9 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="lineEdit_17">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -1659,6 +1671,9 @@
     </property>
    </widget>
    <widget class="QListWidget" name="listCommentsEncap">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>0</x>

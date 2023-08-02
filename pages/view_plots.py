@@ -415,13 +415,13 @@ class func(object):
 
 	@enforce_mode('view')
 	def goPCB(self,*args,**kwargs):
-		ID = self.page.lePCB.text()
+		ID = self.page.leIDPCB.text()
 		if ID != "":
 			self.setUIPage('PCBs',ID=ID)
 
 	@enforce_mode('view')
 	def goMod(self,*args,**kwargs):
-		ID = self.page.leMod.text()
+		ID = self.page.leIDMod.text()
 		if ID != "":
 			self.setUIPage('Modules',ID=ID)
 
