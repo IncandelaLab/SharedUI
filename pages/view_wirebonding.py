@@ -408,7 +408,7 @@ class func(object):
 
 		# Commented for now
 		num_comments_encap = self.page.listCommentsEncap.count()
-		self.module.encapsulation_comments = [self.page.listComments.item(i).text() for i in range(num_comments_encap)]
+		self.module.encapsulation_comments = [self.page.listCommentsEncap.item(i).text() for i in range(num_comments_encap)]
 
 		# pre-wirebonding qualification
 		self.module.pre_inspection  = str(self.page.cbPreinspection.currentText()  ) if str(self.page.cbPreinspection.currentText()  ) else None
