@@ -10,8 +10,6 @@ import datetime
 from jinja2 import Template
 
 #import rhapi_nolock as rh
-# For DB requests:
-import cx_Oracle
 
 # IMPORTANT NOTE:  Setting this to false disables DB communication.  Purely for debugging.
 ENABLE_DB_COMMUNICATION = False
@@ -85,35 +83,6 @@ def setup(datadir=None):
 
 #setup()
 
-
-# Set up DB_CURSOR object for SQL requests:
-"""
-def connectOracle():
-	global DB_CURSOR
-	print("LOADING ORACLE LIBRARY")
-	try:
-		# Custom bash variable set up in .bashrc by install script
-		lib_dir = os.environ.get("INSTANT_CLIENT_HOME")
-		cx_Oracle.init_oracle_client(lib_dir=lib_dir)
-	except Exception as err:
-		print("FATAL ERROR:  Could not find Oracle InstantClient libraries.")
-		print("$INSTANT_CLIENT_HOME is", os.environ.get("INSTANT_CLIENT_HOME"))
-		print("$PATH is", os.environ.get("PATH"))
-		print("Exiting")
-		sys.exit(1)
-	print("Found instant client")
-	# Set up connection - takes ~1s, so do once
-	# EVERY db request goes through the cursor
-	# TODO:  Change this upon switching to production DB
-	print("Connecting...")
-	db_connection = cx_Oracle.connect(user="CMS_HGC_PRTTYPE_HGCAL_READER",
-					password="HGCAL_Reader_2016",
-					dsn="localhost:10132/int2r_lb.cern.ch",
-					encoding="UTF-8",
-					)
-	DB_CURSOR = db_connection.cursor()
-	print("Connected")
-"""
 
 
 

@@ -8,8 +8,6 @@ from PyQt5 import QtCore
 import datetime
 
 #import rhapi_nolock as rh
-# For DB requests:
-import cx_Oracle
 
 from filemanager import fm, parts
 

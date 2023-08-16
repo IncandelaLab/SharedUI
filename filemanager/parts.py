@@ -19,8 +19,6 @@ import csv
 import jinja2
 
 #import rhapi_nolock as rh
-# For DB requests:
-import cx_Oracle
 from xml.dom import minidom
 
 
