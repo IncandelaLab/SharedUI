@@ -2,6 +2,8 @@ from filemanager import fm, supplies, parts
 from PyQt5 import QtCore
 import time
 import datetime
+import os
+import json
 
 # - Loads a MODULE.  All wirebonding info will be stored in the corresp module object.
 
@@ -44,6 +46,9 @@ class func(object):
 
 		self.module = parts.module()
 		self.module_exists = None
+		self.batch_sylgard = supplies.batch_sylgard()
+		self.batch_bond_wire = supplies.batch_bond_wire()
+		self.batch_wedge = supplies.batch_wedge()
 		self.mode = 'setup'
 
 		# NEW
@@ -351,6 +356,14 @@ class func(object):
 		self.page.pbAddPart     .setEnabled(mode_searching)
 		self.page.pbCancelSearch.setEnabled(mode_searching)
 
+		# NEW:  Update pb's based on search result
+		syl = self.page.leBatchSylgard.text()
+		self.page.pbGoBatchSylgard.setText("select" if syl == "" else "go to")
+		bnd = self.page.leBatchBondWire.text()
+		self.page.pbGoBatchBondWire.setText("select" if bnd == "" else "go to")
+		wdg = self.page.leBatchWedge.text()
+		self.page.pbGoBatchWedge.setText("select" if wdg == "" else "go to")
+
 
 	@enforce_mode('view')
 	def startEditing(self,*args,**kwargs):
@@ -489,17 +502,14 @@ class func(object):
 	@enforce_mode('editing')
 	def loadBatchSylgard(self, *args, **kwargs):
 		self.batch_sylgard.load(self.page.leBatchSylgard.text())
-		self.updateIssues()
 
 	@enforce_mode('editing')
 	def loadBatchBondWire(self, *args, **kwargs):
 		self.batch_bond_wire.load(self.page.leBatchBondWire.text())
-		self.updateIssues()
 
 	@enforce_mode('editing')
 	def loadBatchWedge(self, *args, **kwargs):
 		self.batch_wedge.load(self.page.leBatchWedge.text())
-		self.updateIssues()
 
 
 	def doSearch(self,*args,**kwargs):
@@ -526,7 +536,7 @@ class func(object):
 			elif self.search_part == 'batch_wedge':
 				self.loadBatchWedge()
 
-		self.page.leSearchStatus.setText('{}: row {}'.format(self.search_part, self.search_row))
+		self.page.leSearchStatus.setText("Searched: "+self.search_part)
 		self.mode = 'searching'
 		self.updateElements()
 
@@ -553,19 +563,17 @@ class func(object):
 		elif self.search_part == "batch_wedge":
 			self.loadBatchWedge()
 		self.updateElements()
-		self.updateIssues()
 
 	def cancelSearch(self,*args,**kwargs):
 		self.page.lwPartList.clear()
 		self.page.leSearchStatus.clear()
 		self.mode = 'editing'
 		self.updateElements()
-		self.updateIssues()
 
 
 	def goBatchSylgard(self,*args,**kwargs):
 		batch_sylgard = self.page.leBatchSylgard.text()
-		if batch_araldite != "":
+		if batch_sylgard != "":
 			self.setUIPage('Supplies',batch_sylgard=batch_sylgard)
 		else:
 			self.mode = 'searching'
@@ -574,7 +582,7 @@ class func(object):
 
 	def goBatchBondWire(self,*args,**kwargs):
 		batch_bond_wire = self.page.leBatchBondWire.text()
-		if batch_araldite != "":
+		if batch_bond_wire != "":
 			self.setUIPage('Supplies',batch_bond_wire=batch_bond_wire)
 		else:
 			self.mode = 'searching'

@@ -87,8 +87,8 @@
   <widget class="QLabel" name="label_4">
    <property name="geometry">
     <rect>
-     <x>940</x>
-     <y>160</y>
+     <x>630</x>
+     <y>570</y>
      <width>181</width>
      <height>21</height>
     </rect>
@@ -100,8 +100,8 @@
   <widget class="QFrame" name="frame_3">
    <property name="geometry">
     <rect>
-     <x>940</x>
-     <y>190</y>
+     <x>630</x>
+     <y>600</y>
      <width>241</width>
      <height>41</height>
     </rect>
@@ -188,8 +188,8 @@
   <widget class="QFrame" name="frame_5">
    <property name="geometry">
     <rect>
-     <x>940</x>
-     <y>40</y>
+     <x>310</x>
+     <y>420</y>
      <width>241</width>
      <height>81</height>
     </rect>
@@ -295,26 +295,13 @@
     </property>
    </widget>
   </widget>
-  <widget class="QLabel" name="label_8">
-   <property name="geometry">
-    <rect>
-     <x>940</x>
-     <y>10</y>
-     <width>211</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Test bonds</string>
-   </property>
-  </widget>
   <widget class="QLineEdit" name="leErrors">
    <property name="geometry">
     <rect>
-     <x>940</x>
-     <y>290</y>
-     <width>241</width>
-     <height>61</height>
+     <x>630</x>
+     <y>660</y>
+     <width>301</width>
+     <height>51</height>
     </rect>
    </property>
    <property name="text">
@@ -330,8 +317,8 @@
   <widget class="QLabel" name="label_15">
    <property name="geometry">
     <rect>
-     <x>940</x>
-     <y>270</y>
+     <x>630</x>
+     <y>640</y>
      <width>181</width>
      <height>16</height>
     </rect>
@@ -614,7 +601,7 @@
      <x>310</x>
      <y>20</y>
      <width>301</width>
-     <height>411</height>
+     <height>391</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -824,7 +811,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>260</y>
+      <y>240</y>
       <width>281</width>
       <height>141</height>
      </rect>
@@ -1047,7 +1034,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>240</y>
+      <y>220</y>
       <width>171</width>
       <height>16</height>
      </rect>
@@ -1565,7 +1552,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>520</y>
+     <y>510</y>
      <width>281</width>
      <height>201</height>
     </rect>
@@ -1649,7 +1636,7 @@
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>450</y>
+     <y>510</y>
      <width>281</width>
      <height>201</height>
     </rect>
