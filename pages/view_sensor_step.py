@@ -472,7 +472,7 @@ class func(object):
 			self.sb_tools[i].setReadOnly(         mode_view)
 			self.le_sensors[i].setReadOnly(       mode_view)
 			self.le_baseplates[i].setReadOnly(    mode_view)
-			self.pb_go_tools[i].setEnabled(       mode_view and tools_exist[i]       )
+			self.pb_go_tools[i].setEnabled(       mode_view and tools_exist[i])
 			# ENABLED IF:
 			# - creating
 			# - view, and part exists

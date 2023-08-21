@@ -87,7 +87,7 @@ class fsobj_part(fm.fsobj):
 
 	def __init__(self):
 		self.PROPERTIES = self.PART_PROPERTIES + self.EXTRA_PROPERTIES
-		self.DEFAULTS = self.PART_DEFAULTS | self.EXTRA_DEFAULTS  # | == incl or
+		self.DEFAULTS = {**self.PART_DEFAULTS, **self.EXTRA_DEFAULTS}  #self.PART_DEFAULTS | self.EXTRA_DEFAULTS  # | == incl or
 		super(fsobj_part, self).__init__()
 
 

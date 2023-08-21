@@ -138,6 +138,12 @@ class func(object):
 		for user in self.index_users_fi.keys():
 			self.page.cbWirebondingFinalInspectionUser.addItem(user)
 
+		self.page.pbAddPart.clicked.connect(self.finishSearch)
+		self.page.pbCancelSearch.clicked.connect(self.cancelSearch)
+		self.page.pbGoBatchSylgard.clicked.connect(self.goBatchSylgard)
+		self.page.pbGoBatchBondWire.clicked.connect(self.goBatchBondWire)
+		self.page.pbGoBatchWedge.clicked.connect(self.goBatchWedge)
+
 
 	@enforce_mode(['view', 'editing'])
 	def update_info(self,ID=None,*args,**kwargs):
@@ -260,12 +266,13 @@ class func(object):
 		self.updateElements()
 
 
-	@enforce_mode(['view','editing'])
+	@enforce_mode(['view','editing','searching'])
 	def updateElements(self):
 		module_exists   = self.module_exists
 
-		mode_view     = self.mode == 'view'
-		mode_editing  = self.mode == 'editing'
+		mode_view      = self.mode == 'view'
+		mode_editing   = self.mode == 'editing'
+		mode_searching = self.mode == 'searching'
 
 		self.setMainSwitchingEnabled(mode_view) 
 		self.page.leID.setReadOnly(not mode_view)
@@ -336,6 +343,13 @@ class func(object):
 		self.page.cbWirebondingFinalInspectionUser.setEnabled( mode_editing )
 		self.page.cbWirebondingFinalInspectionOK.setEnabled(   mode_editing )
 
+		# search page:
+		self.page.pbGoBatchSylgard.setEnabled( mode_editing or (mode_view and self.page.leBatchSylgard.text() != ""))
+		self.page.pbGoBatchBondWire.setEnabled(mode_editing or (mode_view and self.page.leBatchBondWire.text() != ""))
+		self.page.pbGoBatchWedge.setEnabled(   mode_editing or (mode_view and self.page.leBatchWedge.text() != ""))
+
+		self.page.pbAddPart     .setEnabled(mode_searching)
+		self.page.pbCancelSearch.setEnabled(mode_searching)
 
 
 	@enforce_mode('view')
@@ -470,6 +484,111 @@ class func(object):
 		self.update_info()
 
 		self.xmlModList.append(self.module.ID)
+
+
+	@enforce_mode('editing')
+	def loadBatchSylgard(self, *args, **kwargs):
+		self.batch_sylgard.load(self.page.leBatchSylgard.text())
+		self.updateIssues()
+
+	@enforce_mode('editing')
+	def loadBatchBondWire(self, *args, **kwargs):
+		self.batch_bond_wire.load(self.page.leBatchBondWire.text())
+		self.updateIssues()
+
+	@enforce_mode('editing')
+	def loadBatchWedge(self, *args, **kwargs):
+		self.batch_wedge.load(self.page.leBatchWedge.text())
+		self.updateIssues()
+
+
+	def doSearch(self,*args,**kwargs):
+		tmp_class = getattr(parts, self.search_part, None)
+		if tmp_class is None:
+			tmp_class = getattr(supplies, self.search_part)
+			tmp_part = tmp_class()
+
+		# Search local-only parts:  open part file
+		part_file_name = os.sep.join([ fm.DATADIR, 'partlist', self.search_part+'s.json' ])
+		with open(part_file_name, 'r') as opfl:
+			part_list = json.load(opfl)
+
+		for part_id, date in part_list.items():
+			# If already added by DB query, skip:
+			if len(self.page.lwPartList.findItems("{} {}".format(self.search_part, part_id), \
+                                                  QtCore.Qt.MatchExactly)) > 0:
+				continue
+			self.page.lwPartList.addItem("{} {}".format(self.search_part, part_id))
+			if self.search_part == 'batch_sylgard':
+				self.loadBatchSylgard()
+			elif self.search_part == 'batch_bond_wire':
+				self.loadBatchBondWire()
+			elif self.search_part == 'batch_wedge':
+				self.loadBatchWedge()
+
+		self.page.leSearchStatus.setText('{}: row {}'.format(self.search_part, self.search_row))
+		self.mode = 'searching'
+		self.updateElements()
+
+	def finishSearch(self,*args,**kwargs):
+		row = self.page.lwPartList.currentRow()
+		if self.page.lwPartList.item(row) is None:
+			return
+		name = self.page.lwPartList.item(row).text().split()[1]
+		if self.search_part == "batch_sylgard":
+			le_to_fill = self.page.leBatchSylgard
+		elif self.search_part == "batch_bond_wire":
+			le_to_fill = self.page.leBatchBondWire
+		elif self.search_part == "batch_wedge":
+			le_to_fill = self.page.leBatchWedge
+		le_to_fill.setText(name)
+
+		self.page.lwPartList.clear()
+		self.page.leSearchStatus.clear()
+		self.mode = 'editing'
+		if self.search_part == "batch_sylgard":
+			self.loadBatchSylgard()
+		elif self.search_part == "batch_bond_wire":
+			self.loadBatchBondWire()
+		elif self.search_part == "batch_wedge":
+			self.loadBatchWedge()
+		self.updateElements()
+		self.updateIssues()
+
+	def cancelSearch(self,*args,**kwargs):
+		self.page.lwPartList.clear()
+		self.page.leSearchStatus.clear()
+		self.mode = 'editing'
+		self.updateElements()
+		self.updateIssues()
+
+
+	def goBatchSylgard(self,*args,**kwargs):
+		batch_sylgard = self.page.leBatchSylgard.text()
+		if batch_araldite != "":
+			self.setUIPage('Supplies',batch_sylgard=batch_sylgard)
+		else:
+			self.mode = 'searching'
+			self.search_part = 'batch_sylgard'
+			self.doSearch()
+
+	def goBatchBondWire(self,*args,**kwargs):
+		batch_bond_wire = self.page.leBatchBondWire.text()
+		if batch_araldite != "":
+			self.setUIPage('Supplies',batch_bond_wire=batch_bond_wire)
+		else:
+			self.mode = 'searching'
+			self.search_part = 'batch_bond_wire'
+			self.doSearch()
+
+	def goBatchWedge(self,*args,**kwargs):
+		batch_wedge = self.page.leBatchWedge.text()
+		if batch_wedge != "":
+			self.setUIPage('Supplies',batch_wedge=batch_wedge)
+		else:
+			self.mode = 'searching'
+			self.search_part = 'batch_wedge'
+			self.doSearch()
 
 
 
