@@ -19,16 +19,10 @@ INDEX_INSTITUTION = {
 	'FSU':11
 }
 
-
-
-INSTITUTION_INDEX = {  # Can probably be replaced w/ list
-	0:'CERN',
-	1:'FNAL',
-	2:'UCSB',
-	3:'UMN',
-	4:'HEPHY',
-	5:'HPK',
+INSTITUTION_INDEX = {
+	value: key for key, value in INDEX_INSTITUTION.items()
 }
+
 
 class simple_fsobj_vc(object):
 	def __init__(self,
@@ -296,8 +290,8 @@ class func(object):
 	def update_info_sensor_tool_inst(self,institution=None,*args,**kwargs):
 		ID = self.page.sbSensorToolID.value()
 		# By default, this fn is handed the # of the combobox, not the text.  Fix that:
-		institution = INSTITUTION_INDEX[institution]
-		self.tool_sensor.update_info(ID,institution)
+		institution_ = INSTITUTION_INDEX[institution]
+		self.tool_sensor.update_info(ID,institution_)
 
 	@enforce_mode(['view','editing_sensor_tool','editing_sensor_tray','editing_pcb_tray','editing_assembly_tray'])
 	def update_info_pcb_tool_ID(self,ID=None,*args,**kwargs):
@@ -310,8 +304,8 @@ class func(object):
 	@enforce_mode(['view','editing_sensor_tool','editing_sensor_tray','editing_pcb_tray','editing_assembly_tray'])
 	def update_info_pcb_tool_inst(self,institution=None,*args,**kwargs):
 		ID = self.page.sbPcbToolID.value()
-		institution = INSTITUTION_INDEX[institution]
-		self.tool_pcb.update_info(ID,institution)
+		institution_ = INSTITUTION_INDEX[institution]
+		self.tool_pcb.update_info(ID,institution_)
 
 	@enforce_mode(['view','editing_sensor_tool','editing_pcb_tool','editing_pcb_tray','editing_assembly_tray'])
 	def update_info_sensor_tray_ID(self,ID=None,*args,**kwargs):
@@ -324,8 +318,8 @@ class func(object):
 	@enforce_mode(['view','editing_sensor_tool','editing_pcb_tool','editing_pcb_tray','editing_assembly_tray'])
 	def update_info_sensor_tray_inst(self,institution=None,*args,**kwargs):
 		ID = self.page.sbSensorTrayID.value()
-		institution = INSTITUTION_INDEX[institution]
-		self.tray_component_sensor.update_info(ID,institution)
+		institution_ = INSTITUTION_INDEX[institution]
+		self.tray_component_sensor.update_info(ID,institution_)
 
 	@enforce_mode(['view','editing_sensor_tool','editing_pcb_tool','editing_sensor_tray','editing_assembly_tray'])
 	def update_info_pcb_tray_ID(self,ID=None,*args,**kwargs):
@@ -338,8 +332,8 @@ class func(object):
 	@enforce_mode(['view','editing_sensor_tool','editing_pcb_tool','editing_sensor_tray','editing_assembly_tray'])
 	def update_info_pcb_tray_inst(self,institution=None,*args,**kwargs):
 		ID = self.page.sbPcbTrayID.value()
-		institution = INSTITUTION_INDEX[institution]
-		self.tray_component_pcb.update_info(ID,institution)
+		institution_ = INSTITUTION_INDEX[institution]
+		self.tray_component_pcb.update_info(ID,institution_)
 
 	@enforce_mode(['view','editing_sensor_tool','editing_pcb_tool','editing_sensor_tray','editing_pcb_tray'])
 	def update_info_assembly_tray_ID(self,ID=None,*args,**kwargs):
@@ -352,8 +346,8 @@ class func(object):
 	@enforce_mode(['view','editing_sensor_tool','editing_pcb_tool','editing_sensor_tray','editing_pcb_tray'])
 	def update_info_assembly_tray_inst(self,institution=None,*args,**kwargs):
 		ID = self.page.sbAssemblyTrayID.value()
-		institution = INSTITUTION_INDEX[institution]
-		self.tray_assembly.update_info(ID,institution)
+		institution_ = INSTITUTION_INDEX[institution]
+		self.tray_assembly.update_info(ID,institution_)
 
 	@enforce_mode('view')
 	def update_info(self,*args,**kwargs):
