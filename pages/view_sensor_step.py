@@ -1015,7 +1015,8 @@ class func(object):
 		row = self.page.lwPartList.currentRow()
 		if self.page.lwPartList.item(row) is None:
 			return
-		name = self.page.lwPartList.item(row).text().split()[1]
+		name_ = self.page.lwPartList.item(row).text().split()[1:]
+		name = " ".join(name_)
 		if self.search_part in ['baseplate', 'sensor']:
 			le_to_fill = getattr(self, 'le_{}s'.format(self.search_part))[self.search_row]
 		elif self.search_part == "batch_araldite":  # araldite
