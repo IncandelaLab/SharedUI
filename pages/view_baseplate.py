@@ -8,6 +8,7 @@ DEBUG = False
 INDEX_MATERIAL = {
 	'CuW/Kapton':0,
 	'PCB/Kapton':1,
+	'CF/Kapton' :2,
 }
 
 INDEX_SHAPE = {

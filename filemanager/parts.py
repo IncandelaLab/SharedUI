@@ -480,13 +480,13 @@ class protomodule(fsobj_part):
 
 	# Note:  baseplate_material determines calorimeter_type!
 	@property
-	def baseplate_material(self):
+	def baseplate_material(self):  # avoid accessing it without setter
 		if self.kind_of_part == "None None Si ProtoModule None None":  return None
 		em_or_had = self.kind_of_part.split()[0]
 		return 'CuW/Kapton' if em_or_had == 'EM' else 'PCB/Kapton'
 	@baseplate_material.setter
 	def baseplate_material(self, value):
-		# CuW -> EM, PCB -> HAD
+		# CuW -> EM, PCB -> HAD, CF -> HAD
 		splt = self.kind_of_part.split(" ")
 		splt[0] = 'EM' if value == 'CuW/Kapton' else 'HAD'
 		self.kind_of_part = " ".join(splt)
@@ -752,13 +752,13 @@ class module(fsobj_part):
 
 	# Note:  baseplate_material determines calorimeter_type!
 	@property
-	def baseplate_material(self):
+	def baseplate_material(self):  # avoid accessing it without setter
 		if self.kind_of_part == "None None Si Module None None":  return None
 		em_or_had = self.kind_of_part.split()[0]
 		return 'CuW/Kapton' if em_or_had == 'EM' else 'PCB/Kapton'
 	@baseplate_material.setter
 	def baseplate_material(self, value):
-		# CuW -> EM, PCB -> HAD
+		# CuW -> EM, PCB -> HAD, CF -> HAD
 		splt = self.kind_of_part.split(" ")
 		splt[0] = 'EM' if value == 'CuW/Kapton' else 'HAD'
 		self.kind_of_part = " ".join(splt)
