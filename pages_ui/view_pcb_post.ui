@@ -367,7 +367,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Sensor step ID</string>
+     <string>PCB step ID</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
