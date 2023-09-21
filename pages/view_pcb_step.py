@@ -1005,21 +1005,17 @@ class func(object):
 				tmp_part.load(part_id)  # db query already done
 				if tmp_part.module is None:
 					self.page.lwPartList.addItem("{} {}".format(self.search_part, part_id))
-				self.loadPcb()
+				#self.loadPcb()
 			elif self.search_part == 'protomodule':
 				tmp_part.load(part_id)  # db query already done
 				if tmp_part.module is None:
 					self.page.lwPartList.addItem("{} {}".format(self.search_part, part_id))
-				self.loadProtomodule()
 			elif self.search_part == 'batch_araldite':  # araldite, no restrictions
 				self.page.lwPartList.addItem("{} {}".format(self.search_part, part_id))
-				self.loadBatchAraldite()
 			elif self.search_part == 'batch_tape_50':
 				self.page.lwPartList.addItem("{} {}".format(self.search_part, part_id))
-				self.loadTape50()
 			elif self.search_part == 'batch_tape_120':
 				self.page.lwPartList.addItem("{} {}".format(self.search_part, part_id))
-				self.loadTape120()
 			#else:
 			#	self.page.lwPartList.addItem("{} {}".format(self.search_part, part_id))
 
@@ -1047,7 +1043,7 @@ class func(object):
 		self.page.leSearchStatus.clear()
 		self.mode = 'creating'
 		if self.search_part in ['baseplate', 'sensor']:
-			getattr(self, 'load'+self.search_part.capitalize())(row=row)  # load part object
+			getattr(self, 'load'+self.search_part.capitalize())(row=self.search_row)  # load part object
 		elif self.search_part == "batch_araldite":
 			self.loadBatchAraldite()
 		elif self.search_part == "batch_tape_50":

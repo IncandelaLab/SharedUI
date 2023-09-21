@@ -643,7 +643,7 @@ before assembly</string>
      </rect>
     </property>
     <property name="text">
-     <string>Module ID (create serial here)</string>
+     <string>Module ID (must type this in manually)</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>

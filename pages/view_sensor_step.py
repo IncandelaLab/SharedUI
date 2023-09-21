@@ -893,7 +893,6 @@ class func(object):
 			temp_sensor = self.sensors[i]
 			temp_protomodule = parts.protomodule()
 			# Attempt to load.  If fails, create new:
-			print("IN SAVEEDITING:  protomods[i] is", protomodules[i])
 			if not temp_protomodule.load(protomodules[i]):
 				temp_protomodule.new(protomodules[i], baseplate_=temp_plt, sensor_=temp_sensor)
 			temp_protomodule.step_sensor    = self.step_sensor.ID
@@ -990,22 +989,16 @@ class func(object):
 				tmp_part.load(part_id)
 				if tmp_part.protomodule is None:
 					self.page.lwPartList.addItem("{} {}".format(self.search_part, part_id))
-				self.loadBaseplate()
 			elif self.search_part == 'sensor':
 				tmp_part.load(part_id)
-				print("Loading part ID:", part_id)
 				if tmp_part.protomodule is None:
 					self.page.lwPartList.addItem("{} {}".format(self.search_part, part_id))
-				self.loadSensor()
 			elif self.search_part == 'batch_araldite':  # araldite, no restrictions
 				self.page.lwPartList.addItem("{} {}".format(self.search_part, part_id))
-				self.loadBatchAraldite()
 			elif self.search_part == 'batch_tape_50':
 				self.page.lwPartList.addItem("{} {}".format(self.search_part, part_id))
-				self.loadTape50()
 			elif self.search_part == 'batch_tape_120':
 				self.page.lwPartList.addItem("{} {}".format(self.search_part, part_id))
-				self.loadTape120()
 
 		self.page.leSearchStatus.setText('{}: row {}'.format(self.search_part, self.search_row))
 		self.mode = 'searching'
@@ -1031,7 +1024,7 @@ class func(object):
 		self.page.leSearchStatus.clear()
 		self.mode = 'creating'
 		if self.search_part in ['baseplate', 'sensor']:
-			getattr(self, 'load'+self.search_part.capitalize())(row=row)  # load part object
+			getattr(self, 'load'+self.search_part.capitalize())(row=self.search_row)  # load part object
 		elif self.search_part == "batch_araldite":
 			self.loadBatchAraldite()
 		elif self.search_part == "batch_tape_50":
