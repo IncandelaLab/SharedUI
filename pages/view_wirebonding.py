@@ -535,6 +535,8 @@ class func(object):
 				self.loadBatchBondWire()
 			elif self.search_part == 'batch_wedge':
 				self.loadBatchWedge()
+		# Sort search results
+		self.page.lwPartList.sortItems()
 
 		self.page.leSearchStatus.setText("Searched: "+self.search_part)
 		self.mode = 'searching'

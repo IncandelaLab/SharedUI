@@ -999,6 +999,8 @@ class func(object):
 				self.page.lwPartList.addItem("{} {}".format(self.search_part, part_id))
 			elif self.search_part == 'batch_tape_120':
 				self.page.lwPartList.addItem("{} {}".format(self.search_part, part_id))
+		# Sort search results
+		self.page.lwPartList.sortItems()
 
 		self.page.leSearchStatus.setText('{}: row {}'.format(self.search_part, self.search_row))
 		self.mode = 'searching'
