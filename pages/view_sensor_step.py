@@ -659,7 +659,7 @@ class func(object):
 			  and self.page.leTape50.text() != "" and self.page.leTape120.text() != "":
 				issues.append(I_TAPE_DNE)
 
-			if self.batch_tape_50.ID is None and self.page.leTape50.text() != "":
+			if self.batch_tape_50.ID is None:  # at least 50 um tape should exist
 				issues.append(I_TAPE_50_DNE)
 			else:
 				objects.append(self.batch_tape_50)

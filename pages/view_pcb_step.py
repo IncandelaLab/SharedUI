@@ -340,7 +340,7 @@ class func(object):
 					dt.setTime(tim)
 
 
-			if self.step_pcb.glue_batch_num is None and self.step_pcb.batch_tape_50 is None:
+			if self.step_pcb.glue_batch_num is None and self.step_pcb.batch_tape_120 is None:
 				self.page.cbAdhesive.setCurrentIndex(-1)
 				self.page.leBatchAraldite.setText("")
 				self.page.leTape50.setText("")
@@ -679,7 +679,7 @@ class func(object):
 			  and self.page.leTape50.text() != "" and self.page.leTape120.text() != "":
 				issues.append(I_TAPE_DNE)
 
-			if self.batch_tape_50.ID is None:
+			if self.batch_tape_50.ID is None and self.page.leTape50.text() != "":
 				issues.append(I_TAPE_50_DNE)
 			else:
 				objects.append(self.batch_tape_50)
