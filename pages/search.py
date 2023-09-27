@@ -241,7 +241,7 @@ and l.LOCATION_NAME like \'{}\'"*"*".format(pt_query, search_criteria['location_
 				self.page.lwTypeList.addItem(localList[serial])
 			else:
 				serial = self.page.lwPartList.item(row).text()
-				self.page.lwTypeList.addItem(localList[serial])
+				self.page.lwTypeList.addItem(remoteList[serial])
 		self.page.leStatus.setText("Results found!")
 
 	def goToPart(self,*args,**kwargs):
