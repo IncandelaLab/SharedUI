@@ -156,6 +156,7 @@ class baseplate(fsobj_part):
 		# build_cond file:
 		# other:
 		'protomodule',
+		'module',
 		'step_sensor',
 		# GUI-only:
 		'barcode',
@@ -244,6 +245,7 @@ class sensor(fsobj_part):
 		'test_files', #_name',
 		# other:
 		'protomodule',
+		'module',
 		'step_sensor',
 		# GUI only:
 		'barcode',

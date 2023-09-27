@@ -165,7 +165,7 @@ class func(object):
 		self.page.pteWriteComment.clear()
 
 
-		"""if self.sensor.step_sensor:
+		if self.sensor.step_sensor:
 			tmp_inst, tmp_id = self.sensor.step_sensor.split("_")
 			self.page.sbStepSensor.setValue(int(tmp_id))
 			self.page.cbInstitutionStep.setCurrentIndex(INDEX_INSTITUTION.get(tmp_inst, -1))
@@ -174,7 +174,7 @@ class func(object):
 			self.page.cbInstitutionStep.setCurrentIndex(-1)
 		self.page.leProtomodule.setText("" if self.sensor.protomodule is None else self.sensor.protomodule)
 		self.page.leModule.setText(     "" if self.sensor.module      is None else self.sensor.module)
-		"""
+		
 		self.updateElements()
 
 

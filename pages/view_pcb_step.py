@@ -96,6 +96,8 @@ class func(object):
 		self.tray_assemblys = [tools.tray_assembly() for _ in range(6)]
 		self.tools_pcb    = [tools.tool_pcb()    for _ in range(6)]
 		self.pcbs         = [parts.pcb()         for _ in range(6)]
+		self.baseplates   = [parts.baseplate()   for _ in range(6)]
+		self.sensors      = [parts.sensor()      for _ in range(6)]
 		self.protomodules = [parts.protomodule() for _ in range(6)]
 		self.modules      = [parts.module()      for _ in range(6)]
 		self.tray_component_pcb = tools.tray_component_pcb()
@@ -917,6 +919,8 @@ class func(object):
 				continue
 			temp_pcb = self.pcbs[i]
 			temp_proto = self.protomodules[i]
+			temp_baseplate = self.baseplates[i]
+			temp_sensor = self.sensors[i]
 			temp_module = parts.module()
 			# Check for existence
 			if not temp_module.load(modules[i]):
@@ -933,6 +937,13 @@ class func(object):
 			self.protomodules[i].step_pcb = self.step_pcb.ID
 			self.protomodules[i].module = temp_module.ID
 			self.protomodules[i].save()
+
+			temp_baseplate.load(temp_proto.baseplate)
+			temp_sensor.load(temp_proto.sensor)
+			temp_baseplate.module = temp_module.ID
+			temp_sensor.module = temp_module.ID
+			temp_baseplate.save()
+			temp_sensor.save()
 
 		self.step_pcb.record_insertion_user = str(self.page.cbUserPerformed.currentText()) \
 			if self.page.cbUserPerformed.currentText()!='' else None
