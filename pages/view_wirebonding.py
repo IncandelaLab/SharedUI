@@ -425,9 +425,9 @@ class func(object):
 		# characteristics
 
 		datew = self.page.dWirebondingBack.date().toPyDate()
-		self.module.wirebonding_date_back  = str(datew)
+		self.module.back_bonds_date  = str(datew)
 		datew = self.page.dWirebondingFront.date().toPyDate()
-		self.module.wirebonding_date_front = str(datew)
+		self.module.front_bonds_date = str(datew)
 
 		# comments
 		num_comments = self.page.listComments.count()
