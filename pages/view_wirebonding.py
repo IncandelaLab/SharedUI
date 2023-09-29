@@ -10,7 +10,7 @@ import json
 PAGE_NAME = "view_wirebonding"
 DEBUG = False
 SITE_SEP = ', '
-NO_DATE = [2022,1,1]
+NO_DATE = [2023, 1, 1] #time.localtime()[:3]
 
 INDEX_INSPECTION = {
 	'yes':0,
@@ -103,6 +103,9 @@ class func(object):
 		self.page.pbEdit.clicked.connect(self.startEditing)
 		self.page.pbSave.clicked.connect(self.saveEditing)
 		self.page.pbCancel.clicked.connect(self.cancelEditing)
+
+		self.page.pbBondStartNowBack.clicked.connect(self.bondStartNowBack)
+		self.page.pbBondStartNowFront.clicked.connect(self.bondStartNowFront)
 
 		self.page.pbCureStartNowBack.clicked.connect(self.cureStartNowBack)
 		self.page.pbCureStopNowBack.clicked.connect( self.cureStopNowBack )
@@ -456,16 +459,10 @@ class func(object):
 		self.module.back_encap            = self.page.ckEncapsulationBack.isChecked()
 		self.module.back_encap_user       = str(self.page.cbEncapsulationUserBack.currentText()             ) if str(self.page.cbEncapsulationUserBack.currentText()             ) else None
 		self.module.back_encap_inspxn = str(self.page.cbEncapsulationInspectionBack.currentText()) if str(self.page.cbEncapsulationInspectionBack.currentText()) else None
-		if self.page.dtCureStartBack.date().year() == NO_DATE[0]:
-			self.module.back_encap_cure_start = None
-		else:
-			pydt = self.page.dtCureStartBack.dateTime().toPyDateTime().astimezone(datetime.timezone.utc)
-			self.module.back_encap_cure_start = str(pydt)
-		if self.page.dtCureStopBack.date().year() == NO_DATE[0]:
-			self.module.back_encap_cure_stop = None
-		else:
-			pydt = self.page.dtCureStopBack.dateTime().toPyDateTime().astimezone(datetime.timezone.utc)
-			self.module.back_encap_cure_stop = str(pydt)
+		pydt = self.page.dtCureStartBack.dateTime().toPyDateTime().astimezone(datetime.timezone.utc)
+		self.module.back_encap_cure_start = str(pydt)
+		pydt = self.page.dtCureStopBack.dateTime().toPyDateTime().astimezone(datetime.timezone.utc)
+		self.module.back_encap_cure_stop = str(pydt)
 
 		# test bonds
 		self.module.is_test_bond_module             = self.page.ckTestBonds.isChecked()
@@ -610,6 +607,16 @@ class func(object):
 	def xmlModifiedReset(self):
 		self.xmlModList = []
 
+
+	@enforce_mode('editing')
+	def bondStartNowBack(self, *args, **kwargs):
+		localtime = time.localtime()
+		self.page.dWirebondingBack.setDate(QtCore.QDate(*localtime[0:3]))
+
+	@enforce_mode('editing')
+	def bondStartNowFront(self, *args, **kwargs):
+		localtime = time.localtime()
+		self.page.dWirebondingFront.setDate(QtCore.QDate(*localtime[0:3]))
 
 	@enforce_mode('editing')
 	def cureStartNowBack(self, *args, **kwargs):
