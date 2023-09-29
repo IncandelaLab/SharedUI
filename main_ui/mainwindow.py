@@ -80,6 +80,7 @@ class Ui_MainWindow(object):
         self.vlUISelect.addItem(spacerItem1)
         self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
         self.lineEdit.setEnabled(True)
+        self.lineEdit.setReadOnly(True)
         self.lineEdit.setObjectName("lineEdit")
         self.vlUISelect.addWidget(self.lineEdit)
         self.listAssembly = QtWidgets.QListWidget(self.centralwidget)
