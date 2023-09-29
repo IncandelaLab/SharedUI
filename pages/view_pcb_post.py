@@ -227,6 +227,7 @@ class func(object):
 
 		self.page.listIssues.clear()
 		self.page.leStatus.clear()
+		localtime = time.localtime()
 
 		if self.step_pcb_exists:
 
@@ -234,7 +235,7 @@ class func(object):
 			                (self.step_pcb.cure_end_timestamp,  self.page.dtCureStop)]
 			for st, dt in times_to_set:
 				if st is None:
-					dt.setDate(QtCore.QDate(*NO_DATE))
+					dt.setDate(QtCore.QDate(localtime.tm_year, 1, 1))
 					dt.setTime(QtCore.QTime(0,0,0))
 				else:
 					tm = datetime.datetime.strptime(st, "%Y-%m-%d %H:%M:%S%z")
@@ -279,9 +280,9 @@ class func(object):
 
 		else:
 			self.page.cbInstitution.setCurrentIndex(-1)
-			self.page.dtCureStart.setDate(QtCore.QDate(*NO_DATE))
+			self.page.dtCureStart.setDate(QtCore.QDate(localtime.tm_year, 1, 1))
 			self.page.dtCureStart.setTime(QtCore.QTime(0,0,0))
-			self.page.dtCureStop.setDate(QtCore.QDate(*NO_DATE))
+			self.page.dtCureStop.setDate(QtCore.QDate(localtime.tm_year, 1, 1))
 			self.page.dtCureStop.setTime(QtCore.QTime(0,0,0))
 
 			self.page.dsbCureTemperature.setValue(-1)

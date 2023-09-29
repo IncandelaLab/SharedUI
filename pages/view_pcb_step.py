@@ -318,6 +318,7 @@ class func(object):
 
 		self.page.listIssues.clear()
 		self.page.leStatus.clear()
+		localtime = time.localtime()
 
 		if self.step_pcb_exists:
 
@@ -331,7 +332,7 @@ class func(object):
 			                (self.step_pcb.run_end_timestamp,   self.page.dtRunStop)]
 			for st, dt in times_to_set:
 				if st is None:
-					dt.setDate(QtCore.QDate(*NO_DATE))
+					dt.setDate(QtCore.QDate(localtime.tm_year, 1, 1))
 					dt.setTime(QtCore.QTime(0,0,0))
 				else:
 					tm = datetime.datetime.strptime(st, "%Y-%m-%d %H:%M:%S%z")
@@ -408,9 +409,9 @@ class func(object):
 
 		else:
 			self.page.cbUserPerformed.setCurrentIndex(-1)
-			self.page.dtRunStart.setDate(QtCore.QDate(*NO_DATE))
+			self.page.dtRunStart.setDate(QtCore.QDate(localtime.tm_year, 1, 1))
 			self.page.dtRunStart.setTime(QtCore.QTime(0,0,0))
-			self.page.dtRunStop.setDate(QtCore.QDate(*NO_DATE))
+			self.page.dtRunStop.setDate(QtCore.QDate(localtime.tm_year, 1, 1))
 			self.page.dtRunStop.setTime(QtCore.QTime(0,0,0))
 
 			self.page.leBatchAraldite.setText("")
