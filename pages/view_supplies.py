@@ -1,5 +1,6 @@
 from PyQt5 import QtCore
 from filemanager import supplies
+import time
 
 PAGE_NAME = "view_supplies"
 #OBJECTTYPE = "sensor_step"
@@ -73,9 +74,10 @@ class simple_fsobj_vc(object):
 
 		else:
 			self.pbEditNew.setText("new")
+			localtime = time.localtime()
 			if self.dReceived != None:
-				self.dReceived.setDate(QtCore.QDate(2020,1,1))
-				self.dExpires.setDate(QtCore.QDate(2020,1,1))
+				self.dReceived.setDate(QtCore.QDate(localtime.tm_year,1,1))
+				self.dExpires.setDate(QtCore.QDate(localtime.tm_year,1,1))
 
 			self.ckIsEmpty.setChecked(False)
 			if not self.leCuring is None:
