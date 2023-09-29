@@ -270,6 +270,12 @@ class func(object):
 		self.page.pbGoPcb.setEnabled(          mode_view and pcb_exists           )
 		self.page.pbGoProtomodule.setEnabled(  mode_view and protomodule_exists   )
 
+		self.page.dsbOffsetTranslationX.setReadOnly( not mode_editing )
+		self.page.dsbOffsetTranslationY.setReadOnly( not mode_editing )
+		self.page.dsbOffsetRotation.setReadOnly(     not mode_editing )
+		self.page.dsbFlatness.setReadOnly(           not mode_editing )
+		self.page.dsbThickness.setReadOnly(          not mode_editing )
+
 		# comments
 		self.page.pbDeleteComment.setEnabled(mode_editing)
 		self.page.pbAddComment.setEnabled(   mode_editing)
@@ -319,7 +325,6 @@ class func(object):
 	def saveEditing(self,*args,**kwargs):
 		# characteristics
 		self.module.record_insertion_user  = str(self.page.cbInsertUser.currentText())  if str(self.page.cbInsertUser.currentText())  else None
-		#self.module.institution_location        = str(self.page.leLocation.text()        ) if str(self.page.leLocation.text())             else None
 		self.module.location     = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
 		self.module.final_inspxn_ok      = str(self.page.cbInspection.currentText())  if str(self.page.cbInspection.currentText())  else None
 

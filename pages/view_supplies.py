@@ -1,5 +1,6 @@
 from PyQt5 import QtCore
 from filemanager import supplies
+import time
 
 PAGE_NAME = "view_supplies"
 #OBJECTTYPE = "sensor_step"
@@ -19,7 +20,8 @@ class simple_fsobj_vc(object):
 		pteWriteComment,
 		pbDeleteComment,
 		pbAddComment,
-		leCuring=None
+		leCuring=None,
+		ckNoExpiry=None
 		):
 
 		self.fsobj_exists    = None
@@ -36,6 +38,7 @@ class simple_fsobj_vc(object):
 		self.pbDeleteComment = pbDeleteComment
 		self.pbAddComment    = pbAddComment
 		self.leCuring        = leCuring  # None if nonexistent
+		self.ckNoExpiry      = ckNoExpiry
 
 	def update_info(self,ID=None,*args,**kwargs):
 		if ID is None:
@@ -62,6 +65,8 @@ class simple_fsobj_vc(object):
 				self.dExpires .setDate(QtCore.QDate(int(ydm[2]), int(ydm[0]), int(ydm[1])))   #*self.fsobj.date_expires))
 
 			self.ckIsEmpty.setChecked(self.fsobj.is_empty)
+			if not self.ckNoExpiry is None:
+				self.ckNoExpiry.setChecked(self.fsobj.no_expiry if not self.fsobj.no_expiry is None else False)
 
 			if not self.leCuring is None:
 				self.leCuring.setText(self.fsobj.curing_agent)
@@ -74,8 +79,9 @@ class simple_fsobj_vc(object):
 		else:
 			self.pbEditNew.setText("new")
 			if self.dReceived != None:
-				self.dReceived.setDate(QtCore.QDate(2020,1,1))
-				self.dExpires.setDate(QtCore.QDate(2020,1,1))
+				localtime = time.localtime()
+				self.dReceived.setDate(QtCore.QDate(*localtime[0:3]))
+				self.dExpires.setDate(QtCore.QDate(*localtime[0:3]))
 
 			self.ckIsEmpty.setChecked(False)
 			if not self.leCuring is None:
@@ -91,6 +97,10 @@ class simple_fsobj_vc(object):
 				self.fsobj.new(self.sbID.text())
 			else:
 				self.fsobj.new(self.sbID.value())
+			# if creating new part, auto-set date to current
+			localtime = time.localtime()
+			self.dReceived.setDate(QtCore.QDate(*localtime[0:3]))
+			self.dExpires.setDate(QtCore.QDate(*localtime[0:3]))
 
 		return True
 
@@ -108,6 +118,8 @@ class simple_fsobj_vc(object):
 			self.fsobj.date_received = "{}-{}-{}".format(dateR.month(), dateR.day(), dateR.year())
 			dateE = self.dExpires.date()
 			self.fsobj.date_expires  = "{}-{}-{}".format(dateE.month(), dateE.day(), dateE.year())
+		if self.ckNoExpiry != None:
+			self.fsobj.no_expiry = self.ckNoExpiry.isChecked()
 
 		self.fsobj.is_empty = self.ckIsEmpty.isChecked()
 		if not self.leCuring is None:
@@ -127,6 +139,10 @@ class simple_fsobj_vc(object):
 		index = self.listComments.currentRow()
 		if index >= 0:
 			self.listComments.takeItem(index)
+
+	def update_expiry(self,*args,**kwargs):
+		self.fsobj.no_expiry = self.ckNoExpiry.isChecked()
+		self.dExpires.setEnabled(not self.fsobj.no_expiry)
 
 
 class func(object):
@@ -209,6 +225,7 @@ class func(object):
 			self.page.pteTape50WriteComment,
 			self.page.pbTape50DeleteComment,
 			self.page.pbTape50AddComment,
+			ckNoExpiry=self.page.ckNoExpiry50,
 			)
 
 		self.batch_tape_120 = simple_fsobj_vc(
@@ -224,6 +241,7 @@ class func(object):
 			self.page.pteTape120WriteComment,
 			self.page.pbTape120DeleteComment,
 			self.page.pbTape120AddComment,
+			ckNoExpiry=self.page.ckNoExpiry120,
 			)
 
 		self.mode = 'setup'
@@ -314,6 +332,8 @@ class func(object):
 		self.page.pbTape50AddComment.clicked.connect(self.add_comment_batch_tape_50)
 		self.page.pbTape120AddComment.clicked.connect(self.add_comment_batch_tape_120)
 
+		self.page.ckNoExpiry50.toggled.connect(self.update_expiry_50)
+		self.page.ckNoExpiry120.toggled.connect(self.update_expiry_120)
 
 	@enforce_mode(['view','editing_batch_wedge','editing_batch_sylgard','editing_batch_bond_wire',
                    'editing_batch_tape_50','editing_batch_tape_120'])
@@ -344,7 +364,14 @@ class func(object):
                    'editing_batch_bond_wire','editing_batch_tape_50'])
 	def update_info_batch_tape_120(self,ID=None,*args,**kwargs):
 		self.batch_tape_120.update_info(ID)
-	
+
+	def update_expiry_50(self,ID=None,*args,**kwargs):
+		self.batch_tape_50.update_expiry()
+
+	def update_expiry_120(self,ID=None,*args,**kwargs):
+		self.batch_tape_120.update_expiry()
+
+
 	@enforce_mode('view')
 	def update_info(self,*args,**kwargs):
 		self.update_info_batch_araldite()
@@ -407,8 +434,10 @@ class func(object):
 		self.page.dWedgeExpires.setEnabled(mode_editing_batch_wedge)
 		self.page.dSylgardExpires.setEnabled(mode_editing_batch_sylgard)
 		self.page.dBondWireExpires.setEnabled(mode_editing_batch_bond_wire)
-		self.page.dTape50Expires.setEnabled(mode_editing_batch_tape_50)
-		self.page.dTape120Expires.setEnabled(mode_editing_batch_tape_120)
+		self.page.dTape50Expires.setEnabled(mode_editing_batch_tape_50 \
+            and self.batch_tape_50.fsobj.no_expiry!=True)
+		self.page.dTape120Expires.setEnabled(mode_editing_batch_tape_120 \
+            and self.batch_tape_120.fsobj.no_expiry!=True)
 
 		self.page.ckIsAralditeEmpty.setEnabled(mode_editing_batch_araldite)
 		self.page.ckIsWedgeEmpty.setEnabled(mode_editing_batch_wedge)
@@ -440,6 +469,8 @@ class func(object):
 		self.page.pteTape50WriteComment.setEnabled(mode_editing_batch_tape_50)
 		self.page.pteTape120WriteComment.setEnabled(mode_editing_batch_tape_120)
 
+		self.page.ckNoExpiry50.setEnabled(mode_editing_batch_tape_50)
+		self.page.ckNoExpiry120.setEnabled(mode_editing_batch_tape_120)
 
 
 	@enforce_mode('view')

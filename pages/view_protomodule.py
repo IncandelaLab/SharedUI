@@ -275,14 +275,11 @@ class func(object):
 	@enforce_mode('editing')
 	def saveEditing(self,*args,**kwargs):
 
-		# NOTE:  None of these should be edited
-		#self.protomodule.record_insertion_user = str(self.page.cbInsertUser.currentText() ) if str(self.page.cbInsertUser.currentText())  else None
-		#self.protomodule.location    = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
-		#self.protomodule.channel_density   = str(self.page.cbType.currentText()      ) if str(self.page.cbType.currentText()    ) e    lse None
-		#self.protomodule.geometry          = str(self.page.cbShape.currentText()      ) if str(self.page.cbShape.currentText()    ) else None
-		#self.protomodule.grade          = str(self.page.cbGrade.currentText()      ) if str(self.page.cbGrade.currentText()    ) else None
-		#self.protomodule.thickness      =     self.page.dsbThickness.value()         if self.page.dsbThickness.value() >=0 else None
-		#self.protomodule.channels       =     self.page.sbChannels.value()           if self.page.sbChannels.value()   >=0 else None
+		self.protomodule.pcb_plcment_x_offset = self.page.dsbOffsetTranslationX.value() if self.page.dsbOffsetTranslationX.value() >=0 else None 
+		self.protomodule.pcb_plcment_y_offset = self.page.dsbOffsetTranslationY.value() if self.page.dsbOffsetTranslationY.value() >=0 else None 
+		self.protomodule.offset_rotation      = self.page.dsbOffsetRotation.value()    if self.page.dsbOffsetRotation.value()    >=0 else None   
+		self.protomodule.flatness = self.page.dsbFlatness.value()    if self.page.dsbFlatness.value()    >=0 else None
+		self.protomodule.thickness = self.page.dsbThickness.value()    if self.page.dsbThickness.value()    >=0 else None
 
 		num_comments = self.page.listComments.count()
 		self.protomodule.comments = ';;'.join([self.page.listComments.item(i).text() for i in range(num_comments)])

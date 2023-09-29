@@ -663,7 +663,7 @@ class func(object):
 				issues.append(I_TAPE_50_DNE)
 			else:
 				objects.append(self.batch_tape_50)
-				if not (self.batch_tape_50.date_expires is None):
+				if not (self.batch_tape_50.date_expires is None and not self.batch_tape_50.no_expiry):
 					ydm =  self.batch_tape_50.date_expires.split('-')
 					expires = QtCore.QDate(int(ydm[2]), int(ydm[0]), int(ydm[1]))   # ymd format for constructor
 					if QtCore.QDate.currentDate() > expires:
@@ -675,7 +675,7 @@ class func(object):
 				issues.append(I_TAPE_120_DNE)
 			else:
 				objects.append(self.batch_tape_120)
-				if not (self.batch_tape_120.date_expires is None):
+				if not (self.batch_tape_120.date_expires is None and not self.batch_tape_120.no_expiry):
 					ydm =  self.batch_tape_120.date_expires.split('-')
 					expires = QtCore.QDate(int(ydm[2]), int(ydm[0]), int(ydm[1]))   # ymd format for constructor
 					if QtCore.QDate.currentDate() > expires:

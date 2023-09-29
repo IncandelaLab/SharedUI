@@ -655,7 +655,7 @@
      <property name="geometry">
       <rect>
        <x>1</x>
-       <y>40</y>
+       <y>20</y>
        <width>171</width>
        <height>21</height>
       </rect>
@@ -716,7 +716,7 @@
      <property name="geometry">
       <rect>
        <x>170</x>
-       <y>40</y>
+       <y>20</y>
        <width>111</width>
        <height>21</height>
       </rect>
@@ -742,7 +742,7 @@
      <property name="geometry">
       <rect>
        <x>170</x>
-       <y>20</y>
+       <y>40</y>
        <width>111</width>
        <height>21</height>
       </rect>
@@ -762,7 +762,7 @@
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>20</y>
+       <y>40</y>
        <width>171</width>
        <height>21</height>
       </rect>
@@ -804,6 +804,19 @@
      </property>
      <property name="maximum">
       <number>18</number>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pbBondStartNowBack">
+     <property name="geometry">
+      <rect>
+       <x>180</x>
+       <y>60</y>
+       <width>91</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>set to now</string>
      </property>
     </widget>
    </widget>
@@ -1123,7 +1136,7 @@
      <property name="geometry">
       <rect>
        <x>1</x>
-       <y>40</y>
+       <y>20</y>
        <width>181</width>
        <height>21</height>
       </rect>
@@ -1217,7 +1230,7 @@
      <property name="geometry">
       <rect>
        <x>180</x>
-       <y>40</y>
+       <y>20</y>
        <width>101</width>
        <height>21</height>
       </rect>
@@ -1243,7 +1256,7 @@
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>20</y>
+       <y>40</y>
        <width>171</width>
        <height>21</height>
       </rect>
@@ -1259,7 +1272,7 @@
      <property name="geometry">
       <rect>
        <x>170</x>
-       <y>20</y>
+       <y>40</y>
        <width>111</width>
        <height>21</height>
       </rect>
@@ -1289,6 +1302,19 @@
      </property>
      <property name="wordWrap">
       <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pbBondStartNowFront">
+     <property name="geometry">
+      <rect>
+       <x>180</x>
+       <y>60</y>
+       <width>91</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>set to now</string>
      </property>
     </widget>
    </widget>
