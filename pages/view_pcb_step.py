@@ -36,8 +36,8 @@ I_BATCH_ARALDITE_DNE     = "araldite batch does not exist or is not selected"
 I_BATCH_ARALDITE_EXPIRED = "araldite batch has expired"
 I_TAPE_50_DNE = "50um tape batch does not exist or is not selected"
 I_TAPE_50_EXPIRED = "50um tape batch has expired"
-I_TAPE_120_DNE = "120um tape batch does not exist or is not selected"
-I_TAPE_120_EXPIRED = "120um tape batch has expired"
+I_TAPE_120_DNE = "125um tape batch does not exist or is not selected"
+I_TAPE_120_EXPIRED = "125um tape batch has expired"
 I_TAPE_DNE = "at least one tape batch is required"
 I_ADHESIVE_NOT_SELECTED = "no adhesive type is selected"
 
@@ -77,7 +77,7 @@ I_USER_DNE = "no pcb step user selected"
 # supply batch empty
 I_BATCH_ARALDITE_EMPTY = "araldite batch is empty"
 I_TAPE_50_EMPTY = "50um tape batch is empty"
-I_TAPE_120_EMPTY = "120um tape batch is empty"
+I_TAPE_120_EMPTY = "125um tape batch is empty"
 
 # NEW
 I_INSTITUTION_NOT_SELECTED = "no institution selected"
@@ -348,14 +348,19 @@ class func(object):
 				self.page.leBatchAraldite.setText("")
 				self.page.leTape50.setText("")
 				self.page.leTape120.setText("")
-			elif self.step_pcb.glue_batch_num != None:
+			elif self.step_pcb.glue_batch_num != None and self.step_pcb.batch_tape_120 is None:
 				self.page.cbAdhesive.setCurrentIndex(0)
 				self.page.leBatchAraldite.setText(self.step_pcb.glue_batch_num)
 				self.page.leTape50.setText("")
 				self.page.leTape120.setText("")
-			else:
+			elif self.step_pcb.glue_batch_num is None and self.step_pcb.batch_tape_120 != None:
 				self.page.cbAdhesive.setCurrentIndex(1)
 				self.page.leBatchAraldite.setText("")
+				self.page.leTape50.setText(self.step_pcb.batch_tape_50)
+				self.page.leTape120.setText(self.step_pcb.batch_tape_120)
+			else:  # Hybrid
+				self.page.cbAdhesive.setCurrentIndex(2)
+				self.page.leBatchAraldite.setText(self.step_pcb.glue_batch_num)
 				self.page.leTape50.setText(self.step_pcb.batch_tape_50)
 				self.page.leTape120.setText(self.step_pcb.batch_tape_120)
 			#self.page.leBatchAraldite.setText(self.step_pcb.glue_batch_num if not (self.step_pcb.glue_batch_num is None) else "")
@@ -464,18 +469,18 @@ class func(object):
 		#self.page.sbTrayAssembly   .setReadOnly(mode_view or mode_searching)
 		self.page.cbAdhesive   .setEnabled(not (mode_view or mode_searching))
 
-		self.page.leBatchAraldite  .setReadOnly(mode_view or mode_searching)
-		self.page.leTextAraldite.setEnabled(not (mode_view or mode_searching or adhesive!="Araldite"))
-		self.page.leTape50      .setEnabled(not (mode_view or mode_searching or adhesive!="Tape"))
-		self.page.leTextTape50  .setEnabled(not (mode_view or mode_searching or adhesive!="Tape"))
-		self.page.leTape120     .setEnabled(not (mode_view or mode_searching or adhesive!="Tape"))
-		self.page.leTextTape120 .setEnabled(not (mode_view or mode_searching or adhesive!="Tape"))
+		self.page.leBatchAraldite  .setReadOnly(mode_view or mode_searching or (adhesive!="Araldite" and adhesive!="Hybrid"))
+		self.page.leTextAraldite.setEnabled(not (mode_view or mode_searching or (adhesive!="Araldite" and adhesive!="Hybrid")))
+		self.page.leTape50      .setReadOnly(mode_view or mode_searching or (adhesive!="Tape" and adhesive!="Hybrid"))
+		self.page.leTextTape50  .setEnabled(not (mode_view or mode_searching or (adhesive!="Tape" and adhesive!="Hybrid")))
+		self.page.leTape120     .setReadOnly(mode_view or mode_searching or (adhesive!="Tape" and adhesive!="Hybrid"))
+		self.page.leTextTape120 .setEnabled(not (mode_view or mode_searching or (adhesive!="Tape" and adhesive!="Hybrid")))
 
 		self.page.pbGoTrayComponent.setEnabled(mode_view and self.page.sbTrayComponent.value() >= 0)
 		#self.page.pbGoTrayAssembly .setEnabled(mode_view and self.page.sbTrayAssembly .value() >= 0)
-		self.page.pbGoBatchAraldite.setEnabled((mode_creating or (mode_view and self.page.leBatchAraldite.text() != "")) and adhesive == "Araldite")
-		self.page.pbGoTape50.setEnabled((mode_creating or (mode_view and self.page.leTape50.text() != "")) and adhesive == "Tape")
-		self.page.pbGoTape120.setEnabled((mode_creating or (mode_view and self.page.leTape120.text() != "")) and adhesive == "Tape")
+		self.page.pbGoBatchAraldite.setEnabled((mode_creating or mode_editing or (mode_view and self.page.leBatchAraldite.text() != "")) and (adhesive == "Araldite" or adhesive == "Hybrid"))
+		self.page.pbGoTape50.setEnabled((mode_creating or mode_editing or (mode_view and self.page.leTape50.text() != "")) and (adhesive == "Araldite" or adhesive == "Hybrid"))
+		self.page.pbGoTape120.setEnabled((mode_creating or mode_editing or (mode_view and self.page.leTape120.text() != "")) and (adhesive == "Araldite" or adhesive == "Hybrid"))
 
 		for i in range(6):
 			self.sb_tray_assemblys[i].setReadOnly(mode_view)
@@ -636,7 +641,11 @@ class func(object):
 		if adhesive == "Tape":
 			# clear araldite
 			self.page.leBatchAraldite.clear()
-		else:  # Araldite
+		elif adhesive == "Araldite":  # Araldite
+			self.page.leTape50.clear()
+			self.page.leTape120.clear()
+		else:
+			self.page.leBatchAraldite.clear()
 			self.page.leTape50.clear()
 			self.page.leTape120.clear()
 		self.updateElements()
@@ -678,6 +687,45 @@ class func(object):
 					issues.append(I_BATCH_ARALDITE_EMPTY)
 
 		elif self.page.cbAdhesive.currentText() == "Tape":
+			if self.batch_tape_50.ID is None and self.batch_tape_120.ID is None \
+			  and self.page.leTape50.text() != "" and self.page.leTape120.text() != "":
+				issues.append(I_TAPE_DNE)
+
+			if self.batch_tape_50.ID is None and self.page.leTape50.text() != "":
+				issues.append(I_TAPE_50_DNE)
+			else:
+				objects.append(self.batch_tape_50)
+				if not (self.batch_tape_50.date_expires is None or self.batch_tape_50.no_expiry == True):
+					ydm =  self.batch_tape_50.date_expires.split('-')
+					expires = QtCore.QDate(int(ydm[2]), int(ydm[0]), int(ydm[1]))   # ymd format for c     onstructor
+					if QtCore.QDate.currentDate() > expires:
+						issues.append(I_TAPE_50_EXPIRED)
+				if self.batch_tape_50.is_empty:
+					issues.append(I_TAPE_50_EMPTY)
+
+			if self.batch_tape_120.ID is None:
+				issues.append(I_TAPE_120_DNE)
+			else:
+				objects.append(self.batch_tape_120)
+				if not (self.batch_tape_120.date_expires is None or self.batch_tape_120.no_expiry == True):
+					ydm =  self.batch_tape_120.date_expires.split('-')
+					expires = QtCore.QDate(int(ydm[2]), int(ydm[0]), int(ydm[1]))   # ymd format for c     onstructor
+					if QtCore.QDate.currentDate() > expires:
+						issues.append(I_TAPE_120_EXPIRED)
+				if self.batch_tape_120.is_empty:
+					issues.append(I_TAPE_120_EMPTY)
+		elif self.page.cbAdhesive.currentText() == "Hybrid":
+			if self.batch_araldite.ID is None:
+				issues.append(I_BATCH_ARALDITE_DNE)
+			else:
+				objects.append(self.batch_araldite)
+				if not (self.batch_araldite.date_expires is None):
+					ydm = self.batch_araldite.date_expires.split('-')
+					expires = QtCore.QDate(int(ydm[2]), int(ydm[0]), int(ydm[1]))  #datetime.date(*self.batch_araldite.date_expires)
+					if QtCore.QDate.currentDate() > expires:
+						issues.append(I_BATCH_ARALDITE_EXPIRED)
+				if self.batch_araldite.is_empty:
+					issues.append(I_BATCH_ARALDITE_EMPTY)
 			if self.batch_tape_50.ID is None and self.batch_tape_120.ID is None \
 			  and self.page.leTape50.text() != "" and self.page.leTape120.text() != "":
 				issues.append(I_TAPE_DNE)

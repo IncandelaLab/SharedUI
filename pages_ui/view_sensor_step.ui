@@ -1507,6 +1507,11 @@ before assembly</string>
       <string>Tape</string>
      </property>
     </item>
+    <item>
+     <property name="text">
+      <string>Hybrid</string>
+     </property>
+    </item>
    </widget>
    <widget class="QLineEdit" name="lineEdit_33">
     <property name="geometry">
