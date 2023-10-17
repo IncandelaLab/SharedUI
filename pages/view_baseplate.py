@@ -8,6 +8,7 @@ DEBUG = False
 INDEX_MATERIAL = {
 	'CuW/Kapton':0,
 	'PCB/Kapton':1,
+	'CF/Kapton' :2,
 }
 
 INDEX_SHAPE = {
@@ -173,7 +174,7 @@ class func(object):
 		if self.page.dsbFlatness.value() == -1: self.page.dsbFlatness.clear()
 		self.page.cbGrade         .setCurrentIndex(INDEX_GRADE      .get(self.baseplate.grade          , -1))
 
-		"""if self.baseplate.step_sensor:
+		if self.baseplate.step_sensor:
 			tmp_inst, tmp_id = self.baseplate.step_sensor.split("_")
 			self.page.sbStepSensor.setValue(int(tmp_id))
 			self.page.cbInstitutionStep.setCurrentIndex(INDEX_INSTITUTION.get(tmp_inst, -1))
@@ -183,7 +184,7 @@ class func(object):
 		if self.page.sbStepSensor.value() == -1: self.page.sbStepSensor.clear()
 		self.page.leProtomodule.setText("" if self.baseplate.protomodule is None else self.baseplate.protomodule)
 		self.page.leModule.setText(     "" if self.baseplate.module      is None else self.baseplate.module)
-		"""
+
 		self.updateElements()
 
 
@@ -192,11 +193,11 @@ class func(object):
 		self.page.leStatus.setText(self.mode)
 
 		baseplate_exists = self.baseplate_exists
-		"""step_sensor_exists   = self.page.sbStepSensor.value() >= 0 and \
+		step_sensor_exists   = self.page.sbStepSensor.value() >= 0 and \
 		                       self.page.cbInstitutionStep.currentText() != ""
 		protomodule_exists   = self.page.leProtomodule.text() != ""
 		module_exists        = self.page.leModule.text()      != ""
-		"""
+		
 		mode_view     = self.mode == 'view'
 		mode_editing  = self.mode == 'editing'
 		mode_creating = self.mode == 'creating'
@@ -228,10 +229,10 @@ class func(object):
 		self.page.pbAddComment.setEnabled(      mode_creating or mode_editing  )
 		self.page.pteWriteComment.setEnabled(   mode_creating or mode_editing  )
 
-		"""self.page.pbGoStepSensor.setEnabled(    mode_view and step_sensor_exists)
+		self.page.pbGoStepSensor.setEnabled(    mode_view and step_sensor_exists)
 		self.page.pbGoProtomodule.setEnabled(   mode_view and protomodule_exists)
 		self.page.pbGoModule.setEnabled(        mode_view and module_exists)
-		"""
+		
 
 
 	# NEW:

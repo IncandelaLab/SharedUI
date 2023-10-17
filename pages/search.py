@@ -228,10 +228,20 @@ and l.LOCATION_NAME like \'{}\'"*"*".format(pt_query, search_criteria['location_
 
 		for serial, typ in localList.items(): # serial: type
 			self.page.lwPartList.addItem(serial+" (not uploaded to DB)")
-			self.page.lwTypeList.addItem(typ)
+			# self.page.lwTypeList.addItem(typ)
 		for serial, typ in remoteList.items():
 			self.page.lwPartList.addItem(serial)
-			self.page.lwTypeList.addItem(typ)
+			# self.page.lwTypeList.addItem(typ)
+		
+  		# Sort search results
+		self.page.lwPartList.sortItems()
+		for row in range(self.page.lwPartList.count()):
+			if self.page.lwPartList.item(row).text().find(" (not uploaded to DB)"):
+				serial = self.page.lwPartList.item(row).text().split(" (not uploaded to DB)")[0]
+				self.page.lwTypeList.addItem(localList[serial])
+			else:
+				serial = self.page.lwPartList.item(row).text()
+				self.page.lwTypeList.addItem(remoteList[serial])
 		self.page.leStatus.setText("Results found!")
 
 	def goToPart(self,*args,**kwargs):

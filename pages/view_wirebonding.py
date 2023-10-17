@@ -169,7 +169,8 @@ class func(object):
 						(self.module.front_bonds_date, self.page.dWirebondingFront)]
 		for st, dt in dates_to_set:
 			if st is None:
-				dt.setDate(QtCore.QDate(*NO_DATE))
+				localtime = time.localtime()
+				dt.setDate(QtCore.QDate(localtime.tm_year, 1, 1))
 			else:
 				tm = datetime.datetime.strptime(st, "%Y-%m-%d")
 				dat = QtCore.QDate(tm.year, tm.month, tm.day)
@@ -222,7 +223,8 @@ class func(object):
 						(self.module.front_encap_cure_stop, self.page.dtCureStopFront)]
 		for st, dt in times_to_set:
 			if st is None:
-				dt.setDate(QtCore.QDate(*NO_DATE))
+				localtime = time.localtime()
+				dt.setDate(QtCore.QDate(localtime.tm_year, 1, 1))
 				dt.setTime(QtCore.QTime(0,0,0))
 			else:
 				tm = datetime.datetime.strptime(st, "%Y-%m-%d %H:%M:%S%z")
@@ -532,6 +534,8 @@ class func(object):
 				self.loadBatchBondWire()
 			elif self.search_part == 'batch_wedge':
 				self.loadBatchWedge()
+		# Sort search results
+		self.page.lwPartList.sortItems()
 
 		self.page.leSearchStatus.setText("Searched: "+self.search_part)
 		self.mode = 'searching'

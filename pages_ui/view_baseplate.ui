@@ -232,6 +232,11 @@
       <string>PCB/Kapton</string>
      </property>
     </item>
+    <item>
+     <property name="text">
+      <string>CF/Kapton</string>
+     </property>
+    </item>
    </widget>
    <widget class="QLineEdit" name="lineEdit_39">
     <property name="geometry">

@@ -78,6 +78,7 @@ class simple_fsobj_vc(object):
 
 		else:
 			self.pbEditNew.setText("new")
+			localtime = time.localtime()
 			if self.dReceived != None:
 				localtime = time.localtime()
 				self.dReceived.setDate(QtCore.QDate(*localtime[0:3]))
