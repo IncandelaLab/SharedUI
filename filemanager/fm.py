@@ -334,6 +334,8 @@ class fsobj(object):
 	# NEW:  If obj has XML template files, write them.
 	def generate_xml(self):
 		# save():  Required so it calls add_part_to_list (for filedir_filename)
+		print("FM:  Generating XML")
+		print("XML templates are:", self.XML_TEMPLATES)
 		self.save()
 		filedir, filename = self.get_filedir_filename()
 		for template in self.XML_TEMPLATES:
@@ -347,6 +349,7 @@ class fsobj(object):
 			template_file_name = os.path.basename(template_file)
 			outfile = filename.replace(".json", "") + "_" + template_file_name
 			with open(os.sep.join([filedir, outfile]), 'w') as file:
+				print("Writing to", os.sep.join([filedir, outfile]))
 				file.write(rendered)
 
 	# Return all XML files to upload (full filepath)
