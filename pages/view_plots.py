@@ -83,7 +83,7 @@ class simple_fsobj_pt(object):  # from tools
 
 		# comments
 		self.listComments.clear()
-		for comment in self.fsobj_pt.comments:
+		for comment in self.fsobj_pt.comments.split(';;'):
 			self.listComments.addItem(comment)
 		self.pteWriteComment.clear()
 
