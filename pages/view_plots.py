@@ -84,7 +84,8 @@ class simple_fsobj_pt(object):  # from tools
 		# comments
 		self.listComments.clear()
 		for comment in self.fsobj_pt.comments.split(';;'):
-			self.listComments.addItem(comment)
+			if comment != '':
+				self.listComments.addItem(comment)
 		self.pteWriteComment.clear()
 
 
@@ -122,9 +123,8 @@ class simple_fsobj_pt(object):  # from tools
 
 	def save_editing(self,*args,**kwargs):
 		# comments
-		self.fsobj_pt.comments = []
-		for i in range(self.listComments.count()):
-			self.fsobj_pt.comments.append(str(self.listComments.item(i).text()))
+		num_comments = self.listComments.count()
+		self.fsobj_pt.comments = ';;'.join([self.listComments.item(i).text() for i in range(num_comments)])
 
 		files = []
 		for i in range(self.listFiles.count()):
