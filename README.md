@@ -50,6 +50,10 @@ Note that protomodules and modules are automatically created by the sensor place
 
 Currently, parts (baseplates, sensors, etc) can only be created locally, as DB communication has not been implemented yet.  After the API is ready, however, all baseplates, sensors, and PCBs should be entered into the DB prior to being shipped to MACs, and they must be downloaded by the GUI before they can be used for assembly.  Creation of those parts with the GUI will be disabled.
 
+#### ***Error supplies cannot be loaded (fixed in commits on Nov 18, 2023)***
+
+There was an error that the Supplies page cannot load the items with their IDs. It was caused by the incorrect file format of the locally stored data files. This only happened to the supplies: if you created them before this error was fixed (without the commits on Nov 18, 2023), the files stored in ```filemanager_data/supplies``` would be xml files instead of json files. This error can be fixed by going to the Supplies page and loading the items again, which will rename the xml files to json files. Note that loading supplies requires the original IDs of the supplies when they were first created, you can find them in ```filemanager_data/partlist/batch_xxx.json``` (```xxx``` stands for the name of the supplies) -- the keyword strings are the IDs.
+
 ### Production steps and testing routines
 
 Once all necessary information in the parts, tooling, and supplies section has been filled in, you can proceed to the production steps.  The production step pages are broadly similar to the previous ones, but with one major difference:  the data will be automatically checked for errors, and if any are found, a message explaining the problem will appear in the status box.  (For instance, entering in a nonexistent part or partially filling a row will produce errors.)  Once all errors have been resolved, you can save the step.
