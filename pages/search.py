@@ -1,9 +1,10 @@
 from PyQt5 import QtCore
+from PyQt5.QtWidgets import QComboBox, QCheckBox
 import time
 import datetime
 import os
 import json
-from filemanager import fm, parts
+from filemanager import fm, parts, tools, supplies
 
 PAGE_NAME = "search"
 DEBUG = False
@@ -16,6 +17,8 @@ PAGE_NAME_DICT = {
 	'PCB':         'PCBs',
 	'Protomodule': 'Protomodules',
 	'Module':      'Modules',
+	'Tool':        'Tooling',
+	'Supply':      'Supplies'
 }
 
 PART_DICT = {
@@ -23,8 +26,26 @@ PART_DICT = {
 	'Sensor':      parts.sensor,
 	'PCB':         parts.pcb,
 	'Protomodule': parts.protomodule,
-	'Module':      parts.module,
+	'Module':      parts.module
 }
+
+TOOL_SUPPLY_DICT = {
+    # tools
+	'Sensor tool'           : tools.tool_sensor,
+	'PCB tool'              : tools.tool_pcb,
+	'Assembly tray'         : tools.tray_assembly,
+	'Sensor component tray' : tools.tray_component_sensor,
+	'PCB component tray'    : tools.tray_component_pcb,
+	# supplies
+	'Araldite batch'        : supplies.batch_araldite,
+	'Wedge batch'           : supplies.batch_wedge,
+	'Sylgard batch'         : supplies.batch_sylgard,
+	'Bond wire batch'       : supplies.batch_bond_wire,
+	'Transfer tape 50um'    : supplies.batch_tape_50,
+	'Transfer tape 125um'   : supplies.batch_tape_120
+}
+
+TOOL_SUPPLY_OBJNAME_CLSNAME = {}
 
 PART_NAME_DICT = {
 	'Baseplate':  '{mat_type} Baseplate {channel_density} {geometry}',
@@ -88,6 +109,7 @@ class func(object):
 		print("{} setup completed".format(PAGE_NAME))
 
 	def rig(self):
+		# search for parts
 		self.page.pbSearch.clicked.connect(self.search)
 
 		self.page.cbPartType.currentIndexChanged.connect( self.updateElements )
@@ -98,6 +120,16 @@ class func(object):
 		self.page.pbClearResults.clicked.connect( self.clearResults )
 		self.page.pbGoToPart.clicked.connect( self.goToPart )
 
+		# search for tools and supplies
+		self.page.pbSearch_2.clicked.connect(self.search_tool_supply)
+		self.page.cbToolSupplyType.currentIndexChanged.connect( self.updateElements )
+		self.page.ckEmpty.stateChanged.connect( self.updateElements )
+		self.page.ckExpired.stateChanged.connect( self.updateElements )
+
+		self.page.pbClearParams_2.clicked.connect( self.clearParams_tool_supply )
+
+		self.page.pbClearResults_2.clicked.connect( self.clearResults_tool_supply )
+		self.page.pbGoToToolSupply.clicked.connect( self.goToToolSupply )
 		self.updateElements()
 
 	def search(self, *args, **kwargs):  # WIP WIP WIP
@@ -188,8 +220,57 @@ and l.LOCATION_NAME like \'{}\'"*"*".format(pt_query, search_criteria['location_
 
 		self.displayResults(found_local_parts, found_remote_parts)
 
+	def search_tool_supply(self, *args, **kwargs):
+		self.clearResults_tool_supply()
 
+		tool_supply_type = self.page.cbToolSupplyType.currentText()
+		tool_supply_temp = TOOL_SUPPLY_DICT[tool_supply_type]()
+		
+		search_dict = {
+			self.page.cbInstitutionTool : 'institution',
+			self.page.ckEmpty           : 'is_empty',
+			self.page.ckExpired         : 'is_expired'
+		}
+    
+		search_criteria = {}
+		for wdgt, qty in search_dict.items():
+			if wdgt.isEnabled():
+				if isinstance(wdgt, QComboBox):
+					search_criteria[qty] = wdgt.currentText() if wdgt.currentText() != "" else "%"
+				elif isinstance(wdgt, QCheckBox):
+					search_criteria[qty] = wdgt.isChecked()
+		# Search for tools and supplies:
+		tool_supply_name = tool_supply_temp.__class__.__name__
+		part_file_name = os.sep.join([ fm.DATADIR, 'partlist', tool_supply_name+'s.json' ])
+		with open(part_file_name, 'r') as opfl:
+			tool_supply_list = json.load(opfl)
+
+		# Go through all parts in part_list, load each, and check search criteria...
+		found_tool_supply = {}
+		for tool_supply_id, date in tool_supply_list.items():
+			if 'batch' in tool_supply_name:  # supply
+				tool_supply_temp.load(tool_supply_id)
+				TOOL_SUPPLY_OBJNAME_CLSNAME[tool_supply_temp.OBJECTNAME] = tool_supply_name
+				found = True
+				for qty, value in search_criteria.items():
+					# if value == '%':  continue  # "wildcard" option, ignore this
+					if getattr(tool_supply_temp, qty, None) != value:
+						found = False
+				if found:  found_tool_supply[tool_supply_id] = tool_supply_temp.OBJECTNAME + ', date expires: ' + tool_supply_temp.date_expires
+			else:  # tool
+				found = True
+				tool_ID = tool_supply_id.split('_')[0]
+				tool_institute = tool_supply_id.split('_')[1]
+				if tool_institute != search_criteria['institution']:
+					found = False
+				if found:
+					tool_supply_temp.load(tool_ID,tool_institute)
+					TOOL_SUPPLY_OBJNAME_CLSNAME[tool_supply_temp.OBJECTNAME] = tool_supply_name
+					found_tool_supply[tool_supply_id] = tool_supply_temp.OBJECTNAME + ', location: ' + tool_supply_temp.location
 	
+		self.displayResults_tool_supply(found_tool_supply)
+    
+    
 	def updateElements(self):
 		# Update enabled/disabled elements
 		# institution, geometry are always enabled (EXCEPT when assembly steps added)
@@ -206,6 +287,14 @@ and l.LOCATION_NAME like \'{}\'"*"*".format(pt_query, search_criteria['location_
 		self.page.cbAssmRow       .setEnabled(part_type == 'Protomodule' or part_type == 'Module')
 		self.page.cbAssmCol       .setEnabled(part_type == 'Protomodule' or part_type == 'Module')
 
+		tool_supply_name = self.page.cbToolSupplyType.currentText()
+		if 'batch' in tool_supply_name or 'tape' in tool_supply_name:
+			tool_supply_type = 'supply'
+		else: tool_supply_type = 'tool'
+		self.page.cbInstitutionTool   .setEnabled(tool_supply_type == 'tool')
+		self.page.ckEmpty             .setEnabled(tool_supply_type == 'supply')
+		self.page.ckExpired           .setEnabled(tool_supply_type == 'supply')
+
 	def clearParams(self,*args,**kwargs):
 		for wdgt in [self.page.cbInstitution,     self.page.cbShape,
 					 self.page.cbMaterial,       self.page.cbThickness,
@@ -213,12 +302,29 @@ and l.LOCATION_NAME like \'{}\'"*"*".format(pt_query, search_criteria['location_
 					 self.page.cbAssmRow,        self.page.cbAssmCol
 					]:
 			wdgt.setCurrentIndex(0)
+		self.page.ckUseDate.setChecked(False)
+
+	def clearParams_tool_supply(self,*args,**kwargs):
+		# for wdgt in [
+		# 	self.page.cbInstitutionTool,
+		# 	self.page.ckEmpty,
+		# 	self.page.ckExpired
+		# 	]:
+		self.page.cbInstitutionTool.setCurrentIndex(0)
+		self.page.ckEmpty.setChecked(False)
+		self.page.ckExpired.setChecked(False)
 
 	def clearResults(self,*args,**kwargs):
 		# empty lwPartList
 		self.page.lwPartList.clear()
 		self.page.lwTypeList.clear()
 		self.page.leStatus.setText("")
+
+	def clearResults_tool_supply(self,*args,**kwargs):
+		# empty lwToolSupplyList
+		self.page.lwToolSupplyList.clear()
+		self.page.lwInfoList.clear()
+		self.page.leStatusToolSupply.setText("")
 
 	def displayResults(self, localList, remoteList):
 		# result list is [ [serial, type], ... ]
@@ -244,6 +350,19 @@ and l.LOCATION_NAME like \'{}\'"*"*".format(pt_query, search_criteria['location_
 				self.page.lwTypeList.addItem(remoteList[serial])
 		self.page.leStatus.setText("Results found!")
 
+	def displayResults_tool_supply(self, foundList):
+		if foundList=={}:
+			self.page.leStatusToolSupply.setText("No results found")
+			return
+		for serial, typ in foundList.items(): # serial: type
+			self.page.lwToolSupplyList.addItem(serial)
+		# Sort search results
+		self.page.lwToolSupplyList.sortItems()
+		for row in range(self.page.lwToolSupplyList.count()):
+			serial = self.page.lwToolSupplyList.item(row).text()
+			self.page.lwInfoList.addItem(foundList[serial])
+		self.page.leStatusToolSupply.setText("Results found!")
+
 	def goToPart(self,*args,**kwargs):
 		if not self.page.lwPartList.currentItem():  return
 		name = self.page.lwPartList.currentItem().text().replace(" (not uploaded to DB)", "") #.text().split()
@@ -258,6 +377,23 @@ and l.LOCATION_NAME like \'{}\'"*"*".format(pt_query, search_criteria['location_
 				break
 		self.setUIPage(pageName, ID=name)
 
+	def goToToolSupply(self,*args,**kwargs):
+		if not self.page.lwToolSupplyList.currentItem():  return
+		name = self.page.lwToolSupplyList.currentItem().text()
+		# find corresponding tool/supply type
+		info = self.page.lwInfoList.item(self.page.lwToolSupplyList.currentRow()).text()
+		pageName = None
+		clsname = TOOL_SUPPLY_OBJNAME_CLSNAME[info.split(',')[0]]
+		args_dict = {}
+		if 'batch' in info:
+			pageName = PAGE_NAME_DICT['Supply']
+			args_dict[clsname] = name
+		else:
+			pageName = PAGE_NAME_DICT['Tool']
+			args_dict[clsname] = int(name.split('_')[0])
+			args_dict['institution'] = name.split('_')[1]
+		self.setUIPage(pageName, **args_dict)
+		
 
 	def load_kwargs(self,kwargs):
 		if 'ID' in kwargs.keys():

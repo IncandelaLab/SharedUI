@@ -261,7 +261,7 @@ class fsobj(object):
 		if len(xml_files) == 1 and not os.path.exists(json_file):
 			print('Rename file {} to {}'.format(os.path.basename(xml_files[0]), filename))
 			os.rename(xml_files[0], os.sep.join([filedir, filename]))
-  		assert os.path.exists(json_file), "Part {} in partlist has no json file {}!".format(ID, json_file)
+		assert os.path.exists(json_file), "Part {} in partlist has no json file {}!".format(ID, json_file)
 		with open(json_file, 'r') as opfl:
 			data = json.load(opfl)
 
