@@ -8,9 +8,9 @@ SharedUI is a graphical user interface designed help engineers monitor and recor
 
 ## Prerequisites
 
-This GUI requires Python 3.  It's been tested thoroughly with Python 3.7+ and less thoroughly with Python 3.6; versions 3.4 and earlier are incompatible with PyQt5.
+This GUI requires Python 3.7 or later.  It's been tested thoroughly with Python 3.9 and more briefly with 3.7; versions 3.6 and earlier will not work properly.
 
-Additionally, the GUI has been deveoped on a Mac machine, and may run into issues on other operating systems.  (Update:  The GUI appears to work fine on Windows, but has not been extensively tested yet.)
+Additionally, the GUI has been deveoped on a Mac machine, and may run into issues on other operating systems.  (Update:  The GUI appears to work fine on Windows and will likely work fine on Linux, but has not been extensively tested yet.)
 
 To install the GUI, simply download and clone the git repository:
 
