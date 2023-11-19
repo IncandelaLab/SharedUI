@@ -255,9 +255,14 @@ class fsobj(object):
 				return False
 
 		filedir, filename = self.get_filedir_filename(ID)
-		xml_file = os.sep.join([filedir, filename])
-		assert os.path.exists(xml_file), "Part {} in partlist has no json file {}!".format(ID, xml_file)
-		with open(xml_file, 'r') as opfl:
+		json_file = os.sep.join([filedir, filename])
+		# Fix error: change the xml file name to json
+		xml_files = glob.glob(filedir + '/*' + ID +'*.xml')
+		if len(xml_files) == 1 and not os.path.exists(json_file):
+			print('Rename file {} to {}'.format(os.path.basename(xml_files[0]), filename))
+			os.rename(xml_files[0], os.sep.join([filedir, filename]))
+  		assert os.path.exists(json_file), "Part {} in partlist has no json file {}!".format(ID, json_file)
+		with open(json_file, 'r') as opfl:
 			data = json.load(opfl)
 
 		self.ID = ID
