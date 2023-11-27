@@ -123,8 +123,8 @@ class func(object):
 		# search for tools and supplies
 		self.page.pbSearch_2.clicked.connect(self.search_tool_supply)
 		self.page.cbToolSupplyType.currentIndexChanged.connect( self.updateElements )
-		self.page.ckEmpty.stateChanged.connect( self.updateElements )
-		self.page.ckExpired.stateChanged.connect( self.updateElements )
+		self.page.cbEmpty.currentIndexChanged.connect( self.updateElements )
+		self.page.cbExpired.currentIndexChanged.connect( self.updateElements )
 
 		self.page.pbClearParams_2.clicked.connect( self.clearParams_tool_supply )
 
@@ -228,17 +228,17 @@ and l.LOCATION_NAME like \'{}\'"*"*".format(pt_query, search_criteria['location_
 		
 		search_dict = {
 			self.page.cbInstitutionTool : 'institution',
-			self.page.ckEmpty           : 'is_empty',
-			self.page.ckExpired         : 'is_expired'
+			self.page.cbEmpty           : 'is_empty',
+			self.page.cbExpired         : 'is_expired'
 		}
     
 		search_criteria = {}
 		for wdgt, qty in search_dict.items():
 			if wdgt.isEnabled():
-				if isinstance(wdgt, QComboBox):
-					search_criteria[qty] = wdgt.currentText() if wdgt.currentText() != "" else "%"
-				elif isinstance(wdgt, QCheckBox):
-					search_criteria[qty] = wdgt.isChecked()
+				# if isinstance(wdgt, QComboBox):
+				search_criteria[qty] = wdgt.currentText() if wdgt.currentText() != "" else "%"
+				# elif isinstance(wdgt, QCheckBox):
+				# 	search_criteria[qty] = wdgt.isChecked()
 		# Search for tools and supplies:
 		tool_supply_name = tool_supply_temp.__class__.__name__
 		part_file_name = os.sep.join([ fm.DATADIR, 'partlist', tool_supply_name+'s.json' ])
@@ -253,10 +253,11 @@ and l.LOCATION_NAME like \'{}\'"*"*".format(pt_query, search_criteria['location_
 				TOOL_SUPPLY_OBJNAME_CLSNAME[tool_supply_temp.OBJECTNAME] = tool_supply_name
 				found = True
 				for qty, value in search_criteria.items():
-					# if value == '%':  continue  # "wildcard" option, ignore this
+					if value == '%':  continue  # "wildcard" option, ignore this
+					value = False if 'not' in value else True
 					if getattr(tool_supply_temp, qty, None) != value:
 						found = False
-				if found:  found_tool_supply[tool_supply_id] = tool_supply_temp.OBJECTNAME + ', date expires: ' + tool_supply_temp.date_expires
+				if found:  found_tool_supply[tool_supply_id] = tool_supply_temp.OBJECTNAME + ': expires after ' + tool_supply_temp.date_expires
 			else:  # tool
 				found = True
 				tool_ID = tool_supply_id.split('_')[0]
@@ -266,7 +267,12 @@ and l.LOCATION_NAME like \'{}\'"*"*".format(pt_query, search_criteria['location_
 				if found:
 					tool_supply_temp.load(tool_ID,tool_institute)
 					TOOL_SUPPLY_OBJNAME_CLSNAME[tool_supply_temp.OBJECTNAME] = tool_supply_name
-					found_tool_supply[tool_supply_id] = tool_supply_temp.OBJECTNAME + ', location: ' + tool_supply_temp.location
+					# load comments in the info box
+					coment_str = ''
+					for i, cmt in enumerate(tool_supply_temp.comments):
+						coment_str += cmt
+						if i != len(tool_supply_temp.comments)-1: coment_str += ', '
+					found_tool_supply[tool_supply_id] = tool_supply_temp.OBJECTNAME + ': ' + coment_str
 	
 		self.displayResults_tool_supply(found_tool_supply)
     
@@ -292,8 +298,8 @@ and l.LOCATION_NAME like \'{}\'"*"*".format(pt_query, search_criteria['location_
 			tool_supply_type = 'supply'
 		else: tool_supply_type = 'tool'
 		self.page.cbInstitutionTool   .setEnabled(tool_supply_type == 'tool')
-		self.page.ckEmpty             .setEnabled(tool_supply_type == 'supply')
-		self.page.ckExpired           .setEnabled(tool_supply_type == 'supply')
+		self.page.cbEmpty             .setEnabled(tool_supply_type == 'supply')
+		self.page.cbExpired           .setEnabled(tool_supply_type == 'supply')
 
 	def clearParams(self,*args,**kwargs):
 		for wdgt in [self.page.cbInstitution,     self.page.cbShape,
@@ -305,14 +311,15 @@ and l.LOCATION_NAME like \'{}\'"*"*".format(pt_query, search_criteria['location_
 		self.page.ckUseDate.setChecked(False)
 
 	def clearParams_tool_supply(self,*args,**kwargs):
-		# for wdgt in [
-		# 	self.page.cbInstitutionTool,
-		# 	self.page.ckEmpty,
-		# 	self.page.ckExpired
-		# 	]:
-		self.page.cbInstitutionTool.setCurrentIndex(0)
-		self.page.ckEmpty.setChecked(False)
-		self.page.ckExpired.setChecked(False)
+		for wdgt in [
+			self.page.cbInstitutionTool,
+			self.page.cbEmpty,
+			self.page.cbExpired
+			]:
+			wdgt.setCurrentIndex(0)
+		# self.page.cbInstitutionTool.setCurrentIndex(0)
+		# self.page.cbEmpty.setCurrentIndex(0)
+		# self.page.ckExpired.setCurrentIndex(0)
 
 	def clearResults(self,*args,**kwargs):
 		# empty lwPartList
@@ -383,7 +390,7 @@ and l.LOCATION_NAME like \'{}\'"*"*".format(pt_query, search_criteria['location_
 		# find corresponding tool/supply type
 		info = self.page.lwInfoList.item(self.page.lwToolSupplyList.currentRow()).text()
 		pageName = None
-		clsname = TOOL_SUPPLY_OBJNAME_CLSNAME[info.split(',')[0]]
+		clsname = TOOL_SUPPLY_OBJNAME_CLSNAME[info.split(':')[0]]
 		args_dict = {}
 		if 'batch' in info:
 			pageName = PAGE_NAME_DICT['Supply']

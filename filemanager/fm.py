@@ -256,9 +256,11 @@ class fsobj(object):
 
 		filedir, filename = self.get_filedir_filename(ID)
 		json_file = os.sep.join([filedir, filename])
-		# Fix error: change the xml file name to json
+		# Fix error: change the tool/supply xml file name to json
 		xml_files = glob.glob(filedir + '/*' + ID +'*.xml')
-		if len(xml_files) == 1 and not os.path.exists(json_file):
+		# there are >=2 xml tmls for parts, make sure this won't affect them
+		# batch in filename so only changes the supplies
+		if 'batch' in filename and len(xml_files) == 1 and not os.path.exists(json_file):
 			print('Rename file {} to {}'.format(os.path.basename(xml_files[0]), filename))
 			os.rename(xml_files[0], os.sep.join([filedir, filename]))
 		assert os.path.exists(json_file), "Part {} in partlist has no json file {}!".format(ID, json_file)

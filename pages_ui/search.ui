@@ -193,7 +193,7 @@
     </property>
     <property name="dateTime">
      <datetime>
-      <hour>16</hour>
+      <hour>0</hour>
       <minute>0</minute>
       <second>0</second>
       <year>2023</year>
@@ -849,22 +849,6 @@
    <property name="frameShadow">
     <enum>QFrame::Raised</enum>
    </property>
-   <widget class="QCheckBox" name="ckEmpty">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>230</x>
-      <y>20</y>
-      <width>71</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>empty</string>
-    </property>
-   </widget>
    <widget class="QComboBox" name="cbInstitutionTool">
     <property name="geometry">
      <rect>
@@ -991,21 +975,61 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QCheckBox" name="ckExpired">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
+   <widget class="QComboBox" name="cbEmpty">
     <property name="geometry">
      <rect>
-      <x>230</x>
-      <y>40</y>
-      <width>71</width>
+      <x>220</x>
+      <y>20</y>
+      <width>161</width>
       <height>21</height>
      </rect>
     </property>
-    <property name="text">
-     <string>expired</string>
+    <property name="currentIndex">
+     <number>0</number>
     </property>
+    <item>
+     <property name="text">
+      <string/>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>not empty</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>empty</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QComboBox" name="cbExpired">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>40</y>
+      <width>161</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
+    <item>
+     <property name="text">
+      <string/>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>not expired</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>expired</string>
+     </property>
+    </item>
    </widget>
   </widget>
   <widget class="QPushButton" name="pbSearch_2">
