@@ -309,6 +309,7 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 	def rig(self):
 		self.listUsers.itemActivated.connect(self.changeUIPage)
 		self.listInformation.itemActivated.connect(self.changeUIPage)
+		self.listModules.itemActivated.connect(self.changeUIPage)
 		self.listAssembly.itemActivated.connect(self.changeUIPage)
 		self.swPages.currentChanged.connect(self.pageChanged)
 
