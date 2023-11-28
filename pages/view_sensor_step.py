@@ -470,8 +470,8 @@ class func(object):
 		self.page.pbGoTrayComponent.setEnabled(mode_view and self.page.sbTrayComponent.value() >= 0)
 		#self.page.pbGoTrayAssembly .setEnabled(mode_view and self.page.sbTrayAssembly .value() >= 0)
 		self.page.pbGoBatchAraldite.setEnabled((mode_creating or mode_editing or (mode_view and self.page.leBatchAraldite.text() != "")) and (adhesive == "Araldite" or adhesive == "Hybrid"))
-		self.page.pbGoTape50.setEnabled((mode_creating or mode_editing or (mode_view and self.page.leTape50.text() != "")) and (adhesive == "Araldite" or adhesive == "Hybrid"))
-		self.page.pbGoTape120.setEnabled((mode_creating or mode_editing or (mode_view and self.page.leTape120.text() != "")) and (adhesive == "Araldite" or adhesive == "Hybrid"))
+		self.page.pbGoTape50.setEnabled((mode_creating or mode_editing or (mode_view and self.page.leTape50.text() != "")) and (adhesive == "Tape" or adhesive == "Hybrid"))
+		self.page.pbGoTape120.setEnabled((mode_creating or mode_editing or (mode_view and self.page.leTape120.text() != "")) and (adhesive == "Tape" or adhesive == "Hybrid"))
 
 		for i in range(6):
 			self.sb_tray_assemblys[i].setReadOnly(mode_view)
