@@ -164,6 +164,7 @@ class baseplate(fsobj_part):
 
 	EXTRA_DEFAULTS = {
 		# display_name ->
+		# example: CF/Kapton Baseplate LD Right
 		"kind_of_part": "None Baseplate None None"
 	}
 
@@ -414,6 +415,10 @@ class protomodule(fsobj_part):
 		'module',
 		'step_sensor',
 		'step_pcb',
+
+		# Properties for naming
+		'version',
+		'serial_number',
 
 		# Properties for assembly data:
 		# Read/write from cond:

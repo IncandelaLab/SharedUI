@@ -3,6 +3,7 @@ import time
 import datetime
 import os
 import json
+import re
 
 from filemanager import fm, parts, tools, supplies, assembly
 
@@ -26,6 +27,68 @@ INDEX_INSTITUTION = {
 	'NTU':10,
 	'FSU':11
 }
+
+# Naming dictionary
+NAME_DENSITY = {
+	'LD' : 'L',
+	'HD' : 'H'
+}
+NAME_GEOMETRY = {
+	'Full'   : 'F',
+	'Top'    : 'T',
+	'Bottom' : 'B',
+	'Left'   : 'L',
+	'Right'  : 'R',
+	'Five'   : '5',
+	'Full+Three' : 'F' # not sure if necessary
+}
+NAME_THICKNESS = {
+    '120um' : '1',
+    '200um' : '2',
+	'300um' : '3'
+}
+NAME_MATERIAL = {
+	'CuW/Kapton' : 'W',
+	'PCB/Kapton' : 'P',
+	'CF/Kapton'  : 'C'
+}
+NAME_VERSION = {
+	'preseries'  : 'X',
+	'production' : 'X'  # TBD, currently set to X
+}
+NAME_INSTITUTION = {
+	'CERN'  : 'CN', # TBD ?
+	'FNAL'  : 'FL', # TBD ?
+	'UCSB'  : 'SB',
+	'UMN'   : 'MN', # TBD ?
+	'HEPHY' : 'HY', # TBD ?
+	'HPK'   : 'HK', # TBD ?
+	'CMU'   : 'CM',
+	'TTU'   : 'TT',
+	'IHEP'  : 'IH',
+	'TIFR'  : 'TI', # TBD ?
+	'NTU'   : 'NT',
+	'FSU'   : 'FS'  # TBD ?
+}
+
+def is_proper_name(name):
+	# check if the protomodule name is proper
+	density_list = list(NAME_DENSITY.values())
+	geometry_list = list(NAME_GEOMETRY.values())
+	thickness_list = list(NAME_THICKNESS.values())
+	material_list = list(NAME_MATERIAL.values())
+	version_list = list(NAME_VERSION.values())
+	institution_list = list(NAME_INSTITUTION.values())
+	flag = False
+	if name[0] == 'P' \
+		and name[1] in density_list \
+		and name[2] in geometry_list \
+		and name[3] in thickness_list \
+		and name[4] in material_list \
+		and name[5] in version_list \
+		and name[7:9] in institution_list:
+		flag = True
+	return flag
 
 STATUS_NO_ISSUES = "valid (no issues)"
 STATUS_ISSUES    = "invalid (issues present)"
@@ -59,6 +122,7 @@ I_TRAY_ASSEMBLY_DUPLICATE = "same assembly tray is selected on multiple position
 I_TOOL_SENSOR_DUPLICATE = "same sensor tool is selected on multiple positions: {}"
 I_BASEPLATE_DUPLICATE   = "same baseplate is selected on multiple positions: {}"
 I_SENSOR_DUPLICATE      = "same sensor is selected on multiple positions: {}"
+I_SERIAL_DUPLICATE      = "same serial number is used on multiple positions: {}"
 I_PROTOMODULE_COPY      = "protomodule has already been created: {}"
 I_LONE_TRAY             = "assembly tray entered, but rows {} and {} are empty"
 
@@ -238,6 +302,25 @@ class func(object):
 			self.page.pbGoTrayAssembly3,
 		]
 
+		# NEW: protomodule version & serial number
+		self.cb_versions = [
+			self.page.cbVersion1,
+			self.page.cbVersion2,
+			self.page.cbVersion3,
+			self.page.cbVersion4,
+			self.page.cbVersion5,
+			self.page.cbVersion6,
+		]
+
+		self.sb_serials = [
+			self.page.sbSerial1,
+			self.page.sbSerial2,
+			self.page.sbSerial3,
+			self.page.sbSerial4,
+			self.page.sbSerial5,
+			self.page.sbSerial6,
+		]
+
 		for i in range(6):
 			# was editingFinished
 			self.sb_tray_assemblys[i].valueChanged.connect(self.loadTrayAssembly)
@@ -251,6 +334,8 @@ class func(object):
 			self.sb_tools[i].editingFinished.connect(      self.loadToolSensor)
 			self.le_baseplates[i].textChanged.connect( self.loadBaseplate)
 			self.le_sensors[i].textChanged.connect( self.loadSensor)
+
+			self.cb_versions[i].activated.connect( self.updateIssues )
 
 			self.pb_clears[i].clicked.connect(self.clearRow)
 
@@ -396,9 +481,25 @@ class func(object):
 			if not (self.step_sensor.protomodules is None):
 				for i in range(6):
 					self.le_protomodules[i].setText(str(self.step_sensor.protomodules[i]) if not (self.step_sensor.protomodules[i] is None) else "")
+					if not (self.step_sensor.protomodules[i] is None) and is_proper_name(self.step_sensor.protomodules[i]):
+						protomodule_name = str(self.step_sensor.protomodules[i])
+						for i, (_, name) in enumerate(NAME_VERSION.items()):
+							if name == protomodule_name[5]:
+								self.cb_versions[i].setCurrentIndex(i)
+						match = re.search(r'[1-9]', protomodule_name[7:])
+						print("row ",i)
+						print("digits:",protomodule_name[7:][match.start():])
+						print("is int?:",isinstance(int(protomodule_name[7:][match.start():]), int))
+						self.sb_serials[i-1].setValue(int(protomodule_name[7:][match.start():]))
+					else:
+						self.cb_versions[i].setCurrentIndex(-1)
+						self.sb_serials[i].setValue(-1)
+					
 			else:
 				for i in range(6):
 					self.le_protomodules[i].setText("")
+					self.cb_versions[i].setCurrentIndex(-1)
+					self.sb_serials[i].setValue(-1)
 
 			self.page.ckCheckFeet.setChecked(self.step_sensor.snsr_tool_feet_chk if not (self.step_sensor.snsr_tool_feet_chk is None) else False)
 
@@ -420,12 +521,15 @@ class func(object):
 				self.sb_tools[i].setValue(-1)
 				self.le_sensors[i].setText("")
 				self.le_baseplates[i].setText("")
+				self.cb_versions[i].setCurrentIndex(-1)
+				self.sb_serials[i].setValue(-1)
 				self.le_protomodules[i].setText("")
 			self.page.ckCheckFeet.setChecked(False)
 
 		for i in range(6):
 			if self.sb_tray_assemblys[i].value() == -1:  self.sb_tray_assemblys[i].clear()
 			if self.sb_tools[i].value()        == -1:  self.sb_tools[i].clear()
+			if self.sb_serials[i].value()        == -1:  self.sb_serials[i].clear()
 
 		if self.page.sbTrayComponent.value() == -1:  self.page.sbTrayComponent.clear()
 		#if self.page.sbTrayAssembly.value()  == -1:  self.page.sbTrayAssembly.clear()
@@ -479,6 +583,8 @@ class func(object):
 			self.le_sensors[i].setReadOnly(       mode_view)
 			self.le_baseplates[i].setReadOnly(    mode_view)
 			self.pb_go_tools[i].setEnabled(       mode_view and tools_exist[i])
+			self.cb_versions[i].setEnabled( mode_creating or mode_editing)
+			self.sb_serials[i].setReadOnly(    mode_view)
 			# ENABLED IF:
 			# - creating
 			# - view, and part exists
@@ -735,15 +841,18 @@ class func(object):
 
 		# Now, loop over each row and check for missing/bad input
 		tray_assemblys_selected = [_.value() for _ in self.sb_tray_assemblys]
-		sensor_tools_selected = [_.value() for _ in self.sb_tools     ]
-		baseplates_selected   = [_.text() for _ in self.le_baseplates  ]
-		sensors_selected      = [_.text() for _ in self.le_sensors     ]
+		sensor_tools_selected   = [_.value() for _ in self.sb_tools     ]
+		baseplates_selected     = [_.text() for _ in self.le_baseplates  ]
+		sensors_selected        = [_.text() for _ in self.le_sensors     ]
+		versions_selected       = [_.currentText() for _ in self.cb_versions]
+		serials_selected        = [_.value() for _ in self.sb_serials]
 
 		# note: >2 bc of every tray is repeated in the list
 		tray_assembly_duplicates = [_ for _ in range(6) if tray_assemblys_selected[_] >= 0 and tray_assemblys_selected.count(tray_assemblys_selected[_])>2]
-		sensor_tool_duplicates = [_ for _ in range(6) if sensor_tools_selected[_] >= 0 and sensor_tools_selected.count(sensor_tools_selected[_])>1]
-		baseplate_duplicates   = [_ for _ in range(6) if baseplates_selected[_]   != "" and baseplates_selected.count(  baseplates_selected[_]  )>1]
-		sensor_duplicates      = [_ for _ in range(6) if sensors_selected[_]      != "" and sensors_selected.count(     sensors_selected[_]     )>1]
+		sensor_tool_duplicates   = [_ for _ in range(6) if sensor_tools_selected[_] >= 0 and sensor_tools_selected.count(sensor_tools_selected[_])>1]
+		baseplate_duplicates     = [_ for _ in range(6) if baseplates_selected[_]   != "" and baseplates_selected.count(  baseplates_selected[_]  )>1]
+		sensor_duplicates        = [_ for _ in range(6) if sensors_selected[_]      != "" and sensors_selected.count(     sensors_selected[_]     )>1]
+		# serial_duplicates        = [_ for _ in range(6) if serials_selected[_]      >= 0 and serials_selected.count(     serials_selected[_]     )>1]
 
 		if tray_assembly_duplicates:
 			issues.append(I_TRAY_ASSEMBLY_DUPLICATE.format(', '.join([str(_+1) for _ in tray_assembly_duplicates])))
@@ -753,6 +862,8 @@ class func(object):
 			issues.append(I_BASEPLATE_DUPLICATE.format(', '.join([str(_+1) for _ in baseplate_duplicates])))
 		if sensor_duplicates:
 			issues.append(I_SENSOR_DUPLICATE.format(', '.join([str(_+1) for _ in sensor_duplicates])))
+		# if serial_duplicates:
+		# 	issues.append(I_SERIAL_DUPLICATE.format(', '.join([str(_+1) for _ in serial_duplicates])))
 
 		rows_empty           = []
 		rows_full            = []
@@ -762,9 +873,13 @@ class func(object):
 		rows_baseplate_dne   = []
 		rows_tool_sensor_dne = []
 		rows_sensor_dne      = []
+		rows_version_dne      = []
+		rows_serial_dne      = []
 
 		for i in range(6):
 			num_parts = 0
+			has_version = False
+			has_serial = False
 			tmp_id = self.step_sensor.ID
 
 			if sensor_tools_selected[i] >= 0:
@@ -792,6 +907,12 @@ class func(object):
 					ready, reason = self.sensors[i].ready_step_sensor(tmp_id)
 					if not ready:
 						issues.append(I_PART_NOT_READY.format('sensor',i,reason))
+
+			# version and serial number must exist
+			if versions_selected[i] != "":
+				has_version = True
+			if serials_selected[i] >0:
+				has_serial = True
 
 			# NOTE:  TODO:  geometry, channel_density must match
 			if baseplates_selected[i] != "" and sensors_selected[i] != "" \
@@ -821,7 +942,7 @@ class func(object):
 
 			if num_parts == 0:
 				rows_empty.append(i)
-			elif num_parts == 4:
+			elif num_parts == 4 and has_version and has_serial:
 				rows_full.append(i)
 			else:
 				rows_incomplete.append(i)
@@ -925,7 +1046,18 @@ class func(object):
 			sensors.append(     self.le_sensors[i].text()      if self.le_sensors[i].text() != "" else None)
 			baseplates.append(  self.le_baseplates[i].text()   if self.le_baseplates[i].text() != "" else None)
 			if self.le_baseplates[i].text() != "" and self.le_sensors[i].text() != "":
-				protomodules.append("PROTO_{}_{}".format(self.le_baseplates[i].text(), self.le_sensors[i].text()))
+				# auto name the proto module
+				# protomodules.append("P{}_{}".format(self.le_baseplates[i].text(), self.le_sensors[i].text()))
+				name = 'P'
+				name += NAME_DENSITY[self.sensors[i].channel_density]
+				name += NAME_GEOMETRY[self.sensors[i].geometry]
+				name += NAME_THICKNESS[self.sensors[i].sen_type]
+				name += NAME_MATERIAL[self.baseplates[i].material]
+				name += NAME_VERSION[self.cb_versions[i].currentText()]
+				name += '-' # TBD: may need to delete
+				name += NAME_INSTITUTION[self.page.cbInstitution.currentText()]
+				name += str(self.sb_serials[i].value()).zfill(4)
+				protomodules.append(name)
 			else:
 				protomodules.append(None)
 		#self.step_sensor.asmbl_tray_names = trays
@@ -946,6 +1078,8 @@ class func(object):
 			if not temp_protomodule.load(protomodules[i]):
 				temp_protomodule.new(protomodules[i], baseplate_=temp_plt, sensor_=temp_sensor)
 			temp_protomodule.step_sensor    = self.step_sensor.ID
+			temp_protomodule.version = self.cb_versions[i].currentText()
+			temp_protomodule.serial_number = self.sb_serials[i].value()
 			temp_protomodule.save()
 
 			self.baseplates[i].step_sensor = self.step_sensor.ID
@@ -1005,10 +1139,12 @@ class func(object):
 	def clearRow(self,*args,**kwargs):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
-		self.sb_tools[which].setValue(-1)
+		# self.sb_tools[which].setValue(-1)
 		self.sb_tools[which].clear()
 		self.le_sensors[which].clear()
 		self.le_baseplates[which].clear()
+		self.cb_versions[which].clear()
+		self.sb_serials[which].clear()
 		# clear tray assembly only if current and neighboring rows are clear
 		uprow   = which if which%2==0 else which-1
 		downrow = which if which%2!=0 else which+1

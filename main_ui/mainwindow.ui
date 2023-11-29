@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1417</width>
-    <height>858</height>
+    <height>883</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -253,6 +253,9 @@
          <widget class="QLineEdit" name="lineEdit_2">
           <property name="text">
            <string>Protomodules and modules</string>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
           </property>
          </widget>
         </item>

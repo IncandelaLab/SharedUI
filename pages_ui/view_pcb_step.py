@@ -515,7 +515,7 @@ class Ui_Form(object):
         self.pbGoTool3.setText(_translate("Form", "go to"))
         self.lineEdit_13.setText(_translate("Form", "PCB tool ID"))
         self.pbGoProtomodule2.setText(_translate("Form", "go to"))
-        self.lineEdit_14.setText(_translate("Form", "Module ID (must type this in manually)"))
+        self.lineEdit_14.setText(_translate("Form", "Module ID (auto)"))
         self.lineEdit_20.setText(_translate("Form", "6 (3, 2)"))
         self.lineEdit_22.setText(_translate("Form", "Protomodule ID"))
         self.pbGoPcb1.setText(_translate("Form", "go to"))

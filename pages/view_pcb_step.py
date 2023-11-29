@@ -479,15 +479,15 @@ class func(object):
 		self.page.pbGoTrayComponent.setEnabled(mode_view and self.page.sbTrayComponent.value() >= 0)
 		#self.page.pbGoTrayAssembly .setEnabled(mode_view and self.page.sbTrayAssembly .value() >= 0)
 		self.page.pbGoBatchAraldite.setEnabled((mode_creating or mode_editing or (mode_view and self.page.leBatchAraldite.text() != "")) and (adhesive == "Araldite" or adhesive == "Hybrid"))
-		self.page.pbGoTape50.setEnabled((mode_creating or mode_editing or (mode_view and self.page.leTape50.text() != "")) and (adhesive == "Araldite" or adhesive == "Hybrid"))
-		self.page.pbGoTape120.setEnabled((mode_creating or mode_editing or (mode_view and self.page.leTape120.text() != "")) and (adhesive == "Araldite" or adhesive == "Hybrid"))
+		self.page.pbGoTape50.setEnabled((mode_creating or mode_editing or (mode_view and self.page.leTape50.text() != "")) and (adhesive == "Tape" or adhesive == "Hybrid"))
+		self.page.pbGoTape120.setEnabled((mode_creating or mode_editing or (mode_view and self.page.leTape120.text() != "")) and (adhesive == "Tape" or adhesive == "Hybrid"))
 
 		for i in range(6):
 			self.sb_tray_assemblys[i].setReadOnly(mode_view)
 			self.sb_tools[i].setReadOnly(       mode_view)
 			self.le_pcbs[i].setReadOnly(        mode_view)
 			self.le_protomodules[i].setReadOnly(mode_view)
-			self.le_modules[i].setReadOnly(     mode_view)
+			# self.le_modules[i].setReadOnly(     mode_view)
 			self.pb_go_tray_assemblys[i].setEnabled(mode_creating or (mode_view and self.sb_tray_assemblys[i].value() != -1) )
 			self.pb_go_tools[i].setEnabled(       mode_view and tools_exist[i]       )
 			self.pb_go_pcbs[i].setEnabled(        mode_creating or (mode_view and self.le_pcbs[i].text()            != "") )
@@ -504,6 +504,11 @@ class func(object):
 
 		self.page.pbAddPart     .setEnabled(mode_searching)
 		self.page.pbCancelSearch.setEnabled(mode_searching)
+
+		# update module name from protomodule name
+		for i in range(6):
+			self.le_modules[i].setText('M'+self.le_protomodules[i].text()[1:] if self.le_protomodules[i].text() != ""  else "")
+
 		# NEW:  Update pb's based on search result
 		for i in range(6):
 			self.pb_go_tools[i]       .setText("" if self.sb_tools[i].value()        < 0  else "go to")
@@ -511,6 +516,7 @@ class func(object):
 			for btn, ledit in [[self.pb_go_pcbs[i],         self.le_pcbs[i]],
 			                   [self.pb_go_protomodules[i], self.le_protomodules[i]]]:
 				btn.setText("select" if ledit.text() == "" else "go to")
+			
 		aral = self.page.leBatchAraldite.text()
 		self.page.pbGoBatchAraldite.setText("select" if aral == "" else "go to")
 		t50 = self.page.leTape50.text()
@@ -955,7 +961,9 @@ class func(object):
 			tools.append(       self.sb_tools[i].value()        if self.sb_tools[i].value()        >= 0 else None)
 			pcbs.append(        self.le_pcbs[i].text()         if self.le_pcbs[i].text()         != "" else None)
 			protomodules.append(self.le_protomodules[i].text() if self.le_protomodules[i].text() != "" else None)
-			modules.append(     self.le_modules[i].text()      if self.le_modules[i].text()      != "" else None)
+			# modules.append(     self.le_modules[i].text()      if self.le_modules[i].text()      != "" else None)
+			# Auto generate module name from protomodule
+			modules.append(     'M' + self.le_protomodules[i].text()[1:]      if self.le_protomodules[i].text()      != "" else None)
 	
 		self.step_pcb.pcbs         = pcbs
 		self.step_pcb.protomodules = protomodules
