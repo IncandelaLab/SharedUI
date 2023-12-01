@@ -1056,19 +1056,11 @@ class func(object):
 			tools.append(       self.sb_tools[i].value()        if self.sb_tools[i].value()        >= 0 else None)
 			sensors.append(     self.le_sensors[i].text()      if self.le_sensors[i].text() != "" else None)
 			baseplates.append(  self.le_baseplates[i].text()   if self.le_baseplates[i].text() != "" else None)
+			# protomodules.append( self.le_protomodules[i].text() if self.le_baseplates[i].text() != "" else None )
+			# Auto name the proto module
 			if self.le_baseplates[i].text() != "" and self.le_sensors[i].text() != "":
-				# auto name the proto module
 				# protomodules.append("P{}_{}".format(self.le_baseplates[i].text(), self.le_sensors[i].text()))
-				name = 'P'
-				name += NAME_DENSITY[self.sensors[i].channel_density]
-				name += NAME_GEOMETRY[self.sensors[i].geometry]
-				name += NAME_THICKNESS[self.sensors[i].sen_type]
-				name += NAME_MATERIAL[self.baseplates[i].material]
-				name += NAME_VERSION[self.cb_versions[i].currentText()]
-				name += '-' # TBD: may need to delete
-				name += NAME_INSTITUTION[self.page.cbInstitution.currentText()]
-				name += str(self.sb_serials[i].value()).zfill(4)
-				protomodules.append(name)
+				protomodules.append(self.make_name(i))
 			else:
 				protomodules.append(None)
 		#self.step_sensor.asmbl_tray_names = trays
@@ -1362,6 +1354,8 @@ class func(object):
 		else:
 			tmp_serial = 1
 		self.sb_serials[which].setValue(tmp_serial)
+		self.le_protomodules[which].setText(self.make_name(which))
+		self.update_info()
 
 
 	def filesToUpload(self):
@@ -1389,3 +1383,15 @@ class func(object):
 	def changed_to(self):
 		print("changed to {}".format(PAGE_NAME))
 		self.update_info()
+
+	def make_name(self,i):
+		name = 'P'
+		name += NAME_DENSITY[self.sensors[i].channel_density]
+		name += NAME_GEOMETRY[self.sensors[i].geometry]
+		name += NAME_THICKNESS[self.sensors[i].sen_type]
+		name += NAME_MATERIAL[self.baseplates[i].material]
+		name += NAME_VERSION[self.cb_versions[i].currentText()]
+		name += '-' # TBD: may need to delete
+		name += NAME_INSTITUTION[self.page.cbInstitution.currentText()]
+		name += str(self.sb_serials[i].value()).zfill(4)
+		return name
