@@ -182,6 +182,15 @@ class func(object):
 			self.page.dsbThickness5,
 			self.page.dsbThickness6,
 		]
+  
+		self.dsb_weight = [
+			self.page.dsbWeight1,
+			self.page.dsbWeight2,
+			self.page.dsbWeight3,
+			self.page.dsbWeight4,
+			self.page.dsbWeight5,
+			self.page.dsbWeight6,
+		]
 
 		self.cb_grades = [
 			self.page.cbGrade1,
@@ -258,6 +267,7 @@ class func(object):
 				thicks = self.step_pcb.thicknesses
 				flats = self.step_pcb.flatnesses
 				grades = self.step_pcb.grades
+				weights = self.step_pcb.weights
 
 				for i in range(6):
 					self.le_modules[i]     .setText(mods[i] if mods[i] else "")
@@ -266,6 +276,7 @@ class func(object):
 					self.dsb_offsets_rot[i].setValue(ang_off[i] if ang_off[i] else 0)
 					self.dsb_thickness[i]  .setValue(thicks[i] if thicks[i] else 0)
 					self.dsb_flatness[i]   .setValue(flats[i] if flats[i] else 0)
+					self.dsb_weight[i]   .setValue(weights[i] if weights[i] else 0)
 					self.cb_grades[i]      .setCurrentIndex(INDEX_GRADE.get(grades[i], -1))
 
 			else:
@@ -276,6 +287,7 @@ class func(object):
 					self.dsb_offsets_rot[i].setValue(0)
 					self.dsb_thickness[i].setValue(0)
 					self.dsb_flatness[i].setValue(0)
+					self.dsb_weight[i].setValue(0)
 					self.cb_grades[i].setCurrentIndex(-1)
 
 		else:
@@ -296,6 +308,7 @@ class func(object):
 				self.dsb_offsets_rot[i].setValue(0)
 				self.dsb_thickness[i].setValue(-1)
 				self.dsb_flatness[i].setValue(0)
+				self.dsb_weight[i].setValue(0)
 				self.cb_grades[i].setCurrentIndex(-1)
 
 		
@@ -329,6 +342,7 @@ class func(object):
 			self.dsb_offsets_rot[i].setReadOnly(not (mode_editing and modules_exist[i]))
 			self.dsb_thickness[i]  .setReadOnly(not (mode_editing and modules_exist[i]))
 			self.dsb_flatness[i]   .setReadOnly(not (mode_editing and modules_exist[i]))
+			self.dsb_weight[i]     .setReadOnly(not (mode_editing and modules_exist[i]))
 			self.cb_grades[i]      .setEnabled(      mode_editing and modules_exist[i])
 
 		self.page.pbEdit.setEnabled(   mode_view and     step_pcb_exists )
@@ -424,6 +438,8 @@ class func(object):
 		self.step_pcb.pcb_ang_offsts = [self.dsb_offsets_rot[i].value() for i in range(6)]
 		self.step_pcb.flatnesses = [self.dsb_flatness[i].value() for i in range(6)]
 		self.step_pcb.thicknesses = [self.dsb_thickness[i].value() for i in range(6)]
+		self.step_pcb.weights = [self.dsb_weight[i].value() for i in range(6)]
+		print("step_pcb.weights = ",self.step_pcb.weights)
 		self.step_pcb.grades = [str(self.cb_grades[i].currentText()) if self.cb_grades[i].currentText() else None for i in range(6)]
 
 		self.step_pcb.save()
@@ -481,6 +497,7 @@ class func(object):
 		itemdata = xml_tree.find('.//MEAN')
 		self.dsb_thickness[0].setValue(float(itemdata.text))
 		itemdata = xml_tree.find('.//GRADE')
+		# TO DO?: read weights from xml
 		self.cb_grades[0].setCurrentIndex(INDEX_COLOR_GRADE[itemdata.text])
 
 		self.page.leXML.setText(filename)

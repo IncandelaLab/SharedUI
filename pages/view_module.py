@@ -258,9 +258,9 @@ class func(object):
 		# characteristics
 		# Note: most non-editable b/c either fixed or filled in w/ assembly pages
 		#self.page.leLocation.setReadOnly(   not mode_editing )
-		self.page.cbInstitution.setEnabled(     mode_editing )
-		self.page.cbInsertUser.setEnabled(      mode_editing )
-		self.page.cbInspection.setEnabled(      mode_editing )
+		# self.page.cbInstitution.setEnabled(     mode_editing )
+		# self.page.cbInsertUser.setEnabled(      mode_editing )
+		# self.page.cbInspection.setEnabled(      mode_editing )
 
 		# parts and steps
 		self.page.pbGoStepSensor.setEnabled(   mode_view and step_sensor_exists   )
@@ -270,11 +270,12 @@ class func(object):
 		self.page.pbGoPcb.setEnabled(          mode_view and pcb_exists           )
 		self.page.pbGoProtomodule.setEnabled(  mode_view and protomodule_exists   )
 
-		self.page.dsbOffsetTranslationX.setReadOnly( not mode_editing )
-		self.page.dsbOffsetTranslationY.setReadOnly( not mode_editing )
-		self.page.dsbOffsetRotation.setReadOnly(     not mode_editing )
-		self.page.dsbFlatness.setReadOnly(           not mode_editing )
-		self.page.dsbThickness.setReadOnly(          not mode_editing )
+		# Disable editting assemply data
+		# self.page.dsbOffsetTranslationX.setReadOnly( not mode_editing )
+		# self.page.dsbOffsetTranslationY.setReadOnly( not mode_editing )
+		# self.page.dsbOffsetRotation.setReadOnly(     not mode_editing )
+		# self.page.dsbFlatness.setReadOnly(           not mode_editing )
+		# self.page.dsbThickness.setReadOnly(          not mode_editing )
 
 		# comments
 		self.page.pbDeleteComment.setEnabled(mode_editing)

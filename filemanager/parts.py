@@ -158,6 +158,7 @@ class baseplate(fsobj_part):
 		'protomodule',
 		'module',
 		'step_sensor',
+		'weight',
 		# GUI-only:
 		'barcode',
 	]
@@ -678,6 +679,7 @@ class module(fsobj_part):
 		#"time_stop",
 		"temp_degc",
 		"humidity_prcnt",
+		"weight",
 
 		# wirebonding:
 		"bond_wire_batch_num",

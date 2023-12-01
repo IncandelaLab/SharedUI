@@ -840,8 +840,8 @@ class func(object):
 					issues.append(I_PCB_PROTOMODULE_SHAPE.format(self.pcbs[i].ID, self.pcbs[i].geometry, \
                                                                   self.protomodules[i].ID, self.protomodules[i].geometry))
 				if self.pcbs[i].channel_density != self.protomodules[i].channel_density:
-					issues.append(I_PCB_PROTOMODULE_CHANNEL.format(self.pcbs[i].ID, self.protomodules[i].channel_density, \
-                                                                    self.pcbs[i].ID, self.protomodules[i].channel_density))
+					issues.append(I_PCB_PROTOMODULE_CHANNEL.format(self.pcbs[i].ID, self.pcbs[i].channel_density, \
+                                                                    self.protomodules[i].ID, self.protomodules[i].channel_density))
 
 			# note: only count toward filled row if the rest of the row is nonempty
 			# ...unless both rows are empty, in which case throw error

@@ -213,8 +213,8 @@ class func(object):
 		#self.page.leLocation.setReadOnly(  not mode_editing )
 		#self.page.cbType.setEnabled(           mode_editing )
 		#self.page.cbShape.setEnabled(          mode_editing )
-		self.page.cbInstitution.setEnabled(    mode_editing )
-		self.page.cbInsertUser.setEnabled(     mode_editing )
+		# self.page.cbInstitution.setEnabled(    mode_editing )
+		# self.page.cbInsertUser.setEnabled(     mode_editing )
 		self.page.dsbThickness.setReadOnly(not mode_editing )
 
 		self.page.pbDeleteComment.setEnabled(mode_editing)
@@ -227,11 +227,12 @@ class func(object):
 		self.page.pbGoStepPcb.setEnabled(    mode_view and step_pcb_exists    )
 		self.page.pbGoModule.setEnabled(     mode_view and module_exists      )
 
-		self.page.dsbOffsetTranslationX.setReadOnly( not mode_editing )
-		self.page.dsbOffsetTranslationY.setReadOnly( not mode_editing )
-		self.page.dsbOffsetRotation.setReadOnly(     not mode_editing )
-		self.page.dsbFlatness.setReadOnly(           not mode_editing )
-		self.page.dsbThickness.setReadOnly(          not mode_editing )
+		# Disable editting assemply data
+		# self.page.dsbOffsetTranslationX.setReadOnly( not mode_editing )
+		# self.page.dsbOffsetTranslationY.setReadOnly( not mode_editing )
+		# self.page.dsbOffsetRotation.setReadOnly(     not mode_editing )
+		# self.page.dsbFlatness.setReadOnly(           not mode_editing )
+		# self.page.dsbThickness.setReadOnly(          not mode_editing )
 
 
 

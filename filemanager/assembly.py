@@ -414,5 +414,10 @@ class step_pcb(fsobj_step):
 	def pcb_tool_feet_chk(self, value):
 		self.set_var_from_part("pcb_tool_feet_chk", value)
 
-
+	@property
+	def weights(self):
+		return self.get_vars_from_part("weight")
+	@weights.setter
+	def weights(self, value):
+		self.set_vars_from_part("weight", value)
 

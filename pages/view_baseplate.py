@@ -182,6 +182,8 @@ class func(object):
 		if self.page.dsbThickness.value() == -1: self.page.dsbThickness.clear()
 		self.page.dsbFlatness .setValue(-1 if self.baseplate.flatness  is None else self.baseplate.flatness )
 		if self.page.dsbFlatness.value() == -1: self.page.dsbFlatness.clear()
+		self.page.dsbWeight .setValue(-1 if self.baseplate.weight  is None else self.baseplate.weight )
+		if self.page.dsbWeight.value() == -1: self.page.dsbWeight.clear()
 		self.page.cbGrade         .setCurrentIndex(INDEX_GRADE      .get(self.baseplate.grade          , -1))
 
 		if self.baseplate.step_sensor:
@@ -234,6 +236,7 @@ class func(object):
 
 		self.page.dsbThickness.setEnabled(      mode_creating or mode_editing  )
 		self.page.dsbFlatness.setEnabled(       mode_creating or mode_editing  )
+		self.page.dsbWeight.setEnabled(       mode_creating or mode_editing  )
 		self.page.cbGrade.setEnabled(           mode_creating or mode_editing  )
 
 		self.page.pbDeleteComment.setEnabled(   mode_creating or mode_editing  )
@@ -312,6 +315,7 @@ class func(object):
 		self.baseplate.geometry             = str(self.page.cbShape.currentText())       if str(self.page.cbShape.currentText())       else None
 		self.baseplate.thickness            =     self.page.dsbThickness.value()         if self.page.dsbThickness.value() >=0         else None
 		self.baseplate.flatness             =     self.page.dsbFlatness.value()          if self.page.dsbFlatness.value() >= 0         else None
+		self.baseplate.weight               =     self.page.dsbWeight.value()            if self.page.dsbWeight.value() >= 0           else None
 		self.baseplate.channel_density      = str(self.page.cbChannelDensity.currentText()) if str(self.page.cbChannelDensity.currentText())  else None
 		self.baseplate.grade                = str(self.page.cbGrade.currentText())       if str(self.page.cbGrade.currentText())       else None
 
