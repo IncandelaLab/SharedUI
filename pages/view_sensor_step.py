@@ -40,7 +40,7 @@ NAME_GEOMETRY = {
 	'Left'   : 'L',
 	'Right'  : 'R',
 	'Five'   : '5',
-	'Full+Three' : 'F' # not sure if necessary
+	# 'Full+Three' : 'F' # not sure if necessary
 }
 NAME_THICKNESS = {
     '120um' : '1',
@@ -54,7 +54,7 @@ NAME_MATERIAL = {
 }
 NAME_VERSION = {
 	'preseries'  : 'X',
-	'production' : 'X'  # TBD, currently set to X
+	'production' : '0'  # TBD, currently set to X
 }
 NAME_INSTITUTION = {
 	'CERN'  : 'CN', # TBD ?
