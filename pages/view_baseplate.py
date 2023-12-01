@@ -5,6 +5,15 @@ PAGE_NAME = "view_baseplate"
 OBJECTTYPE = "baseplate"
 DEBUG = False
 
+SHAPE_TYPE = [
+	# 'Full',
+	'Top',
+	'Bottom',
+	'Left',
+	'Right',
+	'Five'
+]
+
 INDEX_MATERIAL = {
 	'CuW/Kapton':0,
 	'PCB/Kapton':1,
@@ -124,6 +133,7 @@ class func(object):
 		self.page.pbGoStepSensor.clicked.connect(self.goStepSensor)
 		self.page.pbGoProtomodule.clicked.connect(self.goProtomodule)
 		self.page.pbGoModule.clicked.connect(self.goModule)
+		self.page.cbShape.activated.connect(self.updateElements)
 
 		self.page.pbDeleteComment.clicked.connect(self.deleteComment)
 		self.page.pbAddComment.clicked.connect(self.addComment)
@@ -189,7 +199,7 @@ class func(object):
 
 
 	@enforce_mode(['view','editing','creating'])
-	def updateElements(self):
+	def updateElements(self,*args,**kwargs):
 		self.page.leStatus.setText(self.mode)
 
 		baseplate_exists = self.baseplate_exists
@@ -201,6 +211,7 @@ class func(object):
 		mode_view     = self.mode == 'view'
 		mode_editing  = self.mode == 'editing'
 		mode_creating = self.mode == 'creating'
+		is_partial_shape = self.page.cbShape.currentText() in SHAPE_TYPE
 
 		self.setMainSwitchingEnabled(mode_view)
 		self.page.leID.setReadOnly(not mode_view)
@@ -219,7 +230,7 @@ class func(object):
 		self.page.leBarcode.setReadOnly(   not (mode_creating or mode_editing) )
 		self.page.cbMaterial.setEnabled(        mode_creating or mode_editing  )
 		self.page.cbShape.setEnabled(           mode_creating or mode_editing  )
-		self.page.cbChannelDensity.setEnabled(  mode_creating or mode_editing  )
+		self.page.cbChannelDensity.setEnabled(  (mode_creating or mode_editing) and is_partial_shape )
 
 		self.page.dsbThickness.setEnabled(      mode_creating or mode_editing  )
 		self.page.dsbFlatness.setEnabled(       mode_creating or mode_editing  )

@@ -315,7 +315,7 @@ before assembly</string>
     <rect>
      <x>10</x>
      <y>140</y>
-     <width>1021</width>
+     <width>1061</width>
      <height>141</height>
     </rect>
    </property>
@@ -328,7 +328,7 @@ before assembly</string>
    <widget class="QPushButton" name="pbClear6">
     <property name="geometry">
      <rect>
-      <x>960</x>
+      <x>1000</x>
       <y>120</y>
       <width>51</width>
       <height>21</height>
@@ -396,7 +396,7 @@ before assembly</string>
     </property>
     <property name="geometry">
      <rect>
-      <x>780</x>
+      <x>820</x>
       <y>40</y>
       <width>121</width>
       <height>20</height>
@@ -412,7 +412,7 @@ before assembly</string>
     </property>
     <property name="geometry">
      <rect>
-      <x>900</x>
+      <x>940</x>
       <y>20</y>
       <width>51</width>
       <height>21</height>
@@ -438,7 +438,7 @@ before assembly</string>
    <widget class="QPushButton" name="pbClear3">
     <property name="geometry">
      <rect>
-      <x>960</x>
+      <x>1000</x>
       <y>60</y>
       <width>51</width>
       <height>21</height>
@@ -506,7 +506,7 @@ before assembly</string>
     </property>
     <property name="geometry">
      <rect>
-      <x>900</x>
+      <x>940</x>
       <y>80</y>
       <width>51</width>
       <height>21</height>
@@ -532,7 +532,7 @@ before assembly</string>
     </property>
     <property name="geometry">
      <rect>
-      <x>780</x>
+      <x>820</x>
       <y>20</y>
       <width>121</width>
       <height>20</height>
@@ -548,7 +548,7 @@ before assembly</string>
    <widget class="QPushButton" name="pbClear1">
     <property name="geometry">
      <rect>
-      <x>960</x>
+      <x>1000</x>
       <y>20</y>
       <width>51</width>
       <height>21</height>
@@ -561,7 +561,7 @@ before assembly</string>
    <widget class="QPushButton" name="pbClear2">
     <property name="geometry">
      <rect>
-      <x>960</x>
+      <x>1000</x>
       <y>40</y>
       <width>51</width>
       <height>21</height>
@@ -635,7 +635,7 @@ before assembly</string>
     </property>
     <property name="geometry">
      <rect>
-      <x>900</x>
+      <x>940</x>
       <y>40</y>
       <width>51</width>
       <height>21</height>
@@ -664,7 +664,7 @@ before assembly</string>
     </property>
     <property name="geometry">
      <rect>
-      <x>900</x>
+      <x>940</x>
       <y>100</y>
       <width>51</width>
       <height>21</height>
@@ -693,7 +693,7 @@ before assembly</string>
     </property>
     <property name="geometry">
      <rect>
-      <x>780</x>
+      <x>820</x>
       <y>120</y>
       <width>121</width>
       <height>20</height>
@@ -706,7 +706,7 @@ before assembly</string>
    <widget class="QPushButton" name="pbClear5">
     <property name="geometry">
      <rect>
-      <x>960</x>
+      <x>1000</x>
       <y>100</y>
       <width>51</width>
       <height>21</height>
@@ -722,7 +722,7 @@ before assembly</string>
     </property>
     <property name="geometry">
      <rect>
-      <x>780</x>
+      <x>820</x>
       <y>0</y>
       <width>231</width>
       <height>20</height>
@@ -748,7 +748,7 @@ before assembly</string>
    <widget class="QPushButton" name="pbClear4">
     <property name="geometry">
      <rect>
-      <x>960</x>
+      <x>1000</x>
       <y>80</y>
       <width>51</width>
       <height>21</height>
@@ -990,7 +990,7 @@ before assembly</string>
     </property>
     <property name="geometry">
      <rect>
-      <x>780</x>
+      <x>820</x>
       <y>80</y>
       <width>121</width>
       <height>20</height>
@@ -1097,7 +1097,7 @@ before assembly</string>
     </property>
     <property name="geometry">
      <rect>
-      <x>780</x>
+      <x>820</x>
       <y>60</y>
       <width>121</width>
       <height>20</height>
@@ -1123,7 +1123,7 @@ before assembly</string>
     </property>
     <property name="geometry">
      <rect>
-      <x>780</x>
+      <x>820</x>
       <y>100</y>
       <width>121</width>
       <height>20</height>
@@ -1165,7 +1165,7 @@ before assembly</string>
     </property>
     <property name="geometry">
      <rect>
-      <x>900</x>
+      <x>940</x>
       <y>120</y>
       <width>51</width>
       <height>21</height>
@@ -1217,7 +1217,7 @@ before assembly</string>
     </property>
     <property name="geometry">
      <rect>
-      <x>900</x>
+      <x>940</x>
       <y>60</y>
       <width>51</width>
       <height>21</height>
@@ -1333,7 +1333,7 @@ before assembly</string>
    <widget class="QLineEdit" name="lineEdit_30">
     <property name="geometry">
      <rect>
-      <x>630</x>
+      <x>620</x>
       <y>0</y>
       <width>81</width>
       <height>20</height>
@@ -1349,7 +1349,7 @@ before assembly</string>
    <widget class="QComboBox" name="cbVersion1">
     <property name="geometry">
      <rect>
-      <x>620</x>
+      <x>610</x>
       <y>20</y>
       <width>101</width>
       <height>20</height>
@@ -1372,7 +1372,7 @@ before assembly</string>
    <widget class="QComboBox" name="cbVersion2">
     <property name="geometry">
      <rect>
-      <x>620</x>
+      <x>610</x>
       <y>40</y>
       <width>101</width>
       <height>20</height>
@@ -1395,7 +1395,7 @@ before assembly</string>
    <widget class="QComboBox" name="cbVersion3">
     <property name="geometry">
      <rect>
-      <x>620</x>
+      <x>610</x>
       <y>60</y>
       <width>101</width>
       <height>20</height>
@@ -1418,7 +1418,7 @@ before assembly</string>
    <widget class="QComboBox" name="cbVersion4">
     <property name="geometry">
      <rect>
-      <x>620</x>
+      <x>610</x>
       <y>80</y>
       <width>101</width>
       <height>20</height>
@@ -1441,7 +1441,7 @@ before assembly</string>
    <widget class="QComboBox" name="cbVersion5">
     <property name="geometry">
      <rect>
-      <x>620</x>
+      <x>610</x>
       <y>100</y>
       <width>101</width>
       <height>20</height>
@@ -1464,7 +1464,7 @@ before assembly</string>
    <widget class="QComboBox" name="cbVersion6">
     <property name="geometry">
      <rect>
-      <x>620</x>
+      <x>610</x>
       <y>120</y>
       <width>101</width>
       <height>20</height>
@@ -1487,7 +1487,7 @@ before assembly</string>
    <widget class="QSpinBox" name="sbSerial1">
     <property name="geometry">
      <rect>
-      <x>720</x>
+      <x>710</x>
       <y>20</y>
       <width>51</width>
       <height>21</height>
@@ -1503,14 +1503,14 @@ before assembly</string>
    <widget class="QLineEdit" name="lineEdit_31">
     <property name="geometry">
      <rect>
-      <x>720</x>
+      <x>710</x>
       <y>0</y>
-      <width>51</width>
+      <width>101</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>serial</string>
+     <string>serial number</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -1519,7 +1519,7 @@ before assembly</string>
    <widget class="QSpinBox" name="sbSerial2">
     <property name="geometry">
      <rect>
-      <x>720</x>
+      <x>710</x>
       <y>40</y>
       <width>51</width>
       <height>21</height>
@@ -1535,7 +1535,7 @@ before assembly</string>
    <widget class="QSpinBox" name="sbSerial3">
     <property name="geometry">
      <rect>
-      <x>720</x>
+      <x>710</x>
       <y>60</y>
       <width>51</width>
       <height>21</height>
@@ -1551,7 +1551,7 @@ before assembly</string>
    <widget class="QSpinBox" name="sbSerial4">
     <property name="geometry">
      <rect>
-      <x>720</x>
+      <x>710</x>
       <y>80</y>
       <width>51</width>
       <height>21</height>
@@ -1567,7 +1567,7 @@ before assembly</string>
    <widget class="QSpinBox" name="sbSerial5">
     <property name="geometry">
      <rect>
-      <x>720</x>
+      <x>710</x>
       <y>100</y>
       <width>51</width>
       <height>21</height>
@@ -1583,7 +1583,7 @@ before assembly</string>
    <widget class="QSpinBox" name="sbSerial6">
     <property name="geometry">
      <rect>
-      <x>720</x>
+      <x>710</x>
       <y>120</y>
       <width>51</width>
       <height>21</height>
@@ -1594,6 +1594,102 @@ before assembly</string>
     </property>
     <property name="maximum">
      <number>9999</number>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbSetNextSerial1">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>760</x>
+      <y>20</y>
+      <width>51</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>next</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbSetNextSerial2">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>760</x>
+      <y>40</y>
+      <width>51</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>next</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbSetNextSerial3">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>760</x>
+      <y>60</y>
+      <width>51</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>next</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbSetNextSerial4">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>760</x>
+      <y>80</y>
+      <width>51</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>next</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbSetNextSerial5">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>760</x>
+      <y>100</y>
+      <width>51</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>next</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbSetNextSerial6">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>760</x>
+      <y>120</y>
+      <width>51</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>next</string>
     </property>
    </widget>
   </widget>

@@ -320,6 +320,14 @@ class func(object):
 			self.page.sbSerial5,
 			self.page.sbSerial6,
 		]
+		self.pb_set_next_serial = [
+			self.page.pbSetNextSerial1,
+			self.page.pbSetNextSerial2,
+			self.page.pbSetNextSerial3,
+			self.page.pbSetNextSerial4,
+			self.page.pbSetNextSerial5,
+			self.page.pbSetNextSerial6,
+		]
 
 		for i in range(6):
 			# was editingFinished
@@ -330,6 +338,7 @@ class func(object):
 			self.pb_go_sensors[i].clicked.connect(     self.goSensor     )
 			self.pb_go_baseplates[i].clicked.connect(  self.goBaseplate  )
 			self.pb_go_protomodules[i].clicked.connect(self.goProtomodule)
+			self.pb_set_next_serial[i].clicked.connect( self.setNextSerial )
 
 			self.sb_tools[i].editingFinished.connect(      self.loadToolSensor)
 			self.le_baseplates[i].textChanged.connect( self.loadBaseplate)
@@ -487,9 +496,9 @@ class func(object):
 							if name == protomodule_name[5]:
 								self.cb_versions[i].setCurrentIndex(i)
 						match = re.search(r'[1-9]', protomodule_name[7:])
-						print("row ",i)
-						print("digits:",protomodule_name[7:][match.start():])
-						print("is int?:",isinstance(int(protomodule_name[7:][match.start():]), int))
+						# print("row ",i)
+						# print("digits:",protomodule_name[7:][match.start():])
+						# print("is int?:",isinstance(int(protomodule_name[7:][match.start():]), int))
 						self.sb_serials[i-1].setValue(int(protomodule_name[7:][match.start():]))
 					else:
 						self.cb_versions[i].setCurrentIndex(-1)
@@ -597,6 +606,7 @@ class func(object):
 			self.pb_go_baseplates[i].setEnabled(  mode_creating or (mode_view and self.le_baseplates[i].text() != "") )
 			self.pb_go_protomodules[i].setEnabled(mode_view and protomodules_exist[i])
 			self.pb_clears[i].setEnabled(         mode_creating or mode_editing)
+			self.pb_set_next_serial[i].setEnabled(mode_creating or mode_editing)
 
 		self.page.pbNew.setEnabled(    mode_view)# and not step_sensor_exists )
 		self.page.pbEdit.setEnabled(   mode_view and     step_sensor_exists )
@@ -921,7 +931,8 @@ class func(object):
 				if self.baseplates[i].geometry != self.sensors[i].geometry:
 					issues.append(I_BASEPLATE_SENSOR_SHAPE.format(self.baseplates[i].ID,    self.baseplates[i].geometry, \
 																  self.sensors[i].ID, self.sensors[i].geometry))
-				if self.baseplates[i].channel_density != self.sensors[i].channel_density:
+				# NEW: Full baseplate doesn't have channel density
+				if self.baseplates[i].geometry != 'Full' and self.baseplates[i].channel_density != self.sensors[i].channel_density:
 					issues.append(I_BASEPLATE_SENSOR_CHANNEL.format(self.baseplates[i].ID,    self.baseplates[i].channel_density, \
 																  self.sensors[i].ID, self.sensors[i].channel_density))
 
@@ -1321,6 +1332,36 @@ class func(object):
 		localtime = time.localtime()
 		self.page.dtRunStop.setDate(QtCore.QDate(*localtime[0:3]))
 		self.page.dtRunStop.setTime(QtCore.QTime(*localtime[3:6]))
+
+	def setNextSerial(self, *args, **kwargs):
+		sender_name = str(self.page.sender().objectName())
+		which = int(sender_name[-1]) - 1
+		# NEW:  Search for all protomodules at this institution, then create the next in order
+		if self.page.cbInstitution.currentText() == "":  return
+		part_file_name = os.sep.join([ fm.DATADIR, 'partlist', 'protomodules.json' ])
+		with open(part_file_name, 'r') as opfl:
+			part_list = json.load(opfl)
+		tmp_inst = self.page.cbInstitution.currentText()
+		serials = []
+		for part_id, date in part_list.items():
+			if is_proper_name(part_id) and part_id[7:9] == NAME_INSTITUTION[tmp_inst]\
+       		and not ('None' in self.sensors[which].kind_of_part)\
+            and not ('None' in self.baseplates[which].kind_of_part):
+				name = 'P'
+				name += NAME_DENSITY[self.sensors[which].channel_density]
+				name += NAME_GEOMETRY[self.sensors[which].geometry]
+				name += NAME_THICKNESS[self.sensors[which].sen_type]
+				name += NAME_MATERIAL[self.baseplates[which].material]
+				name += NAME_VERSION[self.cb_versions[which].currentText()]
+				if name in part_id:
+					match = re.search(r'[1-9]', part_id[7:])
+					s = int(part_id[7:][match.start():])
+					serials.append(s)
+		if serials:
+			tmp_serial = max(serials) + 1
+		else:
+			tmp_serial = 1
+		self.sb_serials[which].setValue(tmp_serial)
 
 
 	def filesToUpload(self):
