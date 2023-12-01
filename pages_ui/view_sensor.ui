@@ -579,7 +579,7 @@
    <widget class="QPushButton" name="pbNew">
     <property name="geometry">
      <rect>
-      <x>90</x>
+      <x>50</x>
       <y>30</y>
       <width>71</width>
       <height>21</height>
@@ -592,7 +592,7 @@
    <widget class="QPushButton" name="pbEdit">
     <property name="geometry">
      <rect>
-      <x>170</x>
+      <x>130</x>
       <y>30</y>
       <width>71</width>
       <height>21</height>
@@ -648,19 +648,6 @@
     </property>
     <property name="readOnly">
      <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pbLoad">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>30</y>
-      <width>71</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Load</string>
     </property>
    </widget>
   </widget>

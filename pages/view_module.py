@@ -120,7 +120,8 @@ class func(object):
 
 	@enforce_mode('setup')
 	def rig(self):
-		self.page.pbLoad.clicked.connect(self.loadPart)
+		self.page.leID.textChanged.connect(self.loadPart)
+		# self.page.pbLoad.clicked.connect(self.loadPart)
 		self.page.pbEdit.clicked.connect(self.startEditing)
 		self.page.pbSave.clicked.connect(self.saveEditing)
 		self.page.pbCancel.clicked.connect(self.cancelEditing)
@@ -250,7 +251,7 @@ class func(object):
 		self.setMainSwitchingEnabled(mode_view) 
 		self.page.leID.setReadOnly(not mode_view)
 
-		self.page.pbLoad.setEnabled(mode_view)
+		# self.page.pbLoad.setEnabled(mode_view)
 		self.page.pbEdit  .setEnabled( mode_view and     module_exists )
 		self.page.pbSave  .setEnabled( mode_editing   )
 		self.page.pbCancel.setEnabled( mode_editing   )
