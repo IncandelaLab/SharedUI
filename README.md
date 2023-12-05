@@ -54,9 +54,17 @@ Currently, parts (baseplates, sensors, etc) can only be created locally, as DB c
 
 Once all necessary information in the parts, tooling, and supplies section has been filled in, you can proceed to the production steps.  The production step pages are broadly similar to the previous ones, but with one major difference:  the data will be automatically checked for errors, and if any are found, a message explaining the problem will appear in the status box.  (For instance, entering in a nonexistent part or partially filling a row will produce errors.)  Once all errors have been resolved, you can save the step.
 
-### Part search
+### Part, tool and supply search
 
-To use the part search page, simply select the type of part you want to search for using the drop-down menu at the upper-left-hand corner, then select any other criteria you want using the options below.  You can then press "Search" to perform the query and display the results.  Lastly, you can jump to a part's info page by clicking on the part name in the "search results" box, then clicking the "Go to selected item" button underneath.
+The Search page is designed to search for both parts and tools/supplies. They are organized into two parallel sections, and can work simutaneously without conflict.
+
+To use the search page, simply select the type of item you want to search for using the drop-down menu at the upper-left-hand corner, then select any other criteria you want using the options below.  You can then press "Search" to perform the query and display the results.  Lastly, you can jump to an item's info page by clicking on the item's name in the "search results" box, then clicking the "Go to selected item" button underneath.
+
+<!-- ***Possible error when some of the existing supplies are not found in the results***
+
+Due to some history problems during development, the data files of the supplies stored in ```filemanager_data/supplies``` are xml files instead of json files like other parts and tools (even though the content of the files is sructured in json format), and the GUI zero-pads the ID in the filename up to 5 digits 
+
+There was an error that the Supplies page cannot load the items with their IDs. It was caused by the incorrect file format of the locally stored data files. This only happened to the supplies: if you created them before this error was fixed (without the commits on Nov 18, 2023), the files stored in ```filemanager_data/supplies``` would be xml files instead of json files. This error can be fixed by going to the Supplies page and loading the items again, which will rename the xml files to json files. Note that loading supplies requires the original IDs of the supplies when they were first created, you can find them in ```filemanager_data/partlist/batch_xxx.json``` (```xxx``` stands for the name of the supplies) -- the keyword strings are the IDs. -->
 
 ### XML generation (temporary)
 

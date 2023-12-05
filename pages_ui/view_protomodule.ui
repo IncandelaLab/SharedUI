@@ -411,7 +411,7 @@
    <widget class="QPushButton" name="pbEdit">
     <property name="geometry">
      <rect>
-      <x>130</x>
+      <x>90</x>
       <y>30</y>
       <width>71</width>
       <height>21</height>
@@ -482,19 +482,6 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QPushButton" name="pbLoad">
-    <property name="geometry">
-     <rect>
-      <x>50</x>
-      <y>30</y>
-      <width>71</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Load</string>
-    </property>
-   </widget>
    <widget class="QLineEdit" name="lineEdit_27">
     <property name="geometry">
      <rect>
@@ -555,13 +542,13 @@
    <property name="geometry">
     <rect>
      <x>330</x>
-     <y>10</y>
-     <width>271</width>
-     <height>51</height>
+     <y>0</y>
+     <width>281</width>
+     <height>71</height>
     </rect>
    </property>
    <property name="text">
-    <string>Note:  protomodules are automatically created upon completion of a sensor step.</string>
+    <string>Note:  protomodules are automatically created upon completion of a sensor step. User cannot change assembly data in this page.</string>
    </property>
    <property name="wordWrap">
     <bool>true</bool>

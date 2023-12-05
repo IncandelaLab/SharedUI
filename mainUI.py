@@ -139,7 +139,7 @@ class widget_view_supplies(wdgt.QWidget, form_view_supplies):
 # Dict of page IDs by name (as the name shows up in the page list widgets)
 PAGE_IDS = {
 	'Users'                  : 0,
-	'Search for parts'       : 1,
+	'Search'                 : 1,
 	'Baseplates'             : 2,
 	'Sensors'                : 3,
 	'PCBs'                   : 4,
@@ -309,6 +309,7 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 	def rig(self):
 		self.listUsers.itemActivated.connect(self.changeUIPage)
 		self.listInformation.itemActivated.connect(self.changeUIPage)
+		self.listModules.itemActivated.connect(self.changeUIPage)
 		self.listAssembly.itemActivated.connect(self.changeUIPage)
 		self.swPages.currentChanged.connect(self.pageChanged)
 

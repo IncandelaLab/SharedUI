@@ -120,7 +120,8 @@ class func(object):
 
 	@enforce_mode('setup')
 	def rig(self):
-		self.page.pbLoad.clicked.connect(self.loadPart)
+		self.page.leID.textChanged.connect(self.loadPart)
+		# self.page.pbLoad.clicked.connect(self.loadPart)
 		self.page.pbEdit.clicked.connect(self.startEditing)
 		self.page.pbSave.clicked.connect(self.saveEditing)
 		self.page.pbCancel.clicked.connect(self.cancelEditing)
@@ -250,7 +251,7 @@ class func(object):
 		self.setMainSwitchingEnabled(mode_view) 
 		self.page.leID.setReadOnly(not mode_view)
 
-		self.page.pbLoad.setEnabled(mode_view)
+		# self.page.pbLoad.setEnabled(mode_view)
 		self.page.pbEdit  .setEnabled( mode_view and     module_exists )
 		self.page.pbSave  .setEnabled( mode_editing   )
 		self.page.pbCancel.setEnabled( mode_editing   )
@@ -258,9 +259,9 @@ class func(object):
 		# characteristics
 		# Note: most non-editable b/c either fixed or filled in w/ assembly pages
 		#self.page.leLocation.setReadOnly(   not mode_editing )
-		self.page.cbInstitution.setEnabled(     mode_editing )
-		self.page.cbInsertUser.setEnabled(      mode_editing )
-		self.page.cbInspection.setEnabled(      mode_editing )
+		# self.page.cbInstitution.setEnabled(     mode_editing )
+		# self.page.cbInsertUser.setEnabled(      mode_editing )
+		# self.page.cbInspection.setEnabled(      mode_editing )
 
 		# parts and steps
 		self.page.pbGoStepSensor.setEnabled(   mode_view and step_sensor_exists   )
@@ -270,11 +271,12 @@ class func(object):
 		self.page.pbGoPcb.setEnabled(          mode_view and pcb_exists           )
 		self.page.pbGoProtomodule.setEnabled(  mode_view and protomodule_exists   )
 
-		self.page.dsbOffsetTranslationX.setReadOnly( not mode_editing )
-		self.page.dsbOffsetTranslationY.setReadOnly( not mode_editing )
-		self.page.dsbOffsetRotation.setReadOnly(     not mode_editing )
-		self.page.dsbFlatness.setReadOnly(           not mode_editing )
-		self.page.dsbThickness.setReadOnly(          not mode_editing )
+		# Disable editting assemply data
+		# self.page.dsbOffsetTranslationX.setReadOnly( not mode_editing )
+		# self.page.dsbOffsetTranslationY.setReadOnly( not mode_editing )
+		# self.page.dsbOffsetRotation.setReadOnly(     not mode_editing )
+		# self.page.dsbFlatness.setReadOnly(           not mode_editing )
+		# self.page.dsbThickness.setReadOnly(          not mode_editing )
 
 		# comments
 		self.page.pbDeleteComment.setEnabled(mode_editing)

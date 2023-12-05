@@ -360,6 +360,9 @@ before assembly</string>
       <height>20</height>
      </rect>
     </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="QSpinBox" name="sbTool2">
     <property name="geometry">
@@ -385,6 +388,9 @@ before assembly</string>
       <width>131</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QLineEdit" name="lineEdit_23">
@@ -643,7 +649,7 @@ before assembly</string>
      </rect>
     </property>
     <property name="text">
-     <string>Module ID (must type this in manually)</string>
+     <string>Module ID (auto)</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -723,6 +729,9 @@ before assembly</string>
       <height>20</height>
      </rect>
     </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="QPushButton" name="pbGoProtomodule4">
     <property name="geometry">
@@ -771,6 +780,9 @@ before assembly</string>
       <width>131</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QLineEdit" name="leProtomodule3">
@@ -840,6 +852,9 @@ before assembly</string>
       <width>131</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QPushButton" name="pbClear6">
@@ -1048,6 +1063,9 @@ before assembly</string>
       <width>131</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QPushButton" name="pbGoPcb5">

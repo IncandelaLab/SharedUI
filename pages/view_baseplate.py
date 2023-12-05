@@ -5,6 +5,15 @@ PAGE_NAME = "view_baseplate"
 OBJECTTYPE = "baseplate"
 DEBUG = False
 
+SHAPE_TYPE = [
+	# 'Full',
+	'Top',
+	'Bottom',
+	'Left',
+	'Right',
+	'Five'
+]
+
 INDEX_MATERIAL = {
 	'CuW/Kapton':0,
 	'PCB/Kapton':1,
@@ -115,7 +124,8 @@ class func(object):
 
 	@enforce_mode('setup')
 	def rig(self):
-		self.page.pbLoad.clicked.connect(self.loadPart)
+		self.page.leID.textChanged.connect(self.loadPart)
+		# self.page.pbLoad.clicked.connect(self.loadPart)
 		self.page.pbNew.clicked.connect(self.startCreating)
 		self.page.pbEdit.clicked.connect(self.startEditing)
 		self.page.pbSave.clicked.connect(self.saveEditing)
@@ -124,6 +134,7 @@ class func(object):
 		self.page.pbGoStepSensor.clicked.connect(self.goStepSensor)
 		self.page.pbGoProtomodule.clicked.connect(self.goProtomodule)
 		self.page.pbGoModule.clicked.connect(self.goModule)
+		self.page.cbShape.activated.connect(self.updateElements)
 
 		self.page.pbDeleteComment.clicked.connect(self.deleteComment)
 		self.page.pbAddComment.clicked.connect(self.addComment)
@@ -172,6 +183,8 @@ class func(object):
 		if self.page.dsbThickness.value() == -1: self.page.dsbThickness.clear()
 		self.page.dsbFlatness .setValue(-1 if self.baseplate.flatness  is None else self.baseplate.flatness )
 		if self.page.dsbFlatness.value() == -1: self.page.dsbFlatness.clear()
+		self.page.dsbWeight .setValue(-1 if self.baseplate.weight  is None else self.baseplate.weight )
+		if self.page.dsbWeight.value() == -1: self.page.dsbWeight.clear()
 		self.page.cbGrade         .setCurrentIndex(INDEX_GRADE      .get(self.baseplate.grade          , -1))
 
 		if self.baseplate.step_sensor:
@@ -189,7 +202,7 @@ class func(object):
 
 
 	@enforce_mode(['view','editing','creating'])
-	def updateElements(self):
+	def updateElements(self,*args,**kwargs):
 		self.page.leStatus.setText(self.mode)
 
 		baseplate_exists = self.baseplate_exists
@@ -201,11 +214,12 @@ class func(object):
 		mode_view     = self.mode == 'view'
 		mode_editing  = self.mode == 'editing'
 		mode_creating = self.mode == 'creating'
+		is_partial_shape = self.page.cbShape.currentText() in SHAPE_TYPE
 
 		self.setMainSwitchingEnabled(mode_view)
 		self.page.leID.setReadOnly(not mode_view)
 
-		self.page.pbLoad.setEnabled(   mode_view )
+		# self.page.pbLoad.setEnabled(   mode_view )
 		self.page.pbNew.setEnabled(    mode_view and not baseplate_exists )
 		self.page.pbEdit.setEnabled(   mode_view and     baseplate_exists )
 		self.page.pbSave.setEnabled(   mode_creating or mode_editing )
@@ -219,10 +233,11 @@ class func(object):
 		self.page.leBarcode.setReadOnly(   not (mode_creating or mode_editing) )
 		self.page.cbMaterial.setEnabled(        mode_creating or mode_editing  )
 		self.page.cbShape.setEnabled(           mode_creating or mode_editing  )
-		self.page.cbChannelDensity.setEnabled(  mode_creating or mode_editing  )
+		self.page.cbChannelDensity.setEnabled(  (mode_creating or mode_editing) and is_partial_shape )
 
 		self.page.dsbThickness.setEnabled(      mode_creating or mode_editing  )
 		self.page.dsbFlatness.setEnabled(       mode_creating or mode_editing  )
+		self.page.dsbWeight.setEnabled(       mode_creating or mode_editing  )
 		self.page.cbGrade.setEnabled(           mode_creating or mode_editing  )
 
 		self.page.pbDeleteComment.setEnabled(   mode_creating or mode_editing  )
@@ -301,6 +316,7 @@ class func(object):
 		self.baseplate.geometry             = str(self.page.cbShape.currentText())       if str(self.page.cbShape.currentText())       else None
 		self.baseplate.thickness            =     self.page.dsbThickness.value()         if self.page.dsbThickness.value() >=0         else None
 		self.baseplate.flatness             =     self.page.dsbFlatness.value()          if self.page.dsbFlatness.value() >= 0         else None
+		self.baseplate.weight               =     self.page.dsbWeight.value()            if self.page.dsbWeight.value() >= 0           else None
 		self.baseplate.channel_density      = str(self.page.cbChannelDensity.currentText()) if str(self.page.cbChannelDensity.currentText())  else None
 		self.baseplate.grade                = str(self.page.cbGrade.currentText())       if str(self.page.cbGrade.currentText())       else None
 

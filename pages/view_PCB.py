@@ -123,7 +123,8 @@ class func(object):
 
 	@enforce_mode('setup')
 	def rig(self):
-		self.page.pbLoad.clicked.connect(self.loadPart)
+		self.page.leID.textChanged.connect(self.loadPart)
+		# self.page.pbLoad.clicked.connect(self.loadPart)
 		self.page.pbNew.clicked.connect(self.startCreating)
 		self.page.pbEdit.clicked.connect(self.startEditing)
 		self.page.pbSave.clicked.connect(self.saveEditing)
@@ -221,7 +222,7 @@ class func(object):
 		self.setMainSwitchingEnabled(mode_view)
 		self.page.leID.setReadOnly(not mode_view)
 		
-		self.page.pbLoad.setEnabled(mode_view)
+		# self.page.pbLoad.setEnabled(mode_view)
 		self.page.pbNew.setEnabled(    mode_view and not pcb_exists  )
 		self.page.pbEdit.setEnabled(   mode_view and     pcb_exists  )
 		self.page.pbSave.setEnabled(   mode_editing or mode_creating )
