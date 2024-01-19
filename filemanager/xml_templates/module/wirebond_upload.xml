@@ -3,7 +3,7 @@
 <HEADER>
 	<TYPE>
 		<EXTENSION_TABLE_NAME>HGC_MOD_WIREBOND_TEST</EXTENSION_TABLE_NAME>
-		<NAME>HGC Six Inch Module Wire Bond Pull Test</NAME>
+		<NAME>HGC Eight Inch Module Wire Bond Pull Test</NAME>
 	</TYPE>
 	<RUN>
 		<RUN_NAME>Wirebonding data</RUN_NAME>

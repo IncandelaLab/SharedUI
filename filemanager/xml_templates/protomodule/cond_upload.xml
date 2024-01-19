@@ -3,7 +3,7 @@
 <HEADER>
 	<TYPE>
 		<EXTENSION_TABLE_NAME>HGC_PRTO_MOD_ASMBLY_COND</EXTENSION_TABLE_NAME>
-		<NAME>HGC Six Inch Proto Module Curing Cond</NAME>
+		<NAME>HGC Eight Inch Proto Module Curing Cond</NAME>
 	</TYPE>
 	<RUN>
 		<RUN_NAME>ProtoModule Assembly</RUN_NAME>
