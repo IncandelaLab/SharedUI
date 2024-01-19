@@ -27,6 +27,68 @@ INDEX_INSTITUTION = {
 	'FSU':11,
 }
 
+# Naming dictionary
+NAME_DENSITY = {
+	'LD' : 'L',
+	'HD' : 'H'
+}
+NAME_GEOMETRY = {
+	'Full'   : 'F',
+	'Top'    : 'T',
+	'Bottom' : 'B',
+	'Left'   : 'L',
+	'Right'  : 'R',
+	'Five'   : '5',
+	# 'Full+Three' : 'F' # not sure if necessary
+}
+NAME_THICKNESS = {
+    '120um' : '1',
+    '200um' : '2',
+	'300um' : '3'
+}
+NAME_MATERIAL = {
+	'CuW/Kapton' : 'W',
+	'PCB/Kapton' : 'P',
+	'CF/Kapton'  : 'C'
+}
+NAME_VERSION = {
+	'preseries'  : 'X',
+	'production' : '0'  # TBD, currently set to X
+}
+NAME_INSTITUTION = {
+	'CERN'  : 'CN', # TBD ?
+	'FNAL'  : 'FL', # TBD ?
+	'UCSB'  : 'SB',
+	'UMN'   : 'MN', # TBD ?
+	'HEPHY' : 'HY', # TBD ?
+	'HPK'   : 'HK', # TBD ?
+	'CMU'   : 'CM',
+	'TTU'   : 'TT',
+	'IHEP'  : 'IH',
+	'TIFR'  : 'TI', # TBD ?
+	'NTU'   : 'NT',
+	'FSU'   : 'FS'  # TBD ?
+}
+
+def is_proper_name(name):
+	# check if the protomodule name is proper
+	density_list = list(NAME_DENSITY.values())
+	geometry_list = list(NAME_GEOMETRY.values())
+	thickness_list = list(NAME_THICKNESS.values())
+	material_list = list(NAME_MATERIAL.values())
+	version_list = list(NAME_VERSION.values())
+	institution_list = list(NAME_INSTITUTION.values())
+	flag = False
+	if name[0] == 'P' \
+		and name[1] in density_list \
+		and name[2] in geometry_list \
+		and name[3] in thickness_list \
+		and name[4] in material_list \
+		and name[5] in version_list \
+		and name[7:9] in institution_list:
+		flag = True
+	return flag
+
 STATUS_NO_ISSUES = "valid (no issues)"
 STATUS_ISSUES    = "invalid (issues present)"
 
@@ -487,7 +549,7 @@ class func(object):
 			self.sb_tools[i].setReadOnly(       mode_view)
 			self.le_pcbs[i].setReadOnly(        mode_view)
 			self.le_protomodules[i].setReadOnly(mode_view)
-			# self.le_modules[i].setReadOnly(     mode_view)
+			self.le_modules[i].setReadOnly(     mode_view)  # turn on maual change module name
 			self.pb_go_tray_assemblys[i].setEnabled(mode_creating or (mode_view and self.sb_tray_assemblys[i].value() != -1) )
 			self.pb_go_tools[i].setEnabled(       mode_view and tools_exist[i]       )
 			self.pb_go_pcbs[i].setEnabled(        mode_creating or (mode_view and self.le_pcbs[i].text()            != "") )
@@ -507,7 +569,10 @@ class func(object):
 
 		# update module name from protomodule name
 		for i in range(6):
-			self.le_modules[i].setText('M'+self.le_protomodules[i].text()[1:] if self.le_protomodules[i].text() != ""  else "")
+			if self.le_protomodules[i].text() != "" and is_proper_name(self.le_protomodules[i].text()):
+				self.le_modules[i].setText("M"+self.le_protomodules[i].text()[1:])
+			# else:
+			# 	self.le_modules[i].setText("")
 
 		# NEW:  Update pb's based on search result
 		for i in range(6):
@@ -963,7 +1028,10 @@ class func(object):
 			protomodules.append(self.le_protomodules[i].text() if self.le_protomodules[i].text() != "" else None)
 			# modules.append(     self.le_modules[i].text()      if self.le_modules[i].text()      != "" else None)
 			# Auto generate module name from protomodule
-			modules.append(     'M' + self.le_protomodules[i].text()[1:]      if self.le_protomodules[i].text()      != "" else None)
+			if self.le_modules[i].text() != "":
+				modules.append(self.le_modules[i].text())
+			else:
+				modules.append(None)
 	
 		self.step_pcb.pcbs         = pcbs
 		self.step_pcb.protomodules = protomodules

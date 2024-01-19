@@ -594,6 +594,7 @@ class func(object):
 			self.pb_go_tools[i].setEnabled(       mode_view and tools_exist[i])
 			self.cb_versions[i].setEnabled( mode_creating or mode_editing)
 			self.sb_serials[i].setReadOnly(    mode_view)
+			self.le_protomodules[i].setReadOnly(       mode_view)  # turn on maual change protomodule name
 			# ENABLED IF:
 			# - creating
 			# - view, and part exists
@@ -1060,7 +1061,9 @@ class func(object):
 			# Auto name the proto module
 			if self.le_baseplates[i].text() != "" and self.le_sensors[i].text() != "":
 				# protomodules.append("P{}_{}".format(self.le_baseplates[i].text(), self.le_sensors[i].text()))
-				protomodules.append(self.make_name(i))
+				if self.le_protomodules[i].text() != "":
+					protomodules.append(self.le_protomodules[i].text())
+				# protomodules.append(self.make_name(i))
 			else:
 				protomodules.append(None)
 		#self.step_sensor.asmbl_tray_names = trays

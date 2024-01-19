@@ -582,7 +582,7 @@ class protomodule(fsobj_part):
 		t = []
 		for tp in [self.batch_tape_50, self.batch_tape_120]:
 			if tp != None:  t.append(tp)
-		return ';;'.join(tp)
+		return ';;'.join(t)
 
 
 	## Functions
@@ -860,7 +860,7 @@ class module(fsobj_part):
 		t = []
 		for tp in [self.batch_tape_50, self.batch_tape_120]:
 			if tp != None:  t.append(tp)
-		return ';;'.join(tp)
+		return ';;'.join(t)
 
 
 	# new():  Optionally, create proto from baseplate and sensor objects
