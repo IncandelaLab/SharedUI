@@ -54,9 +54,14 @@ Currently, parts (baseplates, sensors, etc) can only be created locally, as DB c
 
 Once all necessary information in the parts, tooling, and supplies section has been filled in, you can proceed to the production steps.  The production step pages are broadly similar to the previous ones, but with one major difference:  the data will be automatically checked for errors, and if any are found, a message explaining the problem will appear in the status box.  (For instance, entering in a nonexistent part or partially filling a row will produce errors.)  Once all errors have been resolved, you can save the step.
 
+#### (NEW) Auto-naming protomodule and module
+In production step 1, the protomodule ID will be auto-generated (in standard naming scheme) after providing the sensor ID, baseplate ID, version (preseries/production) and serial number. The next largest serial number will be assigned if the "next" button under "serial number" is clicked.
+Similarly, in step 3, the module ID will be auto-generated after providing the protomodule ID that has the standard format.
+The auto-generated IDs are also allowed to modify if there's a need for editing.
+
 ### Part, tool and supply search
 
-The Search page is designed to search for both parts and tools/supplies. They are organized into two parallel sections, and can work simutaneously without conflict.
+The Search page is designed to search for **both parts and tools/supplies**. They are organized into two parallel sections, and can work simutaneously without conflict.
 
 To use the search page, simply select the type of item you want to search for using the drop-down menu at the upper-left-hand corner, then select any other criteria you want using the options below.  You can then press "Search" to perform the query and display the results.  Lastly, you can jump to an item's info page by clicking on the item's name in the "search results" box, then clicking the "Go to selected item" button underneath.
 
