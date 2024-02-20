@@ -4,7 +4,7 @@
 		<PART mode="auto">
 			<KIND_OF_PART>{{ kind_of_part }}</KIND_OF_PART>
 			<SERIAL_NUMBER>{{ ID }}</SERIAL_NUMBER>
-			<LOCATION>{{ location }}</LOCATION>
+			<!-- <LOCATION>{{ location }}</LOCATION> -->
 			<RECORD_INSERTION_USER>{{ record_insertion_user }}</RECORD_INSERTION_USER>
 			<COMMENT_DESCRIPTION>n/a</COMMENT_DESCRIPTION>
 		</PART>

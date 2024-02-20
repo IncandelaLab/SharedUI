@@ -1355,6 +1355,9 @@ before assembly</string>
       <height>20</height>
      </rect>
     </property>
+    <property name="currentText">
+     <string/>
+    </property>
     <property name="currentIndex">
      <number>-1</number>
     </property>
@@ -1365,7 +1368,7 @@ before assembly</string>
     </item>
     <item>
      <property name="text">
-      <string>generation</string>
+      <string>production</string>
      </property>
     </item>
    </widget>
@@ -1388,7 +1391,7 @@ before assembly</string>
     </item>
     <item>
      <property name="text">
-      <string>generation</string>
+      <string>production</string>
      </property>
     </item>
    </widget>
@@ -1401,9 +1404,6 @@ before assembly</string>
       <height>20</height>
      </rect>
     </property>
-    <property name="currentIndex">
-     <number>-1</number>
-    </property>
     <item>
      <property name="text">
       <string>preseries</string>
@@ -1411,7 +1411,7 @@ before assembly</string>
     </item>
     <item>
      <property name="text">
-      <string>generation</string>
+      <string>production</string>
      </property>
     </item>
    </widget>
@@ -1424,9 +1424,6 @@ before assembly</string>
       <height>20</height>
      </rect>
     </property>
-    <property name="currentIndex">
-     <number>-1</number>
-    </property>
     <item>
      <property name="text">
       <string>preseries</string>
@@ -1434,7 +1431,7 @@ before assembly</string>
     </item>
     <item>
      <property name="text">
-      <string>generation</string>
+      <string>production</string>
      </property>
     </item>
    </widget>
@@ -1447,9 +1444,6 @@ before assembly</string>
       <height>20</height>
      </rect>
     </property>
-    <property name="currentIndex">
-     <number>-1</number>
-    </property>
     <item>
      <property name="text">
       <string>preseries</string>
@@ -1457,7 +1451,7 @@ before assembly</string>
     </item>
     <item>
      <property name="text">
-      <string>generation</string>
+      <string>production</string>
      </property>
     </item>
    </widget>
@@ -1470,9 +1464,6 @@ before assembly</string>
       <height>20</height>
      </rect>
     </property>
-    <property name="currentIndex">
-     <number>-1</number>
-    </property>
     <item>
      <property name="text">
       <string>preseries</string>
@@ -1480,7 +1471,7 @@ before assembly</string>
     </item>
     <item>
      <property name="text">
-      <string>generation</string>
+      <string>production</string>
      </property>
     </item>
    </widget>

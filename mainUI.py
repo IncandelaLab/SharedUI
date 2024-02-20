@@ -7,7 +7,7 @@ import os
 
 # FOR DATABASE COMMUNICATION:
 #from cmsdbldr_client import LoaderClient
-#import atexit  # Close ssh tunnel upon exiting the GUI
+import atexit  # Close ssh tunnel upon exiting the GUI
 import glob
 
 # For uploading XML files in background

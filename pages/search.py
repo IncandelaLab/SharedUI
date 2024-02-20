@@ -286,7 +286,7 @@ and l.LOCATION_NAME like \'{}\'"*"*".format(pt_query, search_criteria['location_
 		self.page.cbShape         .setEnabled(part_type != '')
 		self.page.cbMaterial      .setEnabled(part_type == 'Baseplate')
 		self.page.cbThickness     .setEnabled(part_type == 'Sensor')
-		self.page.cbChannelDensity.setEnabled(True)
+		self.page.cbChannelDensity.setEnabled(part_type != 'Baseplate')
 		self.page.ckUseDate       .setEnabled(part_type == 'Protomodule' or part_type == 'Module')
 		useDate = self.page.ckUseDate.isChecked()
 		self.page.dCreated        .setReadOnly(not (part_type == 'Protomodule' or part_type == 'Module'))

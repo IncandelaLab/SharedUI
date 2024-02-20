@@ -54,7 +54,7 @@ NAME_MATERIAL = {
 }
 NAME_VERSION = {
 	'preseries'  : 'X',
-	'production' : '0'  # TBD, currently set to X
+	'production' : 'X'  # TBD, currently set to X
 }
 NAME_INSTITUTION = {
 	'CERN'  : 'CN', # TBD ?
@@ -345,6 +345,12 @@ class func(object):
 			self.le_sensors[i].textChanged.connect( self.loadSensor)
 
 			self.cb_versions[i].activated.connect( self.updateIssues )
+
+			# update protomodule ID
+			self.le_baseplates[i].textChanged.connect( self.update_protoID)
+			self.le_sensors[i].textChanged.connect( self.update_protoID)
+			self.cb_versions[i].activated.connect( self.update_protoID )
+			self.sb_serials[i].valueChanged.connect( self.update_protoID )
 
 			self.pb_clears[i].clicked.connect(self.clearRow)
 
@@ -1151,6 +1157,7 @@ class func(object):
 		self.le_baseplates[which].clear()
 		self.cb_versions[which].clear()
 		self.sb_serials[which].clear()
+		self.le_protomodules[which].clear()
 		# clear tray assembly only if current and neighboring rows are clear
 		uprow   = which if which%2==0 else which-1
 		downrow = which if which%2!=0 else which+1
@@ -1360,6 +1367,16 @@ class func(object):
 		self.le_protomodules[which].setText(self.make_name(which))
 		self.update_info()
 
+	def update_protoID(self, *args, **kwargs):
+		for i in range(6):
+			# print("updating state for {}".format(i))
+			# print("params: {} {} {}".format(self.le_sensors[i].text(), self.le_baseplates[i].text(), self.cb_versions[i].currentIndex(), self.sb_serials[i].value()))
+			# Update name if the pamams are not empty
+			if self.le_sensors[i].text() != "" and self.le_baseplates[i].text()\
+			and self.cb_versions[i].currentIndex() != -1 and self.sb_serials[i].value() >=1:
+				self.sensors[i].load(   self.le_sensors[i].text())
+				self.baseplates[i].load(   self.le_baseplates[i].text())
+				self.le_protomodules[i].setText(self.make_name(i))
 
 	def filesToUpload(self):
 		# Return a list of all files to upload to DB
