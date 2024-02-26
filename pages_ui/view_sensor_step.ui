@@ -1404,6 +1404,12 @@ before assembly</string>
       <height>20</height>
      </rect>
     </property>
+    <property name="currentText">
+     <string/>
+    </property>
+    <property name="currentIndex">
+     <number>-1</number>
+    </property>
     <item>
      <property name="text">
       <string>preseries</string>
@@ -1423,6 +1429,9 @@ before assembly</string>
       <width>101</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="currentIndex">
+     <number>-1</number>
     </property>
     <item>
      <property name="text">
@@ -1444,6 +1453,9 @@ before assembly</string>
       <height>20</height>
      </rect>
     </property>
+    <property name="currentIndex">
+     <number>-1</number>
+    </property>
     <item>
      <property name="text">
       <string>preseries</string>
@@ -1463,6 +1475,9 @@ before assembly</string>
       <width>101</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="currentIndex">
+     <number>-1</number>
     </property>
     <item>
      <property name="text">

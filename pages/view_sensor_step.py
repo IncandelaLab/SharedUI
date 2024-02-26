@@ -1376,7 +1376,8 @@ class func(object):
 			and self.cb_versions[i].currentIndex() != -1 and self.sb_serials[i].value() >=1:
 				self.sensors[i].load(   self.le_sensors[i].text())
 				self.baseplates[i].load(   self.le_baseplates[i].text())
-				self.le_protomodules[i].setText(self.make_name(i))
+				if self.sensors[i].ID is not None and self.baseplates[i].ID is not None and self.cb_versions[i].currentText() != '' and self.sb_serials[i].value() != 0:
+					self.le_protomodules[i].setText(self.make_name(i))
 
 	def filesToUpload(self):
 		# Return a list of all files to upload to DB
