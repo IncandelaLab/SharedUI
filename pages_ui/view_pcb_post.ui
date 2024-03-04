@@ -392,8 +392,8 @@
    <widget class="QPushButton" name="pbSave">
     <property name="geometry">
      <rect>
-      <x>100</x>
-      <y>50</y>
+      <x>20</x>
+      <y>80</y>
       <width>71</width>
       <height>21</height>
      </rect>
@@ -405,7 +405,7 @@
    <widget class="QPushButton" name="pbCancel">
     <property name="geometry">
      <rect>
-      <x>60</x>
+      <x>100</x>
       <y>80</y>
       <width>71</width>
       <height>21</height>
@@ -418,7 +418,7 @@
    <widget class="QPushButton" name="pbEdit">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>100</x>
       <y>50</y>
       <width>71</width>
       <height>21</height>
@@ -500,6 +500,22 @@
       <string>FSU</string>
      </property>
     </item>
+   </widget>
+   <widget class="QPushButton" name="pbNext">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>50</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Next</string>
+    </property>
    </widget>
   </widget>
   <widget class="QFrame" name="frame_3">

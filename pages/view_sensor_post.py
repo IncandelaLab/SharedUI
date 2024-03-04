@@ -1,6 +1,8 @@
 from PyQt5 import QtCore
 import time
 import datetime
+import os
+import json
 # for xml loading:
 import csv
 from xml.etree.ElementTree import parse
@@ -203,6 +205,7 @@ class func(object):
 		self.page.sbID.valueChanged.connect(self.loadStep)
 		self.page.cbInstitution.activated.connect( self.loadStep )
 
+		self.page.pbNext.clicked.connect(self.startCreating)
 		self.page.pbEdit.clicked.connect(self.startEditing)
 		self.page.pbSave.clicked.connect(self.saveEditing)
 		self.page.pbCancel.clicked.connect(self.cancelEditing)
@@ -334,6 +337,7 @@ class func(object):
 			self.dsb_flatness[i]   .setReadOnly(not (mode_editing and protomodules_exist[i]))
 			self.cb_grades[i]      .setEnabled(      mode_editing and protomodules_exist[i])
 
+		self.page.pbNext.setEnabled(    mode_view)
 		self.page.pbEdit.setEnabled(   mode_view and     step_sensor_exists )
 		self.page.pbSave.setEnabled(   mode_editing        )
 		self.page.pbCancel.setEnabled( mode_editing        )
@@ -389,6 +393,38 @@ class func(object):
 			self.step_sensor = tmp_step
 			self.update_info()
 
+	@enforce_mode('view')
+	def startCreating(self,*args,**kwargs):
+		# NEW:  Search for all steps at this institution, then create the next in order
+		if self.page.cbInstitution.currentText() == "":  return
+		part_file_name = os.sep.join([ fm.DATADIR, 'partlist', 'step_sensors.json' ])
+		with open(part_file_name, 'r') as opfl:
+			part_list = json.load(opfl)
+		tmp_inst = self.page.cbInstitution.currentText()
+		ids = []
+		for part_id, date in part_list.items():
+			inst, num = part_id.split("_")
+			if inst == tmp_inst:
+				ids.append(int(num))
+		if ids:
+			tmp_ID = max(ids)
+		else:
+			tmp_ID = 0
+		self.page.sbID.setValue(tmp_ID)
+
+		tmp_step = assembly.step_sensor()
+		tmp_exists = tmp_step.load("{}_{}".format(tmp_inst, tmp_ID))
+		if tmp_exists:
+			self.step_sensor = tmp_step
+			self.mode = 'editing'
+			self.loadAllObjects()
+			self.update_info()
+		# if not tmp_exists:
+		# 	self.step_sensor.new("{}_{}".format(tmp_inst, tmp_ID))
+		# 	self.mode = 'creating'
+		# 	self.updateElements()
+
+ 
 	@enforce_mode('view')
 	def startEditing(self,*args,**kwargs):
 		tmp_step = assembly.step_sensor()
