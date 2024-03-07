@@ -23,7 +23,7 @@
 		</PART>
 		<DATA>
 			<BOND_WIRE_BATCH_NUM>{{ bond_wire_batch_num }}</BOND_WIRE_BATCH_NUM>
-			<PRE_INSPECTION>{{ pre_inspection }}<PRE_INSPECTION>
+			<PRE_INSPECTION>{{ pre_inspection }}</PRE_INSPECTION>
 			<SYLGARD_BATCH>{{ sylgard_batch }}</SYLGARD_BATCH>
 			<WEDGE_BATCH>{{ wedge_batch }}</WEDGE_BATCH>
 
@@ -45,13 +45,13 @@
 			<BACK_ENCAP>{{ back_encap }}</BACK_ENCAP>
 			<BACK_ENCAP_USER>{{ back_encap_user }}</BACK_ENCAP_USER>
 			<BACK_ENCAP_CURE_START>{{ back_encap_cure_start }}</BACK_ENCAP_CURE_START>
-			<BACK_ENCAP_CURE_STOP>{{ back_encap_cure_stop }}</BACK_ENCAP_CURE_STOP.
+			<BACK_ENCAP_CURE_STOP>{{ back_encap_cure_stop }}</BACK_ENCAP_CURE_STOP>
 			<BACK_ENCAP_INSPXN>{{ back_encap_inspxn }}</BACK_ENCAP_INSPXN>
 			
 			<FRONT_ENCAP>{{ front_encap }}</FRONT_ENCAP>
 			<FRONT_ENCAP_USER>{{ front_encap_user }}</FRONT_ENCAP_USER>
 			<FRONT_ENCAP_CURE_START>{{ front_encap_cure_start }}</FRONT_ENCAP_CURE_START>
-			<FRONT_ENCAP_CURE_STOP>{{ front_encap_cure_stop }}</FRONT_ENCAP_CURE_STOP.
+			<FRONT_ENCAP_CURE_STOP>{{ front_encap_cure_stop }}</FRONT_ENCAP_CURE_STOP>
 			<FRONT_ENCAP_INSPXN>{{ front_encap_inspxn }}</FRONT_ENCAP_INSPXN>
 
 			<IS_TEST_BOND_MODULE>{{ is_test_bond_module }}</IS_TEST_BOND_MODULE>

@@ -346,6 +346,7 @@ class func(object):
 		self.page.pbEdit.clicked.connect(self.startEditing)
 		self.page.pbSave.clicked.connect(self.saveEditing)
 		self.page.pbCancel.clicked.connect(self.cancelEditing)
+		self.page.pbLoad.clicked.connect(self.loadSensorStep)
 
 		self.page.cbAdhesive.currentIndexChanged.connect(self.switchAdhesive)
 		self.page.pbGoBatchAraldite.clicked.connect(self.goBatchAraldite)
@@ -537,6 +538,10 @@ class func(object):
 		self.page.leTextTape50  .setEnabled(not (mode_view or mode_searching or (adhesive!="Tape" and adhesive!="Hybrid")))
 		self.page.leTape120     .setReadOnly(mode_view or mode_searching or (adhesive!="Tape" and adhesive!="Hybrid"))
 		self.page.leTextTape120 .setEnabled(not (mode_view or mode_searching or (adhesive!="Tape" and adhesive!="Hybrid")))
+		
+		self.page.leMaxSensorStep.setReadOnly(True)
+		self.page.pbLoad.setEnabled(mode_creating or mode_editing)
+		self.page.sbSensorStep.setReadOnly(mode_view)
 
 		self.page.pbGoTrayComponent.setEnabled(mode_view and self.page.sbTrayComponent.value() >= 0)
 		#self.page.pbGoTrayAssembly .setEnabled(mode_view and self.page.sbTrayAssembly .value() >= 0)
@@ -571,8 +576,8 @@ class func(object):
 		for i in range(6):
 			if self.le_protomodules[i].text() != "" and is_proper_name(self.le_protomodules[i].text()):
 				self.le_modules[i].setText("M"+self.le_protomodules[i].text()[1:])
-			# else:
-			# 	self.le_modules[i].setText("")
+			else:
+				self.le_modules[i].setText("")
 
 		# NEW:  Update pb's based on search result
 		for i in range(6):
@@ -588,6 +593,8 @@ class func(object):
 		self.page.pbGoTape50.setText("select" if t50 == "" else "go to")
 		t120 = self.page.leTape120.text()
 		self.page.pbGoTape120.setText("select" if t120 == "" else "go to")
+
+		# self.setMaxSensorStep()
 
 
 	@enforce_mode(['editing','creating'])
@@ -969,6 +976,27 @@ class func(object):
 			self.step_pcb = tmp_step
 			self.update_info()
 
+	# @enforce_mode('view')
+	def loadSensorStep(self,*args,**kwargs):
+		if self.page.sbSensorStep.value() == -1:  return
+		if self.page.cbInstitution.currentText() == "":  return
+		tmp_step = assembly.step_sensor()
+		tmp_ID = self.page.sbSensorStep.value()
+		tmp_inst = self.page.cbInstitution.currentText()
+		tmp_exists = tmp_step.load("{}_{}".format(tmp_inst, tmp_ID))
+		if not tmp_exists:
+			self.update_info()
+			print("Sensor step {} does not exist".format(tmp_ID))
+		else:
+			if not (tmp_step.protomodules is None):
+				for i in range(6):
+					self.le_protomodules[i].setText(str(tmp_step.protomodules[i]) if not (tmp_step.protomodules[i] is None) else "")
+					if not (tmp_step.asmbl_tray_nums[i] is None):
+						self.sb_tray_assemblys[i].setValue(tmp_step.asmbl_tray_nums[i])
+					# self.sb_tray_assemblys[i].setValue(tmp_step.asmbl_tray_nums[i] if not (tmp_step.asmbl_tray_nums[i] is None) else -1)
+			self.update_info()
+			print("Sensor step {} loaded".format(tmp_ID))
+
 	@enforce_mode('view')
 	def startCreating(self,*args,**kwargs):
 		# NEW:  Search for all steps at this institution, then create the next in order
@@ -994,6 +1022,7 @@ class func(object):
 			self.step_pcb.new("{}_{}".format(tmp_inst, tmp_ID))
 			self.mode = 'creating'
 			self.updateElements()
+			self.setMaxSensorStep()
 
 	@enforce_mode('view')
 	def startEditing(self,*args,**kwargs):
@@ -1111,6 +1140,7 @@ class func(object):
 		self.sb_tools[which].clear()
 		self.le_pcbs[which].clear()
 		self.le_protomodules[which].clear()
+		self.le_modules[which].clear()
 		# clear tray assembly only if current and neighboring rows are clear
 		uprow   = which if which%2==0 else which-1
 		downrow = which if which%2!=0 else which+1
@@ -1313,3 +1343,23 @@ class func(object):
 	def changed_to(self):
 		print("changed to {}".format(PAGE_NAME))
 		self.update_info()
+
+	def setMaxSensorStep(self,*args,**kwargs):
+		# NEW:  Search for all sensor steps at this institution, then set the max value
+		if self.page.cbInstitution.currentText() == "":  return
+		part_file_name = os.sep.join([ fm.DATADIR, 'partlist', 'step_sensors.json' ])
+		with open(part_file_name, 'r') as opfl:
+			part_list = json.load(opfl)
+		tmp_inst = self.page.cbInstitution.currentText()
+		ids = []
+		for part_id, date in part_list.items():
+			inst, num = part_id.split("_")
+			if inst == tmp_inst:
+				ids.append(int(num))
+		if ids:
+			tmp_ID = max(ids)
+		else:
+			tmp_ID = 0
+		self.page.leMaxSensorStep.setText(str(tmp_ID))
+		self.page.sbSensorStep.setMaximum(tmp_ID)
+		self.page.sbSensorStep.setValue(tmp_ID)
