@@ -1035,6 +1035,7 @@ class func(object):
 			self.mode = 'editing'
 			self.loadAllObjects()
 			self.update_info()
+			self.setMaxSensorStep()
 
 	@enforce_mode(['editing','creating'])
 	def cancelEditing(self,*args,**kwargs):

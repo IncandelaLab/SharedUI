@@ -233,7 +233,8 @@ class func(object):
 		self.page.leBarcode.setReadOnly(   not (mode_creating or mode_editing) )
 		self.page.cbMaterial.setEnabled(        mode_creating or mode_editing  )
 		self.page.cbShape.setEnabled(           mode_creating or mode_editing  )
-		self.page.cbChannelDensity.setEnabled(  (mode_creating or mode_editing) and is_partial_shape )
+		# self.page.cbChannelDensity.setEnabled(  (mode_creating or mode_editing) and is_partial_shape )
+		self.page.cbChannelDensity.setEnabled(  (mode_creating or mode_editing))  ## to enable DB upload for now
 
 		self.page.dsbThickness.setEnabled(      mode_creating or mode_editing  )
 		self.page.dsbFlatness.setEnabled(       mode_creating or mode_editing  )

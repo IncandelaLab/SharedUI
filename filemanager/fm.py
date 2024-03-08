@@ -11,8 +11,20 @@ from jinja2 import Template
 
 #import rhapi_nolock as rh
 
+import oracledb
+
 # IMPORTANT NOTE:  Setting this to false disables DB communication.  Purely for debugging.
-ENABLE_DB_COMMUNICATION = False
+# ENABLE_DB_COMMUNICATION = False
+ENABLE_DB_COMMUNICATION = True
+CON = None
+DB_CURSOR = None
+
+def db_connect():
+	if not ENABLE_DB_COMMUNICATION:
+		return
+	CON = oracledb.connect(user="CMS_HGC_PRTTYPE_HGCAL_READER", password="HGCAL_Reader_2016", dsn="localhost:10131/int2r_lb.cern.ch")  # create connection
+	DB_CURSOR = CON.cursor()
+
 
 
 INSTITUTION_DICT = {  # For loading from/to LOCATION_ID XML tag
@@ -364,10 +376,11 @@ class fsobj(object):
 		if self.XML_TEMPLATES is None:  return None
 		filedir, filename = self.get_filedir_filename()
 		upFiles = []
-		for xt in self.XML_TEMPLATES:
+		for template_file in self.XML_TEMPLATES:
 			template_file_name = os.path.basename(template_file)
-			outfile =  filename.replace(".xml", "") + "_" + template_file_name
-			upFiles.append(outfile)
+			outfile = filename.replace(".json", "") + "_" + template_file_name
+			outfile_fullname = os.sep.join([filedir, outfile])
+			upFiles.append(outfile_fullname)
 		return upFiles
 
 

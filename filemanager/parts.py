@@ -840,7 +840,11 @@ class module(fsobj_part):
 
 	@property
 	def wirebond_comments_concat(self):
-		return ";;".join(self.wirebond_comments)
+		# return ";;".join(self.wirebond_comments)
+		# NOTE:  Can't upload empty string, so...
+		if self.wirebond_comments is None:  return "None"
+		if self.wirebond_comments == "":  return "None"
+		return self.wirebond_comments[:4000] if len(self.wirebond_comments)>4000 else self.wirebond_comments
 	
 	@property
 	def wirebonding_completed(self):
@@ -862,6 +866,10 @@ class module(fsobj_part):
 			if tp != None:  t.append(tp)
 		return ';;'.join(t)
 
+	@property
+	def step_pcb_num(self):
+		if self.step_pcb is None:  return None
+		return int(self.step_pcb.split('_')[1])
 
 	# new():  Optionally, create proto from baseplate and sensor objects
 	# Note:  baseplate and sensor must be the actual objects, not IDs

@@ -178,14 +178,20 @@ class func(object):
 
 		# comments
 		self.page.listComments.clear()
-		for comment in self.module.wirebond_comments:
-			self.page.listComments.addItem(comment)
+		# for comment in self.module.wirebond_comments:
+		# 	self.page.listComments.addItem(comment)
+		if self.module.wirebond_comments:
+			for comment in self.module.wirebond_comments.split(';;'):
+				self.page.listComments.addItem(comment)
 		self.page.pteWriteComment.clear()
 
 		# Not in DB, maybe ignore?
 		self.page.listCommentsEncap.clear()
-		for comment in self.module.encapsulation_comments:
-			self.page.listCommentsEncap.addItem(comment)
+		# for comment in self.module.encapsulation_comments:
+		# 	self.page.listCommentsEncap.addItem(comment)
+		if self.module.encapsulation_comments:
+			for comment in self.module.encapsulation_comments.split(';;'):
+				self.page.listCommentsEncap.addItem(comment)
 		self.page.pteWriteCommentEncap.clear()
 
 
@@ -436,11 +442,12 @@ class func(object):
 
 		# comments
 		num_comments = self.page.listComments.count()
-		self.module.wirebond_comments = [self.page.listComments.item(i).text() for i in range(num_comments)]
+		# self.module.wirebond_comments = [self.page.listComments.item(i).text() for i in range(num_comments)]
+		self.module.wirebond_comments = ';;'.join([self.page.listComments.item(i).text() for i in range(num_comments)])
 
-		# Commented for now
 		num_comments_encap = self.page.listCommentsEncap.count()
-		self.module.encapsulation_comments = [self.page.listCommentsEncap.item(i).text() for i in range(num_comments_encap)]
+		# self.module.encapsulation_comments = [self.page.listCommentsEncap.item(i).text() for i in range(num_comments_encap)]
+		self.module.encapsulation_comments = ';;'.join([self.page.listComments.item(i).text() for i in range(num_comments_encap)])
 
 		# pre-wirebonding qualification
 		self.module.pre_inspection  = str(self.page.cbPreinspection.currentText()  ) if str(self.page.cbPreinspection.currentText()  ) else None
@@ -496,6 +503,8 @@ class func(object):
 		self.update_info()
 
 		self.xmlModList.append(self.module.ID)
+
+		self.module.generate_xml()
 
 
 	@enforce_mode('editing')

@@ -290,6 +290,8 @@ class func(object):
 		self.mode = 'view'
 		self.update_info()
 
+		self.protomodule.generate_xml()  # allow modification of comments (not in xml)
+
 	
 	@enforce_mode('editing')
 	def deleteComment(self,*args,**kwargs):

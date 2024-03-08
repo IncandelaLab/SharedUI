@@ -11,8 +11,9 @@ import atexit  # Close ssh tunnel upon exiting the GUI
 import glob
 
 # For uploading XML files in background
-#import threading
+import threading
 #import subprocess
+import pexpect
 
 
 # Import page functionality classes
@@ -227,20 +228,25 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		#	if loginResult == 1:  break
 		#	attempts += 1
 		self.username = ldlg.getUsername()
+		self.password = ldlg.getPassword()
 		print("Got username:  ",  ldlg.getUsername())
 		# WARNING:  May need ot be changed for developemnt DB!
 		# to:  ssh -L 10221:itrac5403-v.cern.ch:10121 -L 10222:itrac5423-v.cern.ch:10121 -L 10223:itrac5432-v.cern.ch:10121 username@lxplus.cern.ch
-		os.system('ssh -fNT -M -S temp_socket -L 10131:itrac1609-v.cern.ch:10121 -L 10132:itrac1601-v.cern.ch:10121 {}@lxplus.cern.ch'.format(self.username))
+		# os.system('ssh -fNT -M -S temp_socket -L 10131:itrac1609-v.cern.ch:10121 -L 10132:itrac1601-v.cern.ch:10121 {}@lxplus.cern.ch'.format(self.username))
 		#os.system('ssh -vvv -f -N -M -L 10131:itrac1609-v.cern.ch:10121 -L 10132:itrac1601-v.cern.ch:10121 {}@lxplus.cern.ch'.format(self.username))
+
+		# Now, connect to the DB
+		# fm.db_connect()
+	
 		# Close upon exiting
-		def close_ssh():
-			print("Closing ssh connection")
-			os.system('ssh -S temp_socket -O exit lxplus.cern.ch')
-			print("Closed ssh connection")
-		atexit.register(close_ssh)
+		# def close_ssh():
+		# 	print("Closing ssh connection")
+		# 	os.system('ssh -S temp_socket -O exit lxplus.cern.ch')
+		# 	print("Closed ssh connection")
+		# atexit.register(close_ssh)
 
 		# After tunnel established, :
-		fm.connectOracle()
+		# fm.connectOracle()
 
 
 	def setupPagesUI(self):
@@ -339,9 +345,9 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 
 			# NEW:  Enable/disable uploading accordingly.
 			enableUploading = which_page in UPLOAD_ENABLED_PAGES
-			#self.pbUploadObject.setEnabled(enableUploading)
-			#self.pbUploadDate.setEnabled(  enableUploading)
-			#self.dUpload.setEnabled(       enableUploading)
+			self.pbUploadObject.setEnabled(enableUploading)
+			# self.pbUploadDate.setEnabled(  enableUploading)
+			# self.dUpload.setEnabled(       enableUploading)
 			self.leStatus.setText("")
 			self.leStatus.setEnabled(      enableUploading)
 
@@ -418,13 +424,37 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 			# Note:  .bash_history does NOT store commands run w/ subprocess
 			#upload_status = lc.run(iargs=["--login", "--url", "https://cmsdca.cern.ch/hgc_loader/hgc/int2r", f, "--verbose"])
 			self.leStatus.setText("TEMP: OPEN TERMINAL WINDOW AND ENTER PASSWORD")
-			scpcmd = "scp -vvv {} {}@dbloader-hgcal.cern.ch:/home/dbspool/spool/hgc/int2r".format(f, self.username)
-			print("Scping...")
-			result = os.system(scpcmd)
-			print("scp'ed...")
-			success = success and result == 0
+			# scpcmd = "scp -vvv {} {}@dbloader-hgcal.cern.ch:/home/dbspool/spool/hgc/int2r".format(f, self.username)
+			scpcmd = "scp -o ProxyJump={}@lxplus.cern.ch {} {}@dbloader-hgcal:/home/dbspool/spool/hgc/int2r/".format(self.username, f, self.username)
+			print("Scping {} ...".format(f))
+			# result = os.system(scpcmd)
+
+			# pexpect method
+			mypassword = self.password
+			child = pexpect.spawn(scpcmd)
+			password_prompt_index1 = child.expect(['Password:', pexpect.EOF, pexpect.TIMEOUT])
+			
+			if password_prompt_index1 == 0:
+				
+				child.sendline(mypassword)
+				password_prompt_index2 = child.expect(['Password:', pexpect.EOF, pexpect.TIMEOUT])
+				if password_prompt_index2 == 0:
+					print("ssh to lxplus successful")
+					child.sendline(mypassword)
+					exit_status = child.expect([pexpect.EOF, pexpect.TIMEOUT])
+					if exit_status == 0:
+						print("scp to dbloader successful")
+					else:
+						print("scp to dbloader failed")
+				else:
+					print("ssh to lxplus failed")
+			else:
+				print("Password prompt not found")
+			
+			print("scp'ed {} ...".format(f))
+			success = success and exit_status == 0
 			#success = (upload_status == 200) and success
-			if result != 0:
+			if exit_status != 0:
 				print("File transfer:  possible error!  Return code {}".format(result))
 
 			if f != flist[-1]:  # if not final:
@@ -472,18 +502,30 @@ class UserDialog(wdgt.QDialog):
 		super(UserDialog, self).__init__(*args, **kwargs)
 		print("Initializing request box")
 
-		self.setWindowTitle("SSH tunnel:  username required")
+		self.setWindowTitle("SSH: username and password required")
+		self.resize(300,150)
 		
 		self.textName = wdgt.QLineEdit(self)
-		#self.passName = wdgt.QLineEdit(self)
-		#passName.setEchoMode(gui.QLineEdit.Password) # conceal password
-		self.buttonLogin = wdgt.QPushButton('Connect', self)
+		self.passName = wdgt.QLineEdit(self)
+		self.passName.setEchoMode(wdgt.QLineEdit.Password) # conceal password
+  
+		self.labelName = wdgt.QLabel('Username:', self)
+		self.labelPass = wdgt.QLabel('Password:', self)
+		self.buttonLogin = wdgt.QPushButton('Confirm', self)
 		self.buttonCancel = wdgt.QPushButton('Cancel', self)
 		self.buttonLogin.clicked.connect(self.handleLogin)
 		self.buttonCancel.clicked.connect(self.handleCancel)
+  
 		layout = wdgt.QVBoxLayout(self)
+		layout.addWidget(self.labelName)
 		layout.addWidget(self.textName)
-		#layout.addWidget(self.passName)
+		layout.addWidget(self.labelPass)
+		layout.addWidget(self.passName)
+  
+		
+		# layout = wdgt.QVBoxLayout(self)
+		# layout.addWidget(self.textName)
+		# layout.addWidget(self.passName)
 		layout.addWidget(self.buttonLogin)
 		layout.addWidget(self.buttonCancel)
 
@@ -493,8 +535,10 @@ class UserDialog(wdgt.QDialog):
 	def handleLogin(self):
 		self.username = self.textName.text()
 		print("Got username {}".format(self.username))
+		self.password = self.passName.text()
+		print("Got password!")
 		
-		if self.username != "":
+		if self.username != "" and self.password != "":
 			self.accept()
 		else:
 			self.reject()
@@ -509,7 +553,10 @@ class UserDialog(wdgt.QDialog):
 		return self.cancelled
 
 	def getUsername(self):
-		return self.username
+		return self.username	
+
+	def getPassword(self):
+		return self.password
 
 
 # Class for DB upload login

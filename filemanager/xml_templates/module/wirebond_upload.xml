@@ -58,7 +58,7 @@
 			<!-- note - matching typo in DB -->
 			<BOND_IULL_USER>{{ bond_pull_user }}</BOND_IULL_USER>
 			<BOND_PULL_AVG>{{ bond_pull_avg }}</BOND_PULL_AVG>
-			<BOND_PULL_STDDEV>{{ bond_pull_stdddev }}</BOND_PULL_STDDEV>
+			<BOND_PULL_STDDEV>{{ bond_pull_stddev }}</BOND_PULL_STDDEV>
 			<FINAL_INSPXN_USER>{{ final_inspxn_user }}</FINAL_INSPXN_USER>
 			<FINAL_INSPXN_OK>{{ final_inspxn_ok }}</FINAL_INSPXN_OK>
 			<WIREBOND_COMMENTS>{{ wirebond_comments }}</WIREBOND_COMMENTS>

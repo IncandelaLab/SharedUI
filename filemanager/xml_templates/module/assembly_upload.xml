@@ -7,7 +7,7 @@
 	</TYPE>
 	<RUN>
 		<RUN_TYPE>Module Assembly</RUN_TYPE>
-		<RUN_NUMBER>{{ step_pcb }}</RUN_NUMBER>
+		<RUN_NUMBER>{{ step_pcb_num }}</RUN_NUMBER>
 		<RUN_BEGIN_TIMESTAMP>{{ run_begin_timestamp_ }}</RUN_BEGIN_TIMESTAMP>
 		<RUN_END_TIMESTAMP>{{ run_end_timestamp_ }}</RUN_END_TIMESTAMP>
 		<INITIATED_BY_USER>{{ initiated_by_user }}</INITIATED_BY_USER>

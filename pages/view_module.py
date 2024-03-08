@@ -346,6 +346,7 @@ class func(object):
 
 		self.xmlModList.append(self.module.ID)
 
+		self.module.generate_xml()  # allow modification of comments (not in xml)
 
 
 	def xmlModified(self):
