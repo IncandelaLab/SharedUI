@@ -836,7 +836,9 @@ class module(fsobj_part):
 
 	@property
 	def pcb_thickness(self):
-		return None
+		tmp_pcb = pcb()
+		if not tmp_pcb.load(self.pcb):  return None
+		return tmp_pcb.thickness
 
 	@property
 	def wirebond_comments_concat(self):
@@ -870,6 +872,11 @@ class module(fsobj_part):
 	def step_pcb_num(self):
 		if self.step_pcb is None:  return None
 		return int(self.step_pcb.split('_')[1])
+
+	@property
+	def pcb_tool_feet_chk_str(self):
+		if self.pcb_tool_feet_chk is None:  return "N/A"
+		return "yes" if self.pcb_tool_feet_chk else "no"
 
 	# new():  Optionally, create proto from baseplate and sensor objects
 	# Note:  baseplate and sensor must be the actual objects, not IDs

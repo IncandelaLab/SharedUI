@@ -33,9 +33,9 @@
 			<PCB_CMP_ROW>{{ asm_row }}</PCB_CMP_ROW>
 			<PCB_CMP_COL>{{ asm_col }}</PCB_CMP_COL>
 			<PCB_TOOL_NAME>{{ pcb_tool_name }}</PCB_TOOL_NAME>
-			<!-- <PCB_TOOL_HT_SET>{{ pcb_tool_ht_set }}</PCB_TOOL_HT_SET>
-			<PCB_TOOL_HT_CHK>{{ pcb_tool_ht_chk }}</PCB_TOOL_HT_CHK> -->
-			<PCB_TOOL_FEET_CHK>{{ pcb_tool_feet_chk }}</PCB_TOOL_FEET_CHK>
+			<!-- <PCB_TOOL_HT_SET>0.0</PCB_TOOL_HT_SET>
+			<PCB_TOOL_HT_CHK>0.0</PCB_TOOL_HT_CHK> -->
+			<PCB_TOOL_FEET_CHK>{{ pcb_tool_feet_chk_str }}</PCB_TOOL_FEET_CHK>
 			<GLUE_TYPE>Araldite</GLUE_TYPE>
 			<GLUE_BATCH_NUM>{{ adhesive_type }}</GLUE_BATCH_NUM>
 			<MOD_GRADE>{{ grade }}</MOD_GRADE>
