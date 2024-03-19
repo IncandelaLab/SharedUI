@@ -327,7 +327,7 @@
           </widget>
           <widget class="QPushButton" name="pbUploadObject">
            <property name="enabled">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="geometry">
             <rect>
@@ -371,12 +371,12 @@
           </widget>
           <widget class="QPushButton" name="pbUploadDate">
            <property name="enabled">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="geometry">
             <rect>
              <x>30</x>
-             <y>115</y>
+             <y>120</y>
              <width>161</width>
              <height>25</height>
             </rect>
@@ -393,13 +393,13 @@
           </widget>
           <widget class="QDateEdit" name="dUpload">
            <property name="enabled">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="geometry">
             <rect>
-             <x>35</x>
+             <x>0</x>
              <y>90</y>
-             <width>151</width>
+             <width>150</width>
              <height>26</height>
             </rect>
            </property>
@@ -450,6 +450,19 @@
            </property>
            <property name="text">
             <string>Upload status</string>
+           </property>
+          </widget>
+          <widget class="QPushButton" name="pbUploadStartNow">
+           <property name="geometry">
+            <rect>
+             <x>150</x>
+             <y>90</y>
+             <width>81</width>
+             <height>21</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>set to now</string>
            </property>
           </widget>
          </widget>

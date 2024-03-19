@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '../main_ui/mainwindow.ui'
+# Form implementation generated from reading ui file 'mainwindow.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.9
 #
@@ -133,7 +133,7 @@ class Ui_MainWindow(object):
         self.lineEdit_3.setGeometry(QtCore.QRect(0, 0, 226, 25))
         self.lineEdit_3.setObjectName("lineEdit_3")
         self.pbUploadObject = QtWidgets.QPushButton(self.groupBox)
-        self.pbUploadObject.setEnabled(False)
+        self.pbUploadObject.setEnabled(True)
         self.pbUploadObject.setGeometry(QtCore.QRect(29, 30, 171, 25))
         self.pbUploadObject.setMinimumSize(QtCore.QSize(150, 0))
         self.pbUploadObject.setMaximumSize(QtCore.QSize(220, 16777215))
@@ -143,13 +143,13 @@ class Ui_MainWindow(object):
         self.label.setGeometry(QtCore.QRect(5, 70, 221, 17))
         self.label.setObjectName("label")
         self.pbUploadDate = QtWidgets.QPushButton(self.groupBox)
-        self.pbUploadDate.setEnabled(False)
-        self.pbUploadDate.setGeometry(QtCore.QRect(30, 115, 161, 25))
+        self.pbUploadDate.setEnabled(True)
+        self.pbUploadDate.setGeometry(QtCore.QRect(30, 120, 161, 25))
         self.pbUploadDate.setMinimumSize(QtCore.QSize(150, 0))
         self.pbUploadDate.setObjectName("pbUploadDate")
         self.dUpload = QtWidgets.QDateEdit(self.groupBox)
-        self.dUpload.setEnabled(False)
-        self.dUpload.setGeometry(QtCore.QRect(35, 90, 151, 26))
+        self.dUpload.setEnabled(True)
+        self.dUpload.setGeometry(QtCore.QRect(0, 90, 150, 26))
         self.dUpload.setMinimumSize(QtCore.QSize(150, 0))
         self.dUpload.setCalendarPopup(True)
         self.dUpload.setDate(QtCore.QDate(2021, 1, 1))
@@ -163,6 +163,9 @@ class Ui_MainWindow(object):
         self.label_2.setEnabled(True)
         self.label_2.setGeometry(QtCore.QRect(5, 150, 211, 17))
         self.label_2.setObjectName("label_2")
+        self.pbUploadStartNow = QtWidgets.QPushButton(self.groupBox)
+        self.pbUploadStartNow.setGeometry(QtCore.QRect(150, 90, 81, 21))
+        self.pbUploadStartNow.setObjectName("pbUploadStartNow")
         self.vlUISelect.addWidget(self.groupBox)
         spacerItem4 = QtWidgets.QSpacerItem(20, 30, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.vlUISelect.addItem(spacerItem4)
@@ -253,3 +256,4 @@ class Ui_MainWindow(object):
         self.label.setText(_translate("MainWindow", "Upload objects created on date:"))
         self.pbUploadDate.setText(_translate("MainWindow", "Upload objects"))
         self.label_2.setText(_translate("MainWindow", "Upload status"))
+        self.pbUploadStartNow.setText(_translate("MainWindow", "set to now"))

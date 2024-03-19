@@ -321,6 +321,8 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 
 		self.pbUploadObject.clicked.connect(self.goUploadObject)
 		self.pbUploadDate.clicked.connect(self.goUploadDate)
+  
+		self.pbUploadStartNow.clicked.connect(self.uploadStartNow)
 
 	
 
@@ -346,8 +348,8 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 			# NEW:  Enable/disable uploading accordingly.
 			enableUploading = which_page in UPLOAD_ENABLED_PAGES
 			self.pbUploadObject.setEnabled(enableUploading)
-			# self.pbUploadDate.setEnabled(  enableUploading)
-			# self.dUpload.setEnabled(       enableUploading)
+			self.pbUploadDate.setEnabled(  enableUploading)
+			self.dUpload.setEnabled(       enableUploading)
 			self.leStatus.setText("")
 			self.leStatus.setEnabled(      enableUploading)
 
@@ -423,7 +425,7 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		for f in flist:
 			# Note:  .bash_history does NOT store commands run w/ subprocess
 			#upload_status = lc.run(iargs=["--login", "--url", "https://cmsdca.cern.ch/hgc_loader/hgc/int2r", f, "--verbose"])
-			self.leStatus.setText("TEMP: OPEN TERMINAL WINDOW AND ENTER PASSWORD")
+			self.leStatus.setText("Uploading {} ...".format(os.path.basename(f)))
 			# scpcmd = "scp -vvv {} {}@dbloader-hgcal.cern.ch:/home/dbspool/spool/hgc/int2r".format(f, self.username)
 			scpcmd = "scp -o ProxyJump={}@lxplus.cern.ch {} {}@dbloader-hgcal:/home/dbspool/spool/hgc/int2r/".format(self.username, f, self.username)
 			print("Scping {} ...".format(f))
@@ -463,8 +465,9 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 				# the DB won't be able to find the part and will throw and error)
 				# 20s is a conservative estimate for the worst-case upload duration
 				# (It's also really obnoxious w/ multiple passwords and must change ASAP)
-				print("Waiting 20s before uploading the next file...(you must re-enter your password after the wait)")
-				time.sleep(20)
+				# 2024/3/19 reduce to 15s
+				print("Waiting 15s before uploading the next file...(you must re-enter your password after the wait)")
+				time.sleep(15)
 		if success:
 			self.leStatus.setText("Success!")
 		else:
@@ -475,12 +478,50 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 
 	def goUploadDate(self):
 		lDate = self.dUpload.date()
-		dateStr = "{}-{}-{}".format(lDate.year(), lDate.month(), lDate.day())
+		dateStr = "{}-{}-{}".format(lDate.month(), lDate.day(), lDate.year())
+		print("Uploading files for date", dateStr)
 		filemanager_dir = os.sep.join([os.getcwd(), 'filemanager_data'])
-		part_files = glob.glob(filemanager_dir + "/*/{}/*upload*".format(dateStr))
-		step_files = glob.glob(filemanager_dir + "/steps/*/*upload*".format(dateStr))
-		print("Preparing to upload multiple object files:", part_files + step_files)
-		lc = LoaderClient()
+		# part_files = glob.glob(filemanager_dir + "/*/{}/*upload*".format(dateStr))
+		# step_files = glob.glob(filemanager_dir + "/steps/*/*upload*".format(dateStr))  # no steps xml to upload
+		
+		
+		upload_files = []
+
+		# Upload in order:
+		# 1.  Part files
+		#     1.1  build
+		#     1.2  cond
+		parts = ['baseplate', 'sensor', 'pcb']
+		for part in parts:
+			upload_files += glob.glob(filemanager_dir + "/{}*/{}/*build*upload*".format(part, dateStr))
+			upload_files += glob.glob(filemanager_dir + "/{}*/{}/*cond*upload*".format(part, dateStr))
+		# 2.  Protomodule files
+		#     2.1  build
+		#     2.2  cond
+		#     2.3  assembly
+		upload_files += glob.glob(filemanager_dir + "/protomodule*/{}/*build*upload*".format(dateStr))
+		upload_files += glob.glob(filemanager_dir + "/protomodule*/{}/*cond*upload*".format(dateStr))
+		# 3.  Module files
+		#     3.1  build
+		#     3.2  cond
+		#     3.3  assembly	
+		#     3.4  wirebond
+		upload_files += glob.glob(filemanager_dir + "/module*/{}/*build*upload*".format(dateStr))
+		upload_files += glob.glob(filemanager_dir + "/module*/{}/*cond*upload*".format(dateStr))
+		upload_files += glob.glob(filemanager_dir + "/module*/{}/*assembly*upload*".format(dateStr))
+		upload_files += glob.glob(filemanager_dir + "/module*/{}/*wirebond*upload*".format(dateStr))
+  
+		print("Preparing to upload multiple object files:", upload_files)
+
+		# Now upload files in separate thread - will need to wait if multiple files, loader can only handle 1
+		x = threading.Thread(target=self.uploadFilesAndSleep, args=(upload_files,))
+		x.start()
+		print("Starting upload.  Will continue in background.")
+  
+
+  
+		'''
+  		lc = LoaderClient()
 		success = True
 		# NOTE:  Writing all errors to upload_errors.log
 		sys.stdout = open('upload_errors.log', 'w+')
@@ -494,7 +535,12 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 			self.leStatus.setText("Success!")
 		else:
 			self.leStatus.setText("Error during upload!")
+		'''
 
+
+	def uploadStartNow(self, *args, **kwargs):
+		localtime = time.localtime()
+		self.dUpload.setDate(core.QDate(*localtime[0:3]))
 
 # Class for requesting GUI username at start (for ssh tunnel)
 class UserDialog(wdgt.QDialog):
