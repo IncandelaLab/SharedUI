@@ -671,6 +671,7 @@ class module(fsobj_part):
 		"pcb_plcment_ang_offset",
 		"batch_tape_50",
 		"batch_tape_120",
+		"max_thickness",
 
 		# for cond page:
 		"cure_begin_timestamp",

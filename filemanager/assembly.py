@@ -420,4 +420,11 @@ class step_pcb(fsobj_step):
 	@weights.setter
 	def weights(self, value):
 		self.set_vars_from_part("weight", value)
+  
+	@property
+	def max_thicknesses(self):
+		return self.get_vars_from_part("max_thickness")
+	@max_thicknesses.setter
+	def max_thicknesses(self, value):
+		self.set_vars_from_part("max_thickness", value)
 
