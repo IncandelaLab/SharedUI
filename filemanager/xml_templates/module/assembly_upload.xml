@@ -44,7 +44,8 @@
 			<PCB_PLCMENT_Y_OFFSET>{{ pcb_plcment_y_offset }}</PCB_PLCMENT_Y_OFFSET>
 			<PCB_PLCMENT_ANG_OFFSET>{{ pcb_plcment_ang_offset }}</PCB_PLCMENT_ANG_OFFSET>
 			<MOD_FLTNS_MM>{{ flatness }}</MOD_FLTNS_MM>
-			<MOD_THKNS_MM>{{ thickness }}</MOD_THKNS_MM>
+			<MOD_AVE_THKNS_MM>{{ thickness }}</MOD_AVE_THKNS_MM>
+			<MOD_MAX_THKNS_MM>{{ max_thickness }}</MOD_MAX_THKNS_MM>
 		</DATA>
 	</DATA_SET>
 </ROOT>
