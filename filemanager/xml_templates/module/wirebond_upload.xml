@@ -61,7 +61,7 @@
 			<BOND_PULL_STDDEV>{{ bond_pull_stddev }}</BOND_PULL_STDDEV>
 			<FINAL_INSPXN_USER>{{ final_inspxn_user }}</FINAL_INSPXN_USER>
 			<FINAL_INSPXN_OK>{{ final_inspxn_ok }}</FINAL_INSPXN_OK>
-			<WIREBOND_COMMENTS>{{ wirebond_comments }}</WIREBOND_COMMENTS>
+			<WIREBOND_COMMENTS>{{ wirebond_comments_concat }}</WIREBOND_COMMENTS>
 		</DATA>
 	</DATA_SET>
 </ROOT>

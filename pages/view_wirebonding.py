@@ -443,7 +443,6 @@ class func(object):
 		# comments
 		num_comments = self.page.listComments.count()
 		# self.module.wirebond_comments = [self.page.listComments.item(i).text() for i in range(num_comments)]
-		print("wirebond comments: {}".format(self.module.wirebond_comments))
 		self.module.wirebond_comments = ';;'.join([self.page.listComments.item(i).text() for i in range(num_comments)])
 
 		num_comments_encap = self.page.listCommentsEncap.count()
