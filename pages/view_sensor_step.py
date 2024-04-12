@@ -505,7 +505,9 @@ class func(object):
 						# print("row ",i)
 						# print("digits:",protomodule_name[7:][match.start():])
 						# print("is int?:",isinstance(int(protomodule_name[7:][match.start():]), int))
-						self.sb_serials[i-1].setValue(int(protomodule_name[7:][match.start():]))
+						snum = protomodule_name[7:][match.start():]
+						if not self.has_non_integer_characters(snum):
+							self.sb_serials[i].setValue(int(snum))
 					else:
 						self.cb_versions[i].setCurrentIndex(-1)
 						self.sb_serials[i].setValue(-1)
@@ -1416,3 +1418,9 @@ class func(object):
 		name += NAME_INSTITUTION[self.page.cbInstitution.currentText()]
 		name += str(self.sb_serials[i].value()).zfill(4)
 		return name
+
+	def has_non_integer_characters(self,input_string):
+		for char in input_string:
+			if not char.isdigit():
+				return True
+		return False
