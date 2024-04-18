@@ -246,14 +246,33 @@ class func(object):
 		# Check whether baseplate exists:
 		tmp_protomodule = parts.protomodule()
 		tmp_ID = self.page.leID.text()
-		tmp_exists = tmp_protomodule.load(tmp_ID)
-		if not tmp_exists:  # DNE; good to create
-			self.page.leStatus.setText("protomodule DNE")
-			self.update_info()
-		else:
+
+		# NEW: Load from central DB if not found locally
+		if tmp_protomodule.load(tmp_ID):  # exist locally
 			self.protomodule = tmp_protomodule
-			self.page.leStatus.setText("protomodule exists")
 			self.update_info()
+			self.page.leStatus.setText("promodule exists locally")
+		elif tmp_protomodule.load_remote(tmp_ID, full=True):  # exist in central DB
+			self.protomodule = tmp_protomodule
+			print("\n!! Loading promodule {} from central DB".format(tmp_ID))
+			print("record_insertion_user: {}".format(self.protomodule.record_insertion_user))
+			print("thickness: {}, type {}".format(self.protomodule.thickness, type(self.protomodule.thickness)))
+			print("flatness: {}".format(self.protomodule.flatness))
+			print("grade: {}".format(self.protomodule.grade))
+			self.update_info()
+			self.page.leStatus.setText("promodule exists in central DB")
+		else:  # DNE; good to create
+			self.update_info()
+			self.page.leStatus.setText("promodule DNE")
+
+		# tmp_exists = tmp_protomodule.load(tmp_ID)
+		# if not tmp_exists:  # DNE; good to create
+		# 	self.page.leStatus.setText("protomodule DNE")
+		# 	self.update_info()
+		# else:
+		# 	self.protomodule = tmp_protomodule
+		# 	self.page.leStatus.setText("protomodule exists")
+		# 	self.update_info()
 
 
 

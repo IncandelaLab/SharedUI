@@ -179,13 +179,13 @@ class func(object):
 		self.page.pteWriteComment.clear()
 
 
-		self.page.dsbThickness.setValue(-1 if self.baseplate.thickness is None else self.baseplate.thickness)
+		self.page.dsbThickness.setValue(-1 if (self.baseplate.thickness is None) or (self.baseplate.thickness == "None") else float(self.baseplate.thickness))
 		if self.page.dsbThickness.value() == -1: self.page.dsbThickness.clear()
-		self.page.dsbFlatness .setValue(-1 if self.baseplate.flatness  is None else self.baseplate.flatness )
+		self.page.dsbFlatness .setValue(-1 if (self.baseplate.flatness  is None) or (self.baseplate.flatness == "None") else float(self.baseplate.flatness) )
 		if self.page.dsbFlatness.value() == -1: self.page.dsbFlatness.clear()
-		self.page.dsbWeight .setValue(-1 if self.baseplate.weight  is None else self.baseplate.weight )
+		self.page.dsbWeight .setValue(-1 if (self.baseplate.weight is None) or (self.baseplate.weight == "None") else float(self.baseplate.weight) )
 		if self.page.dsbWeight.value() == -1: self.page.dsbWeight.clear()
-		self.page.cbGrade         .setCurrentIndex(INDEX_GRADE      .get(self.baseplate.grade          , -1))
+		self.page.cbGrade .setCurrentIndex(INDEX_GRADE.get(self.baseplate.grade.lower().capitalize(), -1) if type(self.baseplate.grade) is str else -1)
 
 		if self.baseplate.step_sensor:
 			tmp_inst, tmp_id = self.baseplate.step_sensor.split("_")
@@ -260,14 +260,34 @@ class func(object):
 		# Check whether baseplate exists:
 		tmp_baseplate = parts.baseplate()
 		tmp_ID = self.page.leID.text()
-		tmp_exists = tmp_baseplate.load(tmp_ID)
-		if not tmp_exists:  # DNE; good to create
-			self.page.leStatus.setText("baseplate DNE")
-			self.update_info()
-		else:
+		
+		# NEW: Load from central DB if not found locally
+		if tmp_baseplate.load(tmp_ID):  # exist locally
 			self.baseplate = tmp_baseplate
-			self.page.leStatus.setText("baseplate exists")
 			self.update_info()
+			self.page.leStatus.setText("baseplate exists locally")
+		elif tmp_baseplate.load_remote(tmp_ID, full=True):  # exist in central DB
+			self.baseplate = tmp_baseplate
+			print("\n!! Loading baseplate {} from central DB".format(tmp_ID))
+			print("record_insertion_user: {}".format(self.baseplate.record_insertion_user))
+			print("thickness: {}, type {}".format(self.baseplate.thickness, type(self.baseplate.thickness)))
+			print("flatness: {}".format(self.baseplate.flatness))
+			print("weight: {}".format(self.baseplate.weight))
+			print("grade: {}".format(self.baseplate.grade))
+			self.update_info()
+			self.page.leStatus.setText("baseplate exists in central DB")
+		else:  # DNE; good to create
+			self.update_info()
+			self.page.leStatus.setText("baseplate DNE")
+
+		# tmp_exists = tmp_baseplate.load(tmp_ID)
+		# if not tmp_exists:  # DNE; good to create
+		# 	self.page.leStatus.setText("baseplate DNE")
+		# 	self.update_info()
+		# else:
+		# 	self.baseplate = tmp_baseplate
+		# 	self.page.leStatus.setText("baseplate exists")
+		# 	self.update_info()
 
 
 	@enforce_mode('view')

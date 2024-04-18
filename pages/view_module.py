@@ -214,15 +214,17 @@ class func(object):
 			name = os.path.split(f)[1]
 			self.page.listFiles.addItem(name)
 
-		self.page.dsbOffsetTranslationX.setValue( -1 if self.module.pcb_plcment_x_offset is None else self.module.pcb_plcment_x_offset )
-		self.page.dsbOffsetTranslationY.setValue( -1 if self.module.pcb_plcment_y_offset is None else self.module.pcb_plcment_y_offset )
-		self.page.dsbOffsetRotation.setValue(    -1 if self.module.pcb_plcment_ang_offset    is None else self.module.pcb_plcment_ang_offset )
+		self.page.dsbOffsetTranslationX.setValue( -1 if (self.module.pcb_plcment_x_offset is None) or (self.module.pcb_plcment_x_offset == "None") else float(self.module.pcb_plcment_x_offset) )
+		self.page.dsbOffsetTranslationY.setValue( -1 if (self.module.pcb_plcment_y_offset is None) or (self.module.pcb_plcment_y_offset == "None") else float(self.module.pcb_plcment_y_offset) )
+		self.page.dsbOffsetRotation.setValue(    -1 if (self.module.pcb_plcment_ang_offset is None) or (self.module.pcb_plcment_ang_offset == "None") else float(self.module.pcb_plcment_ang_offset) )
 		self.page.dsbThickness.setValue(-1 if self.module.thickness   is None else self.module.thickness  )
+		self.page.dsbMaxThickness.setValue(-1 if self.module.max_thickness   is None else self.module.max_thickness  )
 		self.page.dsbFlatness.setValue( -1 if self.module.flatness  is None else self.module.flatness   )
 		if self.page.dsbOffsetTranslationX.value() == -1: self.page.dsbOffsetTranslationX.clear()
 		if self.page.dsbOffsetTranslationY.value() == -1: self.page.dsbOffsetTranslationY.clear()
 		if self.page.dsbOffsetRotation.value() == -1: self.page.dsbOffsetRotation.clear()
 		if self.page.dsbThickness.value() == -1: self.page.dsbThickness.clear()
+		if self.page.dsbMaxThickness.value() == -1: self.page.dsbMaxThickness.clear()
 		if self.page.dsbFlatness.value()  == -1: self.page.dsbFlatness.clear()
 
 		self.updateElements()
@@ -296,14 +298,33 @@ class func(object):
 		# Check whether baseplate exists:
 		tmp_module = parts.module()
 		tmp_ID = self.page.leID.text()
-		tmp_exists = tmp_module.load(tmp_ID)
-		if not tmp_exists:  # DNE; good to create
-			self.page.leStatus.setText("module DNE")
-			self.update_info(do_load=False)
-		else:
+
+		# NEW: Load from central DB if not found locally
+		if tmp_module.load(tmp_ID):  # exist locally
 			self.module = tmp_module
-			self.page.leStatus.setText("module exists")
 			self.update_info()
+			self.page.leStatus.setText("module exists locally")
+		elif tmp_module.load_remote(tmp_ID, full=True):  # exist in central DB
+			self.module = tmp_module
+			print("\n!! Loading module {} from central DB".format(tmp_ID))
+			print("record_insertion_user: {}".format(self.module.record_insertion_user))
+			print("thickness: {}, type {}".format(self.module.thickness, type(self.module.thickness)))
+			print("flatness: {}".format(self.module.flatness))
+			print("grade: {}".format(self.module.grade))
+			self.update_info()
+			self.page.leStatus.setText("module exists in central DB")
+		else:  # DNE; good to create
+			self.update_info()
+			self.page.leStatus.setText("module DNE")
+
+		# tmp_exists = tmp_module.load(tmp_ID)
+		# if not tmp_exists:  # DNE; good to create
+		# 	self.page.leStatus.setText("module DNE")
+		# 	self.update_info(do_load=False)
+		# else:
+		# 	self.module = tmp_module
+		# 	self.page.leStatus.setText("module exists")
+		# 	self.update_info()
 
 
 	@enforce_mode('view')
@@ -339,6 +360,7 @@ class func(object):
 		self.module.offset_rotation      = self.page.dsbOffsetRotation.value()    if self.page.dsbOffsetRotation.value()    >=0 else None
 		self.module.flatness = self.page.dsbFlatness.value()    if self.page.dsbFlatness.value()    >=0 else None
 		self.module.thickness = self.page.dsbThickness.value()    if self.page.dsbThickness.value()    >=0 else None
+		self.module.max_thickness = self.page.dsbMaxThickness.value()    if self.page.dsbMaxThickness.value()    >=0 else None
 
 		self.module.save()
 		self.mode = 'view'

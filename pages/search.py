@@ -176,8 +176,31 @@ class func(object):
 					found = False
 			if found:  found_local_parts[part_id] = part_temp.kind_of_part
 
+
 		# Search for parts in DB:
 		found_remote_parts = {}  # serial:type
+		part_temp_remote = PART_DICT[part_type]()  # Constructs instance of searched-for class
+		
+		if part_type != 'Sensor':  # sensor search is desabled for now
+			obj_list_remote = os.sep.join([ fm.DATADIR, 'partlist_remote', part_type.lower()+'s.json' ])
+			
+			# Load part list from remote DB list
+			part_file_name_remote = {}  # serial:type
+			with open(obj_list_remote, 'r') as opfl:
+				part_data = json.load(opfl)
+				for part in part_data['parts']:
+					part_file_name_remote[part['serial_number']] = part['kind']
+			# print("!!! part_file_name_remote is:\n", part_file_name_remote)
+
+			for part_id, part_type in part_file_name_remote.items():
+				part_temp_remote.load_remote(part_id, full=False)
+				found = True
+				for qty, value in search_criteria.items():
+					if value == '%':  continue  # "wildcard" option, ignore this
+					if str(getattr(part_temp_remote, qty, None)) != value:
+						found = False
+				if found:  found_remote_parts[part_id] = part_temp_remote.kind_of_part
+			
 		"""
 		if fm.ENABLE_DB_COMMUNICATION:
 			# In general:  Assemble sql query w/ items from search_dict
@@ -217,6 +240,8 @@ and l.LOCATION_NAME like \'{}\'"*"*".format(pt_query, search_criteria['location_
 		for rp in found_remote_parts.keys():
 			if rp in found_local_parts.keys():
 				found_local_parts.pop(rp)
+		# print("found_local_parts is:\n", found_local_parts)
+		# print("found_remote_parts is:\n", found_remote_parts)
 
 		self.displayResults(found_local_parts, found_remote_parts)
 
@@ -348,11 +373,17 @@ and l.LOCATION_NAME like \'{}\'"*"*".format(pt_query, search_criteria['location_
 		
   		# Sort search results
 		self.page.lwPartList.sortItems()
+		for index in range(self.page.lwPartList.count()):
+			item = self.page.lwPartList.item(index)
+			# print(item.text())
+
 		for row in range(self.page.lwPartList.count()):
-			if self.page.lwPartList.item(row).text().find(" (not uploaded to DB)"):
+			if self.page.lwPartList.item(row).text().find("(not uploaded to DB)") != -1:
+				# print("local part: ", self.page.lwPartList.item(row).text())
 				serial = self.page.lwPartList.item(row).text().split(" (not uploaded to DB)")[0]
 				self.page.lwTypeList.addItem(localList[serial])
 			else:
+				# print("remote part: ", self.page.lwPartList.item(row).text())
 				serial = self.page.lwPartList.item(row).text()
 				self.page.lwTypeList.addItem(remoteList[serial])
 		self.page.leStatus.setText("Results found!")
