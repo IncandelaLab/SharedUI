@@ -5,7 +5,7 @@
 			<KIND_OF_PART>{{ kind_of_part }}</KIND_OF_PART>
 			<RECORD_INSERTION_USER>{{ record_insertion_user }}</RECORD_INSERTION_USER>
 			<SERIAL_NUMBER>{{ ID }}</SERIAL_NUMBER>
-			<!-- <LOCATION>{{ location }}</LOCATION> -->
+			<LOCATION>{{ location }}</LOCATION>
 			<MANUFACTURER>{{ manufacturer }}</MANUFACTURER>
 			<COMMENT_DESCRIPTION>n/a</COMMENT_DESCRIPTION>
 		</PART>

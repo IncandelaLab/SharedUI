@@ -10,7 +10,7 @@
         <RUN_BEGIN_TIMESTAMP>{{ run_begin_timestamp_ }}</RUN_BEGIN_TIMESTAMP>
         <RUN_END_TIMESTAMP>{{ run_end_timestamp_ }}</RUN_END_TIMESTAMP>
         <INITIATED_BY_USER>{{ initiated_by_user }}</INITIATED_BY_USER>
-        <!-- <LOCATION>{{ location }}</LOCATION> -->
+        <LOCATION>{{ location }}</LOCATION>
         <COMMENT_DESCRIPTION>Measured flatness/thickness data</COMMENT_DESCRIPTION>
     </RUN>
 
