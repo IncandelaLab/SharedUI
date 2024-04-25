@@ -144,60 +144,64 @@ def setup(datadir=None):
 				json.dump({}, opfl)
 
 	# NEW for remote central DB searching: HGCAL API - will need to figure out the CERN auth in the future
-	partlistdir_remote = os.sep.join([DATADIR, 'partlist_remote'])
-	if not os.path.exists(partlistdir_remote):
-		os.makedirs(partlistdir_remote)
-	
 	obj_list_remote = ['baseplate', 'pcb', 'protomodule', 'module']  # sensor search is desabled for now
 	for part in obj_list_remote:
-		fname = os.sep.join([partlistdir_remote, part+'s.json'])
-
-		# Make the GET request
-		url = 'https://hgcapi.web.cern.ch/mac/parts/types/{}s'.format(part)
-		headers = {'accept': 'application/json'}
-		response = requests.get(url, headers=headers)
-		
-		if not os.path.exists(fname):
-			
-			# Check if the request was successful
-			if response.status_code == 200:
-				# Store the response JSON data in a file
-				with open(fname, 'w') as opfl:
-					# Dump an empty dict if nothing is found
-					# NOTE:  Format of dictionary is {ID:creation-date-string, ...}
-					# json.dump({}, opfl)
-					json.dump(response.json(), opfl, indent=4)
-					print("central DB JSON data saved to '{}'".format(fname))
-
-				# Read the saved JSON file and print serial numbers
-				# with open(fname, 'r') as file:
-				# 	data = json.load(file)
-					# serial_numbers = [part['serial_number'] for part in data['parts']]
-					# print("Serial Numbers:")
-					# for serial_number in serial_numbers:
-					# 	print(serial_number)
-			else:
-				print(f"Failed to fetch data: {response.status_code} - {response.text}")
-		else:
-			# Read the local JSON file
-			with open(fname, 'r') as file:
-				local_data = json.load(file)
-
-			# Check if the request was successful
-			if response.status_code == 200:
-				# Compare the local and remote JSON data
-				remote_data = response.json()
-				if local_data != remote_data:
-					# Store the updated JSON data in the local file
-					with open(fname, 'w') as opfl:
-						json.dump(remote_data, opfl, indent=4)
-						print("Local JSON data updated for '{}'".format(part))
-			else:
-				print(f"Failed to fetch an update data: {response.status_code} - {response.text}")
+		fetchRemoteDB(part)
 	
 #setup()
 
 
+def fetchRemoteDB(part,location=None):
+	partlistdir_remote = os.sep.join([DATADIR, 'partlist_remote'])
+	if not os.path.exists(partlistdir_remote):
+		os.makedirs(partlistdir_remote)
+
+	fname = os.sep.join([partlistdir_remote, part+'s.json'])
+
+	# Make the GET request
+	url = 'https://hgcapi.web.cern.ch/mac/parts/types/{}s'.format(part)
+	if location:  # request filtered by location
+		url += '?location={}'.format(location)
+	headers = {'accept': 'application/json'}
+	response = requests.get(url, headers=headers)
+	
+	if not os.path.exists(fname):
+		
+		# Check if the request was successful
+		if response.status_code == 200:
+			# Store the response JSON data in a file
+			with open(fname, 'w') as opfl:
+				# Dump an empty dict if nothing is found
+				# NOTE:  Format of dictionary is {ID:creation-date-string, ...}
+				# json.dump({}, opfl)
+				json.dump(response.json(), opfl, indent=4)
+				print("central DB JSON data saved to '{}'".format(fname))
+
+			# Read the saved JSON file and print serial numbers
+			# with open(fname, 'r') as file:
+			# 	data = json.load(file)
+				# serial_numbers = [part['serial_number'] for part in data['parts']]
+				# print("Serial Numbers:")
+				# for serial_number in serial_numbers:
+				# 	print(serial_number)
+		else:
+			print(f"Failed to fetch data: {response.status_code} - {response.text}")
+	else:
+		# Read the local JSON file
+		with open(fname, 'r') as file:
+			local_data = json.load(file)
+
+		# Check if the request was successful
+		if response.status_code == 200:
+			# Compare the local and remote JSON data
+			remote_data = response.json()
+			if local_data != remote_data:
+				# Store the updated JSON data in the local file
+				with open(fname, 'w') as opfl:
+					json.dump(remote_data, opfl, indent=4)
+					print("Local JSON data updated for '{}'".format(part))
+		else:
+			print(f"Failed to fetch an update data: {response.status_code} - {response.text}")
 
 
 
@@ -476,6 +480,16 @@ class fsobj(object):
 										setattr(self, 'pcb', child['serial_number'])
 									if 'ProtoModule' in kind:
 										setattr(self, 'protomodule', child['serial_number'])
+						if 'parent' in data_keys:
+							parents = response_json['parent']
+							for parent in parents:
+								if 'kind' in parent.keys():
+									kind = parent['kind']
+									if 'ProtoModule' in kind:
+										setattr(self, 'protomodule', parent['serial_number'])
+									# only shows the first parent
+									elif 'Module' in kind:
+										setattr(self, 'module', parent['serial_number'])
 			return True
 		else:
 			print(f"Failed to fetch data: {response.status_code} - {response.text}")

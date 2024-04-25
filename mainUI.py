@@ -466,10 +466,10 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 				# 20s is a conservative estimate for the worst-case upload duration
 				# (It's also really obnoxious w/ multiple passwords and must change ASAP)
 				# 2024/3/19 reduce to 15s
-				print("Waiting 15s before uploading the next file...(you must re-enter your password after the wait)")
+				print("Waiting 15s before uploading the next file...")
 				time.sleep(15)
 		if success:
-			self.leStatus.setText("Success!")
+			self.leStatus.setText("Upload to dbloader success!")
 		else:
 			self.leStatus.setText("Upload failed!")
 

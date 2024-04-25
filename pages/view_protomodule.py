@@ -247,20 +247,21 @@ class func(object):
 		tmp_protomodule = parts.protomodule()
 		tmp_ID = self.page.leID.text()
 
-		# NEW: Load from central DB if not found locally
-		if tmp_protomodule.load(tmp_ID):  # exist locally
-			self.protomodule = tmp_protomodule
-			self.update_info()
-			self.page.leStatus.setText("promodule exists locally")
-		elif tmp_protomodule.load_remote(tmp_ID, full=True):  # exist in central DB
+		# NEW: Load from central DB if exists
+		if tmp_protomodule.load_remote(tmp_ID, full=True):  # exist in central DB
 			self.protomodule = tmp_protomodule
 			print("\n!! Loading promodule {} from central DB".format(tmp_ID))
+			print("kind of part: {}".format(self.protomodule.kind_of_part))
 			print("record_insertion_user: {}".format(self.protomodule.record_insertion_user))
 			print("thickness: {}, type {}".format(self.protomodule.thickness, type(self.protomodule.thickness)))
 			print("flatness: {}".format(self.protomodule.flatness))
 			print("grade: {}".format(self.protomodule.grade))
 			self.update_info()
 			self.page.leStatus.setText("promodule exists in central DB")
+		elif tmp_protomodule.load(tmp_ID):  # exist locally
+			self.protomodule = tmp_protomodule
+			self.update_info()
+			self.page.leStatus.setText("promodule only exists locally")
 		else:  # DNE; good to create
 			self.update_info()
 			self.page.leStatus.setText("promodule DNE")
