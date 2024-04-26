@@ -1,12 +1,36 @@
+from filemanager import tools
+
 PAGE_NAME = "view_tooling"
 #OBJECTTYPE = "sensor_step"
 DEBUG = False
 
+INDEX_INSTITUTION = {
+	'CERN':0,
+	'FNAL':1,
+	'UCSB':2,
+	'UMN':3,
+	'HEPHY':4,
+	'HPK':5,
+	'CMU':6,
+	'TTU':7,
+	'IHEP':8,
+	'TIFR':9,
+	'NTU':10,
+	'FSU':11
+}
+
+INSTITUTION_INDEX = {
+	value: key for key, value in INDEX_INSTITUTION.items()
+}
+
+
 class simple_fsobj_vc(object):
 	def __init__(self,
-		fsobj,
+		fsobj_tool,
 		sbID,
-		dsbSize,
+		cbInstitution,  # New
+		#dsbSize,
+		leLocation,  # New
 		pbEditNew,
 		pbSave,
 		pbCancel,
@@ -17,9 +41,11 @@ class simple_fsobj_vc(object):
 		):
 
 		self.fsobj_exists    = None
-		self.fsobj           = fsobj
+		self.fsobj_tool      = fsobj_tool  # Renamed to clarify that obj is a fsobj_tool
 		self.sbID            = sbID
-		self.dsbSize         = dsbSize
+		self.cbInstitution   = cbInstitution
+		#self.dsbSize         = dsbSize
+		self.leLocation      = leLocation
 		self.pbEditNew       = pbEditNew
 		self.pbSave          = pbSave
 		self.pbCancel        = pbCancel
@@ -28,35 +54,39 @@ class simple_fsobj_vc(object):
 		self.pbDeleteComment = pbDeleteComment
 		self.pbAddComment    = pbAddComment
 
-	def update_info(self,ID=None,*args,**kwargs):
+	def update_info(self,ID=None,institution=None,*args,**kwargs):
 		if ID is None:
 			ID = self.sbID.value()
 		else:
 			self.sbID.setValue(ID)
-		self.fsobj_exists = self.fsobj.load(ID)
+		if institution is None:
+			institution = self.cbInstitution.currentText()
+		else:
+			self.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(institution, -1))
+
+		self.fsobj_exists = self.fsobj_tool.load(ID, institution)
 
 		if self.fsobj_exists:
 			self.pbEditNew.setText("edit")
-			if self.fsobj.size is None:
-				self.dsbSize.setValue(0)
-				self.dsbSize.clear()
+			if self.fsobj_tool.location is None:
+				self.leLocation.setText("")
 			else:
-				self.dsbSize.setValue(self.fsobj.size)
+				self.leLocation.setText(self.fsobj_tool.location)
+
 			self.listComments.clear()
-			for comment in self.fsobj.comments:
+			for comment in self.fsobj_tool.comments:
 				self.listComments.addItem(comment)
 			self.pteWriteComment.clear()
 
 		else:
 			self.pbEditNew.setText("new")
-			self.dsbSize.setValue(0)
-			self.dsbSize.clear()
+			self.leLocation.setText("")
 			self.listComments.clear()
 			self.pteWriteComment.clear()
 
 	def start_editing(self,*args,**kwargs):
 		if not self.fsobj_exists:
-			self.fsobj.new(self.sbID.value())
+			self.fsobj_tool.new(self.sbID.value(), self.cbInstitution.currentText())
 
 	def cancel_editing(self,*args,**kwargs):
 		self.update_info()
@@ -65,12 +95,9 @@ class simple_fsobj_vc(object):
 		comments = []
 		for i in range(self.listComments.count()):
 			comments.append(self.listComments.item(i).text())
-		self.fsobj.comments = comments
-		size = self.dsbSize.value()
-		if size == 0.0:
-			size = None
-		self.fsobj.size = size
-		self.fsobj.save()
+		self.fsobj_tool.comments = comments
+		self.fsobj_tool.location = self.leLocation.text() if self.leLocation.text() != '' else 'n/a'  # New
+		self.fsobj_tool.save()
 		self.update_info()
 
 	def add_comment(self,*args,**kwargs):
@@ -87,15 +114,15 @@ class simple_fsobj_vc(object):
 
 class func(object):
 	def __init__(self,fm,page,setUIPage,setSwitchingEnabled):
-		self.fm        = fm
 		self.page      = page
 		self.setUIPage = setUIPage
 		self.setMainSwitchingEnabled = setSwitchingEnabled
 
 		self.tool_sensor = simple_fsobj_vc(
-			self.fm.tool_sensor(),
+			tools.tool_sensor(),
 			self.page.sbSensorToolID,
-			self.page.dsbSensorToolSize,
+			self.page.cbSensorToolInstitution,
+			self.page.leSensorToolLocation,
 			self.page.pbSensorToolEditNew,
 			self.page.pbSensorToolSave,
 			self.page.pbSensorToolCancel,
@@ -106,9 +133,10 @@ class func(object):
 			)
 
 		self.tool_pcb = simple_fsobj_vc(
-			self.fm.tool_pcb(),
+			tools.tool_pcb(),
 			self.page.sbPcbToolID,
-			self.page.dsbPcbToolSize,
+			self.page.cbPcbToolInstitution,
+			self.page.lePcbToolLocation,
 			self.page.pbPcbToolEditNew,
 			self.page.pbPcbToolSave,
 			self.page.pbPcbToolCancel,
@@ -119,9 +147,10 @@ class func(object):
 			)
 
 		self.tray_component_sensor = simple_fsobj_vc(
-			self.fm.tray_component_sensor(),
+			tools.tray_component_sensor(),
 			self.page.sbSensorTrayID,
-			self.page.dsbSensorTraySize,
+			self.page.cbSensorTrayInstitution,
+			self.page.leSensorTrayLocation,
 			self.page.pbSensorTrayEditNew,
 			self.page.pbSensorTraySave,
 			self.page.pbSensorTrayCancel,
@@ -132,9 +161,10 @@ class func(object):
 			)
 
 		self.tray_component_pcb = simple_fsobj_vc(
-			self.fm.tray_component_pcb(),
+			tools.tray_component_pcb(),
 			self.page.sbPcbTrayID,
-			self.page.dsbPcbTraySize,
+			self.page.cbPcbTrayInstitution,
+			self.page.lePcbTrayLocation,
 			self.page.pbPcbTrayEditNew,
 			self.page.pbPcbTraySave,
 			self.page.pbPcbTrayCancel,
@@ -145,9 +175,10 @@ class func(object):
 			)
 
 		self.tray_assembly = simple_fsobj_vc(
-			self.fm.tray_assembly(),
+			tools.tray_assembly(),
 			self.page.sbAssemblyTrayID,
-			self.page.dsbAssemblyTraySize,
+			self.page.cbAssemblyTrayInstitution,
+			self.page.leAssemblyTrayLocation,
 			self.page.pbAssemblyTrayEditNew,
 			self.page.pbAssemblyTraySave,
 			self.page.pbAssemblyTrayCancel,
@@ -203,11 +234,17 @@ class func(object):
 
 	@enforce_mode('setup')
 	def rig(self):
-		self.page.sbSensorToolID  .valueChanged.connect(self.update_info_sensor_tool  )
-		self.page.sbPcbToolID     .valueChanged.connect(self.update_info_pcb_tool     )
-		self.page.sbSensorTrayID  .valueChanged.connect(self.update_info_sensor_tray  )
-		self.page.sbPcbTrayID     .valueChanged.connect(self.update_info_pcb_tray     )
-		self.page.sbAssemblyTrayID.valueChanged.connect(self.update_info_assembly_tray)
+		self.page.sbSensorToolID  .valueChanged.connect(self.update_info_sensor_tool_ID  )
+		self.page.sbPcbToolID     .valueChanged.connect(self.update_info_pcb_tool_ID     )
+		self.page.sbSensorTrayID  .valueChanged.connect(self.update_info_sensor_tray_ID  )
+		self.page.sbPcbTrayID     .valueChanged.connect(self.update_info_pcb_tray_ID     )
+		self.page.sbAssemblyTrayID.valueChanged.connect(self.update_info_assembly_tray_ID)
+		# New:
+		self.page.cbSensorToolInstitution  .currentIndexChanged.connect(self.update_info_sensor_tool_inst  )
+		self.page.cbPcbToolInstitution     .currentIndexChanged.connect(self.update_info_pcb_tool_inst     )
+		self.page.cbSensorTrayInstitution  .currentIndexChanged.connect(self.update_info_sensor_tray_inst  )
+		self.page.cbPcbTrayInstitution     .currentIndexChanged.connect(self.update_info_pcb_tray_inst     )
+		self.page.cbAssemblyTrayInstitution.currentIndexChanged.connect(self.update_info_assembly_tray_inst)
 
 		self.page.pbSensorToolEditNew  .clicked.connect(self.start_editing_sensor_tool  )
 		self.page.pbPcbToolEditNew     .clicked.connect(self.start_editing_pcb_tool     )
@@ -242,32 +279,83 @@ class func(object):
 
 
 	@enforce_mode(['view','editing_pcb_tool','editing_sensor_tray','editing_pcb_tray','editing_assembly_tray'])
-	def update_info_sensor_tool(self,ID=None,*args,**kwargs):
-		self.tool_sensor.update_info(ID)
+	def update_info_sensor_tool_ID(self,ID=None,*args,**kwargs):
+		if ID is None:
+			institution = None
+		else:
+			institution = self.page.cbSensorToolInstitution.currentText()
+		self.tool_sensor.update_info(ID,institution)
+
+	@enforce_mode(['view','editing_pcb_tool','editing_sensor_tray','editing_pcb_tray','editing_assembly_tray'])
+	def update_info_sensor_tool_inst(self,institution=None,*args,**kwargs):
+		ID = self.page.sbSensorToolID.value()
+		# By default, this fn is handed the # of the combobox, not the text.  Fix that:
+		institution_ = INSTITUTION_INDEX[institution]
+		self.tool_sensor.update_info(ID,institution_)
 
 	@enforce_mode(['view','editing_sensor_tool','editing_sensor_tray','editing_pcb_tray','editing_assembly_tray'])
-	def update_info_pcb_tool(self,ID=None,*args,**kwargs):
-		self.tool_pcb.update_info(ID)
+	def update_info_pcb_tool_ID(self,ID=None,*args,**kwargs):
+		if ID is None:
+			institution = None
+		else:
+			institution = self.page.cbPcbToolInstitution.currentText()
+		self.tool_pcb.update_info(ID,institution)
+
+	@enforce_mode(['view','editing_sensor_tool','editing_sensor_tray','editing_pcb_tray','editing_assembly_tray'])
+	def update_info_pcb_tool_inst(self,institution=None,*args,**kwargs):
+		ID = self.page.sbPcbToolID.value()
+		institution_ = INSTITUTION_INDEX[institution]
+		self.tool_pcb.update_info(ID,institution_)
 
 	@enforce_mode(['view','editing_sensor_tool','editing_pcb_tool','editing_pcb_tray','editing_assembly_tray'])
-	def update_info_sensor_tray(self,ID=None,*args,**kwargs):
-		self.tray_component_sensor.update_info(ID)
+	def update_info_sensor_tray_ID(self,ID=None,*args,**kwargs):
+		if ID is None:
+			institution = None
+		else:
+			institution = self.page.cbSensorTrayInstitution.currentText()
+		self.tray_component_sensor.update_info(ID,institution)
+
+	@enforce_mode(['view','editing_sensor_tool','editing_pcb_tool','editing_pcb_tray','editing_assembly_tray'])
+	def update_info_sensor_tray_inst(self,institution=None,*args,**kwargs):
+		ID = self.page.sbSensorTrayID.value()
+		institution_ = INSTITUTION_INDEX[institution]
+		self.tray_component_sensor.update_info(ID,institution_)
 
 	@enforce_mode(['view','editing_sensor_tool','editing_pcb_tool','editing_sensor_tray','editing_assembly_tray'])
-	def update_info_pcb_tray(self,ID=None,*args,**kwargs):
-		self.tray_component_pcb.update_info(ID)
+	def update_info_pcb_tray_ID(self,ID=None,*args,**kwargs):
+		if ID is None:
+			institution = None
+		else:
+			institution = self.page.cbPcbTrayInstitution.currentText()
+		self.tray_component_pcb.update_info(ID,institution)
+
+	@enforce_mode(['view','editing_sensor_tool','editing_pcb_tool','editing_sensor_tray','editing_assembly_tray'])
+	def update_info_pcb_tray_inst(self,institution=None,*args,**kwargs):
+		ID = self.page.sbPcbTrayID.value()
+		institution_ = INSTITUTION_INDEX[institution]
+		self.tray_component_pcb.update_info(ID,institution_)
 
 	@enforce_mode(['view','editing_sensor_tool','editing_pcb_tool','editing_sensor_tray','editing_pcb_tray'])
-	def update_info_assembly_tray(self,ID=None,*args,**kwargs):
-		self.tray_assembly.update_info(ID)
+	def update_info_assembly_tray_ID(self,ID=None,*args,**kwargs):
+		if ID is None:
+			institution = None
+		else:
+			institution = self.page.cbAssemblyTrayInstitution.currentText()
+		self.tray_assembly.update_info(ID,institution)
+
+	@enforce_mode(['view','editing_sensor_tool','editing_pcb_tool','editing_sensor_tray','editing_pcb_tray'])
+	def update_info_assembly_tray_inst(self,institution=None,*args,**kwargs):
+		ID = self.page.sbAssemblyTrayID.value()
+		institution_ = INSTITUTION_INDEX[institution]
+		self.tray_assembly.update_info(ID,institution_)
 
 	@enforce_mode('view')
 	def update_info(self,*args,**kwargs):
-		self.update_info_sensor_tool()
-		self.update_info_pcb_tool()
-		self.update_info_sensor_tray()
-		self.update_info_pcb_tray()
-		self.update_info_assembly_tray()
+		self.update_info_sensor_tool_ID()
+		self.update_info_pcb_tool_ID()
+		self.update_info_sensor_tray_ID()
+		self.update_info_pcb_tray_ID()
+		self.update_info_assembly_tray_ID()
 
 
 
@@ -287,6 +375,12 @@ class func(object):
 		self.page.sbSensorTrayID  .setEnabled(not mode_editing_sensor_tray  )
 		self.page.sbPcbTrayID     .setEnabled(not mode_editing_pcb_tray     )
 		self.page.sbAssemblyTrayID.setEnabled(not mode_editing_assembly_tray)
+		# New
+		self.page.cbSensorToolInstitution  .setEnabled(not mode_editing_sensor_tool  )
+		self.page.cbPcbToolInstitution     .setEnabled(not mode_editing_pcb_tool     )
+		self.page.cbSensorTrayInstitution  .setEnabled(not mode_editing_sensor_tray  )
+		self.page.cbPcbTrayInstitution     .setEnabled(not mode_editing_pcb_tray     )
+		self.page.cbAssemblyTrayInstitution.setEnabled(not mode_editing_assembly_tray)
 
 		self.page.pbSensorToolEditNew  .setEnabled(mode_view)
 		self.page.pbPcbToolEditNew     .setEnabled(mode_view)
@@ -306,11 +400,12 @@ class func(object):
 		self.page.pbPcbTrayCancel     .setEnabled(mode_editing_pcb_tray     )
 		self.page.pbAssemblyTrayCancel.setEnabled(mode_editing_assembly_tray)
 
-		self.page.dsbSensorToolSize  .setEnabled(mode_editing_sensor_tool  )
-		self.page.dsbPcbToolSize     .setEnabled(mode_editing_pcb_tool     )
-		self.page.dsbSensorTraySize  .setEnabled(mode_editing_sensor_tray  )
-		self.page.dsbPcbTraySize     .setEnabled(mode_editing_pcb_tray     )
-		self.page.dsbAssemblyTraySize.setEnabled(mode_editing_assembly_tray)
+
+		self.page.leSensorToolLocation  .setEnabled(mode_editing_sensor_tool  )  # New
+		self.page.lePcbToolLocation     .setEnabled(mode_editing_pcb_tool     )
+		self.page.leSensorTrayLocation  .setEnabled(mode_editing_sensor_tray  )
+		self.page.lePcbTrayLocation     .setEnabled(mode_editing_pcb_tray     )
+		self.page.leAssemblyTrayLocation.setEnabled(mode_editing_assembly_tray)
 
 		self.page.pbSensorToolDeleteComment  .setEnabled(mode_editing_sensor_tool  )
 		self.page.pbPcbToolDeleteComment     .setEnabled(mode_editing_pcb_tool     )
@@ -334,6 +429,7 @@ class func(object):
 
 	@enforce_mode('view')
 	def start_editing_sensor_tool(self,*args,**kwargs):
+		if self.page.cbSensorToolInstitution.currentText() == "":  return
 		self.mode = 'editing_sensor_tool'
 		self.tool_sensor.start_editing()
 		self.update_elements()
@@ -362,6 +458,7 @@ class func(object):
 
 	@enforce_mode('view')
 	def start_editing_pcb_tool(self,*args,**kwargs):
+		if self.page.cbPcbToolInstitution.currentText() == "":  return
 		self.mode = 'editing_pcb_tool'
 		self.tool_pcb.start_editing()
 		self.update_elements()
@@ -390,6 +487,7 @@ class func(object):
 
 	@enforce_mode('view')
 	def start_editing_sensor_tray(self,*args,**kwargs):
+		if self.page.cbSensorTrayInstitution.currentText() == "":  return
 		self.mode = 'editing_sensor_tray'
 		self.tray_component_sensor.start_editing()
 		self.update_elements()
@@ -418,6 +516,7 @@ class func(object):
 
 	@enforce_mode('view')
 	def start_editing_pcb_tray(self,*args,**kwargs):
+		if self.page.cbPcbTrayInstitution.currentText() == "":  return
 		self.mode = 'editing_pcb_tray'
 		self.tray_component_pcb.start_editing()
 		self.update_elements()
@@ -446,6 +545,7 @@ class func(object):
 
 	@enforce_mode('view')
 	def start_editing_assembly_tray(self,*args,**kwargs):
+		if self.page.cbAssemblyTrayInstitution.currentText() == "":  return
 		self.mode = 'editing_assembly_tray'
 		self.tray_assembly.start_editing()
 		self.update_elements()
@@ -476,16 +576,19 @@ class func(object):
 	@enforce_mode('view')
 	def load_kwargs(self,kwargs):
 		keys = kwargs.keys()
+		print("load_kwargs, tooling:", kwargs)
+		if not "institution" in keys:  return
 		if "tool_sensor" in keys:
-			self.update_info_sensor_tool(kwargs['tool_sensor'])
+			self.tool_sensor          .update_info(kwargs['tool_sensor'],           kwargs['institution'])
 		if "tool_pcb" in keys:
-			self.update_info_pcb_tool(kwargs['tool_pcb'])
+			self.tool_pcb             .update_info(kwargs['tool_pcb'],              kwargs['institution'])
 		if "tray_component_sensor" in keys:
-			self.update_info_sensor_tray(kwargs['tray_component_sensor'])
+			self.tray_component_sensor.update_info(kwargs['tray_component_sensor'], kwargs['institution'])
 		if "tray_component_pcb" in keys:
-			self.update_info_pcb_tray(kwargs['tray_component_pcb'])
+			self.tray_component_pcb   .update_info(kwargs['tray_component_pcb'],    kwargs['institution'])
 		if "tray_assembly" in keys:
-			self.update_info_assembly_tray(kwargs['tray_assembly'])
+			self.tray_assembly        .update_info(kwargs['tray_assembly'],         kwargs['institution'])
+
 
 	@enforce_mode('view')
 	def changed_to(self):

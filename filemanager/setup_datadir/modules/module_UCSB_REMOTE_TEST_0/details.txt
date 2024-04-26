@@ -1,9 +1,0 @@
-ID = 0
-baseplate = 0
-sensor = 0
-PCB = 0
-thickness = 42.0
-kaptontype = single
-kaptonstep = 0
-sensorstep = 0
-PCBstep = 0

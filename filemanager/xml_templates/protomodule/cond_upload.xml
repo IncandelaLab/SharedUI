@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ROOT xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<HEADER>
+	<TYPE>
+		<EXTENSION_TABLE_NAME>HGC_PRTO_MOD_ASMBLY_COND</EXTENSION_TABLE_NAME>
+		<NAME>HGC Six Inch Proto Module Curing Cond</NAME>
+	</TYPE>
+	<RUN>
+		<RUN_NAME>ProtoModule Assembly</RUN_NAME>
+		<RUN_BEGIN_TIMESTAMP>{{ run_begin_timestamp_ }}</RUN_BEGIN_TIMESTAMP>
+		<RUN_END_TIMESTAMP>{{ run_end_timestamp_ }}</RUN_END_TIMESTAMP>
+		<INITIATED_BY_USER>{{ initiated_by_user }}</INITIATED_BY_USER>
+		<LOCATION> {{ location }}</LOCATION>
+		<COMMENT_DESCRIPTION>Protomodule curing data</COMMENT_DESCRIPTION>
+	</RUN>
+</HEADER>
+
+	<DATA_SET>
+		<COMMENT_DESCRIPTION>Protomodule curing data</COMMENT_DESCRIPTION>
+		<VERSION>1</VERSION>
+		<PART mode="auto">
+			<KIND_OF_PART>{{ kind_of_part }}</KIND_OF_PART>
+			<SERIAL_NUMBER>{{ ID }}</SERIAL_NUMBER>
+		</PART>
+		<DATA>
+			<CURING_TIME_HRS>{{ curing_time_hrs }}</CURING_TIME_HRS>
+			<TIME_START>{{ cure_begin_timestamp_ }}</TIME_START>
+			<TIME_STOP>{{ cure_end_timestamp_ }}</TIME_STOP>
+			<TEMP_DEGC>{{ temp_degc }}</TEMP_DEGC>
+			<HUMIDITY_PRCNT>{{ humidity_prcnt }}</HUMIDITY_PRCNT>
+		</DATA>
+	</DATA_SET>
+
+</ROOT>

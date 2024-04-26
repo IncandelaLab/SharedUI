@@ -7,924 +7,1656 @@
     <x>0</x>
     <y>0</y>
     <width>1097</width>
-    <height>705</height>
+    <height>749</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QLineEdit" name="lineEdit">
+  <widget class="QFrame" name="frame">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>10</y>
+     <width>281</width>
+     <height>351</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <widget class="QLineEdit" name="lineEdit_21">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>60</y>
+      <width>141</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Curing agent batch</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_16">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>20</y>
+      <width>121</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Received</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbSylgardDeleteComment">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>110</y>
+      <width>131</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>delete selected</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbSylgardCancel">
+    <property name="geometry">
+     <rect>
+      <x>210</x>
+      <y>40</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>cancel</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="ckIsSylgardEmpty">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>85</y>
+      <width>161</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Batch is empty</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_13">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>40</y>
+      <width>121</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Expires</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="pteSylgardWriteComment">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>260</y>
+      <width>281</width>
+      <height>71</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbSylgardAddComment">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>330</y>
+      <width>111</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>add comment</string>
+    </property>
+   </widget>
+   <widget class="QListWidget" name="listSylgardComments">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>130</y>
+      <width>281</width>
+      <height>121</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QDateEdit" name="dSylgardExpires">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>40</y>
+      <width>91</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="dateTime">
+     <datetime>
+      <hour>21</hour>
+      <minute>0</minute>
+      <second>0</second>
+      <year>2019</year>
+      <month>12</month>
+      <day>31</day>
+     </datetime>
+    </property>
+    <property name="maximumDate">
+     <date>
+      <year>2030</year>
+      <month>12</month>
+      <day>31</day>
+     </date>
+    </property>
+    <property name="minimumDate">
+     <date>
+      <year>2000</year>
+      <month>1</month>
+      <day>1</day>
+     </date>
+    </property>
+    <property name="calendarPopup">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QDateEdit" name="dSylgardReceived">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>20</y>
+      <width>91</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="dateTime">
+     <datetime>
+      <hour>21</hour>
+      <minute>0</minute>
+      <second>0</second>
+      <year>2019</year>
+      <month>12</month>
+      <day>31</day>
+     </datetime>
+    </property>
+    <property name="maximumDate">
+     <date>
+      <year>2030</year>
+      <month>12</month>
+      <day>31</day>
+     </date>
+    </property>
+    <property name="minimumDate">
+     <date>
+      <year>2000</year>
+      <month>1</month>
+      <day>1</day>
+     </date>
+    </property>
+    <property name="calendarPopup">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbSylgardSave">
+    <property name="geometry">
+     <rect>
+      <x>210</x>
+      <y>20</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>save</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_15">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>121</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Sylgard batch</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbSylgardEditNew">
+    <property name="geometry">
+     <rect>
+      <x>210</x>
+      <y>0</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>edit/new</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leSylgardCuring">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>60</y>
+      <width>141</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_14">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>110</y>
+      <width>151</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Comments</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leSylgardID">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>0</y>
+      <width>91</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QFrame" name="frame_2">
    <property name="geometry">
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>81</width>
-     <height>21</height>
+     <width>261</width>
+     <height>351</height>
     </rect>
    </property>
-   <property name="text">
-    <string>Araldite batch</string>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
    </property>
-   <property name="readOnly">
-    <bool>true</bool>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
    </property>
+   <widget class="QLineEdit" name="leAralditeID">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>0</y>
+      <width>91</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="pteAralditeWriteComment">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>260</y>
+      <width>261</width>
+      <height>71</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbAralditeCancel">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>40</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>cancel</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_3">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>110</y>
+      <width>131</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Comments</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbAralditeDeleteComment">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>110</y>
+      <width>131</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>delete selected</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbAralditeAddComment">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>330</y>
+      <width>111</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>add comment</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="ckIsAralditeEmpty">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>65</y>
+      <width>161</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Batch is empty</string>
+    </property>
+   </widget>
+   <widget class="QListWidget" name="listAralditeComments">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>130</y>
+      <width>261</width>
+      <height>121</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_2">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>20</y>
+      <width>101</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Received</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QDateEdit" name="dAralditeExpires">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>40</y>
+      <width>91</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="dateTime">
+     <datetime>
+      <hour>21</hour>
+      <minute>0</minute>
+      <second>0</second>
+      <year>2019</year>
+      <month>12</month>
+      <day>31</day>
+     </datetime>
+    </property>
+    <property name="maximumDate">
+     <date>
+      <year>2030</year>
+      <month>12</month>
+      <day>31</day>
+     </date>
+    </property>
+    <property name="minimumDate">
+     <date>
+      <year>2000</year>
+      <month>1</month>
+      <day>1</day>
+     </date>
+    </property>
+    <property name="calendarPopup">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QDateEdit" name="dAralditeReceived">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>20</y>
+      <width>91</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="dateTime">
+     <datetime>
+      <hour>21</hour>
+      <minute>0</minute>
+      <second>0</second>
+      <year>2019</year>
+      <month>12</month>
+      <day>31</day>
+     </datetime>
+    </property>
+    <property name="maximumDate">
+     <date>
+      <year>2030</year>
+      <month>12</month>
+      <day>31</day>
+     </date>
+    </property>
+    <property name="minimumDate">
+     <date>
+      <year>2000</year>
+      <month>1</month>
+      <day>1</day>
+     </date>
+    </property>
+    <property name="calendarPopup">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbAralditeSave">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>20</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>save</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_4">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>40</y>
+      <width>101</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Expires</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>101</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Araldite batch</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbAralditeEditNew">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>0</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>edit/new</string>
+    </property>
+   </widget>
   </widget>
-  <widget class="QSpinBox" name="sbAralditeID">
+  <widget class="QFrame" name="frame_3">
    <property name="geometry">
     <rect>
-     <x>90</x>
+     <x>320</x>
+     <y>380</y>
+     <width>281</width>
+     <height>331</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <widget class="QCheckBox" name="ckIsBondWireEmpty">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>65</y>
+      <width>161</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Batch is empty</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_20">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>121</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Bond wire batch</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbBondWireAddComment">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>310</y>
+      <width>111</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>add comment</string>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="pteBondWireWriteComment">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>240</y>
+      <width>281</width>
+      <height>71</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbBondWireDeleteComment">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>90</y>
+      <width>131</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>delete selected</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_18">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>90</y>
+      <width>151</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Comments</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QDateEdit" name="dBondWireExpires">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>40</y>
+      <width>91</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="dateTime">
+     <datetime>
+      <hour>21</hour>
+      <minute>0</minute>
+      <second>0</second>
+      <year>2019</year>
+      <month>12</month>
+      <day>31</day>
+     </datetime>
+    </property>
+    <property name="maximumDate">
+     <date>
+      <year>2030</year>
+      <month>12</month>
+      <day>31</day>
+     </date>
+    </property>
+    <property name="minimumDate">
+     <date>
+      <year>2000</year>
+      <month>1</month>
+      <day>1</day>
+     </date>
+    </property>
+    <property name="calendarPopup">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbBondWireCancel">
+    <property name="geometry">
+     <rect>
+      <x>210</x>
+      <y>40</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>cancel</string>
+    </property>
+   </widget>
+   <widget class="QListWidget" name="listBondWireComments">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>110</y>
+      <width>281</width>
+      <height>121</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbBondWireSave">
+    <property name="geometry">
+     <rect>
+      <x>210</x>
+      <y>20</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>save</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_19">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>20</y>
+      <width>121</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Received</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_17">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>40</y>
+      <width>121</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Expires</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbBondWireEditNew">
+    <property name="geometry">
+     <rect>
+      <x>210</x>
+      <y>0</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>edit/new</string>
+    </property>
+   </widget>
+   <widget class="QDateEdit" name="dBondWireReceived">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>20</y>
+      <width>91</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="dateTime">
+     <datetime>
+      <hour>21</hour>
+      <minute>0</minute>
+      <second>0</second>
+      <year>2019</year>
+      <month>12</month>
+      <day>31</day>
+     </datetime>
+    </property>
+    <property name="maximumDate">
+     <date>
+      <year>2030</year>
+      <month>12</month>
+      <day>31</day>
+     </date>
+    </property>
+    <property name="minimumDate">
+     <date>
+      <year>2000</year>
+      <month>1</month>
+      <day>1</day>
+     </date>
+    </property>
+    <property name="calendarPopup">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leBondWireID">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>0</y>
+      <width>91</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QFrame" name="frame_4">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>380</y>
+     <width>261</width>
+     <height>331</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <widget class="QCheckBox" name="ckIsWedgeEmpty">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>65</y>
+      <width>161</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Batch is empty</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_5">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>40</y>
+      <width>101</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Expires</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_8">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>101</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Loctite = silver epoxy</string>
+    </property>
+    <property name="text">
+     <string>Wedge batch</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_6">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>20</y>
+      <width>101</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Received</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_7">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>90</y>
+      <width>131</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Comments</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QListWidget" name="listWedgeComments">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>110</y>
+      <width>261</width>
+      <height>121</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="pteWedgeWriteComment">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>240</y>
+      <width>261</width>
+      <height>71</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbWedgeDeleteComment">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>90</y>
+      <width>131</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>delete selected</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbWedgeAddComment">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>310</y>
+      <width>111</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>add comment</string>
+    </property>
+   </widget>
+   <widget class="QDateEdit" name="dWedgeReceived">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>20</y>
+      <width>91</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="dateTime">
+     <datetime>
+      <hour>21</hour>
+      <minute>0</minute>
+      <second>0</second>
+      <year>2019</year>
+      <month>12</month>
+      <day>31</day>
+     </datetime>
+    </property>
+    <property name="maximumDate">
+     <date>
+      <year>2030</year>
+      <month>12</month>
+      <day>31</day>
+     </date>
+    </property>
+    <property name="minimumDate">
+     <date>
+      <year>2000</year>
+      <month>1</month>
+      <day>1</day>
+     </date>
+    </property>
+    <property name="calendarPopup">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbWedgeCancel">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>40</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>cancel</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbWedgeSave">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>20</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>save</string>
+    </property>
+   </widget>
+   <widget class="QDateEdit" name="dWedgeExpires">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>40</y>
+      <width>91</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="dateTime">
+     <datetime>
+      <hour>21</hour>
+      <minute>0</minute>
+      <second>0</second>
+      <year>2019</year>
+      <month>12</month>
+      <day>31</day>
+     </datetime>
+    </property>
+    <property name="maximumDate">
+     <date>
+      <year>2030</year>
+      <month>12</month>
+      <day>31</day>
+     </date>
+    </property>
+    <property name="minimumDate">
+     <date>
+      <year>2000</year>
+      <month>1</month>
+      <day>1</day>
+     </date>
+    </property>
+    <property name="calendarPopup">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbWedgeEditNew">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>0</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>edit/new</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leWedgeID">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>0</y>
+      <width>91</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QFrame" name="frame_5">
+   <property name="geometry">
+    <rect>
+     <x>650</x>
      <y>10</y>
-     <width>91</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="maximum">
-    <number>2147483647</number>
-   </property>
-  </widget>
-  <widget class="QListWidget" name="listAralditeComments">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>100</y>
-     <width>251</width>
-     <height>121</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_3">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>80</y>
-     <width>121</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Comments</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbAralditeDeleteComment">
-   <property name="geometry">
-    <rect>
-     <x>130</x>
-     <y>80</y>
-     <width>131</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>delete selected</string>
-   </property>
-  </widget>
-  <widget class="QPlainTextEdit" name="pteAralditeWriteComment">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>230</y>
-     <width>251</width>
-     <height>71</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbAralditeAddComment">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>300</y>
-     <width>81</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>add comment</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbAralditeEditNew">
-   <property name="geometry">
-    <rect>
-     <x>200</x>
-     <y>10</y>
-     <width>61</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>edit/new</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbAralditeSave">
-   <property name="geometry">
-    <rect>
-     <x>200</x>
-     <y>30</y>
-     <width>61</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>save</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbAralditeCancel">
-   <property name="geometry">
-    <rect>
-     <x>200</x>
-     <y>50</y>
-     <width>61</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>cancel</string>
-   </property>
-  </widget>
-  <widget class="QDateEdit" name="dAralditeReceived">
-   <property name="geometry">
-    <rect>
-     <x>90</x>
-     <y>30</y>
-     <width>91</width>
-     <height>21</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QDateEdit" name="dAralditeExpires">
-   <property name="geometry">
-    <rect>
-     <x>90</x>
-     <y>50</y>
-     <width>91</width>
-     <height>21</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_2">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>30</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Received</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_4">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>50</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Expires</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_5">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>410</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Expires</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_6">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>390</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Received</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QListWidget" name="listLoctiteComments">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>460</y>
-     <width>251</width>
-     <height>121</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_7">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>440</y>
-     <width>121</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Comments</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbLoctiteDeleteComment">
-   <property name="geometry">
-    <rect>
-     <x>130</x>
-     <y>440</y>
-     <width>131</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>delete selected</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbLoctiteCancel">
-   <property name="geometry">
-    <rect>
-     <x>200</x>
-     <y>410</y>
-     <width>61</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>cancel</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbLoctiteAddComment">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>660</y>
-     <width>81</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>add comment</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_8">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>370</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="toolTip">
-    <string>Loctite = silver epoxy</string>
-   </property>
-   <property name="text">
-    <string>Loctite batch</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QDateEdit" name="dLoctiteReceived">
-   <property name="geometry">
-    <rect>
-     <x>90</x>
-     <y>390</y>
-     <width>91</width>
-     <height>21</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QPlainTextEdit" name="pteLoctiteWriteComment">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>590</y>
-     <width>251</width>
-     <height>71</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbLoctiteSave">
-   <property name="geometry">
-    <rect>
-     <x>200</x>
-     <y>390</y>
-     <width>61</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>save</string>
-   </property>
-  </widget>
-  <widget class="QDateEdit" name="dLoctiteExpires">
-   <property name="geometry">
-    <rect>
-     <x>90</x>
-     <y>410</y>
-     <width>91</width>
-     <height>21</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbLoctiteEditNew">
-   <property name="geometry">
-    <rect>
-     <x>200</x>
-     <y>370</y>
-     <width>61</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>edit/new</string>
-   </property>
-  </widget>
-  <widget class="QSpinBox" name="sbLoctiteID">
-   <property name="geometry">
-    <rect>
-     <x>90</x>
-     <y>370</y>
-     <width>91</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="maximum">
-    <number>2147483647</number>
-   </property>
-  </widget>
-  <widget class="QSpinBox" name="sbSylgardThinID">
-   <property name="geometry">
-    <rect>
-     <x>420</x>
-     <y>370</y>
-     <width>61</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="maximum">
-    <number>2147483647</number>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbSylgardThinAddComment">
-   <property name="geometry">
-    <rect>
-     <x>310</x>
-     <y>660</y>
-     <width>81</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>add comment</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_9">
-   <property name="geometry">
-    <rect>
-     <x>310</x>
-     <y>410</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Expires</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_10">
-   <property name="geometry">
-    <rect>
-     <x>310</x>
-     <y>440</y>
-     <width>121</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Comments</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_11">
-   <property name="geometry">
-    <rect>
-     <x>310</x>
-     <y>390</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Received</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbSylgardThinSave">
-   <property name="geometry">
-    <rect>
-     <x>500</x>
-     <y>390</y>
-     <width>61</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>save</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_12">
-   <property name="geometry">
-    <rect>
-     <x>310</x>
-     <y>370</y>
-     <width>111</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Sylgard (thin) batch</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QListWidget" name="listSylgardThinComments">
-   <property name="geometry">
-    <rect>
-     <x>310</x>
-     <y>460</y>
-     <width>251</width>
-     <height>121</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbSylgardThinDeleteComment">
-   <property name="geometry">
-    <rect>
-     <x>430</x>
-     <y>440</y>
-     <width>131</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>delete selected</string>
-   </property>
-  </widget>
-  <widget class="QPlainTextEdit" name="pteSylgardThinWriteComment">
-   <property name="geometry">
-    <rect>
-     <x>310</x>
-     <y>590</y>
-     <width>251</width>
-     <height>71</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbSylgardThinCancel">
-   <property name="geometry">
-    <rect>
-     <x>500</x>
-     <y>410</y>
-     <width>61</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>cancel</string>
-   </property>
-  </widget>
-  <widget class="QDateEdit" name="dSylgardThinExpires">
-   <property name="geometry">
-    <rect>
-     <x>390</x>
-     <y>410</y>
-     <width>91</width>
-     <height>21</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QDateEdit" name="dSylgardThinReceived">
-   <property name="geometry">
-    <rect>
-     <x>390</x>
-     <y>390</y>
-     <width>91</width>
-     <height>21</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbSylgardThinEditNew">
-   <property name="geometry">
-    <rect>
-     <x>500</x>
-     <y>370</y>
-     <width>61</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>edit/new</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbSylgardThickEditNew">
-   <property name="geometry">
-    <rect>
-     <x>500</x>
-     <y>10</y>
-     <width>61</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>edit/new</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_13">
-   <property name="geometry">
-    <rect>
-     <x>310</x>
-     <y>50</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Expires</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_14">
-   <property name="geometry">
-    <rect>
-     <x>310</x>
-     <y>80</y>
-     <width>121</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Comments</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QSpinBox" name="sbSylgardThickID">
-   <property name="geometry">
-    <rect>
-     <x>420</x>
-     <y>10</y>
-     <width>61</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="maximum">
-    <number>2147483647</number>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbSylgardThickCancel">
-   <property name="geometry">
-    <rect>
-     <x>500</x>
-     <y>50</y>
-     <width>61</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>cancel</string>
-   </property>
-  </widget>
-  <widget class="QListWidget" name="listSylgardThickComments">
-   <property name="geometry">
-    <rect>
-     <x>310</x>
-     <y>100</y>
-     <width>251</width>
-     <height>121</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_15">
-   <property name="geometry">
-    <rect>
-     <x>310</x>
-     <y>10</y>
-     <width>111</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Sylgard (thick) batch</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbSylgardThickDeleteComment">
-   <property name="geometry">
-    <rect>
-     <x>430</x>
-     <y>80</y>
-     <width>131</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>delete selected</string>
-   </property>
-  </widget>
-  <widget class="QPlainTextEdit" name="pteSylgardThickWriteComment">
-   <property name="geometry">
-    <rect>
-     <x>310</x>
-     <y>230</y>
-     <width>251</width>
-     <height>71</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_16">
-   <property name="geometry">
-    <rect>
-     <x>310</x>
-     <y>30</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Received</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbSylgardThickAddComment">
-   <property name="geometry">
-    <rect>
-     <x>310</x>
-     <y>300</y>
-     <width>81</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>add comment</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbSylgardThickSave">
-   <property name="geometry">
-    <rect>
-     <x>500</x>
-     <y>30</y>
-     <width>61</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>save</string>
-   </property>
-  </widget>
-  <widget class="QDateEdit" name="dSylgardThickExpires">
-   <property name="geometry">
-    <rect>
-     <x>390</x>
-     <y>50</y>
-     <width>91</width>
-     <height>21</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QDateEdit" name="dSylgardThickReceived">
-   <property name="geometry">
-    <rect>
-     <x>390</x>
-     <y>30</y>
-     <width>91</width>
-     <height>21</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QDateEdit" name="dBondWireReceived">
-   <property name="geometry">
-    <rect>
-     <x>690</x>
-     <y>30</y>
-     <width>91</width>
-     <height>21</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_17">
-   <property name="geometry">
-    <rect>
-     <x>610</x>
-     <y>50</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Expires</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QListWidget" name="listBondWireComments">
-   <property name="geometry">
-    <rect>
-     <x>610</x>
-     <y>100</y>
-     <width>251</width>
-     <height>121</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbBondWireEditNew">
-   <property name="geometry">
-    <rect>
-     <x>800</x>
-     <y>10</y>
-     <width>61</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>edit/new</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbBondWireDeleteComment">
-   <property name="geometry">
-    <rect>
-     <x>730</x>
-     <y>80</y>
-     <width>131</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>delete selected</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbBondWireCancel">
-   <property name="geometry">
-    <rect>
-     <x>800</x>
-     <y>50</y>
-     <width>61</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>cancel</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_18">
-   <property name="geometry">
-    <rect>
-     <x>610</x>
-     <y>80</y>
-     <width>121</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Comments</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QSpinBox" name="sbBondWireID">
-   <property name="geometry">
-    <rect>
-     <x>700</x>
-     <y>10</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="maximum">
-    <number>2147483647</number>
-   </property>
-  </widget>
-  <widget class="QPlainTextEdit" name="pteBondWireWriteComment">
-   <property name="geometry">
-    <rect>
-     <x>610</x>
-     <y>230</y>
-     <width>251</width>
-     <height>71</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbBondWireSave">
-   <property name="geometry">
-    <rect>
-     <x>800</x>
-     <y>30</y>
-     <width>61</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>save</string>
-   </property>
-  </widget>
-  <widget class="QDateEdit" name="dBondWireExpires">
-   <property name="geometry">
-    <rect>
-     <x>690</x>
-     <y>50</y>
-     <width>91</width>
-     <height>21</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_19">
-   <property name="geometry">
-    <rect>
-     <x>610</x>
-     <y>30</y>
-     <width>81</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Received</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="lineEdit_20">
-   <property name="geometry">
-    <rect>
-     <x>610</x>
-     <y>10</y>
-     <width>91</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Bond wire batch</string>
-   </property>
-   <property name="readOnly">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pbBondWireAddComment">
-   <property name="geometry">
-    <rect>
-     <x>610</x>
-     <y>300</y>
-     <width>81</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>add comment</string>
-   </property>
+     <width>261</width>
+     <height>351</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <widget class="QLineEdit" name="leTape50ID">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>0</y>
+      <width>61</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="pteTape50WriteComment">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>260</y>
+      <width>261</width>
+      <height>71</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbTape50Cancel">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>40</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>cancel</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_9">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>110</y>
+      <width>131</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Comments</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbTape50DeleteComment">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>110</y>
+      <width>131</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>delete selected</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbTape50AddComment">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>330</y>
+      <width>111</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>add comment</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="ckIsTape50Empty">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>65</y>
+      <width>161</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Batch is empty</string>
+    </property>
+   </widget>
+   <widget class="QListWidget" name="listTape50Comments">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>130</y>
+      <width>261</width>
+      <height>121</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_10">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>20</y>
+      <width>101</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Received</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QDateEdit" name="dTape50Expires">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>40</y>
+      <width>91</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="dateTime">
+     <datetime>
+      <hour>20</hour>
+      <minute>0</minute>
+      <second>0</second>
+      <year>2019</year>
+      <month>12</month>
+      <day>31</day>
+     </datetime>
+    </property>
+    <property name="maximumDate">
+     <date>
+      <year>2030</year>
+      <month>12</month>
+      <day>31</day>
+     </date>
+    </property>
+    <property name="minimumDate">
+     <date>
+      <year>2000</year>
+      <month>1</month>
+      <day>1</day>
+     </date>
+    </property>
+    <property name="calendarPopup">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QDateEdit" name="dTape50Received">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>20</y>
+      <width>91</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="dateTime">
+     <datetime>
+      <hour>20</hour>
+      <minute>0</minute>
+      <second>0</second>
+      <year>2019</year>
+      <month>12</month>
+      <day>31</day>
+     </datetime>
+    </property>
+    <property name="maximumDate">
+     <date>
+      <year>2030</year>
+      <month>12</month>
+      <day>31</day>
+     </date>
+    </property>
+    <property name="minimumDate">
+     <date>
+      <year>2000</year>
+      <month>1</month>
+      <day>1</day>
+     </date>
+    </property>
+    <property name="calendarPopup">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbTape50Save">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>20</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>save</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_11">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>40</y>
+      <width>101</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Expires</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_12">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>131</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Transfer tape 50um</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbTape50EditNew">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>0</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>edit/new</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="ckNoExpiry50">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>65</y>
+      <width>121</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Does not expire</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QFrame" name="frame_6">
+   <property name="geometry">
+    <rect>
+     <x>650</x>
+     <y>380</y>
+     <width>261</width>
+     <height>331</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <widget class="QLineEdit" name="leTape120ID">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>0</y>
+      <width>61</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="pteTape120WriteComment">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>240</y>
+      <width>261</width>
+      <height>71</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbTape120Cancel">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>40</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>cancel</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_30">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>90</y>
+      <width>131</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Comments</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbTape120DeleteComment">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>90</y>
+      <width>131</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>delete selected</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbTape120AddComment">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>310</y>
+      <width>111</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>add comment</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="ckIsTape120Empty">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>65</y>
+      <width>161</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Batch is empty</string>
+    </property>
+   </widget>
+   <widget class="QListWidget" name="listTape120Comments">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>110</y>
+      <width>261</width>
+      <height>121</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_31">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>20</y>
+      <width>101</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Received</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QDateEdit" name="dTape120Expires">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>40</y>
+      <width>91</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="dateTime">
+     <datetime>
+      <hour>19</hour>
+      <minute>0</minute>
+      <second>0</second>
+      <year>2019</year>
+      <month>12</month>
+      <day>31</day>
+     </datetime>
+    </property>
+    <property name="maximumDate">
+     <date>
+      <year>2030</year>
+      <month>12</month>
+      <day>31</day>
+     </date>
+    </property>
+    <property name="minimumDate">
+     <date>
+      <year>2000</year>
+      <month>1</month>
+      <day>1</day>
+     </date>
+    </property>
+    <property name="calendarPopup">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QDateEdit" name="dTape120Received">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>20</y>
+      <width>91</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="dateTime">
+     <datetime>
+      <hour>19</hour>
+      <minute>0</minute>
+      <second>0</second>
+      <year>2019</year>
+      <month>12</month>
+      <day>31</day>
+     </datetime>
+    </property>
+    <property name="maximumDate">
+     <date>
+      <year>2030</year>
+      <month>12</month>
+      <day>31</day>
+     </date>
+    </property>
+    <property name="minimumDate">
+     <date>
+      <year>2000</year>
+      <month>1</month>
+      <day>1</day>
+     </date>
+    </property>
+    <property name="calendarPopup">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbTape120Save">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>20</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>save</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_32">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>40</y>
+      <width>101</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Expires</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_33">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>131</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Transfer tape 125um</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbTape120EditNew">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>0</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>edit/new</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="ckNoExpiry120">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>65</y>
+      <width>121</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Does not expire</string>
+    </property>
+   </widget>
   </widget>
  </widget>
  <resources/>

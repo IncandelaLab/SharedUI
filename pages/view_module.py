@@ -1,60 +1,79 @@
-from PyQt4 import QtCore
-import time
+from filemanager import parts
+import os
+import shutil
+import glob
+
+from PyQt5.QtWidgets import QFileDialog, QWidget
+
 
 PAGE_NAME = "view_module"
 DEBUG = False
-SITE_SEP = ', '
-NO_DATE = [2000,1,1]
-
-INDEX_SIZE = {
-	8:0,
-	"8":0,
-	6:1,
-	"6":1,
-}
 
 INDEX_SHAPE = {
-	'full':0,
-	'half':1,
-	'five':2,
-	'three':3,
-	'semi':4,
-	'semi(-)':5,
-	'choptwo':6,
+	'Full':0,
+	'Top':1,
+	'Bottom':2,
+	'Left':3,
+	'Right':4,
+	'Five':5,
+	'Full+Three':6,
 }
 
-INDEX_CHIRALITY = {
-	'achiral':0,
-	'left':1,
-	'right':2,
+INDEX_TYPE = {
+	'HD':0,
+	'LD':1,
 }
 
 INDEX_INSPECTION = {
-	'yes':0,
 	'pass':0,
-	True:0,
-	'no':1,
 	'fail':1,
-	False:1,
 }
 
-def separate_sites(sites_string):
-	s = sites_string
-	for char in SITE_SEP:
-		s=s.replace(char, '\n')
-	sites = [_ for _ in s.splitlines() if _]
-	return sites
+INDEX_INSTITUTION = {
+	'CERN':0,
+	'FNAL':1,
+	'UCSB':2,
+	'UMN':3,
+	'HEPHY':4,
+	'HPK':5,
+	'CMU':6,
+	'TTU':7,
+	'IHEP':8,
+	'TIFR':9,
+	'NTU':10,
+	'FSU':11
+}
+
+INDEX_GRADE = {
+	'Green':0,
+	'Yellow':1,
+	'Red':2,
+}
+
+
+class Filewindow(QWidget):
+	def __init__(self):
+		super(Filewindow, self).__init__()
+
+	def getdir(self,*args,**kwargs):
+		#fname, fmt = QFileDialog.getOpenFileName(self, 'Open file', '~',"(*.jpg *.png *.xml)")
+		dname = str(QFileDialog.getExistingDirectory(self, "Select directory"))
+		return dname
+
 
 class func(object):
-	def __init__(self,fm,page,setUIPage,setSwitchingEnabled):
+	def __init__(self,fm,userManager,page,setUIPage,setSwitchingEnabled):
+		self.userManager = userManager
 		self.page      = page
 		self.setUIPage = setUIPage
 		self.setMainSwitchingEnabled = setSwitchingEnabled
 
-		self.module = fm.module()
+		self.module = parts.module()
 		self.module_exists = None
 		self.mode = 'setup'
 
+		# NEW
+		self.xmlModList = []
 
 
 	def enforce_mode(mode):
@@ -101,17 +120,12 @@ class func(object):
 
 	@enforce_mode('setup')
 	def rig(self):
-		self.page.sbID.valueChanged.connect(self.update_info)
-
-		self.page.pbNew.clicked.connect(self.startCreating)
+		self.page.leID.textChanged.connect(self.loadPart)
+		# self.page.pbLoad.clicked.connect(self.loadPart)
 		self.page.pbEdit.clicked.connect(self.startEditing)
 		self.page.pbSave.clicked.connect(self.saveEditing)
 		self.page.pbCancel.clicked.connect(self.cancelEditing)
 
-		self.page.pbGoShipment.clicked.connect(self.goShipment)
-
-		self.page.pbGoStepKapton.clicked.connect(   self.goStepKapton   )
-		self.page.pbGoStepKapton_2.clicked.connect( self.goStepKapton_2 )
 		self.page.pbGoStepSensor.clicked.connect(   self.goStepSensor   )
 		self.page.pbGoStepPcb.clicked.connect(      self.goStepPcb      )
 		self.page.pbGoBaseplate.clicked.connect(    self.goBaseplate    )
@@ -122,184 +136,134 @@ class func(object):
 		self.page.pbDeleteComment.clicked.connect(self.deleteComment)
 		self.page.pbAddComment.clicked.connect(self.addComment)
 
-		self.page.pbCureStartNow.clicked.connect(self.cureStartNow)
-		self.page.pbCureStopNow.clicked.connect( self.cureStopNow )
-
-		self.page.pbIvAddToPlotter.clicked.connect( self.ivAddToPlotter )
-		self.page.pbIvGoPlotter.clicked.connect(    self.ivGoPlotter    )
-		self.page.pbDaqAddToPlotter.clicked.connect(self.daqAddToPlotter)
-		self.page.pbDaqGoPlotter.clicked.connect(   self.daqGoPlotter   )
+		self.fwnd = Filewindow()
+		self.page.pbAddFiles.clicked.connect(self.getFile)
+		self.page.pbDeleteFile.clicked.connect(self.deleteFile)
 
 
-
-
-	@enforce_mode('view')
-	def update_info(self,ID=None,*args,**kwargs):
+	@enforce_mode(['view', 'editing'])
+	def update_info(self,ID=None,do_load=True,*args,**kwargs):
 		if ID is None:
-			ID = self.page.sbID.value()
+			ID = self.page.leID.text()
 		else:
-			self.page.sbID.setValue(ID)
-
-		self.module_exists = self.module.load(ID)
+			self.page.leID.setText(ID)
 		
-		# shipments and location
-		self.page.leLocation.setText("" if self.module.location is None else self.module.location)
-		self.page.listShipments.clear()
-		for shipment in self.module.shipments:
-			self.page.listShipments.addItem(str(shipment))
+		self.module_exists = (ID == self.module.ID)
+		
+		self.page.cbInsertUser.clear()
+		auth_users = self.userManager.getAuthorizedUsers(PAGE_NAME)
+		self.index_users = {auth_users[i]:i for i in range(len(auth_users))}
+		for user in self.index_users.keys():
+			self.page.cbInsertUser.addItem(user)
+
+		if not self.module.record_insertion_user in self.index_users.keys() and len(self.index_users.keys())!=0 and not self.module.record_insertion_user is None:
+			# Insertion user was deleted from user page...just add user to the dropdown
+			self.index_users[self.module.record_insertion_user] = max(self.index_users.values()) + 1
+			self.page.cbInsertUser.addItem(self.module.initiated_by_user)
+		self.page.cbInsertUser.setCurrentIndex(self.index_users.get(self.module.record_insertion_user, -1))
+		self.page.cbInstitution.setCurrentIndex(INDEX_INSTITUTION.get(self.module.location, -1))
+		#self.page.leLocation.setText("" if self.module.institution_location is None else self.module.institution_location)
 
 		# characteristics
-		self.page.leNumKaptons.setText( "" if self.module.num_kaptons is None else str(self.module.num_kaptons))
-		self.page.sbChannels.setValue(  -1 if self.module.channels    is None else self.module.channels   )
-		self.page.dsbThickness.setValue(-1 if self.module.thickness   is None else self.module.thickness  )
-		self.page.sbRotation.setValue(  -1 if self.module.rotation    is None else self.module.rotation   )
-		self.page.cbSize.setCurrentIndex(     INDEX_SIZE.get(     self.module.size     , -1))
-		self.page.cbShape.setCurrentIndex(    INDEX_SHAPE.get(    self.module.shape    , -1))
-		self.page.cbChirality.setCurrentIndex(INDEX_CHIRALITY.get(self.module.chirality, -1))
-		if self.page.sbChannels.value()   == -1: self.page.sbChannels.clear()
-		if self.page.dsbThickness.value() == -1: self.page.dsbThickness.clear()
-		if self.page.sbRotation.value()   == -1: self.page.sbRotation.clear()
+		self.page.cbShape.setCurrentIndex(      INDEX_SHAPE.get(      self.module.geometry    , -1)  )
+		self.page.cbResolution.setCurrentIndex( INDEX_TYPE.get(       self.module.channel_density, -1))
+		self.page.cbGrade.setCurrentIndex(      INDEX_GRADE.get(      self.module.grade    , -1)  )
+		self.page.cbInspection.setCurrentIndex( INDEX_INSPECTION.get( self.module.pre_inspection,  -1))
 
 		# parts and steps
-		self.page.sbStepKapton.setValue(   -1 if self.module.step_kapton   is None else self.module.step_kapton   )
-		self.page.sbStepKapton_2.setValue( -1 if self.module.step_kapton_2 is None else self.module.step_kapton_2 )
-		self.page.sbStepSensor.setValue(   -1 if self.module.step_sensor   is None else self.module.step_sensor   )
-		self.page.sbStepPcb.setValue(      -1 if self.module.step_pcb      is None else self.module.step_pcb      )
-		self.page.sbBaseplate.setValue(    -1 if self.module.baseplate     is None else self.module.baseplate     )
-		self.page.sbSensor.setValue(       -1 if self.module.sensor        is None else self.module.sensor        )
-		self.page.sbPcb.setValue(          -1 if self.module.pcb           is None else self.module.pcb           )
-		self.page.sbProtomodule.setValue(  -1 if self.module.protomodule   is None else self.module.protomodule   )
-		if self.page.sbStepKapton.value()   == -1:self.page.sbStepKapton.clear()
-		if self.page.sbStepKapton_2.value() == -1:self.page.sbStepKapton_2.clear()
-		if self.page.sbStepSensor.value()   == -1:self.page.sbStepSensor.clear()
-		if self.page.sbStepPcb.value()      == -1:self.page.sbStepPcb.clear()
-		if self.page.sbBaseplate.value()    == -1:self.page.sbBaseplate.clear()
-		if self.page.sbSensor.value()       == -1:self.page.sbSensor.clear()
-		if self.page.sbPcb.value()          == -1:self.page.sbPcb.clear()
-		if self.page.sbProtomodule.value()  == -1:self.page.sbProtomodule.clear()
+		if self.module.step_sensor:
+			tmp_inst, tmp_id = self.module.step_sensor.split("_")
+			self.page.sbStepSensor.setValue(int(tmp_id))
+			self.page.cbInstitutionStepSensor.setCurrentIndex(INDEX_INSTITUTION.get(tmp_inst, -1))
+		else:
+			self.page.sbStepSensor.clear()
+			self.page.cbInstitutionStepSensor.setCurrentIndex(-1)
+		if self.module.step_pcb:
+			tmp_inst, tmp_id = self.module.step_pcb.split("_")
+			self.page.sbStepPcb.setValue(int(tmp_id))
+			self.page.cbInstitutionStepPcb.setCurrentIndex(INDEX_INSTITUTION.get(tmp_inst, -1))
+		else:
+			self.page.sbStepPcb.clear()
+			self.page.cbInstitutionStepPcb.setCurrentIndex(-1)
+
+		# NOTE - TBD - may have to remove/comment
+		self.page.leBaseplate.setText(    "" if self.module.baseplate     is None else self.module.baseplate     )
+		self.page.leSensor.setText(       "" if self.module.sensor        is None else self.module.sensor        )
+		self.page.lePcb.setText(          "" if self.module.pcb           is None else self.module.pcb           )
+		self.page.leProtomodule.setText(  "" if self.module.protomodule   is None else self.module.protomodule   )
+		if self.page.sbStepSensor.value()  == -1:  self.page.sbStepSensor.clear()
+		if self.page.sbStepPcb.value()     == -1:  self.page.sbStepPcb.clear()
+		if self.page.leBaseplate.text()    == -1:  self.page.leBaseplate.clear()
+		if self.page.leSensor.text()       == -1:  self.page.leSensor.clear()
+		if self.page.lePcb.text()          == -1:  self.page.lePcb.clear()
+		if self.page.leProtomodule.text()  == -1:  self.page.leProtomodule.clear()
+
+		self.page.ckWirebondingCompleted.setChecked(self.module.wirebonding_completed if self.module.wirebonding_completed else False)
+
 
 		# comments
 		self.page.listComments.clear()
-		for comment in self.module.comments:
-			self.page.listComments.addItem(comment)
+		if self.module.comments:
+			for comment in self.module.comments.split(';;'):
+				self.page.listComments.addItem(comment)
 		self.page.pteWriteComment.clear()
 
-		# pre-wirebonding qualification
-		self.page.cbCheckEdgeContact.setCurrentIndex(INDEX_INSPECTION.get(self.module.check_glue_edge_contact, -1))
-		self.page.cbCheckGlueSpill.setCurrentIndex(  INDEX_INSPECTION.get(self.module.check_glue_spill  , -1))
-		self.page.cbUnbondedDaqOK.setCurrentIndex(   INDEX_INSPECTION.get(self.module.unbonded_daq_ok   , -1))
-		self.page.leUnbondedDaq.setText(    "" if self.module.unbonded_daq      is None else self.module.unbonded_daq     )
-		self.page.leUnbondedDaqUser.setText("" if self.module.unbonded_daq_user is None else self.module.unbonded_daq_user)
 
-		# wirebonding
-		self.page.ckWirebonding.setChecked(       False if self.module.wirebonding          is None else self.module.wirebonding         )
-		self.page.ckTestBonds.setChecked(         False if self.module.test_bonds           is None else self.module.test_bonds          )
-		self.page.ckTestBondsPulled.setChecked(   False if self.module.test_bonds_pulled    is None else self.module.test_bonds_pulled   )
-		self.page.ckTestBondsRebonded.setChecked( False if self.module.test_bonds_rebonded  is None else self.module.test_bonds_rebonded )
-		self.page.ckWirebondsInspected.setChecked(False if self.module.wirebonds_inspected  is None else self.module.wirebonds_inspected )
-		self.page.ckWirebondsRepaired.setChecked( False if self.module.wirebonds_repaired   is None else self.module.wirebonds_repaired  )
-		self.page.leWirebondingUser.setText(      "" if self.module.wirebonding_user         is None else self.module.wirebonding_user        )
-		self.page.leWirebondsRepairedUser.setText("" if self.module.wirebonds_repaired_user  is None else self.module.wirebonds_repaired_user )
-		self.page.leTestBondsPulledUser.setText(  "" if self.module.test_bonds_pulled_user   is None else self.module.test_bonds_pulled_user  )
-		self.page.leTestBondsRebondedUser.setText("" if self.module.test_bonds_rebonded_user is None else self.module.test_bonds_rebonded_user)
-		self.page.pteUnbondedSites.setPlainText(        "" if self.module.wirebonding_unbonded_sites          is None else SITE_SEP.join(self.module.wirebonding_unbonded_sites         ))
-		self.page.pteWirebondsDamaged.setPlainText(     "" if self.module.wirebonds_damaged       is None else SITE_SEP.join(self.module.wirebonds_damaged      ))
-		self.page.pteWirebondsRepairedList.setPlainText("" if self.module.wirebonds_repaired_list is None else SITE_SEP.join(self.module.wirebonds_repaired_list))
-		self.page.cbTestBondsPulledOK.setCurrentIndex(  INDEX_INSPECTION.get(self.module.test_bonds_pulled_ok  , -1))
-		self.page.cbTestBondsRebondedOK.setCurrentIndex(INDEX_INSPECTION.get(self.module.test_bonds_rebonded_ok, -1))
+		self.page.listFiles.clear()
+		for f in self.module.test_files if self.module.test_files else []:
+			name = os.path.split(f)[1]
+			self.page.listFiles.addItem(name)
 
-		# wirebonding qualification
-		self.page.ckWirebondingFinalInspection.setChecked(False if self.module.wirebonding_final_inspection is None else self.module.wirebonding_final_inspection)
-		self.page.leWirebondingFinalInspectionUser.setText("" if self.module.wirebonding_final_inspection_user is None else self.module.wirebonding_final_inspection_user)
-		self.page.cbWirebondingFinalInspectionOK.setCurrentIndex(INDEX_INSPECTION.get(self.module.wirebonding_final_inspection_ok,-1))
-
-		# encapsulation
-		self.page.ckEncapsulation.setChecked(False if self.module.encapsulation is None else self.module.encapsulation)
-		self.page.leEncapsulationUser.setText("" if self.module.encapsulation_user is None else self.module.encapsulation_user)
-		self.page.cbEncapsulationInspection.setCurrentIndex(INDEX_INSPECTION.get(self.module.encapsulation_inspection,-1))
-		if self.module.encapsulation_cure_start is None:
-			self.page.dtCureStart.setDate(QtCore.QDate(*NO_DATE))
-			self.page.dtCureStart.setTime(QtCore.QTime(0,0,0))
-		else:
-			localtime = list(time.localtime(self.module.encapsulation_cure_start))
-			self.page.dtCureStart.setDate(QtCore.QDate(*localtime[0:3]))
-			self.page.dtCureStart.setTime(QtCore.QTime(*localtime[3:6]))
-
-		if self.module.encapsulation_cure_stop is None:
-			self.page.dtCureStop.setDate(QtCore.QDate(*NO_DATE))
-			self.page.dtCureStop.setTime(QtCore.QTime(0,0,0))
-		else:
-			localtime = list(time.localtime(self.module.encapsulation_cure_stop))
-			self.page.dtCureStop.setDate(QtCore.QDate(*localtime[0:3]))
-			self.page.dtCureStop.setTime(QtCore.QTime(*localtime[3:6]))
-
-		# finished module qualification
-		self.page.ckHvCablesAttached.setChecked(False if self.module.hv_cables_attached is None else self.module.hv_cables_attached)
-		self.page.leHvCablesAttachedUser.setText("" if self.module.hv_cables_attached_user is None else self.module.hv_cables_attached_user )
-		self.page.leUnbiasedDaq.setText(         "" if self.module.unbiased_daq            is None else self.module.unbiased_daq            )
-		self.page.leUnbiasedDaqUser.setText(     "" if self.module.unbiased_daq_user       is None else self.module.unbiased_daq_user       )
-		self.page.leIv.setText(                  "" if self.module.iv                      is None else self.module.iv                      )
-		self.page.leIvUser.setText(              "" if self.module.iv_user                 is None else self.module.iv_user                 )
-		self.page.leBiasedDaq.setText(           "" if self.module.biased_daq              is None else self.module.biased_daq              )
-		self.page.leBiasedDaqVoltage.setText(    "" if self.module.biased_daq_voltage      is None else self.module.biased_daq_voltage      )
-		self.page.cbUnbiasedDaqOK.setCurrentIndex(INDEX_INSPECTION.get(self.module.unbiased_daq_ok, -1))
-		self.page.cbIvOK.setCurrentIndex(         INDEX_INSPECTION.get(self.module.iv_ok          , -1))
-		self.page.cbBiasedDaqOK.setCurrentIndex(  INDEX_INSPECTION.get(self.module.biased_daq_ok  , -1))
-
-		# iv datasets
-		self.page.listIvData.clear()
-		for iv in self.module.iv_data:
-			self.page.listIvData.addItem(iv)
-
-		# daq datasets
-		self.page.listDaqData.clear()
-		for daq in self.module.daq_data:
-			self.page.listDaqData.addItem(daq)
+		self.page.dsbOffsetTranslationX.setValue( -1 if self.module.pcb_plcment_x_offset is None else self.module.pcb_plcment_x_offset )
+		self.page.dsbOffsetTranslationY.setValue( -1 if self.module.pcb_plcment_y_offset is None else self.module.pcb_plcment_y_offset )
+		self.page.dsbOffsetRotation.setValue(    -1 if self.module.pcb_plcment_ang_offset    is None else self.module.pcb_plcment_ang_offset )
+		self.page.dsbThickness.setValue(-1 if self.module.thickness   is None else self.module.thickness  )
+		self.page.dsbFlatness.setValue( -1 if self.module.flatness  is None else self.module.flatness   )
+		if self.page.dsbOffsetTranslationX.value() == -1: self.page.dsbOffsetTranslationX.clear()
+		if self.page.dsbOffsetTranslationY.value() == -1: self.page.dsbOffsetTranslationY.clear()
+		if self.page.dsbOffsetRotation.value() == -1: self.page.dsbOffsetRotation.clear()
+		if self.page.dsbThickness.value() == -1: self.page.dsbThickness.clear()
+		if self.page.dsbFlatness.value()  == -1: self.page.dsbFlatness.clear()
 
 		self.updateElements()
 
-	@enforce_mode(['view','editing','creating'])
-	def updateElements(self):
-		module_exists   = self.module_exists
-		shipments_exist = self.page.listShipments.count() > 0
-		daq_data_exists = self.page.listDaqData.count()   > 0
-		iv_data_exists  = self.page.listIvData.count()    > 0
 
-		step_kapton_exists   = self.page.sbStepKapton.value()    >= 0
-		step_kapton_2_exists = self.page.sbStepKapton_2.value()  >= 0
-		step_sensor_exists   = self.page.sbStepSensor.value()    >= 0
-		step_pcb_exists      = self.page.sbStepPcb.value()       >= 0
-		baseplate_exists   = self.page.sbBaseplate.value()   >= 0
-		sensor_exists      = self.page.sbSensor.value()      >= 0
-		pcb_exists         = self.page.sbPcb.value()         >= 0
-		protomodule_exists = self.page.sbProtomodule.value() >= 0
+	@enforce_mode(['view','editing'])
+	def updateElements(self):
+		if not self.mode == "view":
+			self.page.leStatus.setText(self.mode)
+
+		module_exists   = self.module_exists
+
+		step_sensor_exists   = self.page.sbStepSensor.value() >= 0 and \
+		                       self.page.cbInstitutionStepSensor.currentText() != ""
+		step_pcb_exists      = self.page.sbStepPcb.value()    >= 0 and \
+		                       self.page.cbInstitutionStepPcb.currentText() != ""
+		baseplate_exists   = self.page.leBaseplate.text()   != ""
+		sensor_exists      = self.page.leSensor.text()      != ""
+		pcb_exists         = self.page.lePcb.text()         != ""
+		protomodule_exists = self.page.leProtomodule.text() != ""
+
 
 		mode_view     = self.mode == 'view'
 		mode_editing  = self.mode == 'editing'
-		mode_creating = self.mode == 'creating'
 
 		self.setMainSwitchingEnabled(mode_view) 
-		self.page.sbID.setEnabled(mode_view)
+		self.page.leID.setReadOnly(not mode_view)
 
-		self.page.pbNew   .setEnabled( mode_view and not module_exists )
+		# self.page.pbLoad.setEnabled(mode_view)
 		self.page.pbEdit  .setEnabled( mode_view and     module_exists )
-		self.page.pbSave  .setEnabled( mode_creating or mode_editing   )
-		self.page.pbCancel.setEnabled( mode_creating or mode_editing   )
-
-		# shipments and location
-		self.page.pbGoShipment.setEnabled(mode_view and shipments_exist)
+		self.page.pbSave  .setEnabled( mode_editing   )
+		self.page.pbCancel.setEnabled( mode_editing   )
 
 		# characteristics
-		self.page.sbChannels.setReadOnly(   not (mode_creating or mode_editing) )
-		self.page.dsbThickness.setReadOnly( not (mode_creating or mode_editing) )
-		self.page.sbRotation.setReadOnly(   not (mode_creating or mode_editing) )
-		self.page.cbSize.setEnabled(      mode_creating or mode_editing )
-		self.page.cbShape.setEnabled(     mode_creating or mode_editing )
-		self.page.cbChirality.setEnabled( mode_creating or mode_editing )
+		# Note: most non-editable b/c either fixed or filled in w/ assembly pages
+		#self.page.leLocation.setReadOnly(   not mode_editing )
+		# self.page.cbInstitution.setEnabled(     mode_editing )
+		# self.page.cbInsertUser.setEnabled(      mode_editing )
+		# self.page.cbInspection.setEnabled(      mode_editing )
 
 		# parts and steps
-		self.page.pbGoStepKapton.setEnabled(   mode_view and step_kapton_exists   )
-		self.page.pbGoStepKapton_2.setEnabled( mode_view and step_kapton_2_exists )
 		self.page.pbGoStepSensor.setEnabled(   mode_view and step_sensor_exists   )
 		self.page.pbGoStepPcb.setEnabled(      mode_view and step_pcb_exists      )
 		self.page.pbGoBaseplate.setEnabled(    mode_view and baseplate_exists     )
@@ -307,186 +271,97 @@ class func(object):
 		self.page.pbGoPcb.setEnabled(          mode_view and pcb_exists           )
 		self.page.pbGoProtomodule.setEnabled(  mode_view and protomodule_exists   )
 
+		# Disable editting assemply data
+		# self.page.dsbOffsetTranslationX.setReadOnly( not mode_editing )
+		# self.page.dsbOffsetTranslationY.setReadOnly( not mode_editing )
+		# self.page.dsbOffsetRotation.setReadOnly(     not mode_editing )
+		# self.page.dsbFlatness.setReadOnly(           not mode_editing )
+		# self.page.dsbThickness.setReadOnly(          not mode_editing )
+
 		# comments
-		self.page.pbDeleteComment.setEnabled(mode_creating or mode_editing)
-		self.page.pbAddComment.setEnabled(   mode_creating or mode_editing)
-		self.page.pteWriteComment.setEnabled(mode_creating or mode_editing)
+		self.page.pbDeleteComment.setEnabled(mode_editing)
+		self.page.pbAddComment.setEnabled(   mode_editing)
+		self.page.pteWriteComment.setEnabled(mode_editing)
 
-		# pre-wirebonding qualification
-		self.page.cbCheckEdgeContact.setEnabled( mode_creating or mode_editing )
-		self.page.cbCheckGlueSpill.setEnabled(   mode_creating or mode_editing )
-		self.page.cbUnbondedDaqOK.setEnabled(    mode_creating or mode_editing )
-		self.page.leUnbondedDaq.setReadOnly(     not (mode_creating or mode_editing) )
-		self.page.leUnbondedDaqUser.setReadOnly( not (mode_creating or mode_editing) )
-
-		# wirebonding
-		self.page.ckWirebonding.setEnabled(        mode_creating or mode_editing )
-		self.page.ckTestBonds.setEnabled(          mode_creating or mode_editing )
-		self.page.ckTestBondsPulled.setEnabled(    mode_creating or mode_editing )
-		self.page.ckTestBondsRebonded.setEnabled(  mode_creating or mode_editing )
-		self.page.ckWirebondsInspected.setEnabled( mode_creating or mode_editing )
-		self.page.ckWirebondsRepaired.setEnabled(  mode_creating or mode_editing )
-		self.page.leWirebondingUser.setReadOnly(        not (mode_creating or mode_editing) )
-		self.page.leWirebondsRepairedUser.setReadOnly(  not (mode_creating or mode_editing) )
-		self.page.leTestBondsPulledUser.setReadOnly(    not (mode_creating or mode_editing) )
-		self.page.leTestBondsRebondedUser.setReadOnly(  not (mode_creating or mode_editing) )
-		self.page.pteUnbondedSites.setReadOnly(         not (mode_creating or mode_editing) )
-		self.page.pteWirebondsDamaged.setReadOnly(      not (mode_creating or mode_editing) )
-		self.page.pteWirebondsRepairedList.setReadOnly( not (mode_creating or mode_editing) )
-		self.page.cbTestBondsPulledOK.setEnabled(   mode_creating or mode_editing )
-		self.page.cbTestBondsRebondedOK.setEnabled( mode_creating or mode_editing )
-
-		# wirebonding qualification
-		self.page.ckWirebondingFinalInspection.setEnabled( mode_creating or mode_editing )
-		self.page.leWirebondingFinalInspectionUser.setReadOnly( not (mode_creating or mode_editing) )
-		self.page.cbWirebondingFinalInspectionOK.setEnabled( mode_creating or mode_editing )
-
-		# encapsulation
-		self.page.ckEncapsulation.setEnabled( mode_creating or mode_editing )
-		self.page.leEncapsulationUser.setReadOnly( not (mode_creating or mode_editing) )
-		self.page.cbEncapsulationInspection.setEnabled( mode_creating or mode_editing )
-		self.page.dtCureStart.setReadOnly( not (mode_creating or mode_editing) )
-		self.page.dtCureStop.setReadOnly(  not (mode_creating or mode_editing) )
-		self.page.pbCureStartNow.setEnabled( mode_creating or mode_editing )
-		self.page.pbCureStopNow.setEnabled(  mode_creating or mode_editing )
-
-		# finished module qualification
-		self.page.ckHvCablesAttached.setEnabled( mode_creating or mode_editing )
-		self.page.leHvCablesAttachedUser.setReadOnly( not (mode_creating or mode_editing) )
-		self.page.leUnbiasedDaq.setReadOnly(          not (mode_creating or mode_editing) )
-		self.page.leUnbiasedDaqUser.setReadOnly(      not (mode_creating or mode_editing) )
-		self.page.leIv.setReadOnly(                   not (mode_creating or mode_editing) )
-		self.page.leIvUser.setReadOnly(               not (mode_creating or mode_editing) )
-		self.page.leBiasedDaq.setReadOnly(            not (mode_creating or mode_editing) )
-		self.page.leBiasedDaqVoltage.setReadOnly(     not (mode_creating or mode_editing) )
-		self.page.cbUnbiasedDaqOK.setEnabled( mode_creating or mode_editing )
-		self.page.cbIvOK.setEnabled(          mode_creating or mode_editing )
-		self.page.cbBiasedDaqOK.setEnabled(   mode_creating or mode_editing )
-
-		# iv datasets
-		self.page.pbIvAddToPlotter.setEnabled(mode_view and iv_data_exists)
-		self.page.pbIvGoPlotter.setEnabled(   mode_view and iv_data_exists)
-
-		# daq datasets
-		self.page.pbDaqAddToPlotter.setEnabled(mode_view and daq_data_exists)
-		self.page.pbDaqGoPlotter.setEnabled(   mode_view and daq_data_exists)
+		self.page.pbAddFiles.setEnabled(  mode_editing)
+		self.page.pbDeleteFile.setEnabled(mode_editing)
 
 
+	# NEW:
 	@enforce_mode('view')
-	def startCreating(self,*args,**kwargs):
-		if not self.module_exists:
-			ID = self.page.sbID.value()
-			self.mode = 'creating'
-			self.module.new(ID)
-			self.updateElements()
+	def loadPart(self,*args,**kwargs):
+		if self.page.leID.text == "":
+			self.page.leStatus.setText("input an ID")
+			return
+		# Check whether baseplate exists:
+		tmp_module = parts.module()
+		tmp_ID = self.page.leID.text()
+		tmp_exists = tmp_module.load(tmp_ID)
+		if not tmp_exists:  # DNE; good to create
+			self.page.leStatus.setText("module DNE")
+			self.update_info(do_load=False)
+		else:
+			self.module = tmp_module
+			self.page.leStatus.setText("module exists")
+			self.update_info()
+
 
 	@enforce_mode('view')
 	def startEditing(self,*args,**kwargs):
-		if self.module_exists:
+		tmp_module = parts.module()
+		tmp_ID = self.page.leID.text()
+		tmp_exists = tmp_module.load(tmp_ID)
+		if not tmp_exists:
+			self.page.leStatus.setText("does not exist")
+		else:
+			self.module = tmp_module
 			self.mode = 'editing'
-			self.updateElements()
+			self.update_info()
 
-	@enforce_mode(['editing','creating'])
+	@enforce_mode('editing')
 	def cancelEditing(self,*args,**kwargs):
 		self.mode = 'view'
 		self.update_info()
 
-	@enforce_mode(['editing','creating'])
+	@enforce_mode('editing')
 	def saveEditing(self,*args,**kwargs):
 		# characteristics
-		self.module.channels  = self.page.sbChannels.value()   if self.page.sbChannels.value()   >= 0 else None
-		self.module.thickness = self.page.dsbThickness.value() if self.page.dsbThickness.value() >= 0 else None
-		self.module.rotation  = self.page.sbRotation.value()   if self.page.sbRotation.value()   >= 0 else None
-		self.module.size      = str(self.page.cbSize.currentText()     ) if str(self.page.cbSize.currentText()     ) else None
-		self.module.shape     = str(self.page.cbShape.currentText()    ) if str(self.page.cbShape.currentText()    ) else None
-		self.module.chirality = str(self.page.cbChirality.currentText()) if str(self.page.cbChirality.currentText()) else None
+		self.module.record_insertion_user  = str(self.page.cbInsertUser.currentText())  if str(self.page.cbInsertUser.currentText())  else None
+		self.module.location     = str(self.page.cbInstitution.currentText()) if str(self.page.cbInstitution.currentText()) else None
+		self.module.final_inspxn_ok      = str(self.page.cbInspection.currentText())  if str(self.page.cbInspection.currentText())  else None
 
 		# comments
 		num_comments = self.page.listComments.count()
-		self.module.comments = []
-		for i in range(num_comments):
-			self.module.comments.append(str(self.page.listComments.item(i).text()))
+		self.module.comments = ';;'.join([self.page.listComments.item(i).text() for i in range(num_comments)])
 
-		# pre-wirebonding qualification
-		self.module.check_glue_edge_contact = str(self.page.cbCheckEdgeContact.currentText()) if str(self.page.cbCheckEdgeContact.currentText()) else None
-		self.module.check_glue_spill        = str(self.page.cbCheckGlueSpill.currentText()  ) if str(self.page.cbCheckGlueSpill.currentText()  ) else None
-		self.module.unbonded_daq_ok         = str(self.page.cbUnbondedDaqOK.currentText()   ) if str(self.page.cbUnbondedDaqOK.currentText()   ) else None
-		self.module.unbonded_daq            = str(self.page.leUnbondedDaq.text()    ) if str(self.page.leUnbondedDaq.text()    ) else None
-		self.module.unbonded_daq_user       = str(self.page.leUnbondedDaqUser.text()) if str(self.page.leUnbondedDaqUser.text()) else None
-
-		# wirebonding
-		self.module.wirebonding              = self.page.ckWirebonding.isChecked()
-		self.module.test_bonds               = self.page.ckTestBonds.isChecked()
-		self.module.test_bonds_pulled        = self.page.ckTestBondsPulled.isChecked()
-		self.module.test_bonds_rebonded      = self.page.ckTestBondsRebonded.isChecked()
-		self.module.wirebonds_inspected      = self.page.ckWirebondsInspected.isChecked()
-		self.module.wirebonds_repaired       = self.page.ckWirebondsRepaired.isChecked()
-		self.module.wirebonding_user         = str(self.page.leWirebondingUser.text()      ) if str(self.page.leWirebondingUser.text()      ) else None
-		self.module.wirebonds_repaired_user  = str(self.page.leWirebondsRepairedUser.text()) if str(self.page.leWirebondsRepairedUser.text()) else None
-		self.module.test_bonds_pulled_user   = str(self.page.leTestBondsPulledUser.text()  ) if str(self.page.leTestBondsPulledUser.text()  ) else None
-		self.module.test_bonds_rebonded_user = str(self.page.leTestBondsRebondedUser.text()) if str(self.page.leTestBondsRebondedUser.text()) else None
-		self.module.wirebonding_unbonded_sites = separate_sites(str(self.page.pteUnbondedSites.toPlainText()        )) if str(self.page.pteUnbondedSites.toPlainText()        ) else None
-		self.module.wirebonds_damaged          = separate_sites(str(self.page.pteWirebondsDamaged.toPlainText()     )) if str(self.page.pteWirebondsDamaged.toPlainText()     ) else None
-		self.module.wirebonds_repaired_list    = separate_sites(str(self.page.pteWirebondsRepairedList.toPlainText())) if str(self.page.pteWirebondsRepairedList.toPlainText()) else None
-		self.module.test_bonds_pulled_ok   = str(self.page.cbTestBondsPulledOK.currentText()  ) if str(self.page.cbTestBondsPulledOK.currentText()  ) else None
-		self.module.test_bonds_rebonded_ok = str(self.page.cbTestBondsRebondedOK.currentText()) if str(self.page.cbTestBondsRebondedOK.currentText()) else None
-
-		# wirebonding qualification
-		self.module.wirebonding_final_inspection      = self.page.ckWirebondingFinalInspection.isChecked()
-		self.module.wirebonding_final_inspection_user = str(self.page.leWirebondingFinalInspectionUser.text()     ) if str(self.page.leWirebondingFinalInspectionUser.text()     ) else None
-		self.module.wirebonding_final_inspection_ok   = str(self.page.cbWirebondingFinalInspectionOK.currentText()) if str(self.page.cbWirebondingFinalInspectionOK.currentText()) else None
-
-		# encapsulation
-		self.module.encapsulation            = self.page.ckEncapsulation.isChecked()
-		self.module.encapsulation_user       = str(self.page.leEncapsulationUser.text()             ) if str(self.page.leEncapsulationUser.text()             ) else None
-		self.module.encapsulation_inspection = str(self.page.cbEncapsulationInspection.currentText()) if str(self.page.cbEncapsulationInspection.currentText()) else None
-		if self.page.dtCureStart.date().year() == NO_DATE[0]:
-			self.module.encapsulation_cure_start = None
-		else:
-			self.module.encapsulation_cure_start = self.page.dtCureStart.dateTime().toTime_t()
-		if self.page.dtCureStop.date().year() == NO_DATE[0]:
-			self.module.encapsulation_cure_stop = None
-		else:
-			self.module.encapsulation_cure_stop = self.page.dtCureStop.dateTime().toTime_t()
-
-		# finished module qualification
-		self.module.hv_cables_attached  = self.page.ckHvCablesAttached.isChecked()
-		self.module.hv_cables_attached_user = str(self.page.leHvCablesAttachedUser.text()) if str(self.page.leHvCablesAttachedUser.text()) else None
-		self.module.unbiased_daq            = str(self.page.leUnbiasedDaq.text()         ) if str(self.page.leUnbiasedDaq.text()         ) else None
-		self.module.unbiased_daq_user       = str(self.page.leUnbiasedDaqUser.text()     ) if str(self.page.leUnbiasedDaqUser.text()     ) else None
-		self.module.iv                      = str(self.page.leIv.text()                  ) if str(self.page.leIv.text()                  ) else None
-		self.module.iv_user                 = str(self.page.leIvUser.text()              ) if str(self.page.leIvUser.text()              ) else None
-		self.module.biased_daq              = str(self.page.leBiasedDaq.text()           ) if str(self.page.leBiasedDaq.text()           ) else None
-		self.module.biased_daq_voltage      = str(self.page.leBiasedDaqVoltage.text()    ) if str(self.page.leBiasedDaqVoltage.text()    ) else None
-		self.module.unbiased_daq_ok = str(self.page.cbUnbiasedDaqOK.currentText()) if str(self.page.cbUnbiasedDaqOK.currentText()) else None
-		self.module.iv_ok           = str(self.page.cbIvOK.currentText()         ) if str(self.page.cbIvOK.currentText()         ) else None
-		self.module.biased_daq_ok   = str(self.page.cbBiasedDaqOK.currentText()  ) if str(self.page.cbBiasedDaqOK.currentText()  ) else None
+		self.module.pcb_plcment_x_offset = self.page.dsbOffsetTranslationX.value() if self.page.dsbOffsetTranslationX.value() >=0 else None
+		self.module.pcb_plcment_y_offset = self.page.dsbOffsetTranslationY.value() if self.page.dsbOffsetTranslationY.value() >=0 else None
+		self.module.offset_rotation      = self.page.dsbOffsetRotation.value()    if self.page.dsbOffsetRotation.value()    >=0 else None
+		self.module.flatness = self.page.dsbFlatness.value()    if self.page.dsbFlatness.value()    >=0 else None
+		self.module.thickness = self.page.dsbThickness.value()    if self.page.dsbThickness.value()    >=0 else None
 
 		self.module.save()
 		self.mode = 'view'
 		self.update_info()
 
+		self.xmlModList.append(self.module.ID)
 
 
-	@enforce_mode(['editing','creating'])
-	def cureStartNow(self, *args, **kwargs):
-		localtime = time.localtime()
-		self.page.dtCureStart.setDate(QtCore.QDate(*localtime[0:3]))
-		self.page.dtCureStart.setTime(QtCore.QTime(*localtime[3:6]))
 
-	@enforce_mode(['editing','creating'])
-	def cureStopNow(self, *args, **kwargs):
-		localtime = time.localtime()
-		self.page.dtCureStop.setDate(QtCore.QDate(*localtime[0:3]))
-		self.page.dtCureStop.setTime(QtCore.QTime(*localtime[3:6]))
+	def xmlModified(self):
+		return self.xmlModList
 
-	@enforce_mode(['editing','creating'])
+	def xmlModifiedReset(self):
+		self.xmlModList = []
+
+
+	@enforce_mode('editing')
 	def deleteComment(self,*args,**kwargs):
 		row = self.page.listComments.currentRow()
 		if row >= 0:
 			self.page.listComments.takeItem(row)
 
-	@enforce_mode(['editing','creating'])
+	@enforce_mode('editing')
 	def addComment(self,*args,**kwargs):
 		text = str(self.page.pteWriteComment.toPlainText())
 		if text:
@@ -495,86 +370,92 @@ class func(object):
 
 	@enforce_mode('view')
 	def goBaseplate(self,*args,**kwargs):
-		ID = self.page.sbBaseplate.value()
-		if ID>=0:
-			self.setUIPage('baseplates',ID=ID)
+		ID = self.page.leBaseplate.text()
+		if ID != "":
+			self.setUIPage('Baseplates',ID=ID)
 
 	@enforce_mode('view')
 	def goSensor(self,*args,**kwargs):
-		ID = self.page.sbSensor.value()
-		if ID>=0:
-			self.setUIPage('sensors',ID=ID)
+		ID = self.page.leSensor.text()
+		if ID != "":
+			self.setUIPage('Sensors',ID=ID)
 
 	@enforce_mode('view')
 	def goPcb(self,*args,**kwargs):
-		ID = self.page.sbPcb.value()
-		if ID>=0:
+		ID = self.page.lePcb.text()
+		if ID != "":
 			self.setUIPage('PCBs',ID=ID)
 
 	@enforce_mode('view')
 	def goProtomodule(self,*args,**kwargs):
-		ID = self.page.sbProtomodule.value()
-		if ID>=0:
-			self.setUIPage('protomodules',ID=ID)
-
-	@enforce_mode('view')
-	def goShipment(self,*args,**kwargs):
-		item = self.page.listShipments.currentItem()
-		if not (item is None):
-			self.setUIPage('shipments',ID=str(item.text()))
-
-	@enforce_mode('view')
-	def goStepKapton(self,*args,**kwargs):
-		ID = self.page.sbStepKapton.value()
-		if ID>=0:
-			self.setUIPage('kapton placement steps',ID=ID)
-
-	@enforce_mode('view')
-	def goStepKapton_2(self,*args,**kwargs):
-		ID = self.page.sbStepKapton_2.value()
-		if ID>=0:
-			self.setUIPage('kapton placement steps',ID=ID)
+		ID = self.page.leProtomodule.text()
+		if ID != "":
+			self.setUIPage('Protomodules',ID=ID)
 
 	@enforce_mode('view')
 	def goStepSensor(self,*args,**kwargs):
-		ID = self.page.sbStepSensor.value()
-		if ID>=0:
-			self.setUIPage('sensor placement steps',ID=ID)
+		tmp_id = self.page.sbStepSensor.value()
+		tmp_inst = self.page.cbInstitutionStepSensor.currentText()
+		if tmp_id >= 0 and tmp_inst != "":
+			self.setUIPage('1. Sensor - pre-assembly',ID="{}_{}".format(tmp_inst, tmp_id))
 
 	@enforce_mode('view')
 	def goStepPcb(self,*args,**kwargs):
-		ID = self.page.sbStepPcb.value()
-		if ID>=0:
-			self.setUIPage('PCB placement steps',ID=ID)
-
-	@enforce_mode('view')
-	def ivAddToPlotter(self,*args,**kwargs):
-		print("not implemented yet - waiting for plotter page to be implemented")
-
-	@enforce_mode('view')
-	def ivGoPlotter(self,*args,**kwargs):
-		self.setUIPage('plotter',which='iv')
-
-	@enforce_mode('view')
-	def daqAddToPlotter(self,*args,**kwargs):
-		print("not implemented yet - waiting for plotter page to be implemented")
-
-	@enforce_mode('view')
-	def daqGoPlotter(self,*args,**kwargs):
-		self.setUIPage('plotter',which='daq')
+		tmp_id = self.page.sbStepPcb.value()
+		tmp_inst = self.page.cbInstitutionStepPcb.currentText()
+		if tmp_id >= 0 and tmp_inst != "":
+			self.setUIPage('3. PCB - pre-assembly',ID="{}_{}".format(tmp_inst, tmp_id))
 
 
+	@enforce_mode('editing')
+	def getFile(self,*args,**kwargs):
+		f = self.fwnd.getdir()
+		if f == '':  return
+		files = glob.glob(f + '/**/*.png', recursive=True) + glob.glob(f + '/**/*.jpg', recursive=True)
+		if files != []:
+			# Need to call this to ensure that necessary dirs for storing item are created
+			self.module.save()
+			for f in files:
+				fname = os.path.split(f)[1]  # Name of file
+				fdir, fname_ = self.module.get_filedir_filename()
+				tmp_filepath = (fdir + '/' + fname).rsplit('.', 1)  # Only want the last . to get replaced...
+				new_filepath = "_upload.".join(tmp_filepath)
+				shutil.copyfile(f, new_filepath)
+				self.page.listComments.addItem(new_filepath)
+				self.module.test_files.append(new_filepath)
+			self.update_info()
+		else:
+			print("WARNING:  Failed to find PNG files in chosen directory!")
+
+	@enforce_mode('editing')
+	def deleteFile(self,*args,**kwargs):
+		row = self.page.listFiles.currentRow()
+		if row >= 0:
+			fname = self.page.listFiles.item(row).text()
+			self.page.listFiles.takeItem(row)
+			# Now need to remove the file...
+			fdir, fname_ = self.module.get_filedir_filename()
+			new_filepath = fdir + '/' + fname
+			os.remove(new_filepath)
+			self.module.test_files.remove(new_filepath)
+			self.update_info()
+
+	def filesToUpload(self):
+		# Return a list of all files to upload to DB
+		if self.module is None:
+			return []
+		else:
+			return self.module.filesToUpload()
 
 
 	@enforce_mode('view')
 	def load_kwargs(self,kwargs):
 		if 'ID' in kwargs.keys():
 			ID = kwargs['ID']
-			if not (type(ID) is int):
-				raise TypeError("Expected type <int> for ID; got <{}>".format(type(ID)))
-			if ID < 0:
-				raise ValueError("ID cannot be negative")
-			self.page.sbID.setValue(ID)
+			if not (type(ID) is str):
+				raise TypeError("Expected type <str> for ID; got <{}>".format(type(ID)))
+			self.page.leID.setText(ID)
+			self.loadPart()
 
 	@enforce_mode('view')
 	def changed_to(self):
