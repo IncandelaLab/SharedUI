@@ -260,8 +260,12 @@ class func(object):
 		tmp_pcb = parts.pcb()
 		tmp_ID = self.page.leID.text()
 
-		# NEW: Load from central DB if exists
-		if tmp_pcb.load_remote(tmp_ID, full=True):  # exist in central DB
+		# NEW: Load from central DB if not found locally
+		if tmp_pcb.load(tmp_ID):  # exist locally
+			self.pcb = tmp_pcb
+			self.update_info()
+			self.page.leStatus.setText("pcb exists locally")
+		elif tmp_pcb.load_remote(tmp_ID, full=True):  # exist in central DB
 			self.pcb = tmp_pcb
 			print("\n!! Loading pcb {} from central DB".format(tmp_ID))
 			print("kind of part: {}".format(self.pcb.kind_of_part))
@@ -270,11 +274,7 @@ class func(object):
 			print("flatness: {}".format(self.pcb.flatness))
 			print("grade: {}".format(self.pcb.grade))
 			self.update_info()
-			self.page.leStatus.setText("PCB exists in central DB")
-		elif tmp_pcb.load(tmp_ID):  # exist locally
-			self.pcb = tmp_pcb
-			self.update_info()
-			self.page.leStatus.setText("pcb only exists locally")
+			self.page.leStatus.setText("PCB only exists in central DB")
 		else:  # DNE; good to create
 			self.update_info()
 			self.page.leStatus.setText("PCB DNE")

@@ -193,7 +193,7 @@
     </property>
     <property name="dateTime">
      <datetime>
-      <hour>16</hour>
+      <hour>0</hour>
       <minute>0</minute>
       <second>0</second>
       <year>2023</year>
@@ -742,6 +742,19 @@
     </property>
     <property name="text">
      <string>Part type:</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbRefresh">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>250</y>
+      <width>141</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Refresh remote DB</string>
     </property>
    </widget>
   </widget>

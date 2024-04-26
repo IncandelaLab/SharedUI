@@ -120,6 +120,9 @@ class func(object):
 		self.page.pbClearResults.clicked.connect( self.clearResults )
 		self.page.pbGoToPart.clicked.connect( self.goToPart )
 
+		# NEW: refresh remote DB list
+		self.page.pbRefresh.clicked.connect( self.refreshRemoteDB )
+
 		# search for tools and supplies
 		self.page.pbSearch_2.clicked.connect(self.search_tool_supply)
 		self.page.cbToolSupplyType.currentIndexChanged.connect( self.updateElements )
@@ -183,7 +186,7 @@ class func(object):
 			if found:  found_local_parts[part_id] = part_temp.kind_of_part
 
 
-		# Search for parts in DB:
+		# Search for parts in central DB:
 		found_remote_parts = {}  # serial:type
 		part_temp_remote = PART_DICT[part_type]()  # Constructs instance of searched-for class
 		
@@ -469,3 +472,21 @@ and l.LOCATION_NAME like \'{}\'"*"*".format(pt_query, search_criteria['location_
 
 	def on_scroll_ToolSupplyList(self, value):
 		self.page.lwInfoList.verticalScrollBar().setValue(value)
+
+	def refreshRemoteDB(self):
+		print("Refreshing remote DB...")
+		self.page.leStatus.setText("Refreshing remote DB...")
+
+		obj_list_remote = ['baseplate', 'pcb', 'protomodule', 'module']
+		for part in obj_list_remote:
+			fm.fetchRemoteDB(part)
+
+		status_text = "Remote DB refreshed!"
+
+		# sensor search has to specify institute
+		if self.page.cbInstitution.currentText() != '':
+			fm.fetchRemoteDB('sensor', self.page.cbInstitution.currentText())
+		else:
+			status_text += " Sensor list is not refreshed, please specify institution!"
+  
+		self.page.leStatus.setText(status_text)

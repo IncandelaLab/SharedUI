@@ -399,6 +399,9 @@ class fsobj(object):
 		return True
 
 	def load_remote(self, ID, full=True):
+		self.clear()
+		if ID == -1 or ID == None:
+			return False
 		
 		part_name = self.__class__.__name__
 		if part_name not in ['baseplate', 'pcb', 'sensor', 'protomodule', 'module']:
@@ -431,7 +434,7 @@ class fsobj(object):
 			response_json = response
 
 		# Check if the full info is needed or the request was successful
-		if not full or request_success:
+		if ((not full) and bool(response_json)) or request_success:
 			data_keys = []
 			
 			# print("!!! remote response_json: ", response_json)
@@ -490,9 +493,13 @@ class fsobj(object):
 									# only shows the first parent
 									elif 'Module' in kind:
 										setattr(self, 'module', parent['serial_number'])
+			self.ID = ID
 			return True
 		else:
-			print(f"Failed to fetch data: {response.status_code} - {response.text}")
+			if response:
+				print(f"Failed to fetch data: {response.status_code} - {response.text}")
+			else:
+				print(f"Part {ID} not found in remote partlist")
 			return False
 
 	def new(self, ID):

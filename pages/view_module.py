@@ -299,8 +299,12 @@ class func(object):
 		tmp_module = parts.module()
 		tmp_ID = self.page.leID.text()
 
-		# NEW: Load from central DB if exists
-		if tmp_module.load_remote(tmp_ID, full=True):  # exist in central DB
+		# NEW: Load from central DB if not found locally
+		if tmp_module.load(tmp_ID):  # exist locally
+			self.module = tmp_module
+			self.update_info()
+			self.page.leStatus.setText("module exists locally")
+		elif tmp_module.load_remote(tmp_ID, full=True):  # exist in central DB
 			self.module = tmp_module
 			print("\n!! Loading module {} from central DB".format(tmp_ID))
 			print("kind of part: {}".format(self.module.kind_of_part))
@@ -309,11 +313,7 @@ class func(object):
 			print("flatness: {}".format(self.module.flatness))
 			print("grade: {}".format(self.module.grade))
 			self.update_info()
-			self.page.leStatus.setText("module exists in central DB")
-		elif tmp_module.load(tmp_ID):  # exist locally
-			self.module = tmp_module
-			self.update_info()
-			self.page.leStatus.setText("module only exists locally")
+			self.page.leStatus.setText("module only exists in central DB")
 		else:  # DNE; good to create
 			self.update_info()
 			self.page.leStatus.setText("module DNE")

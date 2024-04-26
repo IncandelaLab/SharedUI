@@ -237,8 +237,12 @@ class func(object):
 		tmp_sensor = parts.sensor()
 		tmp_ID = self.page.leID.text()
   
-		# NEW: Load from central DB if exists
-		if tmp_sensor.load_remote(tmp_ID, full=True):  # exist in central DB
+		# NEW: Load from central DB if not found locally
+		if tmp_sensor.load(tmp_ID):  # exist locally
+			self.sensor = tmp_sensor
+			self.update_info()
+			self.page.leStatus.setText("sensor exists locally")
+		elif tmp_sensor.load_remote(tmp_ID, full=True):  # exist in central DB
 			self.sensor = tmp_sensor
 			print("\n!! Loading pcb {} from central DB".format(tmp_ID))
 			print("kind of part: {}".format(self.sensor.kind_of_part))
@@ -247,11 +251,7 @@ class func(object):
 			print("flatness: {}".format(self.sensor.flatness))
 			print("grade: {}".format(self.sensor.grade))
 			self.update_info()
-			self.page.leStatus.setText("sensor exists in central DB")
-		elif tmp_sensor.load(tmp_ID):  # exist locally
-			self.sensor = tmp_sensor
-			self.update_info()
-			self.page.leStatus.setText("sensor only exists locally")
+			self.page.leStatus.setText("sensor only exists in central DB")
 		else:  # DNE; good to create
 			self.update_info()
 			self.page.leStatus.setText("sensor DNE")

@@ -261,8 +261,12 @@ class func(object):
 		tmp_baseplate = parts.baseplate()
 		tmp_ID = self.page.leID.text()
 		
-		# NEW: Load from central DB if exists
-		if tmp_baseplate.load_remote(tmp_ID, full=True):  # exist in central DB
+		# NEW: Load from central DB if not found locally
+		if tmp_baseplate.load(tmp_ID):  # exist locally
+			self.baseplate = tmp_baseplate
+			self.update_info()
+			self.page.leStatus.setText("baseplate exists locally")
+		elif tmp_baseplate.load_remote(tmp_ID, full=True):  # exist in central DB
 			self.baseplate = tmp_baseplate
 			print("\n!! Loading baseplate {} from central DB".format(tmp_ID))
 			print("kind of part: {}".format(self.baseplate.kind_of_part))
@@ -272,11 +276,7 @@ class func(object):
 			print("weight: {}".format(self.baseplate.weight))
 			print("grade: {}".format(self.baseplate.grade))
 			self.update_info()
-			self.page.leStatus.setText("baseplate exists in central DB")
-		elif tmp_baseplate.load(tmp_ID):  # exist locally
-			self.baseplate = tmp_baseplate
-			self.update_info()
-			self.page.leStatus.setText("baseplate only exists locally")
+			self.page.leStatus.setText("baseplate only exists in central DB")
 		else:  # DNE; good to create
 			self.update_info()
 			self.page.leStatus.setText("baseplate DNE")
