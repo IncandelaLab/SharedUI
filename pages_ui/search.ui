@@ -193,7 +193,7 @@
     </property>
     <property name="dateTime">
      <datetime>
-      <hour>8</hour>
+      <hour>16</hour>
       <minute>0</minute>
       <second>0</second>
       <year>2023</year>
@@ -371,11 +371,6 @@
     <item>
      <property name="text">
       <string>Five</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Full+Three</string>
      </property>
     </item>
    </widget>

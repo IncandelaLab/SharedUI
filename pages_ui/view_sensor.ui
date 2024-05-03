@@ -413,11 +413,6 @@
       <string>Five</string>
      </property>
     </item>
-    <item>
-     <property name="text">
-      <string>Full+Three</string>
-     </property>
-    </item>
    </widget>
    <widget class="QComboBox" name="cbInstitution">
     <property name="geometry">

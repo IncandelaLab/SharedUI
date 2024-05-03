@@ -112,11 +112,6 @@
       <string>Five</string>
      </property>
     </item>
-    <item>
-     <property name="text">
-      <string>Full+Three</string>
-     </property>
-    </item>
    </widget>
    <widget class="QLineEdit" name="lineEdit_23">
     <property name="geometry">
