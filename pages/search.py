@@ -14,7 +14,7 @@ DEBUG = False
 PAGE_NAME_DICT = {
 	'Baseplate':   'Baseplates',
 	'Sensor':      'Sensors',
-	'PCB':         'PCBs',
+	'Hexaboard':   'Hexaboards',
 	'Protomodule': 'Protomodules',
 	'Module':      'Modules',
 	'Tool':        'Tooling',
@@ -24,7 +24,7 @@ PAGE_NAME_DICT = {
 PART_DICT = {
 	'Baseplate':   parts.baseplate,
 	'Sensor':      parts.sensor,
-	'PCB':         parts.pcb,
+	'PCB':   parts.pcb,
 	'Protomodule': parts.protomodule,
 	'Module':      parts.module
 }
@@ -145,6 +145,8 @@ class func(object):
 		self.clearResults()
 
 		part_type = self.page.cbPartType.currentText()
+		if part_type == 'Hexaboard':  part_type = 'PCB'  # Rename PCB type for now...
+
 		if not part_type in PART_DICT.keys():
 			print("WARNING: {}s are currently disabled".format(part_type))
 			self.displayResults([], [])
@@ -198,7 +200,7 @@ class func(object):
 			# Load remote DB
 			self.page.leStatus.setText("Fetching sensor from remote DB...")
 			fm.fetchRemoteDB('sensor', self.page.cbInstitution.currentText())
-		
+
 		obj_list_remote = os.sep.join([ fm.DATADIR, 'partlist_remote', part_type.lower()+'s.json' ])
 		
 		# Load part list from remote DB list

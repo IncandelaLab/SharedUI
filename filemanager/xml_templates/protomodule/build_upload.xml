@@ -4,8 +4,10 @@
 		<PART mode="auto">
 			<KIND_OF_PART>{{ kind_of_part }}</KIND_OF_PART>
 			<SERIAL_NUMBER>{{ ID }}</SERIAL_NUMBER>
+			<BARCODE>{{ barcode }}</BARCODE>
 			<LOCATION>{{ location }}</LOCATION>
-			<RECORD_INSERTION_USER>{{ record_insertion_user }}</RECORD_INSERTION_USER>
+			<!-- <RECORD_INSERTION_USER>{{ record_insertion_user }}</RECORD_INSERTION_USER> -->
+			<MANUFACTURER>{{ manufacturer }}</MANUFACTURER>
 			<CHILDREN>
 				<PART mode="auto">
 					<KIND_OF_PART>{{ kind_of_part_baseplate }}</KIND_OF_PART>

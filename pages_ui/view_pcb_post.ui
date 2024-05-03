@@ -350,9 +350,9 @@
    <widget class="QSpinBox" name="sbID">
     <property name="geometry">
      <rect>
-      <x>110</x>
+      <x>120</x>
       <y>0</y>
-      <width>91</width>
+      <width>81</width>
       <height>21</height>
      </rect>
     </property>
@@ -362,12 +362,12 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>111</width>
+      <width>121</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>PCB step ID</string>
+     <string>Hexaboard step ID</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>

@@ -12,7 +12,7 @@ from jinja2 import Template
 
 #import rhapi_nolock as rh
 
-import oracledb
+# import oracledb
 
 # IMPORTANT NOTE:  Setting this to false disables DB communication.  Purely for debugging.
 # ENABLE_DB_COMMUNICATION = False
@@ -20,11 +20,11 @@ ENABLE_DB_COMMUNICATION = True
 CON = None
 DB_CURSOR = None
 
-def db_connect():
-	if not ENABLE_DB_COMMUNICATION:
-		return
-	CON = oracledb.connect(user="CMS_HGC_PRTTYPE_HGCAL_READER", password="HGCAL_Reader_2016", dsn="localhost:10131/int2r_lb.cern.ch")  # create connection
-	DB_CURSOR = CON.cursor()
+# def db_connect():
+# 	if not ENABLE_DB_COMMUNICATION:
+# 		return
+# 	CON = oracledb.connect(user="CMS_HGC_PRTTYPE_HGCAL_READER", password="HGCAL_Reader_2016", dsn="localhost:10131/int2r_lb.cern.ch")  # create connection
+# 	DB_CURSOR = CON.cursor()
 
 
 
@@ -479,7 +479,7 @@ class fsobj(object):
 										setattr(self, 'baseplate', child['serial_number'])
 									if 'Sensor' in kind:
 										setattr(self, 'sensor', child['serial_number'])
-									if 'PCB' in kind:
+									if 'Hexaboard' in kind:
 										setattr(self, 'pcb', child['serial_number'])
 									if 'ProtoModule' in kind:
 										setattr(self, 'protomodule', child['serial_number'])

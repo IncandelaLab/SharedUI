@@ -398,7 +398,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>PCB step</string>
+     <string>Hexaboard step</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -514,7 +514,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>PCB ID</string>
+     <string>Hexaboard ID</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>

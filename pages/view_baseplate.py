@@ -5,8 +5,7 @@ PAGE_NAME = "view_baseplate"
 OBJECTTYPE = "baseplate"
 DEBUG = False
 
-SHAPE_TYPE = [
-	# 'Full',
+PARTIAL_SHAPE_TYPE = [
 	'Top',
 	'Bottom',
 	'Left',
@@ -214,7 +213,7 @@ class func(object):
 		mode_view     = self.mode == 'view'
 		mode_editing  = self.mode == 'editing'
 		mode_creating = self.mode == 'creating'
-		is_partial_shape = self.page.cbShape.currentText() in SHAPE_TYPE
+		is_partial_shape = self.page.cbShape.currentText() in PARTIAL_SHAPE_TYPE
 
 		self.setMainSwitchingEnabled(mode_view)
 		self.page.leID.setReadOnly(not mode_view)
@@ -233,8 +232,7 @@ class func(object):
 		self.page.leBarcode.setReadOnly(   not (mode_creating or mode_editing) )
 		self.page.cbMaterial.setEnabled(        mode_creating or mode_editing  )
 		self.page.cbShape.setEnabled(           mode_creating or mode_editing  )
-		# self.page.cbChannelDensity.setEnabled(  (mode_creating or mode_editing) and is_partial_shape )
-		self.page.cbChannelDensity.setEnabled(  (mode_creating or mode_editing))  ## to enable DB upload for now
+		self.page.cbChannelDensity.setEnabled(  (mode_creating or mode_editing) and is_partial_shape )
 
 		self.page.dsbThickness.setEnabled(      mode_creating or mode_editing  )
 		self.page.dsbFlatness.setEnabled(       mode_creating or mode_editing  )

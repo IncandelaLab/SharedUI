@@ -104,11 +104,11 @@ I_TAPE_DNE = "at least one tape batch is required"
 I_ADHESIVE_NOT_SELECTED = "no adhesive type is selected"
 
 # parts
-I_PART_NOT_READY    = "{}(s) in position(s) {} is not ready for pcb application. reason: {}"
-I_PCB_PROTOMODULE_SHAPE = "pcb {} has shape {} but protomodule {} has shape {}"
-I_PCB_PROTOMODULE_CHANNEL = "pcb {} has channel density {} but protomodule {} has channel density {}"
+I_PART_NOT_READY    = "{}(s) in position(s) {} is not ready for hexaboard application. reason: {}"
+I_PCB_PROTOMODULE_SHAPE = "hexaboard {} has shape {} but protomodule {} has shape {}"
+I_PCB_PROTOMODULE_CHANNEL = "hexaboard {} has channel density {} but protomodule {} has channel density {}"
 I_MOD_EXISTS = "module {} already exists!"
-I_PCB_ON_MODULE = "PCB {} on position {} is already assembled on module {}"
+I_PCB_ON_MODULE = "hexaboard {} on position {} is already assembled on module {}"
 I_PROTO_ON_MODULE = "protomodule {} on position {} is already assembled on module {}"
 
 # rows / positions
@@ -118,13 +118,13 @@ I_TRAY_ASSEMBLY_DNE     = "assembly tray(s) in position(s) {} do not exist"
 I_TOOL_SENSOR_DNE       = "sensor tool(s) in position(s) {} do not exist"
 I_BASEPLATE_DNE         = "baseplate(s) in position(s) {} do not exist"
 I_SENSOR_DNE            = "sensor(s) in position(s) {} do not exist"
-I_PCB_DNE               = "pcb(s) in position(s) {} do not exist"
+I_PCB_DNE               = "hexaboard(s) in position(s) {} do not exist"
 I_PROTO_DNE             = "protomodule(s) in position(s) {} do not exist"
 I_TRAY_ASSEMBLY_DUPLICATE = "same assembly tray is selected on multiple positions: {}"
-I_TOOL_PCB_DUPLICATE    = "same PCB tool is selected on multiple positions: {}"
+I_TOOL_PCB_DUPLICATE    = "same hexaboard tool is selected on multiple positions: {}"
 I_BASEPLATE_DUPLICATE   = "same baseplate is selected on multiple positions: {}"
 I_SENSOR_DUPLICATE      = "same sensor is selected on multiple positions: {}"
-I_PCB_DUPLICATE         = "same PCB is selected on multiple positions: {}"
+I_PCB_DUPLICATE         = "same hexaboard is selected on multiple positions: {}"
 I_PROTO_DUPLICATE       = "same protomodule is selected on multiple positions: {}"
 I_LONE_TRAY             = "assembly tray entered, but rows {} and {} are empty"
 
@@ -136,7 +136,7 @@ I_SIZE_MISMATCH_8 = "* list of 8-inch objects selected: {}"
 I_INSTITUTION = "some selected objects are not at this institution: {}"
 
 # Missing user
-I_USER_DNE = "no pcb step user selected"
+I_USER_DNE = "no hexaboard step user selected"
 
 # supply batch empty
 I_BATCH_ARALDITE_EMPTY = "araldite batch is empty"
@@ -609,7 +609,7 @@ class func(object):
 				self.pcbs[i].load(self.le_pcbs[i].text())
 				load_source = "local"
 			if self.pcbs[i].ID:
-				print("pcb {} loaded from {}".format(self.pcbs[i].ID,load_source))
+				print("hexaboard {} loaded from {}".format(self.pcbs[i].ID,load_source))
 			if not self.protomodules[i].load_remote(self.le_protomodules[i].text(),full=False):
 				self.protomodules[i].load(self.le_protomodules[i].text())
 				load_source = "local"
@@ -668,7 +668,7 @@ class func(object):
 			sender_name = str(self.page.sender().objectName())
 			which = int(sender_name[-1]) - 1
 		# load remote if exists, else load local
-		print("pcb position:",which)
+		print("Hexaboard position:",which)
 		load_source = "remote"
 		if not self.pcbs[which].load_remote(self.le_pcbs[which].text(),full=False):
 			self.pcbs[which].load(self.le_pcbs[which].text())
@@ -913,7 +913,7 @@ class func(object):
 				else:
 					ready, reason = self.pcbs[i].ready_step_pcb(tmp_id)
 					if not ready:
-						issues.append(I_PART_NOT_READY.format('pcb',i,reason))
+						issues.append(I_PART_NOT_READY.format('hexaboard',i,reason))
 
 			if protomodules_selected[i] != "":
 				num_parts += 1
@@ -1137,6 +1137,7 @@ class func(object):
 			temp_module.sensor = self.protomodules[i].sensor
 			temp_module.step_sensor = self.protomodules[i].step_sensor
 			temp_module.step_pcb = self.step_pcb.ID
+			temp_module.manufacturer = self.page.cbInstitution.currentText()
 			temp_module.save()
 
 			self.pcbs[i].step_pcb = self.step_pcb.ID
@@ -1315,7 +1316,7 @@ class func(object):
 		which = int(sender_name[-1]) - 1
 		pcb = self.le_pcbs[which].text()
 		if pcb != "":
-			self.setUIPage('PCBs',ID=pcb)
+			self.setUIPage('Hexaboards',ID=pcb)
 		else:
 			self.mode = 'searching'
 			self.search_part = 'pcb'

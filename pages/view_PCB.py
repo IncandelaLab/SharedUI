@@ -183,7 +183,7 @@ class func(object):
 		self.page.cbGrade.setCurrentIndex(  INDEX_GRADE.get( self.pcb.grade.lower().capitalize(), -1) if type(self.pcb.grade) is str else -1)
 
 
-		"""if self.pcb.step_pcb:
+		if self.pcb.step_pcb:
 			tmp_inst, tmp_id = self.pcb.step_pcb.split("_")
 			self.page.sbStepPcb.setValue(int(tmp_id))
 			self.page.cbInstitutionStep.setCurrentIndex(INDEX_INSTITUTION.get(tmp_inst, -1))
@@ -192,7 +192,7 @@ class func(object):
 			self.page.cbInstitutionStep.setCurrentIndex(-1)
 
 		self.page.leModule.setText(  "" if self.pcb.module   is None else self.pcb.module)
-		"""
+		
 		# ;;-separated list of files
 		self.page.listFiles.clear()
 		if self.pcb.test_files:
@@ -263,21 +263,22 @@ class func(object):
 		# NEW: Load from central DB if not found locally
 		if tmp_pcb.load(tmp_ID):  # exist locally
 			self.pcb = tmp_pcb
+			print("PCB {} kind: {}, tmp_id: {}".format(self.pcb.ID, self.pcb.kind_of_part, self.pcb.module))
 			self.update_info()
-			self.page.leStatus.setText("pcb exists locally")
+			self.page.leStatus.setText("Hexaboard exists locally")
 		elif tmp_pcb.load_remote(tmp_ID, full=True):  # exist in central DB
 			self.pcb = tmp_pcb
-			print("\n!! Loading pcb {} from central DB".format(tmp_ID))
+			print("\n!! Loading hexaboard {} from central DB".format(tmp_ID))
 			print("kind of part: {}".format(self.pcb.kind_of_part))
 			print("record_insertion_user: {}".format(self.pcb.record_insertion_user))
 			print("thickness: {}, type {}".format(self.pcb.thickness, type(self.pcb.thickness)))
 			print("flatness: {}".format(self.pcb.flatness))
 			print("grade: {}".format(self.pcb.grade))
 			self.update_info()
-			self.page.leStatus.setText("PCB only exists in central DB")
+			self.page.leStatus.setText("Hexaboard only exists in central DB")
 		else:  # DNE; good to create
 			self.update_info()
-			self.page.leStatus.setText("PCB DNE")
+			self.page.leStatus.setText("Hexaboard DNE")
 
 		# tmp_exists = tmp_pcb.load(tmp_ID)
 		# if not tmp_exists:  # DNE; good to create
@@ -383,7 +384,7 @@ class func(object):
 		tmp_id = self.page.sbStepPcb.value()
 		tmp_inst = self.page.cbInstitutionStep.currentText()
 		if tmp_id >= 0 and tmp_inst != "":
-			self.setUIPage('3. PCB - pre-assembly',ID="{}_{}".format(tmp_inst, tmp_id))
+			self.setUIPage('3. Hexaboard - pre-assembly',ID="{}_{}".format(tmp_inst, tmp_id))
 
 
 	@enforce_mode(['editing', 'creating'])

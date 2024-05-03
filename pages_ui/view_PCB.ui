@@ -18,12 +18,12 @@
     <rect>
      <x>320</x>
      <y>110</y>
-     <width>121</width>
+     <width>151</width>
      <height>16</height>
     </rect>
    </property>
    <property name="text">
-    <string>PCB qualification</string>
+    <string>Hexaboard qualification</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_2">
@@ -31,12 +31,12 @@
     <rect>
      <x>320</x>
      <y>220</y>
-     <width>141</width>
+     <width>171</width>
      <height>16</height>
     </rect>
    </property>
    <property name="text">
-    <string>PCB placement step</string>
+    <string>Hexaboard placement step</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_7">
@@ -433,7 +433,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>PCB serial</string>
+     <string>Hexaboard serial</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -639,7 +639,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>PCB step</string>
+     <string>Hexaboard step</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -803,7 +803,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>PCB Grade</string>
+     <string>Hexaboard Grade</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>

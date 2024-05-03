@@ -1159,6 +1159,7 @@ class func(object):
 			temp_protomodule.step_sensor    = self.step_sensor.ID
 			temp_protomodule.version = self.cb_versions[i].currentText()
 			temp_protomodule.serial_number = self.sb_serials[i].value()
+			temp_protomodule.manufacturer = self.page.cbInstitution.currentText()
 			temp_protomodule.save()
 
 			self.baseplates[i].step_sensor = self.step_sensor.ID

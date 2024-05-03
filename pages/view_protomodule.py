@@ -350,7 +350,7 @@ class func(object):
 		tmp_id = self.page.sbStepPcb.value()
 		tmp_inst = self.page.cbInstitutionStepPcb.currentText()
 		if tmp_id >= 0 and tmp_inst != "":
-			self.setUIPage('3. PCB - pre-assembly',ID="{}_{}".format(tmp_inst, tmp_id))
+			self.setUIPage('3. Hexaboard - pre-assembly',ID="{}_{}".format(tmp_inst, tmp_id))
 
 	@enforce_mode('view')
 	def goModule(self,*args,**kwargs):

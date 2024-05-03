@@ -1158,7 +1158,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>Unbonded channels (to ground)</string>
+      <string>Unbonded channels</string>
      </property>
     </widget>
     <widget class="QCheckBox" name="ckWirebondingFront">
@@ -1223,7 +1223,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>Channels to skip</string>
+      <string>Grounded Channels</string>
      </property>
     </widget>
     <widget class="QComboBox" name="cbWirebondingUserFront">

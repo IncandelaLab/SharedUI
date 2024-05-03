@@ -504,12 +504,12 @@
     <rect>
      <x>330</x>
      <y>350</y>
-     <width>111</width>
+     <width>141</width>
      <height>16</height>
     </rect>
    </property>
    <property name="text">
-    <string>PCB placement</string>
+    <string>Hexaboard placement</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_2">
@@ -980,7 +980,7 @@
     <rect>
      <x>330</x>
      <y>370</y>
-     <width>271</width>
+     <width>281</width>
      <height>41</height>
     </rect>
    </property>
@@ -993,7 +993,7 @@
    <widget class="QLineEdit" name="leModule">
     <property name="geometry">
      <rect>
-      <x>90</x>
+      <x>100</x>
       <y>20</y>
       <width>131</width>
       <height>20</height>
@@ -1009,7 +1009,7 @@
    <widget class="QSpinBox" name="sbStepPcb">
     <property name="geometry">
      <rect>
-      <x>170</x>
+      <x>180</x>
       <y>0</y>
       <width>51</width>
       <height>21</height>
@@ -1028,7 +1028,7 @@
    <widget class="QPushButton" name="pbGoModule">
     <property name="geometry">
      <rect>
-      <x>220</x>
+      <x>230</x>
       <y>20</y>
       <width>51</width>
       <height>21</height>
@@ -1041,7 +1041,7 @@
    <widget class="QPushButton" name="pbGoStepPcb">
     <property name="geometry">
      <rect>
-      <x>220</x>
+      <x>230</x>
       <y>0</y>
       <width>51</width>
       <height>21</height>
@@ -1056,12 +1056,12 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>91</width>
+      <width>101</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>PCB step</string>
+     <string>Hexaboard step</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -1072,7 +1072,7 @@
      <rect>
       <x>0</x>
       <y>20</y>
-      <width>91</width>
+      <width>101</width>
       <height>21</height>
      </rect>
     </property>
@@ -1089,7 +1089,7 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>90</x>
+      <x>100</x>
       <y>0</y>
       <width>81</width>
       <height>21</height>
@@ -1098,36 +1098,6 @@
     <property name="currentIndex">
      <number>-1</number>
     </property>
-    <item>
-     <property name="text">
-      <string>CERN</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>FNAL</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>UCSB</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>UMN</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>HEPHY</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>HPK</string>
-     </property>
-    </item>
    </widget>
   </widget>
   <widget class="QLabel" name="label_6">
