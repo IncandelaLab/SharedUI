@@ -860,7 +860,8 @@ class module(fsobj_part):
 	@property
 	def pcb_thickness(self):
 		tmp_pcb = pcb()
-		if not tmp_pcb.load(self.pcb):  return None
+		if not tmp_pcb.load(self.pcb):  return 0.0  # default to 0
+		if tmp_pcb.thickness is None:  return 0.0  # default to 0
 		return tmp_pcb.thickness
 
 	@property
