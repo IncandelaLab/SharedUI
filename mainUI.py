@@ -31,7 +31,7 @@ from pages.view_sensor_post import func as cls_func_view_sensor_post
 from pages.view_pcb_step    import func as cls_func_view_pcb_step
 from pages.view_pcb_post    import func as cls_func_view_pcb_post
 from pages.view_wirebonding import func as cls_func_view_wirebonding
-from pages.view_plots       import func as cls_func_view_plots
+# from pages.view_plots       import func as cls_func_view_plots
 
 from pages.view_tooling     import func as cls_func_view_tooling
 from pages.view_supplies    import func as cls_func_view_supplies
@@ -116,11 +116,11 @@ class widget_view_wirebonding(wdgt.QWidget, form_view_wirebonding):
 		super(widget_view_wirebonding,self).__init__(parent)
 		self.setupUi(self)
 
-from pages_ui.view_plots import Ui_Form as form_view_plots
-class widget_view_plots(wdgt.QWidget, form_view_plots):
-	def __init__(self,parent):
-		super(widget_view_plots,self).__init__(parent)
-		self.setupUi(self)
+# from pages_ui.view_plots import Ui_Form as form_view_plots
+# class widget_view_plots(wdgt.QWidget, form_view_plots):
+# 	def __init__(self,parent):
+# 		super(widget_view_plots,self).__init__(parent)
+# 		self.setupUi(self)
 
 from pages_ui.view_tooling import Ui_Form as form_view_tooling
 class widget_view_tooling(wdgt.QWidget, form_view_tooling):
@@ -143,7 +143,7 @@ PAGE_IDS = {
 	'Search'                 : 1,
 	'Baseplates'             : 2,
 	'Sensors'                : 3,
-	'PCBs'                   : 4,
+	'Hexaboards'                   : 4,
 	'Protomodules'           : 5,
 	'Modules'                : 6,
 	'Tooling'                : 7,
@@ -151,10 +151,10 @@ PAGE_IDS = {
 
 	'1. Sensor - pre-assembly' : 9,
 	'2. Sensor - post-assembly': 10,
-	'3. PCB - pre-assembly'    : 11,
-	'4. PCB - post-assembly'    : 12,
+	'3. Hexaboard - pre-assembly'    : 11,
+	'4. Hexaboard - post-assembly'    : 12,
 	'5. Wirebonding & encapsulating' : 13,
-	'6. Module testing' : 14,
+	# '6. Module testing' : 14,
 
 }
 
@@ -162,11 +162,11 @@ PAGE_IDS = {
 UPLOAD_ENABLED_PAGES = [
 	'Baseplates',  # In theory, should never have to upload these
 	'Sensors',
-	'PCBs',
+	'Hexaboards',
 	'Protomodules',
 	'Modules',
 	'2. Sensor - post-assembly',
-	'4. PCB - post-assembly',
+	'4. Hexaboard - post-assembly',
 	'5. Wirebonding & encapsulating',
 ]
 
@@ -266,7 +266,7 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		self.page_view_pcb_step    = widget_view_pcb_step(None)    ; self.swPages.addWidget(self.page_view_pcb_step)
 		self.page_view_pcb_post    = widget_view_pcb_post(None)    ; self.swPages.addWidget(self.page_view_pcb_post)
 		self.page_view_wirebonding = widget_view_wirebonding(None) ; self.swPages.addWidget(self.page_view_wirebonding)
-		self.page_view_plots       = widget_view_plots(None)       ; self.swPages.addWidget(self.page_view_plots)
+		# self.page_view_plots       = widget_view_plots(None)       ; self.swPages.addWidget(self.page_view_plots)
 
 
 
@@ -287,7 +287,7 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		self.func_view_pcb_step    = cls_func_view_pcb_step(         fm, self.userManager, self.page_view_pcb_step   , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_pcb_post    = cls_func_view_pcb_post(         fm, self.userManager, self.page_view_pcb_post   , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_wirebonding = cls_func_view_wirebonding(      fm, self.userManager, self.page_view_wirebonding, self.setUIPage, self.setSwitchingEnabled)
-		self.func_view_plots       = cls_func_view_plots(            fm, self.page_view_plots,       self.setUIPage, self.setSwitchingEnabled)
+		# self.func_view_plots       = cls_func_view_plots(            fm, self.page_view_plots,       self.setUIPage, self.setSwitchingEnabled)
 
 		# This list must be in the same order that the pages are in in the stackedWidget in the main UI file.
 		# This is the same order as in the dict PAGE_IDS
@@ -308,7 +308,7 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 			self.func_view_pcb_step,
 			self.func_view_pcb_post,
 			self.func_view_wirebonding,
-			self.func_view_plots,
+			# self.func_view_plots,
 			]
 
 
@@ -441,23 +441,23 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 				child.sendline(mypassword)
 				password_prompt_index2 = child.expect(['Password:', pexpect.EOF, pexpect.TIMEOUT])
 				if password_prompt_index2 == 0:
-					print("ssh to lxplus successful")
+					# print("ssh to lxplus successful")
 					child.sendline(mypassword)
 					exit_status = child.expect([pexpect.EOF, pexpect.TIMEOUT])
 					if exit_status == 0:
-						print("scp to dbloader successful")
+						print("scp to dbloader successful!")
 					else:
-						print("scp to dbloader failed")
+						print("scp to dbloader failed!")
 				else:
-					print("ssh to lxplus failed")
+					print("ssh to lxplus failed!")
 			else:
 				print("Password prompt not found")
 			
-			print("scp'ed {} ...".format(f))
+			# print("scp'ed {} ...".format(f))
 			success = success and exit_status == 0
 			#success = (upload_status == 200) and success
 			if exit_status != 0:
-				print("File transfer:  possible error!  Return code {}".format(result))
+				print("File transfer:  possible error!  Return code {}".format(exit_status))
 
 			if f != flist[-1]:  # if not final:
 				# Wait 20s before uploading the next file
@@ -466,10 +466,10 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 				# 20s is a conservative estimate for the worst-case upload duration
 				# (It's also really obnoxious w/ multiple passwords and must change ASAP)
 				# 2024/3/19 reduce to 15s
-				print("Waiting 15s before uploading the next file...(you must re-enter your password after the wait)")
+				print("Waiting 15s before uploading the next file...")
 				time.sleep(15)
 		if success:
-			self.leStatus.setText("Success!")
+			self.leStatus.setText("Upload to dbloader success!")
 		else:
 			self.leStatus.setText("Upload failed!")
 

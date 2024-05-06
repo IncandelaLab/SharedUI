@@ -724,12 +724,12 @@ before assembly</string>
      <rect>
       <x>820</x>
       <y>0</y>
-      <width>231</width>
+      <width>121</width>
       <height>20</height>
      </rect>
     </property>
     <property name="text">
-     <string>protomodule ID (auto)</string>
+     <string>protomodule ID</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -1696,6 +1696,19 @@ before assembly</string>
     </property>
     <property name="text">
      <string>next</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbGenerate">
+    <property name="geometry">
+     <rect>
+      <x>960</x>
+      <y>0</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>generate</string>
     </property>
    </widget>
   </widget>

@@ -398,7 +398,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>PCB step</string>
+     <string>Hexaboard step</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -514,7 +514,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>PCB ID</string>
+     <string>Hexaboard ID</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -750,7 +750,7 @@
      <x>357</x>
      <y>100</y>
      <width>271</width>
-     <height>161</height>
+     <height>181</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -810,7 +810,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Thickness (mm)</string>
+     <string>Average thickness (mm)</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -971,7 +971,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>140</y>
+      <y>160</y>
       <width>241</width>
       <height>23</height>
      </rect>
@@ -990,7 +990,7 @@
     <property name="geometry">
      <rect>
       <x>190</x>
-      <y>120</y>
+      <y>140</y>
       <width>81</width>
       <height>21</height>
      </rect>
@@ -1021,7 +1021,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>120</y>
+      <y>140</y>
       <width>191</width>
       <height>21</height>
      </rect>
@@ -1037,7 +1037,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>100</y>
+      <y>120</y>
       <width>191</width>
       <height>20</height>
      </rect>
@@ -1056,7 +1056,7 @@
     <property name="geometry">
      <rect>
       <x>190</x>
-      <y>100</y>
+      <y>120</y>
       <width>81</width>
       <height>20</height>
      </rect>
@@ -1074,6 +1074,47 @@
       <string>fail</string>
      </property>
     </item>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_7">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>100</y>
+      <width>191</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Max thickness (mm)</string>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="dsbMaxThickness">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>100</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+    <property name="decimals">
+     <number>3</number>
+    </property>
+    <property name="minimum">
+     <double>-1.000000000000000</double>
+    </property>
+    <property name="maximum">
+     <double>100.000000000000000</double>
+    </property>
+    <property name="singleStep">
+     <double>0.010000000000000</double>
+    </property>
    </widget>
   </widget>
   <widget class="QFrame" name="frame_3">

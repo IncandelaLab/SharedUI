@@ -14,7 +14,7 @@ DEBUG = False
 PAGE_NAME_DICT = {
 	'Baseplate':   'Baseplates',
 	'Sensor':      'Sensors',
-	'PCB':         'PCBs',
+	'Hexaboard':   'Hexaboards',
 	'Protomodule': 'Protomodules',
 	'Module':      'Modules',
 	'Tool':        'Tooling',
@@ -24,7 +24,7 @@ PAGE_NAME_DICT = {
 PART_DICT = {
 	'Baseplate':   parts.baseplate,
 	'Sensor':      parts.sensor,
-	'PCB':         parts.pcb,
+	'PCB':   parts.pcb,
 	'Protomodule': parts.protomodule,
 	'Module':      parts.module
 }
@@ -120,6 +120,9 @@ class func(object):
 		self.page.pbClearResults.clicked.connect( self.clearResults )
 		self.page.pbGoToPart.clicked.connect( self.goToPart )
 
+		# NEW: refresh remote DB list
+		self.page.pbRefresh.clicked.connect( self.refreshRemoteDB )
+
 		# search for tools and supplies
 		self.page.pbSearch_2.clicked.connect(self.search_tool_supply)
 		self.page.cbToolSupplyType.currentIndexChanged.connect( self.updateElements )
@@ -132,10 +135,18 @@ class func(object):
 		self.page.pbGoToToolSupply.clicked.connect( self.goToToolSupply )
 		self.updateElements()
 
+		# Connect the valueChanged signals of the vertical scroll bars
+		self.page.lwPartList.verticalScrollBar().valueChanged.connect(self.on_scroll_PartList)
+		self.page.lwTypeList.verticalScrollBar().valueChanged.connect(self.on_scroll_TypeList)
+		self.page.lwToolSupplyList.verticalScrollBar().valueChanged.connect(self.on_scroll_InfoList)
+		self.page.lwInfoList.verticalScrollBar().valueChanged.connect(self.on_scroll_ToolSupplyList)
+
 	def search(self, *args, **kwargs):  # WIP WIP WIP
 		self.clearResults()
 
 		part_type = self.page.cbPartType.currentText()
+		if part_type == 'Hexaboard':  part_type = 'PCB'  # Rename PCB type for now...
+
 		if not part_type in PART_DICT.keys():
 			print("WARNING: {}s are currently disabled".format(part_type))
 			self.displayResults([], [])
@@ -176,8 +187,39 @@ class func(object):
 					found = False
 			if found:  found_local_parts[part_id] = part_temp.kind_of_part
 
-		# Search for parts in DB:
+
+		# Search for parts in central DB:
 		found_remote_parts = {}  # serial:type
+		part_temp_remote = PART_DICT[part_type]()  # Constructs instance of searched-for class
+		
+  		# sensor search has to specify institute
+		if part_type == 'Sensor':  
+			if self.page.cbInstitution.currentText() == '':
+				self.page.leStatus.setText("Institution (location) cannot be empty for Sensor search!")
+				return
+			# Load remote DB
+			self.page.leStatus.setText("Fetching sensor from remote DB...")
+			fm.fetchRemoteDB('sensor', self.page.cbInstitution.currentText())
+
+		obj_list_remote = os.sep.join([ fm.DATADIR, 'partlist_remote', part_type.lower()+'s.json' ])
+		
+		# Load part list from remote DB list
+		part_file_name_remote = {}  # serial:type
+		with open(obj_list_remote, 'r') as opfl:
+			part_data = json.load(opfl)
+			for part in part_data['parts']:
+				part_file_name_remote[part['serial_number']] = part['kind']
+		# print("!!! part_file_name_remote is:\n", part_file_name_remote)
+
+		for part_id, part_type in part_file_name_remote.items():
+			part_temp_remote.load_remote(part_id, full=False)
+			found = True
+			for qty, value in search_criteria.items():
+				if value == '%':  continue  # "wildcard" option, ignore this
+				if str(getattr(part_temp_remote, qty, None)) != value:
+					found = False
+			if found:  found_remote_parts[part_id] = part_temp_remote.kind_of_part
+			
 		"""
 		if fm.ENABLE_DB_COMMUNICATION:
 			# In general:  Assemble sql query w/ items from search_dict
@@ -217,6 +259,8 @@ and l.LOCATION_NAME like \'{}\'"*"*".format(pt_query, search_criteria['location_
 		for rp in found_remote_parts.keys():
 			if rp in found_local_parts.keys():
 				found_local_parts.pop(rp)
+		# print("found_local_parts is:\n", found_local_parts)
+		# print("found_remote_parts is:\n", found_remote_parts)
 
 		self.displayResults(found_local_parts, found_remote_parts)
 
@@ -341,6 +385,10 @@ and l.LOCATION_NAME like \'{}\'"*"*".format(pt_query, search_criteria['location_
 
 		for serial, typ in localList.items(): # serial: type
 			self.page.lwPartList.addItem(serial+" (not uploaded to DB)")
+			if 'Sensor' in typ:
+				count = self.page.lwPartList.count()
+				new_text = self.page.lwPartList.item(count - 1).text().replace("to DB", " {})".format("or not found with filter in DB"))
+				self.page.lwPartList.item(count - 1).setText(new_text)
 			# self.page.lwTypeList.addItem(typ)
 		for serial, typ in remoteList.items():
 			self.page.lwPartList.addItem(serial)
@@ -348,11 +396,17 @@ and l.LOCATION_NAME like \'{}\'"*"*".format(pt_query, search_criteria['location_
 		
   		# Sort search results
 		self.page.lwPartList.sortItems()
+		for index in range(self.page.lwPartList.count()):
+			item = self.page.lwPartList.item(index)
+			# print(item.text())
+
 		for row in range(self.page.lwPartList.count()):
-			if self.page.lwPartList.item(row).text().find(" (not uploaded to DB)"):
-				serial = self.page.lwPartList.item(row).text().split(" (not uploaded to DB)")[0]
+			if self.page.lwPartList.item(row).text().find("(not uploaded ") != -1:
+				# print("local part: ", self.page.lwPartList.item(row).text())
+				serial = self.page.lwPartList.item(row).text().split(" (not uploaded ")[0]
 				self.page.lwTypeList.addItem(localList[serial])
 			else:
+				# print("remote part: ", self.page.lwPartList.item(row).text())
 				serial = self.page.lwPartList.item(row).text()
 				self.page.lwTypeList.addItem(remoteList[serial])
 		self.page.leStatus.setText("Results found!")
@@ -372,7 +426,7 @@ and l.LOCATION_NAME like \'{}\'"*"*".format(pt_query, search_criteria['location_
 
 	def goToPart(self,*args,**kwargs):
 		if not self.page.lwPartList.currentItem():  return
-		name = self.page.lwPartList.currentItem().text().replace(" (not uploaded to DB)", "") #.text().split()
+		name = self.page.lwPartList.currentItem().text().split(" (not uploaded")[0]#replace(" (not uploaded to DB)", "") #.text().split()
 		# find corresponding part type
 		typ = self.page.lwTypeList.item(self.page.lwPartList.currentRow()).text()
 		pageName = None
@@ -409,4 +463,32 @@ and l.LOCATION_NAME like \'{}\'"*"*".format(pt_query, search_criteria['location_
 	def changed_to(self):
 		print("changed to {}".format(PAGE_NAME))
 
+	def on_scroll_PartList(self, value):
+		self.page.lwTypeList.verticalScrollBar().setValue(value)
 
+	def on_scroll_TypeList(self, value):
+		self.page.lwPartList.verticalScrollBar().setValue(value)
+
+	def on_scroll_InfoList(self, value):
+		self.page.lwToolSupplyList.verticalScrollBar().setValue(value)
+
+	def on_scroll_ToolSupplyList(self, value):
+		self.page.lwInfoList.verticalScrollBar().setValue(value)
+
+	def refreshRemoteDB(self):
+		print("Refreshing remote DB...")
+		self.page.leStatus.setText("Refreshing remote DB...")
+
+		obj_list_remote = ['baseplate', 'pcb', 'protomodule', 'module']
+		for part in obj_list_remote:
+			fm.fetchRemoteDB(part)
+
+		status_text = "Remote DB refreshed!"
+
+		# sensor search has to specify institute
+		if self.page.cbInstitution.currentText() != '':
+			fm.fetchRemoteDB('sensor', self.page.cbInstitution.currentText())
+		else:
+			status_text += " Sensor list is not refreshed, please specify institution!"
+  
+		self.page.leStatus.setText(status_text)

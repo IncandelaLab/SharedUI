@@ -104,8 +104,10 @@ I_TAPE_120_EXPIRED = "120um tape batch has expired"
 I_TAPE_DNE = "at least one tape batch is required"
 I_ADHESIVE_NOT_SELECTED = "no adhesive type is selected"
 
-# baseplates
+# parts
 I_PART_NOT_READY  = "{}(s) in position(s) {} is not ready for sensor application. reason: {}"
+I_BASEPLATE_ON_PROTO = "baseplate {} on position {} is already assembled on protomodule {}"
+I_SENSOR_ON_PROTO = "sensor {} on position {} is already assembled on protomodule {}"
 
 # baseplate-sensor incompatibility
 I_BASEPLATE_SENSOR_SHAPE = "baseplate {} has shape {} but sensor {} has shape {}"
@@ -139,6 +141,9 @@ I_TAPE_50_EMPTY = "50um tape batch is empty"
 I_TAPE_120_EMPTY = "120um tape batch is empty"
 
 I_NO_TOOL_CHK = "pickup tool feet have not been checked"
+
+# protomodule
+I_PROTO_NAME_EXISTS = "protomodule name {} on position {} already exists"
 
 class func(object):
 	def __init__(self,fm,userManager,page,setUIPage,setSwitchingEnabled):
@@ -347,12 +352,15 @@ class func(object):
 			self.cb_versions[i].activated.connect( self.updateIssues )
 
 			# update protomodule ID
-			self.le_baseplates[i].textChanged.connect( self.update_protoID)
-			self.le_sensors[i].textChanged.connect( self.update_protoID)
-			self.cb_versions[i].activated.connect( self.update_protoID )
-			self.sb_serials[i].valueChanged.connect( self.update_protoID )
+			# self.le_baseplates[i].textChanged.connect( self.update_protoID)
+			# self.le_sensors[i].textChanged.connect( self.update_protoID)
+			# self.cb_versions[i].activated.connect( self.update_protoID )
+			# self.sb_serials[i].valueChanged.connect( self.update_protoID )
+			self.le_protomodules[i].textChanged.connect( self.updateIssues )
 
 			self.pb_clears[i].clicked.connect(self.clearRow)
+
+		self.page.pbGenerate.clicked.connect( self.update_protoID )
 
 		self.page.pbAddPart.clicked.connect(self.finishSearch)
 		self.page.pbCancelSearch.clicked.connect(self.cancelSearch)
@@ -498,20 +506,19 @@ class func(object):
 					self.le_protomodules[i].setText(str(self.step_sensor.protomodules[i]) if not (self.step_sensor.protomodules[i] is None) else "")
 					if not (self.step_sensor.protomodules[i] is None) and is_proper_name(self.step_sensor.protomodules[i]):
 						protomodule_name = str(self.step_sensor.protomodules[i])
-						for i, (_, name) in enumerate(NAME_VERSION.items()):
+						for j, (_, name) in enumerate(NAME_VERSION.items()):
 							if name == protomodule_name[5]:
-								self.cb_versions[i].setCurrentIndex(i)
+								self.cb_versions[i].setCurrentIndex(j)
 						match = re.search(r'[1-9]', protomodule_name[7:])
-						# print("row ",i)
-						# print("digits:",protomodule_name[7:][match.start():])
-						# print("is int?:",isinstance(int(protomodule_name[7:][match.start():]), int))
 						snum = protomodule_name[7:][match.start():]
+						# fill the serial number if it is an integer
 						if not self.has_non_integer_characters(snum):
 							self.sb_serials[i].setValue(int(snum))
+						else:
+							self.sb_serials[i].setValue(-1)
 					else:
 						self.cb_versions[i].setCurrentIndex(-1)
 						self.sb_serials[i].setValue(-1)
-					
 			else:
 				for i in range(6):
 					self.le_protomodules[i].setText("")
@@ -621,6 +628,7 @@ class func(object):
 		self.page.pbEdit.setEnabled(   mode_view and     step_sensor_exists )
 		self.page.pbSave.setEnabled(   mode_creating or mode_editing        )
 		self.page.pbCancel.setEnabled( mode_creating or mode_editing        )
+		self.page.pbGenerate.setEnabled(mode_creating or mode_editing)
 
 		self.page.ckCheckFeet.setEnabled(not mode_view)
 
@@ -646,8 +654,20 @@ class func(object):
 		for i in range(6):
 			self.tray_assemblys[i].load(self.sb_tray_assemblys[i].value(), self.page.cbInstitution.currentText())
 			self.tools_sensor[i].load(self.sb_tools[i].value(),   self.page.cbInstitution.currentText())
-			self.baseplates[i].load(self.le_baseplates[i].text())
-			self.sensors[i].load(   self.le_sensors[i].text())
+			load_source = "remote"
+			if not self.baseplates[i].load_remote(self.le_baseplates[i].text(),full=False):
+				self.baseplates[i].load(self.le_baseplates[i].text())
+				load_source = "local"
+			if self.baseplates[i].ID:
+				print("baseplate {} loaded from {}".format(self.baseplates[i].ID,load_source))
+			load_source = "remote"
+			if not self.sensors[i].load_remote(self.le_sensors[i].text(),full=False):
+				self.sensors[i].load(self.le_sensors[i].text())
+				load_source = "local"
+			if self.sensors[i].ID:
+				print("sensor {} loaded from {}".format(self.sensors[i].ID,load_source))
+			# self.baseplates[i].load(self.le_baseplates[i].text())
+			# self.sensors[i].load(   self.le_sensors[i].text())
 
 		self.tray_component_sensor.load(self.page.sbTrayComponent.value(), self.page.cbInstitution.currentText())
 		#self.tray_assembly.load(        self.page.sbTrayAssembly.value(),  self.page.cbInstitution.currentText())
@@ -694,7 +714,17 @@ class func(object):
 		else:
 			sender_name = str(self.page.sender().objectName())
 			which = int(sender_name[-1]) - 1
-		self.baseplates[which].load(self.le_baseplates[which].text())
+		# load remote if exists, else load local
+		print("baseplate position:",which)
+		load_source = "remote"
+		if not self.baseplates[which].load_remote(self.le_baseplates[which].text(),full=False):
+			self.baseplates[which].load(self.le_baseplates[which].text())
+			load_source = "local"
+		print("          loaded from {}".format(load_source))
+		print("          kind:",self.baseplates[which].kind_of_part)
+		print("          ID:",self.baseplates[which].ID)
+		print("          material:",self.baseplates[which].material)
+		print()
 		self.updateIssues()
 
 	@enforce_mode(['editing','creating', 'searching'])
@@ -704,7 +734,16 @@ class func(object):
 		else:
 			sender_name = str(self.page.sender().objectName())
 			which = int(sender_name[-1]) - 1
-		self.sensors[which].load(self.le_sensors[which].text())
+		# load remote if exists, else load local
+		print("sensor position:",which)
+		load_source = "remote"
+		if not self.sensors[which].load_remote(self.le_sensors[which].text(),full=False):
+			self.sensors[which].load(self.le_sensors[which].text())
+			load_source = "local"
+		print("       loaded from {}".format(load_source))
+		print("       kind:",self.sensors[which].kind_of_part)
+		print("       ID:",self.sensors[which].ID)
+		print("       channel density:",self.sensors[which].channel_density)
 		self.updateIssues()
 
 	@enforce_mode(['editing','creating'])
@@ -758,6 +797,8 @@ class func(object):
 	def updateIssues(self,*args,**kwargs):
 		issues = []
 		objects = []
+
+		mode_create    = self.mode == 'creating'
 
 		# Insertion user:
 		if self.page.cbUserPerformed.currentText() == "":
@@ -962,7 +1003,7 @@ class func(object):
 
 			if num_parts == 0:
 				rows_empty.append(i)
-			elif num_parts == 4 and has_version and has_serial:
+			elif num_parts == 4: #and has_version and has_serial:  # version and serial can be empty
 				rows_full.append(i)
 			else:
 				rows_incomplete.append(i)
@@ -982,6 +1023,30 @@ class func(object):
 			issues.append(I_SENSOR_DNE.format(', '.join([str(_+1) for _ in rows_sensor_dne])))
 		if not self.page.ckCheckFeet.isChecked():
 			issues.append(I_NO_TOOL_CHK)
+
+		# NEW: Check for parent (only when creating)
+		if mode_create:
+			for i in range (6):
+				if baseplates_selected[i] != "":
+					temp_baseplate = parts.baseplate()
+					if not temp_baseplate.load_remote(baseplates_selected[i]):
+						temp_baseplate.load(baseplates_selected[i])
+					if temp_baseplate.ID != None and temp_baseplate.protomodule != None:
+						issues.append(I_BASEPLATE_ON_PROTO.format(temp_baseplate.ID, i, temp_baseplate.protomodule))
+				if sensors_selected[i] != "":
+					temp_sensor = parts.sensor()
+					if not temp_sensor.load_remote(sensors_selected[i]):
+						temp_sensor.load(sensors_selected[i])
+					if temp_sensor.ID != None and temp_sensor.protomodule != None:
+						issues.append(I_SENSOR_ON_PROTO.format(temp_sensor.ID, i, temp_sensor.protomodule))
+			# NEW: Check if protomodule already exists
+			for i in range(6):
+				if self.le_protomodules[i].text() != "":
+					temp_protomodule = parts.protomodule()
+					if not temp_protomodule.load_remote(self.le_protomodules[i].text()):
+						temp_protomodule.load(self.le_protomodules[i].text())
+					if temp_protomodule.ID != None:
+						issues.append(I_PROTO_NAME_EXISTS.format(self.le_protomodules[i].text(), i))
 
 		self.page.listIssues.clear()
 		for issue in issues:
@@ -1094,6 +1159,7 @@ class func(object):
 			temp_protomodule.step_sensor    = self.step_sensor.ID
 			temp_protomodule.version = self.cb_versions[i].currentText()
 			temp_protomodule.serial_number = self.sb_serials[i].value()
+			temp_protomodule.manufacturer = self.page.cbInstitution.currentText()
 			temp_protomodule.save()
 
 			self.baseplates[i].step_sensor = self.step_sensor.ID
@@ -1200,6 +1266,32 @@ class func(object):
 				self.page.lwPartList.addItem("{} {}".format(self.search_part, part_id))
 			elif self.search_part == 'batch_tape_120':
 				self.page.lwPartList.addItem("{} {}".format(self.search_part, part_id))
+		
+		# NEW: Search remote parts in central DB (only for sensors and baseplates)
+		if self.search_part in ['baseplate', 'sensor']:
+			partlistdir_remote = os.sep.join([fm.DATADIR, 'partlist_remote'])
+			obj_list_remote = os.sep.join([partlistdir_remote, self.search_part+'s.json'])
+
+			# if sensor remote part list doesn't exist, fetch from DB
+			if not os.path.exists(obj_list_remote) and self.search_part == 'sensor':
+				print("Sensor remote part list doesn't exist, will fetch from DB")
+				self.page.leSearchStatus.setText('Fetching remote sensor list...')
+				fm.fetchRemoteDB(self.search_part,location=self.page.cbInstitution.currentText())
+
+			with open(obj_list_remote, 'r') as opfl:
+				part_data = json.load(opfl)
+				for part in part_data['parts']:
+					# Only list parts at this institution
+					if part['location'] != self.page.cbInstitution.currentText(): continue
+					part_id = part['serial_number']
+					# If already added by DB query, skip:
+					if len(self.page.lwPartList.findItems("{} {}".format(self.search_part, part_id), \
+														QtCore.Qt.MatchExactly)) > 0: continue
+					# need to load full part to check parent -- TOO SLOW!!!
+					# tmp_part.load_remote(part_id, full=True)
+					# if tmp_part.protomodule is None:
+					self.page.lwPartList.addItem("{} {}".format(self.search_part, part_id))
+
 		# Sort search results
 		self.page.lwPartList.sortItems()
 
@@ -1340,6 +1432,14 @@ class func(object):
 	def setNextSerial(self, *args, **kwargs):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
+
+		# Check that all fields are filled
+		if not (self.sensors[which].ID != None and self.baseplates[which].ID != None\
+			and self.cb_versions[which].currentIndex() != -1): #and self.sb_serials[which].value() >=1):
+			print("!! Not all fields are filled for position {} to auto-name".format(which))
+			return
+
+		# print("!! setting next serial for position {}".format(which))
 		# NEW:  Search for all protomodules at this institution, then create the next in order
 		if self.page.cbInstitution.currentText() == "":  return
 		part_file_name = os.sep.join([ fm.DATADIR, 'partlist', 'protomodules.json' ])
@@ -1374,12 +1474,17 @@ class func(object):
 			# print("updating state for {}".format(i))
 			# print("params: {} {} {}".format(self.le_sensors[i].text(), self.le_baseplates[i].text(), self.cb_versions[i].currentIndex(), self.sb_serials[i].value()))
 			# Update name if the pamams are not empty
-			if self.le_sensors[i].text() != "" and self.le_baseplates[i].text()\
+			if  self.le_sensors[i].text() != "" and self.le_baseplates[i].text() != ""\
 			and self.cb_versions[i].currentIndex() != -1 and self.sb_serials[i].value() >=1:
-				self.sensors[i].load(   self.le_sensors[i].text())
-				self.baseplates[i].load(   self.le_baseplates[i].text())
+				print("updating state for position {}".format(i))
+				if self.sensors[i].ID is None and self.baseplates[i].ID is None:
+					if not self.sensors[i].load_remote(self.le_sensors[i].text()):
+						self.sensors[i].load(   self.le_sensors[i].text())
+					if not self.baseplates[i].load_remote(self.le_baseplates[i].text()):
+						self.baseplates[i].load(   self.le_baseplates[i].text())
 				if self.sensors[i].ID is not None and self.baseplates[i].ID is not None and self.cb_versions[i].currentText() != '' and self.sb_serials[i].value() != 0:
 					self.le_protomodules[i].setText(self.make_name(i))
+		self.updateIssues()
 
 	def filesToUpload(self):
 		# Return a list of all files to upload to DB
@@ -1408,6 +1513,7 @@ class func(object):
 		self.update_info()
 
 	def make_name(self,i):
+		# print("channel_density: {} geometry: {} sen_type: {} material: {} version: {} serial: {}".format(self.sensors[i].channel_density, self.sensors[i].geometry, self.sensors[i].sen_type, self.baseplates[i].material, self.cb_versions[i].currentText(), self.sb_serials[i].value()))
 		name = 'P'
 		name += NAME_DENSITY[self.sensors[i].channel_density]
 		name += NAME_GEOMETRY[self.sensors[i].geometry]

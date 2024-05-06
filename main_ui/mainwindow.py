@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'mainwindow.ui'
+# Form implementation generated from reading ui file '../main_ui/mainwindow.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.9
 #
@@ -91,8 +91,6 @@ class Ui_MainWindow(object):
         self.listAssembly.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.listAssembly.setAutoScroll(True)
         self.listAssembly.setObjectName("listAssembly")
-        item = QtWidgets.QListWidgetItem()
-        self.listAssembly.addItem(item)
         item = QtWidgets.QListWidgetItem()
         self.listAssembly.addItem(item)
         item = QtWidgets.QListWidgetItem()
@@ -220,7 +218,7 @@ class Ui_MainWindow(object):
         item = self.listInformation.item(2)
         item.setText(_translate("MainWindow", "Sensors"))
         item = self.listInformation.item(3)
-        item.setText(_translate("MainWindow", "PCBs"))
+        item.setText(_translate("MainWindow", "Hexaboards"))
         item = self.listInformation.item(4)
         item.setText(_translate("MainWindow", "Tooling"))
         item = self.listInformation.item(5)
@@ -234,13 +232,11 @@ class Ui_MainWindow(object):
         item = self.listAssembly.item(1)
         item.setText(_translate("MainWindow", "2. Sensor - post-assembly"))
         item = self.listAssembly.item(2)
-        item.setText(_translate("MainWindow", "3. PCB - pre-assembly"))
+        item.setText(_translate("MainWindow", "3. Hexaboard - pre-assembly"))
         item = self.listAssembly.item(3)
-        item.setText(_translate("MainWindow", "4. PCB - post-assembly"))
+        item.setText(_translate("MainWindow", "4. Hexaboard - post-assembly"))
         item = self.listAssembly.item(4)
         item.setText(_translate("MainWindow", "5. Wirebonding & encapsulating"))
-        item = self.listAssembly.item(5)
-        item.setText(_translate("MainWindow", "6. Module testing"))
         self.listAssembly.setSortingEnabled(__sortingEnabled)
         self.lineEdit_2.setText(_translate("MainWindow", "Protomodules and modules"))
         __sortingEnabled = self.listModules.isSortingEnabled()
