@@ -159,7 +159,7 @@ class func(object):
 		if not self.pcb.record_insertion_user in self.index_users.keys() and len(self.index_users.keys())!=0 and not self.pcb.record_insertion_user is None:
 			# Insertion user is not in user page...fine for now, just add user to the dropdown
 			self.index_users[self.pcb.record_insertion_user] = max(self.index_users.values()) + 1
-			self.page.cbInsertUser.addItem(self.pcb.initiated_by_user)
+			self.page.cbInsertUser.addItem(self.pcb.record_insertion_user)
 		self.page.cbInsertUser.setCurrentIndex(self.index_users.get(self.pcb.record_insertion_user, -1))
 
 		self.page.cbInstitution.setCurrentIndex(   INDEX_INSTITUTION.get(    self.pcb.location, -1)   )
@@ -176,14 +176,14 @@ class func(object):
 				self.page.listComments.addItem(comment)
 		self.page.pteWriteComment.clear()
 
-		self.page.dsbFlatness.setValue( -1 if self.pcb.flatness  is None else self.pcb.flatness )
-		self.page.dsbThickness.setValue(-1 if self.pcb.thickness is None else self.pcb.thickness)
+		self.page.dsbFlatness.setValue( -1 if (self.pcb.flatness  is None) or (self.pcb.flatness == "None") else float(self.pcb.flatness) )
+		self.page.dsbThickness.setValue(-1 if (self.pcb.thickness is None) or (self.pcb.thickness == "None") else float(self.pcb.thickness) )
 		if self.page.dsbFlatness.value()  == -1: self.page.dsbFlatness.clear()
 		if self.page.dsbThickness.value() == -1: self.page.dsbThickness.clear()
-		self.page.cbGrade.setCurrentIndex(         INDEX_GRADE.get(          self.pcb.grade, -1)         )
+		self.page.cbGrade.setCurrentIndex(  INDEX_GRADE.get( self.pcb.grade.lower().capitalize(), -1) if type(self.pcb.grade) is str else -1)
 
 
-		"""if self.pcb.step_pcb:
+		if self.pcb.step_pcb:
 			tmp_inst, tmp_id = self.pcb.step_pcb.split("_")
 			self.page.sbStepPcb.setValue(int(tmp_id))
 			self.page.cbInstitutionStep.setCurrentIndex(INDEX_INSTITUTION.get(tmp_inst, -1))
@@ -192,7 +192,7 @@ class func(object):
 			self.page.cbInstitutionStep.setCurrentIndex(-1)
 
 		self.page.leModule.setText(  "" if self.pcb.module   is None else self.pcb.module)
-		"""
+		
 		# ;;-separated list of files
 		self.page.listFiles.clear()
 		if self.pcb.test_files:
@@ -259,14 +259,35 @@ class func(object):
 		# Check whether baseplate exists:
 		tmp_pcb = parts.pcb()
 		tmp_ID = self.page.leID.text()
-		tmp_exists = tmp_pcb.load(tmp_ID)
-		if not tmp_exists:  # DNE; good to create
-			self.page.leStatus.setText("PCB DNE")
-			self.update_info()
-		else:
+
+		# NEW: Load from central DB if not found locally
+		if tmp_pcb.load(tmp_ID):  # exist locally
 			self.pcb = tmp_pcb
-			self.page.leStatus.setText("PCB exists")
+			print("PCB {} kind: {}, tmp_id: {}".format(self.pcb.ID, self.pcb.kind_of_part, self.pcb.module))
 			self.update_info()
+			self.page.leStatus.setText("Hexaboard exists locally")
+		elif tmp_pcb.load_remote(tmp_ID, full=True):  # exist in central DB
+			self.pcb = tmp_pcb
+			print("\n!! Loading hexaboard {} from central DB".format(tmp_ID))
+			print("kind of part: {}".format(self.pcb.kind_of_part))
+			print("record_insertion_user: {}".format(self.pcb.record_insertion_user))
+			print("thickness: {}, type {}".format(self.pcb.thickness, type(self.pcb.thickness)))
+			print("flatness: {}".format(self.pcb.flatness))
+			print("grade: {}".format(self.pcb.grade))
+			self.update_info()
+			self.page.leStatus.setText("Hexaboard only exists in central DB")
+		else:  # DNE; good to create
+			self.update_info()
+			self.page.leStatus.setText("Hexaboard DNE")
+
+		# tmp_exists = tmp_pcb.load(tmp_ID)
+		# if not tmp_exists:  # DNE; good to create
+		# 	self.page.leStatus.setText("PCB DNE")
+		# 	self.update_info()
+		# else:
+		# 	self.pcb = tmp_pcb
+		# 	self.page.leStatus.setText("PCB exists")
+		# 	self.update_info()
 
 	@enforce_mode('view')
 	def startCreating(self,*args,**kwargs):
@@ -363,7 +384,7 @@ class func(object):
 		tmp_id = self.page.sbStepPcb.value()
 		tmp_inst = self.page.cbInstitutionStep.currentText()
 		if tmp_id >= 0 and tmp_inst != "":
-			self.setUIPage('3. PCB - pre-assembly',ID="{}_{}".format(tmp_inst, tmp_id))
+			self.setUIPage('3. Hexaboard - pre-assembly',ID="{}_{}".format(tmp_inst, tmp_id))
 
 
 	@enforce_mode(['editing', 'creating'])

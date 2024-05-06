@@ -27,6 +27,68 @@ INDEX_INSTITUTION = {
 	'FSU':11,
 }
 
+# Naming dictionary
+NAME_DENSITY = {
+	'LD' : 'L',
+	'HD' : 'H'
+}
+NAME_GEOMETRY = {
+	'Full'   : 'F',
+	'Top'    : 'T',
+	'Bottom' : 'B',
+	'Left'   : 'L',
+	'Right'  : 'R',
+	'Five'   : '5',
+	# 'Full+Three' : 'F' # not sure if necessary
+}
+NAME_THICKNESS = {
+    '120um' : '1',
+    '200um' : '2',
+	'300um' : '3'
+}
+NAME_MATERIAL = {
+	'CuW/Kapton' : 'W',
+	'PCB/Kapton' : 'P',
+	'CF/Kapton'  : 'C'
+}
+NAME_VERSION = {
+	'preseries'  : 'X',
+	'production' : '0'  # TBD, currently set to X
+}
+NAME_INSTITUTION = {
+	'CERN'  : 'CN', # TBD ?
+	'FNAL'  : 'FL', # TBD ?
+	'UCSB'  : 'SB',
+	'UMN'   : 'MN', # TBD ?
+	'HEPHY' : 'HY', # TBD ?
+	'HPK'   : 'HK', # TBD ?
+	'CMU'   : 'CM',
+	'TTU'   : 'TT',
+	'IHEP'  : 'IH',
+	'TIFR'  : 'TI', # TBD ?
+	'NTU'   : 'NT',
+	'FSU'   : 'FS'  # TBD ?
+}
+
+def is_proper_name(name):
+	# check if the protomodule name is proper
+	density_list = list(NAME_DENSITY.values())
+	geometry_list = list(NAME_GEOMETRY.values())
+	thickness_list = list(NAME_THICKNESS.values())
+	material_list = list(NAME_MATERIAL.values())
+	version_list = list(NAME_VERSION.values())
+	institution_list = list(NAME_INSTITUTION.values())
+	flag = False
+	if name[0] == 'P' \
+		and name[1] in density_list \
+		and name[2] in geometry_list \
+		and name[3] in thickness_list \
+		and name[4] in material_list \
+		and name[5] in version_list \
+		and name[7:9] in institution_list:
+		flag = True
+	return flag
+
 STATUS_NO_ISSUES = "valid (no issues)"
 STATUS_ISSUES    = "invalid (issues present)"
 
@@ -42,10 +104,12 @@ I_TAPE_DNE = "at least one tape batch is required"
 I_ADHESIVE_NOT_SELECTED = "no adhesive type is selected"
 
 # parts
-I_PART_NOT_READY    = "{}(s) in position(s) {} is not ready for pcb application. reason: {}"
-I_PCB_PROTOMODULE_SHAPE = "pcb {} has shape {} but protomodule {} has shape {}"
-I_PCB_PROTOMODULE_CHANNEL = "pcb {} has channel density {} but protomodule {} has channel density {}"
+I_PART_NOT_READY    = "{}(s) in position(s) {} is not ready for hexaboard application. reason: {}"
+I_PCB_PROTOMODULE_SHAPE = "hexaboard {} has shape {} but protomodule {} has shape {}"
+I_PCB_PROTOMODULE_CHANNEL = "hexaboard {} has channel density {} but protomodule {} has channel density {}"
 I_MOD_EXISTS = "module {} already exists!"
+I_PCB_ON_MODULE = "hexaboard {} on position {} is already assembled on module {}"
+I_PROTO_ON_MODULE = "protomodule {} on position {} is already assembled on module {}"
 
 # rows / positions
 I_NO_PARTS_SELECTED     = "no parts have been selected"
@@ -54,13 +118,13 @@ I_TRAY_ASSEMBLY_DNE     = "assembly tray(s) in position(s) {} do not exist"
 I_TOOL_SENSOR_DNE       = "sensor tool(s) in position(s) {} do not exist"
 I_BASEPLATE_DNE         = "baseplate(s) in position(s) {} do not exist"
 I_SENSOR_DNE            = "sensor(s) in position(s) {} do not exist"
-I_PCB_DNE               = "pcb(s) in position(s) {} do not exist"
+I_PCB_DNE               = "hexaboard(s) in position(s) {} do not exist"
 I_PROTO_DNE             = "protomodule(s) in position(s) {} do not exist"
 I_TRAY_ASSEMBLY_DUPLICATE = "same assembly tray is selected on multiple positions: {}"
-I_TOOL_PCB_DUPLICATE    = "same PCB tool is selected on multiple positions: {}"
+I_TOOL_PCB_DUPLICATE    = "same hexaboard tool is selected on multiple positions: {}"
 I_BASEPLATE_DUPLICATE   = "same baseplate is selected on multiple positions: {}"
 I_SENSOR_DUPLICATE      = "same sensor is selected on multiple positions: {}"
-I_PCB_DUPLICATE         = "same PCB is selected on multiple positions: {}"
+I_PCB_DUPLICATE         = "same hexaboard is selected on multiple positions: {}"
 I_PROTO_DUPLICATE       = "same protomodule is selected on multiple positions: {}"
 I_LONE_TRAY             = "assembly tray entered, but rows {} and {} are empty"
 
@@ -72,7 +136,7 @@ I_SIZE_MISMATCH_8 = "* list of 8-inch objects selected: {}"
 I_INSTITUTION = "some selected objects are not at this institution: {}"
 
 # Missing user
-I_USER_DNE = "no pcb step user selected"
+I_USER_DNE = "no hexaboard step user selected"
 
 # supply batch empty
 I_BATCH_ARALDITE_EMPTY = "araldite batch is empty"
@@ -83,6 +147,9 @@ I_TAPE_120_EMPTY = "125um tape batch is empty"
 I_INSTITUTION_NOT_SELECTED = "no institution selected"
 
 I_NO_TOOL_CHK = "pickup tool feet have not been checked"
+
+# module
+I_MODULE_NAME_EXISTS = "module name {} on position {} already exists"
 
 
 class func(object):
@@ -264,6 +331,8 @@ class func(object):
 
 			self.pb_clears[i].clicked.connect(self.clearRow)
 
+		self.page.pbGenerate.clicked.connect( self.update_moduleID )
+
 		self.page.pbAddPart.clicked.connect(self.finishSearch)
 		self.page.pbCancelSearch.clicked.connect(self.cancelSearch)
 
@@ -284,6 +353,7 @@ class func(object):
 		self.page.pbEdit.clicked.connect(self.startEditing)
 		self.page.pbSave.clicked.connect(self.saveEditing)
 		self.page.pbCancel.clicked.connect(self.cancelEditing)
+		self.page.pbLoad.clicked.connect(self.loadSensorStep)
 
 		self.page.cbAdhesive.currentIndexChanged.connect(self.switchAdhesive)
 		self.page.pbGoBatchAraldite.clicked.connect(self.goBatchAraldite)
@@ -475,6 +545,10 @@ class func(object):
 		self.page.leTextTape50  .setEnabled(not (mode_view or mode_searching or (adhesive!="Tape" and adhesive!="Hybrid")))
 		self.page.leTape120     .setReadOnly(mode_view or mode_searching or (adhesive!="Tape" and adhesive!="Hybrid"))
 		self.page.leTextTape120 .setEnabled(not (mode_view or mode_searching or (adhesive!="Tape" and adhesive!="Hybrid")))
+		
+		self.page.leMaxSensorStep.setReadOnly(True)
+		self.page.pbLoad.setEnabled(mode_creating or mode_editing)
+		self.page.sbSensorStep.setReadOnly(mode_view)
 
 		self.page.pbGoTrayComponent.setEnabled(mode_view and self.page.sbTrayComponent.value() >= 0)
 		#self.page.pbGoTrayAssembly .setEnabled(mode_view and self.page.sbTrayAssembly .value() >= 0)
@@ -487,7 +561,7 @@ class func(object):
 			self.sb_tools[i].setReadOnly(       mode_view)
 			self.le_pcbs[i].setReadOnly(        mode_view)
 			self.le_protomodules[i].setReadOnly(mode_view)
-			# self.le_modules[i].setReadOnly(     mode_view)
+			self.le_modules[i].setReadOnly(     mode_view)  # turn on maual change module name
 			self.pb_go_tray_assemblys[i].setEnabled(mode_creating or (mode_view and self.sb_tray_assemblys[i].value() != -1) )
 			self.pb_go_tools[i].setEnabled(       mode_view and tools_exist[i]       )
 			self.pb_go_pcbs[i].setEnabled(        mode_creating or (mode_view and self.le_pcbs[i].text()            != "") )
@@ -499,15 +573,13 @@ class func(object):
 		self.page.pbEdit.setEnabled(   mode_view and     step_pcb_exists )
 		self.page.pbSave.setEnabled(   mode_creating or mode_editing     )
 		self.page.pbCancel.setEnabled( mode_creating or mode_editing     )
+		self.page.pbGenerate.setEnabled(mode_creating or mode_editing)
 
 		self.page.ckCheckFeet.setEnabled(not mode_view)
 
 		self.page.pbAddPart     .setEnabled(mode_searching)
 		self.page.pbCancelSearch.setEnabled(mode_searching)
 
-		# update module name from protomodule name
-		for i in range(6):
-			self.le_modules[i].setText('M'+self.le_protomodules[i].text()[1:] if self.le_protomodules[i].text() != ""  else "")
 
 		# NEW:  Update pb's based on search result
 		for i in range(6):
@@ -524,15 +596,28 @@ class func(object):
 		t120 = self.page.leTape120.text()
 		self.page.pbGoTape120.setText("select" if t120 == "" else "go to")
 
+		# self.setMaxSensorStep()
+
 
 	@enforce_mode(['editing','creating'])
 	def loadAllObjects(self,*args,**kwargs):
 		for i in range(6):
 			self.tray_assemblys[i].load(self.sb_tray_assemblys[i].value(), self.page.cbInstitution.currentText())
 			self.tools_pcb[i].load(self.sb_tools[i].value(),       self.page.cbInstitution.currentText())
-			self.pcbs[i].load(        self.le_pcbs[i].text()        )
-			self.protomodules[i].load(self.le_protomodules[i].text())
-			self.modules[i].load(     self.le_modules[i].text()     )
+			load_source = "remote"
+			if not self.pcbs[i].load_remote(self.le_pcbs[i].text(),full=False):
+				self.pcbs[i].load(self.le_pcbs[i].text())
+				load_source = "local"
+			if self.pcbs[i].ID:
+				print("hexaboard {} loaded from {}".format(self.pcbs[i].ID,load_source))
+			if not self.protomodules[i].load_remote(self.le_protomodules[i].text(),full=False):
+				self.protomodules[i].load(self.le_protomodules[i].text())
+				load_source = "local"
+			if self.protomodules[i].ID:
+				print("protomodule {} loaded from {}".format(self.protomodules[i].ID,load_source))
+			# self.protomodules[i].load(self.le_protomodules[i].text())
+			# self.pcbs[i].load(        self.le_pcbs[i].text()        )
+			# self.modules[i].load(     self.le_modules[i].text()     )
 
 		self.tray_component_pcb.load(self.page.sbTrayComponent.value(), self.page.cbInstitution.currentText())
 		#self.tray_assembly.load(        self.page.sbTrayAssembly.value(),  self.page.cbInstitution.currentText())
@@ -575,13 +660,6 @@ class func(object):
 		self.tools_pcb[which].load(self.sb_tools[which].value(), self.page.cbInstitution.currentText())
 		self.updateIssues()
 
-	@enforce_mode(['editing','creating'])
-	def loadBaseplate(self, *args, **kwargs):
-		sender_name = str(self.page.sender().objectName())
-		which = int(sender_name[-1]) - 1
-		self.baseplates[which].load(self.le_baseplates[which].text())
-		self.updateIssues()
-
 	@enforce_mode(['editing','creating', 'searching'])
 	def loadPcb(self, *args, **kwargs):
 		if 'row' in kwargs.keys():
@@ -589,7 +667,18 @@ class func(object):
 		else:
 			sender_name = str(self.page.sender().objectName())
 			which = int(sender_name[-1]) - 1
-		self.pcbs[which].load(self.le_pcbs[which].text())
+		# load remote if exists, else load local
+		print("Hexaboard position:",which)
+		load_source = "remote"
+		if not self.pcbs[which].load_remote(self.le_pcbs[which].text(),full=False):
+			self.pcbs[which].load(self.le_pcbs[which].text())
+			load_source = "local"
+		print("    loaded from {}".format(load_source))
+		print("    kind:",self.pcbs[which].kind_of_part)
+		print("    ID:",self.pcbs[which].ID)
+		print("    density:",self.pcbs[which].channel_density)
+		print()
+		# self.pcbs[which].load(self.le_pcbs[which].text())
 		self.updateIssues()
 
 	#New
@@ -600,7 +689,17 @@ class func(object):
 		else:
 			sender_name = str(self.page.sender().objectName())
 			which = int(sender_name[-1]) - 1
-		self.protomodules[which].load(self.le_protomodules[which].text())
+		# load remote if exists, else load local
+		print("protomodule position:",which)
+		load_source = "remote"
+		if not self.protomodules[which].load_remote(self.le_protomodules[which].text(),full=False):
+			self.protomodules[which].load(self.le_protomodules[which].text())
+			load_source = "local"
+		print("       loaded from {}".format(load_source))
+		print("       kind:",self.protomodules[which].kind_of_part)
+		print("       ID:",self.protomodules[which].ID)
+		print("       channel density:",self.protomodules[which].channel_density)
+		# self.protomodules[which].load(self.le_protomodules[which].text())
 		self.updateIssues()
 
 	@enforce_mode(['editing','creating'])
@@ -662,6 +761,8 @@ class func(object):
 	def updateIssues(self,*args,**kwargs):
 		issues = []
 		objects = []
+
+		mode_create    = self.mode == 'creating'
 
 		if self.page.cbUserPerformed.currentText() == "":
 			issues.append(I_USER_DNE)
@@ -812,7 +913,7 @@ class func(object):
 				else:
 					ready, reason = self.pcbs[i].ready_step_pcb(tmp_id)
 					if not ready:
-						issues.append(I_PART_NOT_READY.format('pcb',i,reason))
+						issues.append(I_PART_NOT_READY.format('hexaboard',i,reason))
 
 			if protomodules_selected[i] != "":
 				num_parts += 1
@@ -879,6 +980,30 @@ class func(object):
 		if not self.page.ckCheckFeet.isChecked():
 			issues.append(I_NO_TOOL_CHK)
 
+		# NEW: Check for parent (only when creating)
+		if mode_create:
+			for i in range (6):
+				if pcbs_selected[i] != "":
+					temp_pcb = parts.pcb()
+					if not temp_pcb.load_remote(pcbs_selected[i]):
+						temp_pcb.load(pcbs_selected[i])
+					if temp_pcb.ID != None and temp_pcb.module != None:
+						issues.append(I_PCB_ON_MODULE.format(temp_pcb.ID, i, temp_pcb.module))
+				if protomodules_selected[i] != "":
+					temp_protomodule = parts.protomodule()
+					if not temp_protomodule.load_remote(protomodules_selected[i]):
+						temp_protomodule.load(protomodules_selected[i])
+					if temp_protomodule.ID != None and temp_protomodule.module != None:
+						issues.append(I_PROTO_ON_MODULE.format(temp_protomodule.ID, i, temp_protomodule.module))
+			# NEW: Check if module already exists
+			for i in range(6):
+				if self.le_modules[i].text() != "":
+					temp_module = parts.module()
+					if not temp_module.load_remote(self.le_modules[i].text()):
+						temp_module.load(self.le_modules[i].text())
+					if temp_module.ID != None:
+						issues.append(I_PROTO_NAME_EXISTS.format(self.le_modules[i].text(), i))
+
 		self.page.listIssues.clear()
 		for issue in issues:
 			self.page.listIssues.addItem(issue)
@@ -903,6 +1028,27 @@ class func(object):
 		else:
 			self.step_pcb = tmp_step
 			self.update_info()
+
+	# @enforce_mode('view')
+	def loadSensorStep(self,*args,**kwargs):
+		if self.page.sbSensorStep.value() == -1:  return
+		if self.page.cbInstitution.currentText() == "":  return
+		tmp_step = assembly.step_sensor()
+		tmp_ID = self.page.sbSensorStep.value()
+		tmp_inst = self.page.cbInstitution.currentText()
+		tmp_exists = tmp_step.load("{}_{}".format(tmp_inst, tmp_ID))
+		if not tmp_exists:
+			self.update_info()
+			print("Sensor step {} does not exist".format(tmp_ID))
+		else:
+			if not (tmp_step.protomodules is None):
+				for i in range(6):
+					self.le_protomodules[i].setText(str(tmp_step.protomodules[i]) if not (tmp_step.protomodules[i] is None) else "")
+					if not (tmp_step.asmbl_tray_nums[i] is None):
+						self.sb_tray_assemblys[i].setValue(tmp_step.asmbl_tray_nums[i])
+					# self.sb_tray_assemblys[i].setValue(tmp_step.asmbl_tray_nums[i] if not (tmp_step.asmbl_tray_nums[i] is None) else -1)
+			self.update_info()
+			print("Sensor step {} loaded".format(tmp_ID))
 
 	@enforce_mode('view')
 	def startCreating(self,*args,**kwargs):
@@ -929,6 +1075,7 @@ class func(object):
 			self.step_pcb.new("{}_{}".format(tmp_inst, tmp_ID))
 			self.mode = 'creating'
 			self.updateElements()
+			self.setMaxSensorStep()
 
 	@enforce_mode('view')
 	def startEditing(self,*args,**kwargs):
@@ -941,6 +1088,7 @@ class func(object):
 			self.mode = 'editing'
 			self.loadAllObjects()
 			self.update_info()
+			self.setMaxSensorStep()
 
 	@enforce_mode(['editing','creating'])
 	def cancelEditing(self,*args,**kwargs):
@@ -963,7 +1111,10 @@ class func(object):
 			protomodules.append(self.le_protomodules[i].text() if self.le_protomodules[i].text() != "" else None)
 			# modules.append(     self.le_modules[i].text()      if self.le_modules[i].text()      != "" else None)
 			# Auto generate module name from protomodule
-			modules.append(     'M' + self.le_protomodules[i].text()[1:]      if self.le_protomodules[i].text()      != "" else None)
+			if self.le_modules[i].text() != "":
+				modules.append(self.le_modules[i].text())
+			else:
+				modules.append(None)
 	
 		self.step_pcb.pcbs         = pcbs
 		self.step_pcb.protomodules = protomodules
@@ -986,6 +1137,7 @@ class func(object):
 			temp_module.sensor = self.protomodules[i].sensor
 			temp_module.step_sensor = self.protomodules[i].step_sensor
 			temp_module.step_pcb = self.step_pcb.ID
+			temp_module.manufacturer = self.page.cbInstitution.currentText()
 			temp_module.save()
 
 			self.pcbs[i].step_pcb = self.step_pcb.ID
@@ -1039,10 +1191,12 @@ class func(object):
 	def clearRow(self,*args,**kwargs):
 		sender_name = str(self.page.sender().objectName())
 		which = int(sender_name[-1]) - 1
+		print("Clearing row {}".format(which))
 		self.sb_tools[which].setValue(-1)
 		self.sb_tools[which].clear()
 		self.le_pcbs[which].clear()
 		self.le_protomodules[which].clear()
+		self.le_modules[which].clear()
 		# clear tray assembly only if current and neighboring rows are clear
 		uprow   = which if which%2==0 else which-1
 		downrow = which if which%2!=0 else which+1
@@ -1050,7 +1204,7 @@ class func(object):
 		if self.isRowClear(uprow) and self.isRowClear(downrow):
 			self.sb_tray_assemblys[which].setValue(-1)
 			self.sb_tray_assemblys[which].clear()
-		self.update_info()
+		self.updateIssues()
 
 	def doSearch(self,*args,**kwargs):
 		tmp_class = getattr(parts, self.search_part, None)
@@ -1086,6 +1240,26 @@ class func(object):
 				self.page.lwPartList.addItem("{} {}".format(self.search_part, part_id))
 			#else:
 			#	self.page.lwPartList.addItem("{} {}".format(self.search_part, part_id))
+
+		# NEW: Search remote parts in central DB (only for pcbs and protomodules)
+		if self.search_part in ['pcb', 'protomodule']:
+			partlistdir_remote = os.sep.join([fm.DATADIR, 'partlist_remote'])
+			obj_list_remote = os.sep.join([partlistdir_remote, self.search_part+'s.json'])
+
+			with open(obj_list_remote, 'r') as opfl:
+				part_data = json.load(opfl)
+				for part in part_data['parts']:
+					# Only list parts at this institution
+					if part['location'] != self.page.cbInstitution.currentText(): continue
+					part_id = part['serial_number']
+					# If already added by DB query, skip:
+					if len(self.page.lwPartList.findItems("{} {}".format(self.search_part, part_id), \
+														QtCore.Qt.MatchExactly)) > 0: continue
+					# need to load full part to check parent -- TOO SLOW!!!
+					# tmp_part.load_remote(part_id, full=True)
+					# if tmp_part.protomodule is None:
+					self.page.lwPartList.addItem("{} {}".format(self.search_part, part_id))
+
 		# Sort search results
 		self.page.lwPartList.sortItems()
 
@@ -1142,7 +1316,7 @@ class func(object):
 		which = int(sender_name[-1]) - 1
 		pcb = self.le_pcbs[which].text()
 		if pcb != "":
-			self.setUIPage('PCBs',ID=pcb)
+			self.setUIPage('Hexaboards',ID=pcb)
 		else:
 			self.mode = 'searching'
 			self.search_part = 'pcb'
@@ -1245,3 +1419,32 @@ class func(object):
 	def changed_to(self):
 		print("changed to {}".format(PAGE_NAME))
 		self.update_info()
+
+	def setMaxSensorStep(self,*args,**kwargs):
+		# NEW:  Search for all sensor steps at this institution, then set the max value
+		if self.page.cbInstitution.currentText() == "":  return
+		part_file_name = os.sep.join([ fm.DATADIR, 'partlist', 'step_sensors.json' ])
+		with open(part_file_name, 'r') as opfl:
+			part_list = json.load(opfl)
+		tmp_inst = self.page.cbInstitution.currentText()
+		ids = []
+		for part_id, date in part_list.items():
+			inst, num = part_id.split("_")
+			if inst == tmp_inst:
+				ids.append(int(num))
+		if ids:
+			tmp_ID = max(ids)
+		else:
+			tmp_ID = 0
+		self.page.leMaxSensorStep.setText(str(tmp_ID))
+		self.page.sbSensorStep.setMaximum(tmp_ID)
+		self.page.sbSensorStep.setValue(tmp_ID)
+
+	def update_moduleID(self,*args,**kwargs):
+		# update module name from protomodule name
+		for i in range(6):
+			if self.le_protomodules[i].text() != "" and is_proper_name(self.le_protomodules[i].text()):
+				self.le_modules[i].setText("M"+self.le_protomodules[i].text()[1:])
+			else:
+				self.le_modules[i].setText("")
+		self.updateIssues()

@@ -236,15 +236,35 @@ class func(object):
 		# Check whether baseplate exists:
 		tmp_sensor = parts.sensor()
 		tmp_ID = self.page.leID.text()
-		tmp_exists = tmp_sensor.load(tmp_ID)
-		if not tmp_exists:  # DNE; good to create
-			self.page.leStatus.setText("sensor DNE")
-			self.update_info()
-		else:
-			# pass
+  
+		# NEW: Load from central DB if not found locally
+		if tmp_sensor.load(tmp_ID):  # exist locally
 			self.sensor = tmp_sensor
-			self.page.leStatus.setText("sensor exists")
 			self.update_info()
+			self.page.leStatus.setText("sensor exists locally")
+		elif tmp_sensor.load_remote(tmp_ID, full=True):  # exist in central DB
+			self.sensor = tmp_sensor
+			print("\n!! Loading pcb {} from central DB".format(tmp_ID))
+			print("kind of part: {}".format(self.sensor.kind_of_part))
+			print("record_insertion_user: {}".format(self.sensor.record_insertion_user))
+			print("thickness: {}, type {}".format(self.sensor.thickness, type(self.sensor.thickness)))
+			print("flatness: {}".format(self.sensor.flatness))
+			print("grade: {}".format(self.sensor.grade))
+			self.update_info()
+			self.page.leStatus.setText("sensor only exists in central DB")
+		else:  # DNE; good to create
+			self.update_info()
+			self.page.leStatus.setText("sensor DNE")
+
+		# tmp_exists = tmp_sensor.load(tmp_ID)
+		# if not tmp_exists:  # DNE; good to create
+		# 	self.page.leStatus.setText("sensor DNE")
+		# 	self.update_info()
+		# else:
+		# 	# pass
+		# 	self.sensor = tmp_sensor
+		# 	self.page.leStatus.setText("sensor exists")
+		# 	self.update_info()
 
 
 	@enforce_mode('view')

@@ -193,7 +193,7 @@
     </property>
     <property name="dateTime">
      <datetime>
-      <hour>0</hour>
+      <hour>16</hour>
       <minute>0</minute>
       <second>0</second>
       <year>2023</year>
@@ -373,11 +373,6 @@
       <string>Five</string>
      </property>
     </item>
-    <item>
-     <property name="text">
-      <string>Full+Three</string>
-     </property>
-    </item>
    </widget>
    <widget class="QComboBox" name="cbAssmRow">
     <property name="enabled">
@@ -540,12 +535,17 @@
     </item>
     <item>
      <property name="text">
-      <string>CuW</string>
+      <string>CuW/Kapton</string>
      </property>
     </item>
     <item>
      <property name="text">
-      <string>PCB</string>
+      <string>PCB/Kapton</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>CF/Kapton</string>
      </property>
     </item>
    </widget>
@@ -587,7 +587,7 @@
    </item>
    <item>
     <property name="text">
-     <string>PCB</string>
+     <string>Hexaboard</string>
     </property>
    </item>
    <item>
@@ -647,7 +647,7 @@
      <rect>
       <x>70</x>
       <y>220</y>
-      <width>221</width>
+      <width>501</width>
       <height>20</height>
      </rect>
     </property>
@@ -737,6 +737,19 @@
     </property>
     <property name="text">
      <string>Part type:</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbRefresh">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>250</y>
+      <width>141</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Refresh remote DB</string>
     </property>
    </widget>
   </widget>

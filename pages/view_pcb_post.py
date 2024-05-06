@@ -1,6 +1,8 @@
 from PyQt5 import QtCore
 import time
 import datetime
+import os
+import json
 # for xml loading:
 import csv
 from xml.etree.ElementTree import parse
@@ -183,13 +185,13 @@ class func(object):
 			self.page.dsbThickness6,
 		]
   
-		self.dsb_weight = [
-			self.page.dsbWeight1,
-			self.page.dsbWeight2,
-			self.page.dsbWeight3,
-			self.page.dsbWeight4,
-			self.page.dsbWeight5,
-			self.page.dsbWeight6,
+		self.dsb_max_thickness = [
+			self.page.dsbMaxThickness1,
+			self.page.dsbMaxThickness2,
+			self.page.dsbMaxThickness3,
+			self.page.dsbMaxThickness4,
+			self.page.dsbMaxThickness5,
+			self.page.dsbMaxThickness6,
 		]
 
 		self.cb_grades = [
@@ -208,6 +210,7 @@ class func(object):
 		self.page.sbID.valueChanged.connect(self.loadStep)
 		self.page.cbInstitution.activated.connect( self.loadStep )
 
+		self.page.pbNext.clicked.connect(self.startCreating)
 		self.page.pbEdit.clicked.connect(self.startEditing)
 		self.page.pbSave.clicked.connect(self.saveEditing)
 		self.page.pbCancel.clicked.connect(self.cancelEditing)
@@ -267,7 +270,8 @@ class func(object):
 				thicks = self.step_pcb.thicknesses
 				flats = self.step_pcb.flatnesses
 				grades = self.step_pcb.grades
-				weights = self.step_pcb.weights
+				max_thicks = self.step_pcb.max_thicknesses
+				print("max_thicks = ",max_thicks)
 
 				for i in range(6):
 					self.le_modules[i]     .setText(mods[i] if mods[i] else "")
@@ -276,7 +280,7 @@ class func(object):
 					self.dsb_offsets_rot[i].setValue(ang_off[i] if ang_off[i] else 0)
 					self.dsb_thickness[i]  .setValue(thicks[i] if thicks[i] else 0)
 					self.dsb_flatness[i]   .setValue(flats[i] if flats[i] else 0)
-					self.dsb_weight[i]   .setValue(weights[i] if weights[i] else 0)
+					self.dsb_max_thickness[i].setValue(max_thicks[i] if max_thicks[i] else 0)
 					self.cb_grades[i]      .setCurrentIndex(INDEX_GRADE.get(grades[i], -1))
 
 			else:
@@ -287,7 +291,7 @@ class func(object):
 					self.dsb_offsets_rot[i].setValue(0)
 					self.dsb_thickness[i].setValue(0)
 					self.dsb_flatness[i].setValue(0)
-					self.dsb_weight[i].setValue(0)
+					self.dsb_max_thickness[i].setValue(0)
 					self.cb_grades[i].setCurrentIndex(-1)
 
 		else:
@@ -308,7 +312,7 @@ class func(object):
 				self.dsb_offsets_rot[i].setValue(0)
 				self.dsb_thickness[i].setValue(-1)
 				self.dsb_flatness[i].setValue(0)
-				self.dsb_weight[i].setValue(0)
+				self.dsb_max_thickness[i].setValue(0)
 				self.cb_grades[i].setCurrentIndex(-1)
 
 		
@@ -342,9 +346,10 @@ class func(object):
 			self.dsb_offsets_rot[i].setReadOnly(not (mode_editing and modules_exist[i]))
 			self.dsb_thickness[i]  .setReadOnly(not (mode_editing and modules_exist[i]))
 			self.dsb_flatness[i]   .setReadOnly(not (mode_editing and modules_exist[i]))
-			self.dsb_weight[i]     .setReadOnly(not (mode_editing and modules_exist[i]))
+			self.dsb_max_thickness[i].setReadOnly(not (mode_editing and modules_exist[i]))
 			self.cb_grades[i]      .setEnabled(      mode_editing and modules_exist[i])
 
+		self.page.pbNext.setEnabled(    mode_view)
 		self.page.pbEdit.setEnabled(   mode_view and     step_pcb_exists )
 		self.page.pbSave.setEnabled(mode_editing     )
 		self.page.pbCancel.setEnabled(mode_editing     )
@@ -403,6 +408,33 @@ class func(object):
 			self.update_info()
 
 	@enforce_mode('view')
+	def startCreating(self,*args,**kwargs):
+		# NEW:  Search for all steps at this institution, then create the next in order
+		if self.page.cbInstitution.currentText() == "":  return
+		part_file_name = os.sep.join([ fm.DATADIR, 'partlist', 'step_pcbs.json' ])
+		with open(part_file_name, 'r') as opfl:
+			part_list = json.load(opfl)
+		tmp_inst = self.page.cbInstitution.currentText()
+		ids = []
+		for part_id, date in part_list.items():
+			inst, num = part_id.split("_")
+			if inst == tmp_inst:
+				ids.append(int(num))
+		if ids:
+			tmp_ID = max(ids)
+		else:
+			tmp_ID = 0
+		self.page.sbID.setValue(tmp_ID)
+
+		tmp_step = assembly.step_pcb()
+		tmp_exists = tmp_step.load("{}_{}".format(tmp_inst, tmp_ID))
+		if tmp_exists:
+			self.step_pcb = tmp_step
+			self.mode = 'editing'
+			self.loadAllObjects()
+			self.update_info()
+
+	@enforce_mode('view')
 	def startEditing(self,*args,**kwargs):
 		tmp_step = assembly.step_pcb()
 		tmp_ID = self.page.sbID.value()
@@ -438,8 +470,8 @@ class func(object):
 		self.step_pcb.pcb_ang_offsts = [self.dsb_offsets_rot[i].value() for i in range(6)]
 		self.step_pcb.flatnesses = [self.dsb_flatness[i].value() for i in range(6)]
 		self.step_pcb.thicknesses = [self.dsb_thickness[i].value() for i in range(6)]
-		self.step_pcb.weights = [self.dsb_weight[i].value() for i in range(6)]
-		print("step_pcb.weights = ",self.step_pcb.weights)
+		self.step_pcb.max_thicknesses = [self.dsb_max_thickness[i].value() for i in range(6)]
+		print("step_pcb.max_thicknesses = ",self.step_pcb.max_thicknesses)
 		self.step_pcb.grades = [str(self.cb_grades[i].currentText()) if self.cb_grades[i].currentText() else None for i in range(6)]
 
 		self.step_pcb.save()

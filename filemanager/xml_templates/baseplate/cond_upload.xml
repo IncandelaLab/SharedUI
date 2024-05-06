@@ -26,6 +26,7 @@
         <DATA>
             <FLATNESS>{{ flatness }}</FLATNESS>
             <THICKNESS>{{ thickness }}</THICKNESS>
+            <WEIGHT>{{ weight }}</WEIGHT>
             <GRADE>{{ grade }}</GRADE>
             <COMMENTS>{{ comments_upload }}</COMMENTS>
         </DATA>

@@ -2,9 +2,11 @@
 
 ------
 
-SharedUI is a graphical user interface designed help engineers monitor and record data during the module assembly process.  Currently, the final product of the GUI is a number of XML files formatted for the HGCAL DB loader.  In the future, it will be possible to automatically store recorded data in the central DB, as well as retrive data for completed parts or assembly steps.
+SharedUI is a graphical user interface designed help engineers monitor and record data during the module assembly process.  The final product of the GUI is a number of XML files formatted for the HGCAL DB loader.  It can automatically store recorded data in the central DB, as well as retrive data for parts.
 
-**NOTE:**  This is a beta version of the module assembly GUI.  **Uploading to the DB has not been implemented yet, and all data will be saved locally.**  Please let me know at pmasterson@ucsb.edu if you have any questions or run into any bugs--I should usually be able to respond within a day.
+Please contact Danyi Zhang at danyizhang@ucsb.edu if you have any questions or run into any bugs.
+
+<!-- **NOTE:**  This is a beta version of the module assembly GUI.  **Uploading to the DB has not been implemented yet, and all data will be saved locally.**  Please let me know at pmasterson@ucsb.edu if you have any questions or run into any bugs--I should usually be able to respond within a day. -->
 
 ## Prerequisites
 
@@ -26,6 +28,8 @@ python -m pip install numpy PyQt5 jinja2 pytest
 
 An installation script `install_dependencies.sh` may be required in the future for installing software required for DB communication, but it is currently WIP and should not be used.
 
+**NOTE:** Currently, data uploading is only supported on Unix systems (Mac and Linux), so please ensure that the machine used for uploading the data is running either Mac or Linux.
+
 ## Running and using the GUI
 
 To run the GUI, `cd` into the `SharedUI` directory and run the following command:
@@ -36,6 +40,8 @@ python mainUI.py
 
 If your default python version is 2.x, you may need to use `python3 mainUI.py` instead.
 
+**(NEW)** Before the GUI appears, a request box will pop up asking for a username and password, which will be used for uploading the parts data. Please ensure that the account used here has the necessary permissions to upload to HGCAL dbloader (please check with Ludivine and Umesh).
+
 The GUI is divided into two main sections:  Parts, tooling, and supplies; and production steps and testing.  There is also a part search page that lets users quickly find existing parts.  To switch between pages, simply double-click on the page name in the sidebar.  (If a page does not open, it's probably WIP.)
 
 ### Parts, tooling, and supplies
@@ -44,21 +50,30 @@ Before performing an assembly step, you will have to go through the parts, tooli
 
 To create a part, navigate to the corresponding page, enter the desired part ID into the "ID" box, and click "New".  The part will not be fully created until you click "Save"; "Cancel" will discard the current changes.  "Load" will check to see whether a part exists, and if the part is found, all relevant data will be downloaded so you can view and edit it.  Parts may also be edited after creation with the "Edit" button, which will replace "New".  (If "Edit" is greyed-out, try pressing "Load" first.)
 
-Tools and supplies may be created in a similar manner.  Note that protomodules and modules cannot be created using the Protomodules and Modules pages, only viewed, because they're automatically created upon completion of a sensor or PCB step.
+Tools and supplies may be created in a similar manner.  Note that protomodules and modules cannot be created using the Protomodules and Modules pages, only viewed, because they're automatically created upon completion of a sensor or hexaboard step.
 
-Note that protomodules and modules are automatically created by the sensor placement and pcb placement steps, respectively.  They cannot be created manually, but can be edited after creation.  (Some protomodule/module information can't be inherited from their component parts, and has to be entered in manually.)
+Note that protomodules and modules are automatically created by the sensor placement and hexaboard placement steps, respectively.  They cannot be created manually, but can be edited after creation.  (Some protomodule/module information can't be inherited from their component parts, and has to be entered in manually.)
 
-Currently, parts (baseplates, sensors, etc) can only be created locally, as DB communication has not been implemented yet.  After the API is ready, however, all baseplates, sensors, and PCBs should be entered into the DB prior to being shipped to MACs, and they must be downloaded by the GUI before they can be used for assembly.  Creation of those parts with the GUI will be disabled.
+**(NEW) Currently, central DB communication has been implemented.** Parts (baseplates, sensors, etc) can be created locally and uploaded to the central DB.  In real production, all baseplates, sensors, and hexaboards should be entered into the DB prior to being shipped to MACs, so that they can be accessed by the GUI and used for assembly.  By that time, creation of those parts with the GUI will be disabled.
 
 ### Production steps and testing routines
 
 Once all necessary information in the parts, tooling, and supplies section has been filled in, you can proceed to the production steps.  The production step pages are broadly similar to the previous ones, but with one major difference:  the data will be automatically checked for errors, and if any are found, a message explaining the problem will appear in the status box.  (For instance, entering in a nonexistent part or partially filling a row will produce errors.)  Once all errors have been resolved, you can save the step.
 
+**(NEW)** The "select" buttons are used to search for available parts for assembly. This search list includes both local and remote parts in DB. The local parts will be filtered out if they are already assembled on certain (proto)modules. However, the remote DB parts are not filtered in the same way, meaning that parts already assembled will still show up on that list. To avoid duplicates, the GUI will report the error "part xxx on position xx is already assembled on (proto) module xxx" in such cases and prevent the step from being created.
+
+#### (NEW) Auto-naming protomodule and module
+In production step 1, by clicking the "generate" button, the protomodule ID can be auto-generated (in standard naming scheme) after providing the sensor ID, baseplate ID, version (preseries/production) and serial number. The next largest serial number will be assigned if the "next" button under "serial number" is clicked.
+Similarly, in step 3, the module ID can be auto-generated after providing a protomodule ID **in the standard format** after clicking the "generate" button.
+The auto-generated IDs are also allowed to modify if there's a need for editing.
+
 ### Part, tool and supply search
 
-The Search page is designed to search for both parts and tools/supplies. They are organized into two parallel sections, and can work simutaneously without conflict.
+The Search page is designed to search for **both parts and tools/supplies**. They are organized into two parallel sections, and can work simutaneously without conflict.
 
 To use the search page, simply select the type of item you want to search for using the drop-down menu at the upper-left-hand corner, then select any other criteria you want using the options below.  You can then press "Search" to perform the query and display the results.  Lastly, you can jump to an item's info page by clicking on the item's name in the "search results" box, then clicking the "Go to selected item" button underneath.
+
+**(NEW)** The search page will list parts that are created locally or exist in the central DB without repetition. A part that exists only locally will be marked with "not uploaded to DB" in parentheses next to its ID.
 
 <!-- ***Possible error when some of the existing supplies are not found in the results***
 
@@ -66,7 +81,7 @@ Due to some history problems during development, the data files of the supplies 
 
 There was an error that the Supplies page cannot load the items with their IDs. It was caused by the incorrect file format of the locally stored data files. This only happened to the supplies: if you created them before this error was fixed (without the commits on Nov 18, 2023), the files stored in ```filemanager_data/supplies``` would be xml files instead of json files. This error can be fixed by going to the Supplies page and loading the items again, which will rename the xml files to json files. Note that loading supplies requires the original IDs of the supplies when they were first created, you can find them in ```filemanager_data/partlist/batch_xxx.json``` (```xxx``` stands for the name of the supplies) -- the keyword strings are the IDs. -->
 
-### XML generation (temporary)
+### XML generation and uploading
 
 Once a part (or a step in the case of protomodules and modules) has been created and saved, XML files formatted for the DB loader will be automatically generated  in the part's storage directory.  The storage directories are located at `SharedUI/filemanager_data/[part-name]/[creation-date]` by default.  As an example, the following files will be generated for a protomodule `PROTO_b1_s1`:
 
@@ -74,6 +89,11 @@ Once a part (or a step in the case of protomodules and modules) has been created
 - filemanager_data/protomodules/6-28-2023/protomodule_PROTO_b1_s1_assembly_upload.xml
 - filemanager_data/protomodules/6-28-2023/protomodule_PROTO_b1_s1_cond_upload.xml
 
+**(NEW)** By using the panel on the bottom left of the GUI, the generated XML files can be uploaded to the central DB in two ways:
+- **"Upload current object"**: go to a part page (baseplate, sensor, hexaboard, protomodule, module), load a part (type in the name or click "Go to selected item" on the search page), then click "Upload current object" button; XML files of this specific part will be uploaded;
+- **"Upload objects created on date"**: select a date (make sure there are parts created on that date by checking the ```filemanager_data``` folder), click "Upload objects"; XML files of all the parts created on that date will be uploaded.
+
+<!--
 Eventually, it will be possible to upload these XML files to the DB using the GUI.  For now, however, these files must be manually scp'ed to the DB loader (if you have the right permissions):
 
 ```
@@ -83,7 +103,7 @@ scp [filename].xml [cern-username]@dbloader-hgcal.cern.ch:/home/dbspool/spool/hg
 The GUI should ensure that the XML files are correctly formatted, so please let me know if you run into any errors in the DB loader logs.
 
 **Note:  Currently, the HGCAL DB is not set up to accept conditions data for eight-inch modules.**  Consequently, you will not be able to upload the XML conditions ("cond") files for protomodules and modules.  (Hopefully we'll be able to fix this soon.)
-
+-->
 
 ## Instructions for developers
 

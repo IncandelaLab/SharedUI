@@ -61,8 +61,8 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>370</x>
-     <y>80</y>
+     <x>230</x>
+     <y>60</y>
      <width>331</width>
      <height>41</height>
     </rect>
@@ -116,9 +116,9 @@ before assembly</string>
    <widget class="QSpinBox" name="sbID">
     <property name="geometry">
      <rect>
-      <x>110</x>
+      <x>120</x>
       <y>0</y>
-      <width>91</width>
+      <width>81</width>
       <height>21</height>
      </rect>
     </property>
@@ -128,12 +128,12 @@ before assembly</string>
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>111</width>
+      <width>121</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>PCB step ID</string>
+     <string>Hexaboard step ID</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -403,7 +403,7 @@ before assembly</string>
      </rect>
     </property>
     <property name="text">
-     <string>PCB ID</string>
+     <string>Hexaboard ID</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -620,7 +620,7 @@ before assembly</string>
      </rect>
     </property>
     <property name="text">
-     <string>PCB tool ID</string>
+     <string>Hexa tool ID</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -644,12 +644,12 @@ before assembly</string>
      <rect>
       <x>640</x>
       <y>0</y>
-      <width>241</width>
+      <width>131</width>
       <height>20</height>
      </rect>
     </property>
     <property name="text">
-     <string>Module ID (auto)</string>
+     <string>Module ID</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -1288,6 +1288,19 @@ before assembly</string>
      <number>2147483647</number>
     </property>
    </widget>
+   <widget class="QPushButton" name="pbGenerate">
+    <property name="geometry">
+     <rect>
+      <x>790</x>
+      <y>0</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>generate</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QFrame" name="frame_3">
    <property name="geometry">
@@ -1343,7 +1356,7 @@ before assembly</string>
      </rect>
     </property>
     <property name="text">
-     <string>component tray (PCB)</string>
+     <string>component tray (Hexaboard)</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -1799,6 +1812,74 @@ before assembly</string>
    </property>
    <property name="wordWrap">
     <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pbLoad">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>590</x>
+     <y>110</y>
+     <width>51</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Load</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_7">
+   <property name="geometry">
+    <rect>
+     <x>460</x>
+     <y>120</y>
+     <width>81</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Sensor step</string>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="sbSensorStep">
+   <property name="geometry">
+    <rect>
+     <x>540</x>
+     <y>115</y>
+     <width>51</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="minimum">
+    <number>-1</number>
+   </property>
+   <property name="maximum">
+    <number>2147483647</number>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="leMaxSensorStep">
+   <property name="geometry">
+    <rect>
+     <x>800</x>
+     <y>120</y>
+     <width>31</width>
+     <height>16</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_8">
+   <property name="geometry">
+    <rect>
+     <x>650</x>
+     <y>120</y>
+     <width>151</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Note: max sensor step is</string>
    </property>
   </widget>
  </widget>

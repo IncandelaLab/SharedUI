@@ -3,7 +3,7 @@
 <HEADER>
 	<TYPE>
 		<EXTENSION_TABLE_NAME>HGC_PRTO_MOD_ASMBLY</EXTENSION_TABLE_NAME>
-		<NAME>HGC Six Inch Proto Module Assembly</NAME>
+		<NAME>HGC Eight Inch Proto Module Assembly</NAME>
 	</TYPE>
 	<RUN>
 		<RUN_NAME>HGC Proto Module Assembly</RUN_NAME>
@@ -27,8 +27,8 @@
 			<PLT_SER_NUM>{{ baseplate }}</PLT_SER_NUM>
 			<PLT_ASM_ROW>{{ asm_row }}</PLT_ASM_ROW>
 			<PLT_ASM_COL>{{ asm_col }}</PLT_ASM_COL>
-			<PLT_FLTNES_MM>{{ flatness }}</PLT_FLTNES_MM>
-			<PLT_THKNES_MM>{{ thickness }}</PLT_THKNES_MM>
+			<PRTO_FLTNES_MM>{{ flatness }}</PRTO_FLTNES_MM>
+			<PRTO_THKNES_MM>{{ thickness }}</PRTO_THKNES_MM>
 			<COMP_TRAY_NAME>{{ comp_tray_name }}</COMP_TRAY_NAME>
 			<SNSR_SER_NUM>{{ sensor }}</SNSR_SER_NUM>
 			<SNSR_CMP_ROW>{{ asm_row }}</SNSR_CMP_ROW>
@@ -41,9 +41,9 @@
 			<SNSR_TOOL_HT_CHK>{{ snsr_tool_ht_chk }}</SNSR_TOOL_HT_CHK>
 			<GLUE_TYPE>Araldite</GLUE_TYPE>
 			<GLUE_BATCH_NUM>{{ adhesive_type }}</GLUE_BATCH_NUM>
-			<SLVR_EPXY_TYPE>{{ slvr_epxy_type }}</SLVR_EPXY_TYPE>
-			<SLVR_EPXY_BATCH_NUM>{{ slvr_epxy_batch_num }}</SLVR_EPXY_BATCH_NUM>
-			<PLT_GRADE>{{ grade }}</PLT_GRADE>
+			<!-- <SLVR_EPXY_TYPE>{{ slvr_epxy_type }}</SLVR_EPXY_TYPE>
+			<SLVR_EPXY_BATCH_NUM>{{ slvr_epxy_batch_num }}</SLVR_EPXY_BATCH_NUM> -->
+			<PRTO_GRADE>{{ grade }}</PRTO_GRADE>
 			<SNSR_TOOL_FEET_CHK>{{ snsr_tool_feet_chk }}</SNSR_TOOL_FEET_CHK>
 			<SNSR_STEP>{{ step_sensor }}</SNSR_STEP>
 		</DATA>

@@ -442,7 +442,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>PCB Component Tray</string>
+     <string>Hexaboard Component Tray</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -573,7 +573,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>PCB tool</string>
+     <string>Hexaboard tool</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>

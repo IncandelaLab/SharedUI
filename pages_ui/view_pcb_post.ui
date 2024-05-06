@@ -100,7 +100,7 @@
   <widget class="QLabel" name="label_6">
    <property name="geometry">
     <rect>
-     <x>750</x>
+     <x>800</x>
      <y>120</y>
      <width>71</width>
      <height>17</height>
@@ -350,9 +350,9 @@
    <widget class="QSpinBox" name="sbID">
     <property name="geometry">
      <rect>
-      <x>110</x>
+      <x>120</x>
       <y>0</y>
-      <width>91</width>
+      <width>81</width>
       <height>21</height>
      </rect>
     </property>
@@ -362,12 +362,12 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>111</width>
+      <width>121</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>PCB step ID</string>
+     <string>Hexaboard step ID</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -392,8 +392,8 @@
    <widget class="QPushButton" name="pbSave">
     <property name="geometry">
      <rect>
-      <x>100</x>
-      <y>50</y>
+      <x>20</x>
+      <y>80</y>
       <width>71</width>
       <height>21</height>
      </rect>
@@ -405,7 +405,7 @@
    <widget class="QPushButton" name="pbCancel">
     <property name="geometry">
      <rect>
-      <x>60</x>
+      <x>100</x>
       <y>80</y>
       <width>71</width>
       <height>21</height>
@@ -418,7 +418,7 @@
    <widget class="QPushButton" name="pbEdit">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>100</x>
       <y>50</y>
       <width>71</width>
       <height>21</height>
@@ -501,13 +501,29 @@
      </property>
     </item>
    </widget>
+   <widget class="QPushButton" name="pbNext">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>50</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Next</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QFrame" name="frame_3">
    <property name="geometry">
     <rect>
      <x>10</x>
      <y>140</y>
-     <width>831</width>
+     <width>881</width>
      <height>141</height>
     </rect>
    </property>
@@ -520,7 +536,7 @@
    <widget class="QComboBox" name="cbGrade6">
     <property name="geometry">
      <rect>
-      <x>740</x>
+      <x>790</x>
       <y>120</y>
       <width>81</width>
       <height>21</height>
@@ -598,7 +614,7 @@
    <widget class="QComboBox" name="cbGrade2">
     <property name="geometry">
      <rect>
-      <x>740</x>
+      <x>790</x>
       <y>40</y>
       <width>81</width>
       <height>21</height>
@@ -651,7 +667,7 @@
    <widget class="QComboBox" name="cbGrade1">
     <property name="geometry">
      <rect>
-      <x>740</x>
+      <x>790</x>
       <y>20</y>
       <width>81</width>
       <height>21</height>
@@ -1069,7 +1085,7 @@
    <widget class="QLineEdit" name="lineEdit_31">
     <property name="geometry">
      <rect>
-      <x>740</x>
+      <x>790</x>
       <y>0</y>
       <width>81</width>
       <height>21</height>
@@ -1529,7 +1545,7 @@
    <widget class="QComboBox" name="cbGrade5">
     <property name="geometry">
      <rect>
-      <x>740</x>
+      <x>790</x>
       <y>100</y>
       <width>81</width>
       <height>21</height>
@@ -1573,7 +1589,7 @@
    <widget class="QComboBox" name="cbGrade4">
     <property name="geometry">
      <rect>
-      <x>740</x>
+      <x>790</x>
       <y>80</y>
       <width>81</width>
       <height>21</height>
@@ -1674,7 +1690,7 @@
    <widget class="QComboBox" name="cbGrade3">
     <property name="geometry">
      <rect>
-      <x>740</x>
+      <x>790</x>
       <y>60</y>
       <width>81</width>
       <height>21</height>
@@ -1797,12 +1813,12 @@
      <string>go to</string>
     </property>
    </widget>
-   <widget class="QDoubleSpinBox" name="dsbWeight1">
+   <widget class="QDoubleSpinBox" name="dsbMaxThickness1">
     <property name="geometry">
      <rect>
       <x>660</x>
       <y>20</y>
-      <width>81</width>
+      <width>101</width>
       <height>21</height>
      </rect>
     </property>
@@ -1827,23 +1843,23 @@
      <rect>
       <x>660</x>
       <y>0</y>
-      <width>81</width>
+      <width>101</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>Weight (g)</string>
+     <string>Max thick (mm)</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QDoubleSpinBox" name="dsbWeight6">
+   <widget class="QDoubleSpinBox" name="dsbMaxThickness6">
     <property name="geometry">
      <rect>
       <x>660</x>
       <y>120</y>
-      <width>81</width>
+      <width>101</width>
       <height>21</height>
      </rect>
     </property>
@@ -1863,12 +1879,12 @@
      <double>0.100000000000000</double>
     </property>
    </widget>
-   <widget class="QDoubleSpinBox" name="dsbWeight5">
+   <widget class="QDoubleSpinBox" name="dsbMaxThickness5">
     <property name="geometry">
      <rect>
       <x>660</x>
       <y>100</y>
-      <width>81</width>
+      <width>101</width>
       <height>21</height>
      </rect>
     </property>
@@ -1888,12 +1904,12 @@
      <double>0.100000000000000</double>
     </property>
    </widget>
-   <widget class="QDoubleSpinBox" name="dsbWeight2">
+   <widget class="QDoubleSpinBox" name="dsbMaxThickness2">
     <property name="geometry">
      <rect>
       <x>660</x>
       <y>40</y>
-      <width>81</width>
+      <width>101</width>
       <height>21</height>
      </rect>
     </property>
@@ -1913,12 +1929,12 @@
      <double>0.100000000000000</double>
     </property>
    </widget>
-   <widget class="QDoubleSpinBox" name="dsbWeight4">
+   <widget class="QDoubleSpinBox" name="dsbMaxThickness4">
     <property name="geometry">
      <rect>
       <x>660</x>
       <y>80</y>
-      <width>81</width>
+      <width>101</width>
       <height>21</height>
      </rect>
     </property>
@@ -1938,12 +1954,12 @@
      <double>0.100000000000000</double>
     </property>
    </widget>
-   <widget class="QDoubleSpinBox" name="dsbWeight3">
+   <widget class="QDoubleSpinBox" name="dsbMaxThickness3">
     <property name="geometry">
      <rect>
       <x>660</x>
       <y>60</y>
-      <width>81</width>
+      <width>101</width>
       <height>21</height>
      </rect>
     </property>
@@ -2030,12 +2046,12 @@
     <rect>
      <x>670</x>
      <y>120</y>
-     <width>71</width>
+     <width>121</width>
      <height>17</height>
     </rect>
    </property>
    <property name="text">
-    <string>Weight</string>
+    <string>Maximum thickness</string>
    </property>
   </widget>
  </widget>

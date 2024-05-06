@@ -3,6 +3,7 @@ import time
 import glob
 import os
 import sys
+import requests
 
 from PyQt5 import QtCore
 import datetime
@@ -11,8 +12,20 @@ from jinja2 import Template
 
 #import rhapi_nolock as rh
 
+# import oracledb
+
 # IMPORTANT NOTE:  Setting this to false disables DB communication.  Purely for debugging.
-ENABLE_DB_COMMUNICATION = False
+# ENABLE_DB_COMMUNICATION = False
+ENABLE_DB_COMMUNICATION = True
+CON = None
+DB_CURSOR = None
+
+# def db_connect():
+# 	if not ENABLE_DB_COMMUNICATION:
+# 		return
+# 	CON = oracledb.connect(user="CMS_HGC_PRTTYPE_HGCAL_READER", password="HGCAL_Reader_2016", dsn="localhost:10131/int2r_lb.cern.ch")  # create connection
+# 	DB_CURSOR = CON.cursor()
+
 
 
 INSTITUTION_DICT = {  # For loading from/to LOCATION_ID XML tag
@@ -32,6 +45,55 @@ INSTITUTION_DICT = {  # For loading from/to LOCATION_ID XML tag
 	1460: "UMN",
 }
 
+LOCAL_REMOTE_PROPS_DICT_PARTS = {
+	'kind_of_part' : 'kind',
+	'location' : 'location',
+	'record_insertion_user' : 'record_insertion_user',
+	'flatness' : 'flatness',
+	'thickness' : 'thickness',
+	'grade' : 'grade',
+	'comments' : 'comments',
+	# baseplate
+	'manufacturer' : 'manufacturer_id',
+	'weight' : 'weight',
+	# pcb
+	# 'test_files' : 'test_file_name',
+}
+
+LOCAL_REMOTE_PROPS_DICT_PROTOMODULE = {
+    'kind_of_part' : 'kind',
+	'location' : 'location',
+	'record_insertion_user' : 'record_insertion_user',
+	'flatness' : 'prto_fltnes_mm',
+	'thickness' : 'prto_thknes_mm',
+	'grade' : 'prto_grade',
+	'step_sensor' : 'snsr_step',
+	'snsr_x_offst' : 'snsr_x_offst',
+	'snsr_y_offst' : 'snsr_y_offst',
+	'snsr_ang_offst' : 'snsr_ang_offset',
+}
+
+LOCAL_REMOTE_PROPS_DICT_MODULE = {
+	'kind_of_part' : 'kind',
+	'location' : 'location',
+	'record_insertion_user' : 'record_insertion_user',
+	'flatness' : 'mod_fltns_mm',
+	'thickness' : 'mod_ave_thkns_mm',
+	'max_thickness' : 'mod_max_thkns_mm',
+	'grade' : 'mod_grade',
+	'step_pcb' : 'pcb_step',
+	'pcb_plcment_x_offset' : 'pcb_plcment_x_offset',
+	'pcb_plcment_y_offset' : 'pcb_plcment_y_offset',
+	'pcb_plcment_ang_offset' : 'pcb_plcment_ang_offset',
+}
+
+CLASSNAME_QCKEYS_DICT = {
+	'baseplate' : ['baseplate'],
+	'sensor' : ['sensor'],
+	'pcb' : ['pcb'],
+	'protomodule' : ['protomodule_assembly_condition', 'protomodule_assembly'],
+	'module' : ['module_assembly_condition', 'module_assembly', 'module_wirebond'],
+}
 
 CENTURY = '{:0>3}__'
 
@@ -81,9 +143,65 @@ def setup(datadir=None):
 				# NOTE:  Format of dictionary is {ID:creation-date-string, ...}
 				json.dump({}, opfl)
 
+	# NEW for remote central DB searching: HGCAL API - will need to figure out the CERN auth in the future
+	obj_list_remote = ['baseplate', 'pcb', 'protomodule', 'module']  # sensor search is desabled for now
+	for part in obj_list_remote:
+		fetchRemoteDB(part)
+	
 #setup()
 
 
+def fetchRemoteDB(part,location=None):
+	partlistdir_remote = os.sep.join([DATADIR, 'partlist_remote'])
+	if not os.path.exists(partlistdir_remote):
+		os.makedirs(partlistdir_remote)
+
+	fname = os.sep.join([partlistdir_remote, part+'s.json'])
+
+	# Make the GET request
+	url = 'https://hgcapi.web.cern.ch/mac/parts/types/{}s'.format(part)
+	if location:  # request filtered by location
+		url += '?location={}'.format(location)
+	headers = {'accept': 'application/json'}
+	response = requests.get(url, headers=headers)
+	
+	if not os.path.exists(fname):
+		
+		# Check if the request was successful
+		if response.status_code == 200:
+			# Store the response JSON data in a file
+			with open(fname, 'w') as opfl:
+				# Dump an empty dict if nothing is found
+				# NOTE:  Format of dictionary is {ID:creation-date-string, ...}
+				# json.dump({}, opfl)
+				json.dump(response.json(), opfl, indent=4)
+				print("central DB JSON data saved to '{}'".format(fname))
+
+			# Read the saved JSON file and print serial numbers
+			# with open(fname, 'r') as file:
+			# 	data = json.load(file)
+				# serial_numbers = [part['serial_number'] for part in data['parts']]
+				# print("Serial Numbers:")
+				# for serial_number in serial_numbers:
+				# 	print(serial_number)
+		else:
+			print(f"Failed to fetch data: {response.status_code} - {response.text}")
+	else:
+		# Read the local JSON file
+		with open(fname, 'r') as file:
+			local_data = json.load(file)
+
+		# Check if the request was successful
+		if response.status_code == 200:
+			# Compare the local and remote JSON data
+			remote_data = response.json()
+			if local_data != remote_data:
+				# Store the updated JSON data in the local file
+				with open(fname, 'w') as opfl:
+					json.dump(remote_data, opfl, indent=4)
+					print("Local JSON data updated for '{}'".format(part))
+		else:
+			print(f"Failed to fetch an update data: {response.status_code} - {response.text}")
 
 
 
@@ -280,6 +398,109 @@ class fsobj(object):
 
 		return True
 
+	def load_remote(self, ID, full=True):
+		self.clear()
+		if ID == -1 or ID == None:
+			return False
+		
+		part_name = self.__class__.__name__
+		if part_name not in ['baseplate', 'pcb', 'sensor', 'protomodule', 'module']:
+			return False
+		
+		remote_partlistfile = os.sep.join([ DATADIR, 'partlist_remote', part_name+'s.json' ])
+
+		data_keys = []
+
+		response = None
+		request_success = False
+		if full:
+			# Make the GET request
+			url = 'https://hgcapi.web.cern.ch/mac/part/{}/full'.format(ID)
+			headers = {'accept': 'application/json'}
+			response = requests.get(url, headers=headers)
+
+			# Check if the request was successful
+			if response.status_code == 200:
+				response_json = response.json()
+				request_success = True
+			else:
+				response_json = {}
+		else:
+			with open(remote_partlistfile, 'r') as opfl:
+				data = json.load(opfl)
+				for part_data in data['parts']:
+					if part_data['serial_number'] == ID:
+						response = part_data
+			response_json = response
+
+		# Check if the full info is needed or the request was successful
+		if ((not full) and bool(response_json)) or request_success:
+			data_keys = []
+			
+			# print("!!! remote response_json: ", response_json)
+			# general keys
+			data_keys += response_json.keys()
+			
+			if full:
+				data_keys.remove('qc')
+				# QC keys
+				qc_keys = CLASSNAME_QCKEYS_DICT[part_name]
+				for qc_key in qc_keys:
+					if bool(response_json['qc']) and qc_key in response_json['qc'].keys():
+						data_keys += response_json['qc'][qc_key].keys()
+			
+			# Load corresponding properties
+			if part_name in ['baseplate', 'sensor', 'pcb']:
+				LOCAL_REMOTE_PROPS_DICT = LOCAL_REMOTE_PROPS_DICT_PARTS
+			elif part_name == 'protomodule':
+				LOCAL_REMOTE_PROPS_DICT = LOCAL_REMOTE_PROPS_DICT_PROTOMODULE
+			elif part_name == 'module':
+				LOCAL_REMOTE_PROPS_DICT = LOCAL_REMOTE_PROPS_DICT_MODULE
+
+			for prop in self.PROPERTIES:
+				# only load the properties in the LOCAL_REMOTE_PROPS_DICT
+				if prop in LOCAL_REMOTE_PROPS_DICT.keys():
+					remote_prop = LOCAL_REMOTE_PROPS_DICT[prop]
+					if remote_prop in response_json.keys():
+						setattr(self, prop, response_json[remote_prop])
+					# load full info
+					elif full:
+						for qc_key in qc_keys:
+							if bool(response_json['qc']) and qc_key in response_json['qc'].keys() \
+           					and remote_prop in response_json['qc'][qc_key].keys():
+								setattr(self, prop, response_json['qc'][qc_key][remote_prop])
+						# load children
+						if 'children' in data_keys:
+							children = response_json['children']
+							for child in children:
+								if 'kind' in child.keys():
+									kind = child['kind']
+									if 'Baseplate' in kind:
+										setattr(self, 'baseplate', child['serial_number'])
+									if 'Sensor' in kind:
+										setattr(self, 'sensor', child['serial_number'])
+									if 'Hexaboard' in kind:
+										setattr(self, 'pcb', child['serial_number'])
+									if 'ProtoModule' in kind:
+										setattr(self, 'protomodule', child['serial_number'])
+						if 'parent' in data_keys:
+							parents = response_json['parent']
+							for parent in parents:
+								if 'kind' in parent.keys():
+									kind = parent['kind']
+									if 'ProtoModule' in kind:
+										setattr(self, 'protomodule', parent['serial_number'])
+									# only shows the first parent
+									elif 'Module' in kind:
+										setattr(self, 'module', parent['serial_number'])
+			self.ID = ID
+			return True
+		else:
+			if response:
+				print(f"Failed to fetch data: {response.status_code} - {response.text}")
+			else:
+				print(f"Part {ID} not found in remote partlist")
+			return False
 
 	def new(self, ID):
 		self.ID = ID
@@ -364,10 +585,11 @@ class fsobj(object):
 		if self.XML_TEMPLATES is None:  return None
 		filedir, filename = self.get_filedir_filename()
 		upFiles = []
-		for xt in self.XML_TEMPLATES:
+		for template_file in self.XML_TEMPLATES:
 			template_file_name = os.path.basename(template_file)
-			outfile =  filename.replace(".xml", "") + "_" + template_file_name
-			upFiles.append(outfile)
+			outfile = filename.replace(".json", "") + "_" + template_file_name
+			outfile_fullname = os.sep.join([filedir, outfile])
+			upFiles.append(outfile_fullname)
 		return upFiles
 
 

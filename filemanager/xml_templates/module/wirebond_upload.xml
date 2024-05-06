@@ -3,7 +3,7 @@
 <HEADER>
 	<TYPE>
 		<EXTENSION_TABLE_NAME>HGC_MOD_WIREBOND_TEST</EXTENSION_TABLE_NAME>
-		<NAME>HGC Six Inch Module Wire Bond Pull Test</NAME>
+		<NAME>HGC Eight Inch Module Wire Bond Pull Test</NAME>
 	</TYPE>
 	<RUN>
 		<RUN_NAME>Wirebonding data</RUN_NAME>
@@ -23,7 +23,7 @@
 		</PART>
 		<DATA>
 			<BOND_WIRE_BATCH_NUM>{{ bond_wire_batch_num }}</BOND_WIRE_BATCH_NUM>
-			<PRE_INSPECTION>{{ pre_inspection }}<PRE_INSPECTION>
+			<PRE_INSPECTION>{{ pre_inspection }}</PRE_INSPECTION>
 			<SYLGARD_BATCH>{{ sylgard_batch }}</SYLGARD_BATCH>
 			<WEDGE_BATCH>{{ wedge_batch }}</WEDGE_BATCH>
 
@@ -37,31 +37,31 @@
 			<FRONT_BONDS>{{ front_bonds }}</FRONT_BONDS>
 			<FRONT_BONDS_DATE>{{ front_bonds_date }}</FRONT_BONDS_DATE>
 			<FRONT_BONDS_USER>{{ front_bonds_user }}</FRONT_BONDS_USER>
-			<FRONT_SKIP>{{ front_skip }}</FRONT_SKIP>
-			<FRONT_UNBONDED>{{ front_unbonded }}</FRONT_UNBONDED>
+			<SI_CELLS_GROUNDED>{{ front_skip }}</SI_CELLS_GROUNDED>
+			<SI_CELLS_UNBONDED>{{ front_unbonded }}</SI_CELLS_UNBONDED>
 			<FRONT_BOND_INSPXN>{{ front_bond_inspxn }}</FRONT_BOND_INSPXN>
 			<FRONT_REPAIR_USER>{{ front_repair_user }}</FRONT_REPAIR_USER>
 
 			<BACK_ENCAP>{{ back_encap }}</BACK_ENCAP>
 			<BACK_ENCAP_USER>{{ back_encap_user }}</BACK_ENCAP_USER>
 			<BACK_ENCAP_CURE_START>{{ back_encap_cure_start }}</BACK_ENCAP_CURE_START>
-			<BACK_ENCAP_CURE_STOP>{{ back_encap_cure_stop }}</BACK_ENCAP_CURE_STOP.
+			<BACK_ENCAP_CURE_STOP>{{ back_encap_cure_stop }}</BACK_ENCAP_CURE_STOP>
 			<BACK_ENCAP_INSPXN>{{ back_encap_inspxn }}</BACK_ENCAP_INSPXN>
 			
 			<FRONT_ENCAP>{{ front_encap }}</FRONT_ENCAP>
 			<FRONT_ENCAP_USER>{{ front_encap_user }}</FRONT_ENCAP_USER>
 			<FRONT_ENCAP_CURE_START>{{ front_encap_cure_start }}</FRONT_ENCAP_CURE_START>
-			<FRONT_ENCAP_CURE_STOP>{{ front_encap_cure_stop }}</FRONT_ENCAP_CURE_STOP.
+			<FRONT_ENCAP_CURE_STOP>{{ front_encap_cure_stop }}</FRONT_ENCAP_CURE_STOP>
 			<FRONT_ENCAP_INSPXN>{{ front_encap_inspxn }}</FRONT_ENCAP_INSPXN>
 
 			<IS_TEST_BOND_MODULE>{{ is_test_bond_module }}</IS_TEST_BOND_MODULE>
 			<!-- note - matching typo in DB -->
 			<BOND_IULL_USER>{{ bond_pull_user }}</BOND_IULL_USER>
 			<BOND_PULL_AVG>{{ bond_pull_avg }}</BOND_PULL_AVG>
-			<BOND_PULL_STDDEV>{{ bond_pull_stdddev }}</BOND_PULL_STDDEV>
+			<BOND_PULL_STDDEV>{{ bond_pull_stddev }}</BOND_PULL_STDDEV>
 			<FINAL_INSPXN_USER>{{ final_inspxn_user }}</FINAL_INSPXN_USER>
 			<FINAL_INSPXN_OK>{{ final_inspxn_ok }}</FINAL_INSPXN_OK>
-			<WIREBOND_COMMENTS>{{ wirebond_comments }}</WIREBOND_COMMENTS>
+			<WIREBOND_COMMENTS>{{ wirebond_comments_concat }}</WIREBOND_COMMENTS>
 		</DATA>
 	</DATA_SET>
 </ROOT>

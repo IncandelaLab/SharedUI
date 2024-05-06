@@ -187,12 +187,17 @@ class baseplate(fsobj_part):
 	@property
 	def geometry(self):
 		if self.kind_of_part == "None Baseplate None None":  return None
+		if "Full" in self.kind_of_part:  return "Full"  # Full baseplate doesn't have density
 		return self.kind_of_part.split()[3]
 	@geometry.setter
 	def geometry(self, value):
 		splt = self.kind_of_part.split(" ")
-		splt[3] = str(value)
-		self.kind_of_part = " ".join(splt)
+		if str(value) == "Full":
+			splt[2] = str(value)
+			self.kind_of_part = " ".join(splt[0:3])
+		else:
+			splt[3] = str(value)
+			self.kind_of_part = " ".join(splt)
 
 	@property
 	def material(self):
@@ -208,10 +213,14 @@ class baseplate(fsobj_part):
 	@property
 	def channel_density(self):
 		if self.kind_of_part == "None Baseplate None None":  return None
-		return self.kind_of_part.split()[2]
+		if "Full" in self.kind_of_part:
+			return None
+		else:
+			return self.kind_of_part.split()[2]
 	@channel_density.setter
 	def channel_density(self, value):
 		splt = self.kind_of_part.split(" ")
+		if "Full" in self.kind_of_part:  return
 		splt[2] = str(value)
 		self.kind_of_part = " ".join(splt)
 
@@ -354,14 +363,15 @@ class pcb(fsobj_part):
 	]
 
 	EXTRA_DEFAULTS = {
-		"kind_of_part": "PCB None None",
+		# "kind_of_part": "PCB None None",
+		"kind_of_part": "Hexaboard None None",
 	}
 
 
 	# no mat_type
 	@property
 	def channel_density(self):
-		if self.kind_of_part == "PCB None None":  return None
+		if self.kind_of_part == "Hexaboard None None":  return None
 		return self.kind_of_part.split()[1]
 	@channel_density.setter
 	def channel_density(self, value):
@@ -371,7 +381,7 @@ class pcb(fsobj_part):
 
 	@property
 	def geometry(self):
-		if self.kind_of_part == "PCB None None":  return None
+		if self.kind_of_part == "Hexaboard None None":  return None
 		return self.kind_of_part.split()[2]
 	@geometry.setter
 	def geometry(self, value):
@@ -416,6 +426,7 @@ class protomodule(fsobj_part):
 		'module',
 		'step_sensor',
 		'step_pcb',
+		'manufacturer',
 
 		# Properties for naming
 		'version',
@@ -543,6 +554,11 @@ class protomodule(fsobj_part):
 		if not tmp_sensor.load(self.sensor):  return None
 		return tmp_sensor.kind_of_part
 
+	@property
+	def barcode(self):
+		if self.ID is None:
+			return None
+		return "320" + self.ID.replace("-", "")
 
 
 	## Assembly data properties:
@@ -582,7 +598,7 @@ class protomodule(fsobj_part):
 		t = []
 		for tp in [self.batch_tape_50, self.batch_tape_120]:
 			if tp != None:  t.append(tp)
-		return ';;'.join(tp)
+		return ';;'.join(t)
 
 
 	## Functions
@@ -647,6 +663,7 @@ class module(fsobj_part):
 		"protomodule",
 		"step_sensor",
 		"step_pcb",
+		'manufacturer',
 
 		# Currently not used in XML/uploading
 		"test_files",
@@ -671,6 +688,7 @@ class module(fsobj_part):
 		"pcb_plcment_ang_offset",
 		"batch_tape_50",
 		"batch_tape_120",
+		"max_thickness",
 
 		# for cond page:
 		"cure_begin_timestamp",
@@ -695,8 +713,8 @@ class module(fsobj_part):
 		"front_bonds",
 		"front_bonds_date",
 		"front_bonds_user",
-		"front_skip",
-		"front_unbonded",
+		"front_skip",  # SI_CELLS_GROUNDED in xml
+		"front_unbonded",  # SI_CELLS_UNBONDED in xml
 		"front_bond_inspxn",
 		"front_repair_user",
 		"back_encap",
@@ -797,6 +815,11 @@ class module(fsobj_part):
 		if not tmp_proto.load(self.protomodule):  return None
 		return tmp_proto.kind_of_part
 
+	@property
+	def barcode(self):
+		if self.ID is None:
+			return None
+		return "320" + self.ID.replace("-", "")
 
 	# TEMPORARY:  NOTE:  Must fix this...
 	@property
@@ -836,11 +859,18 @@ class module(fsobj_part):
 
 	@property
 	def pcb_thickness(self):
-		return None
+		tmp_pcb = pcb()
+		if not tmp_pcb.load(self.pcb):  return 0.0  # default to 0
+		if tmp_pcb.thickness is None:  return 0.0  # default to 0
+		return tmp_pcb.thickness
 
 	@property
 	def wirebond_comments_concat(self):
-		return ";;".join(self.wirebond_comments)
+		# return ";;".join(self.wirebond_comments)
+		# NOTE:  Can't upload empty string, so...
+		if self.wirebond_comments is None:  return "None"
+		if self.wirebond_comments == "":  return "None"
+		return self.wirebond_comments[:4000] if len(self.wirebond_comments)>4000 else self.wirebond_comments
 	
 	@property
 	def wirebonding_completed(self):
@@ -860,8 +890,17 @@ class module(fsobj_part):
 		t = []
 		for tp in [self.batch_tape_50, self.batch_tape_120]:
 			if tp != None:  t.append(tp)
-		return ';;'.join(tp)
+		return ';;'.join(t)
 
+	@property
+	def step_pcb_num(self):
+		if self.step_pcb is None:  return None
+		return int(self.step_pcb.split('_')[1])
+
+	@property
+	def pcb_tool_feet_chk_str(self):
+		if self.pcb_tool_feet_chk is None:  return "N/A"
+		return "yes" if self.pcb_tool_feet_chk else "no"
 
 	# new():  Optionally, create proto from baseplate and sensor objects
 	# Note:  baseplate and sensor must be the actual objects, not IDs
