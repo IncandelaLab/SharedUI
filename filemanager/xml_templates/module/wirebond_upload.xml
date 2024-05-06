@@ -37,8 +37,8 @@
 			<FRONT_BONDS>{{ front_bonds }}</FRONT_BONDS>
 			<FRONT_BONDS_DATE>{{ front_bonds_date }}</FRONT_BONDS_DATE>
 			<FRONT_BONDS_USER>{{ front_bonds_user }}</FRONT_BONDS_USER>
-			<FRONT_SKIP>{{ front_skip }}</FRONT_SKIP>
-			<FRONT_UNBONDED>{{ front_unbonded }}</FRONT_UNBONDED>
+			<SI_CELLS_GROUNDED>{{ front_skip }}</SI_CELLS_GROUNDED>
+			<SI_CELLS_UNBONDED>{{ front_unbonded }}</SI_CELLS_UNBONDED>
 			<FRONT_BOND_INSPXN>{{ front_bond_inspxn }}</FRONT_BOND_INSPXN>
 			<FRONT_REPAIR_USER>{{ front_repair_user }}</FRONT_REPAIR_USER>
 

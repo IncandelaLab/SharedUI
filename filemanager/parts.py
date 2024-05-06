@@ -713,8 +713,8 @@ class module(fsobj_part):
 		"front_bonds",
 		"front_bonds_date",
 		"front_bonds_user",
-		"front_skip",  # channels_unbonded in xml
-		"front_unbonded",  # channels_grounded in xml
+		"front_skip",  # SI_CELLS_GROUNDED in xml
+		"front_unbonded",  # SI_CELLS_UNBONDED in xml
 		"front_bond_inspxn",
 		"front_repair_user",
 		"back_encap",
