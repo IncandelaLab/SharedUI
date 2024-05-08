@@ -214,15 +214,15 @@ class func(object):
 			name = os.path.split(f)[1]
 			self.page.listFiles.addItem(name)
 
-		self.page.dsbOffsetTranslationX.setValue( -1 if (self.module.pcb_plcment_x_offset is None) or (self.module.pcb_plcment_x_offset == "None") else float(self.module.pcb_plcment_x_offset) )
-		self.page.dsbOffsetTranslationY.setValue( -1 if (self.module.pcb_plcment_y_offset is None) or (self.module.pcb_plcment_y_offset == "None") else float(self.module.pcb_plcment_y_offset) )
-		self.page.dsbOffsetRotation.setValue(    -1 if (self.module.pcb_plcment_ang_offset is None) or (self.module.pcb_plcment_ang_offset == "None") else float(self.module.pcb_plcment_ang_offset) )
+		self.page.dsbOffsetTranslationX.setValue( -1001 if (self.module.pcb_plcment_x_offset is None) or (self.module.pcb_plcment_x_offset == "None") else float(self.module.pcb_plcment_x_offset) )
+		self.page.dsbOffsetTranslationY.setValue( -1001 if (self.module.pcb_plcment_y_offset is None) or (self.module.pcb_plcment_y_offset == "None") else float(self.module.pcb_plcment_y_offset) )
+		self.page.dsbOffsetRotation.setValue(    -1001 if (self.module.pcb_plcment_ang_offset is None) or (self.module.pcb_plcment_ang_offset == "None") else float(self.module.pcb_plcment_ang_offset) )
 		self.page.dsbThickness.setValue(-1 if self.module.thickness   is None else self.module.thickness  )
 		self.page.dsbMaxThickness.setValue(-1 if self.module.max_thickness   is None else self.module.max_thickness  )
 		self.page.dsbFlatness.setValue( -1 if self.module.flatness  is None else self.module.flatness   )
-		if self.page.dsbOffsetTranslationX.value() == -1: self.page.dsbOffsetTranslationX.clear()
-		if self.page.dsbOffsetTranslationY.value() == -1: self.page.dsbOffsetTranslationY.clear()
-		if self.page.dsbOffsetRotation.value() == -1: self.page.dsbOffsetRotation.clear()
+		if self.page.dsbOffsetTranslationX.value() == -1001: self.page.dsbOffsetTranslationX.clear()
+		if self.page.dsbOffsetTranslationY.value() == -1001: self.page.dsbOffsetTranslationY.clear()
+		if self.page.dsbOffsetRotation.value() == -1001: self.page.dsbOffsetRotation.clear()
 		if self.page.dsbThickness.value() == -1: self.page.dsbThickness.clear()
 		if self.page.dsbMaxThickness.value() == -1: self.page.dsbMaxThickness.clear()
 		if self.page.dsbFlatness.value()  == -1: self.page.dsbFlatness.clear()
@@ -356,7 +356,7 @@ class func(object):
 		num_comments = self.page.listComments.count()
 		self.module.comments = ';;'.join([self.page.listComments.item(i).text() for i in range(num_comments)])
 
-		self.module.pcb_plcment_x_offset = self.page.dsbOffsetTranslationX.value() if self.page.dsbOffsetTranslationX.value() >=0 else None
+		self.module.pcb_plcment_x_offset = self.page.dsbOffsetTranslationX.value() if self.page.dsbOffsetTranslationX.value() >=0 else None  # problematic, could be negative value
 		self.module.pcb_plcment_y_offset = self.page.dsbOffsetTranslationY.value() if self.page.dsbOffsetTranslationY.value() >=0 else None
 		self.module.offset_rotation      = self.page.dsbOffsetRotation.value()    if self.page.dsbOffsetRotation.value()    >=0 else None
 		self.module.flatness = self.page.dsbFlatness.value()    if self.page.dsbFlatness.value()    >=0 else None
