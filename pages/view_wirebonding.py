@@ -254,6 +254,8 @@ class func(object):
 		self.page.ckWirebondsInspectedFront.setChecked(False if self.module.front_bond_inspxn is None else self.module.front_bond_inspxn )
 		self.page.pteUnbondedChannelsFront.setPlainText(        "" if self.module.front_unbonded is None \
 		                                   else SITE_SEP.join([str(c) for c in self.module.front_unbonded]))
+		self.page.pteWirebondingChannelsSkipFront.setPlainText( "" if self.module.front_skip is None \
+		                                   else SITE_SEP.join([str(c) for c in self.module.front_skip]))
 		if not self.module.front_bonds_user in self.index_users_wf.keys() and not self.module.front_bonds_user is None:
 			self.index_users[self.module.front_bonds_user] = max(self.index_users_wf.values()) + 1
 			self.page.cbWirebondingUserFront.addItem(self.module.front_bonds_user)
