@@ -271,7 +271,6 @@ class func(object):
 				flats = self.step_pcb.flatnesses
 				grades = self.step_pcb.grades
 				max_thicks = self.step_pcb.max_thicknesses
-				print("max_thicks = ",max_thicks)
 
 				for i in range(6):
 					self.le_modules[i]     .setText(mods[i] if mods[i] else "")
@@ -471,7 +470,6 @@ class func(object):
 		self.step_pcb.flatnesses = [self.dsb_flatness[i].value() for i in range(6)]
 		self.step_pcb.thicknesses = [self.dsb_thickness[i].value() for i in range(6)]
 		self.step_pcb.max_thicknesses = [self.dsb_max_thickness[i].value() for i in range(6)]
-		print("step_pcb.max_thicknesses = ",self.step_pcb.max_thicknesses)
 		self.step_pcb.grades = [str(self.cb_grades[i].currentText()) if self.cb_grades[i].currentText() else None for i in range(6)]
 
 		self.step_pcb.save()
