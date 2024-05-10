@@ -114,7 +114,8 @@ This section is intended for developers only, and ordinary users can safely igno
 
 ### GUI overview
 
-![GUI structure](https://user-images.githubusercontent.com/53322354/234279465-5c297726-f480-40dd-97ca-77bf5f68c5c6.png)
+<!--![GUI structure](https://user-images.githubusercontent.com/53322354/234279465-5c297726-f480-40dd-97ca-77bf5f68c5c6.png)-->
+![GUI structure](https://github.com/IncandelaLab/SharedUI/assets/81069106/eabd32c6-8415-45fa-897d-abe8c7e83d5b)
 
 In general:
 - GUI receives data from:
