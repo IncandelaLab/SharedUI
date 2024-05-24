@@ -17,16 +17,17 @@ Additionally, the GUI has been deveoped on a Mac machine, and may run into issue
 To install the GUI, simply download and clone the git repository:
 
 ```
-git clone https://github.com/p-masterson/SharedUI.git
+git clone https://github.com/IncandelaLab/SharedUI.git
 ```
 
 Next, install the required python packages with:
 
 ```
-python -m pip install numpy PyQt5 jinja2 pytest
+python -m pip install numpy PyQt5 jinja2 pytest pexpect
 ```
 
 An installation script `install_dependencies.sh` may be required in the future for installing software required for DB communication, but it is currently WIP and should not be used.
+For now, please ```pip install``` all necessary packages if there's an error from importing packages.
 
 **NOTE:** Currently, data uploading is only supported on Unix systems (Mac and Linux), so please ensure that the machine used for uploading the data is running either Mac or Linux.
 
