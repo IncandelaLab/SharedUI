@@ -43,7 +43,20 @@ INSTITUTION_DICT = {  # For loading from/to LOCATION_ID XML tag
 	1460: "UMN",
 }
 
-
+INSTITUTION_FULLNAME = {
+	'CERN': 'CERN',
+	'FNAL': 'Fermi National Accelerator Lab.',
+	'UCSB': 'Univ. of California Santa Barbara',
+	'UMN': 'UMN',
+	'HEPHY': 'Institut fuer Hochenergiephysik',
+	'HPK': 'HPK',
+	'CMU': 'Carnegie-Mellon University',
+	'TTU': 'Texas Tech University',
+	'IHEP': 'Institute of High Energy Physics',
+	'TIFR': 'Tata Inst. of Fundamental Research',
+	'NTU': 'National Taiwan University',
+	'FSU': 'Florida State University'
+}
 
 
 ### PARENT CLASS FOR PARTS
@@ -130,6 +143,12 @@ class fsobj_part(fm.fsobj):
 			return str(datetime.datetime.now())
 		else:
 			return self.run_end_date
+
+	@property
+	def institution(self):
+		if self.location is None:
+			return None
+		return INSTITUTION_FULLNAME[self.location]
 
 
 ###############################################

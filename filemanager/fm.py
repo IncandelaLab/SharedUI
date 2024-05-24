@@ -144,9 +144,10 @@ def setup(datadir=None):
 				json.dump({}, opfl)
 
 	# NEW for remote central DB searching: HGCAL API - will need to figure out the CERN auth in the future
-	obj_list_remote = ['baseplate', 'pcb', 'protomodule', 'module']  # sensor search is desabled for now
-	for part in obj_list_remote:
-		fetchRemoteDB(part)
+	if ENABLE_DB_COMMUNICATION:
+		obj_list_remote = ['baseplate', 'pcb', 'protomodule', 'module']  # sensor search is desabled for now
+		for part in obj_list_remote:
+			fetchRemoteDB(part)
 	
 #setup()
 
