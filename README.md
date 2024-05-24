@@ -31,6 +31,12 @@ For now, please ```pip install``` all necessary packages if there's an error fro
 
 **NOTE:** Currently, data uploading is only supported on Unix systems (Mac and Linux), so please ensure that the machine used for uploading the data is running either Mac or Linux.
 
+**IMPORTANT:** Before uploading, please make sure to run the command below in the terminal at least one time and follow the prompts to establish a connection with lxplus and dbloader-hgcal hosts:
+```
+scp -o ProxyJump=username@lxplus.cern.ch /directory_to_the_xml_file/xxx.xml username@dbloader-hgcal:/home/dbspool/spool/hgc/int2r/
+```
+To upload XML files, the GUI essentially runs this command in a subprocess. It will expect to see a prompt "Password" (actually twice, so you need to type in your password twice) but if it doesn't in the case of first establishing a connection to hosts, it will report an error. 
+
 ## Running and using the GUI
 
 To run the GUI, `cd` into the `SharedUI` directory and run the following command:
