@@ -6,6 +6,7 @@
 			<SERIAL_NUMBER>{{ ID }}</SERIAL_NUMBER>
 			<BARCODE>{{ barcode }}</BARCODE>
 			<LOCATION>{{ location }}</LOCATION>
+			<INSTITUTION>{{ institution }}</INSTITUTION>
 			<!-- <RECORD_INSERTION_USER>{{ record_insertion_user }}</RECORD_INSERTION_USER> -->
 			<MANUFACTURER>{{ manufacturer }}</MANUFACTURER>
 			<CHILDREN>
