@@ -6,7 +6,7 @@
 		<NAME>HGC Eight Inch Module Curing Cond</NAME>
 	</TYPE>
 	<RUN>
-		<RUN_NAME>EM 120um Si Module Assembly</RUN_NAME>
+		<RUN_NAME>Si Module Assembly</RUN_NAME>
 		<RUN_BEGIN_TIMESTAMP>{{ run_begin_timestamp_ }}</RUN_BEGIN_TIMESTAMP>
 		<RUN_END_TIMESTAMP>{{ run_end_timestamp_ }}</RUN_END_TIMESTAMP>
 		<INITIATED_BY_USER>{{ initiated_by_user }}</INITIATED_BY_USER>
