@@ -29,7 +29,7 @@ python -m pip install numpy PyQt5 jinja2 pytest pexpect
 An installation script `install_dependencies.sh` may be required in the future for installing software required for DB communication, but it is currently WIP and should not be used.
 For now, please ```pip install``` all necessary packages if there's an error from importing packages.
 
-**NOTE:** Currently, data uploading is only supported on Unix systems (Mac and Linux), so please ensure that the machine used for uploading the data is running either Mac or Linux.
+<!-- **NOTE:** Currently, data uploading is only supported on Unix systems (Mac and Linux), so please ensure that the machine used for uploading the data is running either Mac or Linux. -->
 
 **IMPORTANT:** Before uploading, please make sure to run the command below in the terminal at least one time and follow the prompts to establish a connection with lxplus and dbloader-hgcal hosts:
 ```
