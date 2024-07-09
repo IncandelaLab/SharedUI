@@ -13,7 +13,10 @@ import glob
 # For uploading XML files in background
 import threading
 #import subprocess
-import pexpect
+import platform
+if platform.system() == 'Windows':
+	import wexpect as pexpect
+else: import pexpect
 
 
 # Import page functionality classes
@@ -434,12 +437,12 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 			# pexpect method
 			mypassword = self.password
 			child = pexpect.spawn(scpcmd)
-			password_prompt_index1 = child.expect(['Password:', pexpect.EOF, pexpect.TIMEOUT])
+			password_prompt_index1 = child.expect(['Password: ', pexpect.EOF, pexpect.TIMEOUT])
 			
 			if password_prompt_index1 == 0:
 				
 				child.sendline(mypassword)
-				password_prompt_index2 = child.expect(['Password:', pexpect.EOF, pexpect.TIMEOUT])
+				password_prompt_index2 = child.expect(['Password: ', pexpect.EOF, pexpect.TIMEOUT])
 				if password_prompt_index2 == 0:
 					# print("ssh to lxplus successful")
 					child.sendline(mypassword)
