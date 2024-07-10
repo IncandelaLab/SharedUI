@@ -29,7 +29,13 @@ python -m pip install numpy PyQt5 jinja2 pytest pexpect
 An installation script `install_dependencies.sh` may be required in the future for installing software required for DB communication, but it is currently WIP and should not be used.
 For now, please ```pip install``` all necessary packages if there's an error from importing packages.
 
-**NOTE:** Currently, data uploading is only supported on Unix systems (Mac and Linux), so please ensure that the machine used for uploading the data is running either Mac or Linux.
+<!-- **NOTE:** Currently, data uploading is only supported on Unix systems (Mac and Linux), so please ensure that the machine used for uploading the data is running either Mac or Linux. -->
+
+**IMPORTANT:** Before uploading, please make sure to run the command below in the terminal at least one time and follow the prompts to establish a connection with lxplus and dbloader-hgcal hosts:
+```
+scp -o ProxyJump=username@lxplus.cern.ch /directory_to_the_xml_file/xxx.xml username@dbloader-hgcal:/home/dbspool/spool/hgc/int2r/
+```
+To upload XML files, the GUI essentially runs this command in a subprocess. It will expect to see a prompt "Password" (actually twice, so you need to type in your password twice) but if it doesn't in the case of first establishing a connection to hosts, it will report an error. 
 
 ## Running and using the GUI
 
@@ -114,7 +120,8 @@ This section is intended for developers only, and ordinary users can safely igno
 
 ### GUI overview
 
-![GUI structure](https://user-images.githubusercontent.com/53322354/234279465-5c297726-f480-40dd-97ca-77bf5f68c5c6.png)
+<!--![GUI structure](https://user-images.githubusercontent.com/53322354/234279465-5c297726-f480-40dd-97ca-77bf5f68c5c6.png)-->
+![GUI structure](https://github.com/IncandelaLab/SharedUI/assets/81069106/eabd32c6-8415-45fa-897d-abe8c7e83d5b)
 
 In general:
 - GUI receives data from:
