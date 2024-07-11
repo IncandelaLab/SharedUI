@@ -152,7 +152,7 @@ def setup(datadir=None):
 #setup()
 
 
-def fetchRemoteDB(part,location=None):
+def fetchRemoteDB(part,location=None, limit=10000):
 	partlistdir_remote = os.sep.join([DATADIR, 'partlist_remote'])
 	if not os.path.exists(partlistdir_remote):
 		os.makedirs(partlistdir_remote)
@@ -161,8 +161,12 @@ def fetchRemoteDB(part,location=None):
 
 	# Make the GET request
 	url = 'https://hgcapi.web.cern.ch/mac/parts/types/{}s'.format(part)
+	url += '?page=0'  # only fetch page 0 (assuming limit is large enough)
+	if limit:  # request limited by limit
+		url += '&limit={}'.format(limit)
 	if location:  # request filtered by location
-		url += '?location={}'.format(location)
+		url += '&location={}'.format(location)
+	
 	headers = {'accept': 'application/json'}
 	response = requests.get(url, headers=headers)
 	
