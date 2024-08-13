@@ -214,15 +214,27 @@ class func(object):
 			name = os.path.split(f)[1]
 			self.page.listFiles.addItem(name)
 
-		self.page.dsbOffsetTranslationX.setValue( -1001 if (self.module.pcb_plcment_x_offset is None) or (self.module.pcb_plcment_x_offset == "None") else float(self.module.pcb_plcment_x_offset) )
-		self.page.dsbOffsetTranslationY.setValue( -1001 if (self.module.pcb_plcment_y_offset is None) or (self.module.pcb_plcment_y_offset == "None") else float(self.module.pcb_plcment_y_offset) )
-		self.page.dsbOffsetRotation.setValue(    -1001 if (self.module.pcb_plcment_ang_offset is None) or (self.module.pcb_plcment_ang_offset == "None") else float(self.module.pcb_plcment_ang_offset) )
+		if (self.module.pcb_plcment_x_offset is None) or (self.module.pcb_plcment_x_offset == "None"):
+			self.page.dsbOffsetTranslationX.clear()
+		else:
+			self.page.dsbOffsetTranslationX.setValue(float(self.module.pcb_plcment_x_offset))
+		if (self.module.pcb_plcment_y_offset is None) or (self.module.pcb_plcment_y_offset == "None"):
+			self.page.dsbOffsetTranslationY.clear()
+		else:
+			self.page.dsbOffsetTranslationY.setValue(float(self.module.pcb_plcment_y_offset))
+		if (self.module.pcb_plcment_ang_offset is None) or (self.module.pcb_plcment_ang_offset == "None"):
+			self.page.dsbOffsetRotation.clear()
+		else:
+			self.page.dsbOffsetRotation.setValue(float(self.module.pcb_plcment_ang_offset))
+		# self.page.dsbOffsetTranslationX.setValue( 0 if (self.module.pcb_plcment_x_offset is None) or (self.module.pcb_plcment_x_offset == "None") else float(self.module.pcb_plcment_x_offset) )
+		# self.page.dsbOffsetTranslationY.setValue( 0 if (self.module.pcb_plcment_y_offset is None) or (self.module.pcb_plcment_y_offset == "None") else float(self.module.pcb_plcment_y_offset) )
+		# self.page.dsbOffsetRotation.setValue(    0 if (self.module.pcb_plcment_ang_offset is None) or (self.module.pcb_plcment_ang_offset == "None") else float(self.module.pcb_plcment_ang_offset) )
+		# if self.page.dsbOffsetTranslationX.value() == 0: self.page.dsbOffsetTranslationX.clear()
+		# if self.page.dsbOffsetTranslationY.value() == 0: self.page.dsbOffsetTranslationY.clear()
+		# if self.page.dsbOffsetRotation.value() == 0: self.page.dsbOffsetRotation.clear()
 		self.page.dsbThickness.setValue(-1 if self.module.thickness   is None else self.module.thickness  )
 		self.page.dsbMaxThickness.setValue(-1 if self.module.max_thickness   is None else self.module.max_thickness  )
 		self.page.dsbFlatness.setValue( -1 if self.module.flatness  is None else self.module.flatness   )
-		if self.page.dsbOffsetTranslationX.value() == -1001: self.page.dsbOffsetTranslationX.clear()
-		if self.page.dsbOffsetTranslationY.value() == -1001: self.page.dsbOffsetTranslationY.clear()
-		if self.page.dsbOffsetRotation.value() == -1001: self.page.dsbOffsetRotation.clear()
 		if self.page.dsbThickness.value() == -1: self.page.dsbThickness.clear()
 		if self.page.dsbMaxThickness.value() == -1: self.page.dsbMaxThickness.clear()
 		if self.page.dsbFlatness.value()  == -1: self.page.dsbFlatness.clear()
