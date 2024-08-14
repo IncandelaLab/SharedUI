@@ -368,12 +368,13 @@ class func(object):
 		num_comments = self.page.listComments.count()
 		self.module.comments = ';;'.join([self.page.listComments.item(i).text() for i in range(num_comments)])
 
-		self.module.pcb_plcment_x_offset = self.page.dsbOffsetTranslationX.value() if self.page.dsbOffsetTranslationX.value() >=0 else None  # problematic, could be negative value
-		self.module.pcb_plcment_y_offset = self.page.dsbOffsetTranslationY.value() if self.page.dsbOffsetTranslationY.value() >=0 else None
-		self.module.offset_rotation      = self.page.dsbOffsetRotation.value()    if self.page.dsbOffsetRotation.value()    >=0 else None
-		self.module.flatness = self.page.dsbFlatness.value()    if self.page.dsbFlatness.value()    >=0 else None
-		self.module.thickness = self.page.dsbThickness.value()    if self.page.dsbThickness.value()    >=0 else None
-		self.module.max_thickness = self.page.dsbMaxThickness.value()    if self.page.dsbMaxThickness.value()    >=0 else None
+		# Don't save these data again, they are not allowed to edit
+		# self.module.pcb_plcment_x_offset = self.page.dsbOffsetTranslationX.value() if self.page.dsbOffsetTranslationX.value() >=0 else None  # problematic, could be negative value
+		# self.module.pcb_plcment_y_offset = self.page.dsbOffsetTranslationY.value() if self.page.dsbOffsetTranslationY.value() >=0 else None
+		# self.module.offset_rotation      = self.page.dsbOffsetRotation.value()    if self.page.dsbOffsetRotation.value()    >=0 else None
+		# self.module.flatness = self.page.dsbFlatness.value()    if self.page.dsbFlatness.value()    >=0 else None
+		# self.module.thickness = self.page.dsbThickness.value()    if self.page.dsbThickness.value()    >=0 else None
+		# self.module.max_thickness = self.page.dsbMaxThickness.value()    if self.page.dsbMaxThickness.value()    >=0 else None
 
 		self.module.save()
 		self.mode = 'view'
