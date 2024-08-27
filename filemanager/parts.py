@@ -150,6 +150,10 @@ class fsobj_part(fm.fsobj):
 			return None
 		return INSTITUTION_FULLNAME[self.location]
 
+	@property
+	def run_name_time_stamp(self):
+		return str(datetime.datetime.now())
+
 
 ###############################################
 #####  components, protomodules, modules  #####
@@ -277,13 +281,15 @@ class sensor(fsobj_part):
 		'protomodule',
 		'module',
 		'step_sensor',
+		'sen_type',
 		# GUI only:
 		'barcode',
 	]
 
 	EXTRA_DEFAULTS = {
 		# display_name ->
-		"kind_of_part": "None Si Sensor None None"
+		"kind_of_part": "None Si Sensor None None",
+		'sen_type': 'None',
 	}
 
 
@@ -295,6 +301,16 @@ class sensor(fsobj_part):
 			return None
 		else:
 			return float(thkns)/1000
+
+	@property
+	def thickness(self):
+		if self.kind_of_part is None:  return None
+		return self.kind_of_part.split(" ")[0]
+	@thickness.setter
+	def thickness(self, value):
+		splt = self.kind_of_part.split(" ")
+		splt[0] = str(value)
+		self.kind_of_part = " ".join(splt)
 
 	@property
 	def sen_type(self):
