@@ -281,7 +281,7 @@ class sensor(fsobj_part):
 		'protomodule',
 		'module',
 		'step_sensor',
-		'sen_type',
+		# 'sen_type',
 		# GUI only:
 		'barcode',
 	]
@@ -289,7 +289,7 @@ class sensor(fsobj_part):
 	EXTRA_DEFAULTS = {
 		# display_name ->
 		"kind_of_part": "None Si Sensor None None",
-		'sen_type': 'None',
+		# 'sen_type': 'None',
 	}
 
 
@@ -905,7 +905,15 @@ class module(fsobj_part):
 		# NOTE:  Can't upload empty string, so...
 		if self.wirebond_comments is None:  return "None"
 		if self.wirebond_comments == "":  return "None"
-		return self.wirebond_comments[:4000] if len(self.wirebond_comments)>4000 else self.wirebond_comments
+		return self.wirebond_comments[:512] if len(self.wirebond_comments)>512 else self.wirebond_comments  # max 512 bytes
+
+	@property
+	def encapsulation_comments_concat(self):
+		# return ";;".join(self.encapsulation_comments)
+		# NOTE:  Can't upload empty string, so...
+		if self.encapsulation_comments is None:  return "None"
+		if self.encapsulation_comments == "":  return "None"
+		return self.encapsulation_comments[:512] if len(self.encapsulation_comments)>512 else self.encapsulation_comments  # max 512 bytes
 	
 	@property
 	def wirebonding_completed(self):

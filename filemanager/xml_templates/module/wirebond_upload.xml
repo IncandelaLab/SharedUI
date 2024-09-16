@@ -62,6 +62,7 @@
 			<FINAL_INSPXN_USER>{{ final_inspxn_user }}</FINAL_INSPXN_USER>
 			<FINAL_INSPXN_OK>{{ final_inspxn_ok }}</FINAL_INSPXN_OK>
 			<WIREBOND_COMMENTS>{{ wirebond_comments_concat }}</WIREBOND_COMMENTS>
+			<ENCAPSULATION_COMMENTS>{{ encapsulation_comments_concat }}</ENCAPSULATION_COMMENTS>
 		</DATA>
 	</DATA_SET>
 </ROOT>
