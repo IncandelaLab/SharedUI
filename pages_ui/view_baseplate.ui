@@ -221,6 +221,11 @@
     </item>
     <item>
      <property name="text">
+      <string>Ti/Kapton</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
       <string>CF/Kapton</string>
      </property>
     </item>
@@ -315,7 +320,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>-1</number>
     </property>
     <item>
      <property name="text">

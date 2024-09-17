@@ -16,7 +16,8 @@ PARTIAL_SHAPE_TYPE = [
 INDEX_MATERIAL = {
 	'CuW/Kapton':0,
 	'PCB/Kapton':1,
-	'CF/Kapton' :2,
+	'Ti/Kapton' :2,
+	'CF/Kapton' :3,
 }
 
 INDEX_SHAPE = {
@@ -213,7 +214,9 @@ class func(object):
 		mode_view     = self.mode == 'view'
 		mode_editing  = self.mode == 'editing'
 		mode_creating = self.mode == 'creating'
-		is_partial_shape = self.page.cbShape.currentText() in PARTIAL_SHAPE_TYPE
+
+		# 20240916: Only CF/Kapton Full doesn't have density, thus, disable it
+		disable_channel_density = self.page.cbShape.currentText() == 'Full' and self.page.cbMaterial.currentText() == 'CF/Kapton'
 
 		self.setMainSwitchingEnabled(mode_view)
 		self.page.leID.setReadOnly(not mode_view)
@@ -232,7 +235,7 @@ class func(object):
 		self.page.leBarcode.setReadOnly(   not (mode_creating or mode_editing) )
 		self.page.cbMaterial.setEnabled(        mode_creating or mode_editing  )
 		self.page.cbShape.setEnabled(           mode_creating or mode_editing  )
-		self.page.cbChannelDensity.setEnabled(  (mode_creating or mode_editing) and is_partial_shape )
+		self.page.cbChannelDensity.setEnabled(  (mode_creating or mode_editing) and not disable_channel_density )
 
 		self.page.dsbThickness.setEnabled(      mode_creating or mode_editing  )
 		self.page.dsbFlatness.setEnabled(       mode_creating or mode_editing  )

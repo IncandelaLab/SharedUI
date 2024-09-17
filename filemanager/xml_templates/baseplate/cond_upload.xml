@@ -21,7 +21,7 @@
         <VERSION>1</VERSION>
         <PART mode="auto">
             <SERIAL_NUMBER>{{ ID }}</SERIAL_NUMBER>
-            <KIND_OF_PART>{{ kind_of_part }}</KIND_OF_PART>
+            <KIND_OF_PART>{{ kind_of_part_update }}</KIND_OF_PART>
         </PART>
         <DATA>
             <FLATNESS>{{ flatness }}</FLATNESS>

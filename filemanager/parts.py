@@ -210,17 +210,13 @@ class baseplate(fsobj_part):
 	@property
 	def geometry(self):
 		if self.kind_of_part == "None Baseplate None None":  return None
-		if "Full" in self.kind_of_part:  return "Full"  # Full baseplate doesn't have density
 		return self.kind_of_part.split()[3]
 	@geometry.setter
 	def geometry(self, value):
 		splt = self.kind_of_part.split(" ")
-		if str(value) == "Full":
-			splt[2] = str(value)
-			self.kind_of_part = " ".join(splt[0:3])
-		else:
-			splt[3] = str(value)
-			self.kind_of_part = " ".join(splt)
+		print("geometry setter:  splt is", splt)
+		splt[3] = str(value)
+		self.kind_of_part = " ".join(splt)
 
 	@property
 	def material(self):
@@ -236,16 +232,21 @@ class baseplate(fsobj_part):
 	@property
 	def channel_density(self):
 		if self.kind_of_part == "None Baseplate None None":  return None
-		if "Full" in self.kind_of_part:
-			return None
-		else:
-			return self.kind_of_part.split()[2]
+		return self.kind_of_part.split()[2]
 	@channel_density.setter
 	def channel_density(self, value):
 		splt = self.kind_of_part.split(" ")
-		if "Full" in self.kind_of_part:  return
 		splt[2] = str(value)
 		self.kind_of_part = " ".join(splt)
+
+	@property
+	def kind_of_part_update(self):
+		# 20240916: Only CF/Kapton Full doesn't have density
+		if self.geometry == 'Full' and self.material == 'CF/Kapton':
+			splt = self.kind_of_part.split(" ")
+			return " ".join([splt[0], splt[1], splt[3]])
+		else:
+			return self.kind_of_part
 
 
 	def ready_step_sensor(self, step_sensor = None):
@@ -281,7 +282,7 @@ class sensor(fsobj_part):
 		'protomodule',
 		'module',
 		'step_sensor',
-		'sen_type',
+		# 'sen_type',
 		# GUI only:
 		'barcode',
 	]
@@ -289,7 +290,7 @@ class sensor(fsobj_part):
 	EXTRA_DEFAULTS = {
 		# display_name ->
 		"kind_of_part": "None Si Sensor None None",
-		'sen_type': 'None',
+		# 'sen_type': 'None',
 	}
 
 
@@ -905,7 +906,15 @@ class module(fsobj_part):
 		# NOTE:  Can't upload empty string, so...
 		if self.wirebond_comments is None:  return "None"
 		if self.wirebond_comments == "":  return "None"
-		return self.wirebond_comments[:4000] if len(self.wirebond_comments)>4000 else self.wirebond_comments
+		return self.wirebond_comments[:512] if len(self.wirebond_comments)>512 else self.wirebond_comments  # max 512 bytes
+
+	@property
+	def encapsulation_comments_concat(self):
+		# return ";;".join(self.encapsulation_comments)
+		# NOTE:  Can't upload empty string, so...
+		if self.encapsulation_comments is None:  return "None"
+		if self.encapsulation_comments == "":  return "None"
+		return self.encapsulation_comments[:512] if len(self.encapsulation_comments)>512 else self.encapsulation_comments  # max 512 bytes
 	
 	@property
 	def wirebonding_completed(self):
