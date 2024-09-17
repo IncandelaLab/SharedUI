@@ -193,7 +193,7 @@
     </property>
     <property name="dateTime">
      <datetime>
-      <hour>16</hour>
+      <hour>21</hour>
       <minute>0</minute>
       <second>0</second>
       <year>2023</year>
@@ -541,6 +541,11 @@
     <item>
      <property name="text">
       <string>PCB/Kapton</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Ti/Kapton</string>
      </property>
     </item>
     <item>
