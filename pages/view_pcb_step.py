@@ -49,6 +49,7 @@ NAME_THICKNESS = {
 NAME_MATERIAL = {
 	'CuW/Kapton' : 'W',
 	'PCB/Kapton' : 'P',
+	'Ti/Kapton'  : 'T',
 	'CF/Kapton'  : 'C'
 }
 NAME_VERSION = {

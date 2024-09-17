@@ -50,6 +50,7 @@ NAME_THICKNESS = {
 NAME_MATERIAL = {
 	'CuW/Kapton' : 'W',
 	'PCB/Kapton' : 'P',
+	'Ti/Kapton'  : 'T',
 	'CF/Kapton'  : 'C'
 }
 NAME_VERSION = {
@@ -982,7 +983,8 @@ class func(object):
 					issues.append(I_BASEPLATE_SENSOR_SHAPE.format(self.baseplates[i].ID,    self.baseplates[i].geometry, \
 																  self.sensors[i].ID, self.sensors[i].geometry))
 				# NEW: Full baseplate doesn't have channel density
-				if self.baseplates[i].geometry != 'Full' and self.baseplates[i].channel_density != self.sensors[i].channel_density:
+				# 20240916: Only CF/Kapton Full doesn't have density
+				if self.baseplates[i].channel_density != 'None' and self.baseplates[i].channel_density != self.sensors[i].channel_density:
 					issues.append(I_BASEPLATE_SENSOR_CHANNEL.format(self.baseplates[i].ID,    self.baseplates[i].channel_density, \
 																  self.sensors[i].ID, self.sensors[i].channel_density))
 
