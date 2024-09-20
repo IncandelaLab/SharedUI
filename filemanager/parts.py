@@ -210,6 +210,7 @@ class baseplate(fsobj_part):
 	@property
 	def geometry(self):
 		if self.kind_of_part == "None Baseplate None None":  return None
+		if "Full" in self.kind_of_part:  return "Full"
 		return self.kind_of_part.split()[3]
 	@geometry.setter
 	def geometry(self, value):
