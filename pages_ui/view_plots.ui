@@ -49,7 +49,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>380</y>
+     <y>440</y>
      <width>351</width>
      <height>201</height>
     </rect>
@@ -96,7 +96,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>PCB comments</string>
+     <string>Hexaboard comments</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -130,7 +130,7 @@
    <property name="geometry">
     <rect>
      <x>450</x>
-     <y>380</y>
+     <y>440</y>
      <width>351</width>
      <height>201</height>
     </rect>
@@ -213,7 +213,7 @@
      <x>450</x>
      <y>160</y>
      <width>351</width>
-     <height>181</height>
+     <height>211</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -264,17 +264,43 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QPushButton" name="pbAddFilesMod">
+   <widget class="QPushButton" name="pbAddPedTestMod">
     <property name="geometry">
      <rect>
-      <x>120</x>
+      <x>20</x>
       <y>140</y>
-      <width>101</width>
+      <width>141</width>
       <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>Add files</string>
+     <string>Add pedestal_test</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbAddPedPlotsMod">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>140</y>
+      <width>141</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Add pedestal_plots</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbAddIVTestMod">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>170</y>
+      <width>141</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Add iv_test</string>
     </property>
    </widget>
   </widget>
@@ -293,17 +319,17 @@
    <property name="frameShadow">
     <enum>QFrame::Raised</enum>
    </property>
-   <widget class="QPushButton" name="pbAddFilesPCB">
+   <widget class="QPushButton" name="pbAddPedTestPCB">
     <property name="geometry">
      <rect>
-      <x>120</x>
+      <x>90</x>
       <y>140</y>
-      <width>101</width>
+      <width>161</width>
       <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>Add files</string>
+     <string>Add pedestal_test</string>
     </property>
    </widget>
    <widget class="QListWidget" name="listFilesPCB">
@@ -329,7 +355,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>PCB files</string>
+     <string>Hexaboard files</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -553,12 +579,12 @@
      <rect>
       <x>1</x>
       <y>1</y>
-      <width>81</width>
+      <width>91</width>
       <height>19</height>
      </rect>
     </property>
     <property name="text">
-     <string>PCB ID</string>
+     <string>Hexaboard ID</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -567,9 +593,9 @@
    <widget class="QLineEdit" name="leIDPCB">
     <property name="geometry">
      <rect>
-      <x>80</x>
+      <x>90</x>
       <y>0</y>
-      <width>111</width>
+      <width>101</width>
       <height>20</height>
      </rect>
     </property>

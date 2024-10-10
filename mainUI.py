@@ -34,7 +34,7 @@ from pages.view_sensor_post import func as cls_func_view_sensor_post
 from pages.view_pcb_step    import func as cls_func_view_pcb_step
 from pages.view_pcb_post    import func as cls_func_view_pcb_post
 from pages.view_wirebonding import func as cls_func_view_wirebonding
-# from pages.view_plots       import func as cls_func_view_plots
+from pages.view_plots       import func as cls_func_view_plots
 
 from pages.view_tooling     import func as cls_func_view_tooling
 from pages.view_supplies    import func as cls_func_view_supplies
@@ -119,11 +119,11 @@ class widget_view_wirebonding(wdgt.QWidget, form_view_wirebonding):
 		super(widget_view_wirebonding,self).__init__(parent)
 		self.setupUi(self)
 
-# from pages_ui.view_plots import Ui_Form as form_view_plots
-# class widget_view_plots(wdgt.QWidget, form_view_plots):
-# 	def __init__(self,parent):
-# 		super(widget_view_plots,self).__init__(parent)
-# 		self.setupUi(self)
+from pages_ui.view_plots import Ui_Form as form_view_plots
+class widget_view_plots(wdgt.QWidget, form_view_plots):
+	def __init__(self,parent):
+		super(widget_view_plots,self).__init__(parent)
+		self.setupUi(self)
 
 from pages_ui.view_tooling import Ui_Form as form_view_tooling
 class widget_view_tooling(wdgt.QWidget, form_view_tooling):
@@ -157,7 +157,7 @@ PAGE_IDS = {
 	'3. Hexaboard - pre-assembly'    : 11,
 	'4. Hexaboard - post-assembly'    : 12,
 	'5. Wirebonding & encapsulating' : 13,
-	# '6. Module testing' : 14,
+	'6. Module testing' : 14,
 
 }
 
@@ -269,7 +269,7 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		self.page_view_pcb_step    = widget_view_pcb_step(None)    ; self.swPages.addWidget(self.page_view_pcb_step)
 		self.page_view_pcb_post    = widget_view_pcb_post(None)    ; self.swPages.addWidget(self.page_view_pcb_post)
 		self.page_view_wirebonding = widget_view_wirebonding(None) ; self.swPages.addWidget(self.page_view_wirebonding)
-		# self.page_view_plots       = widget_view_plots(None)       ; self.swPages.addWidget(self.page_view_plots)
+		self.page_view_plots       = widget_view_plots(None)       ; self.swPages.addWidget(self.page_view_plots)
 
 
 
@@ -290,7 +290,7 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		self.func_view_pcb_step    = cls_func_view_pcb_step(         fm, self.userManager, self.page_view_pcb_step   , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_pcb_post    = cls_func_view_pcb_post(         fm, self.userManager, self.page_view_pcb_post   , self.setUIPage, self.setSwitchingEnabled)
 		self.func_view_wirebonding = cls_func_view_wirebonding(      fm, self.userManager, self.page_view_wirebonding, self.setUIPage, self.setSwitchingEnabled)
-		# self.func_view_plots       = cls_func_view_plots(            fm, self.page_view_plots,       self.setUIPage, self.setSwitchingEnabled)
+		self.func_view_plots       = cls_func_view_plots(            fm, self.page_view_plots,       self.setUIPage, self.setSwitchingEnabled)
 
 		# This list must be in the same order that the pages are in in the stackedWidget in the main UI file.
 		# This is the same order as in the dict PAGE_IDS
@@ -311,7 +311,7 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 			self.func_view_pcb_step,
 			self.func_view_pcb_post,
 			self.func_view_wirebonding,
-			# self.func_view_plots,
+			self.func_view_plots,
 			]
 
 
@@ -498,12 +498,16 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		for part in parts:
 			upload_files += glob.glob(filemanager_dir + "/{}*/{}/*build*upload*".format(part, dateStr))
 			upload_files += glob.glob(filemanager_dir + "/{}*/{}/*cond*upload*".format(part, dateStr))
+			# 1.3  hexaboard testing files
+			if part == 'pcb':
+				upload_files += glob.glob(filemanager_dir + "/{}*/{}/*pedestal_test*upload*".format(part, dateStr))
 		# 2.  Protomodule files
 		#     2.1  build
 		#     2.2  cond
 		#     2.3  assembly
 		upload_files += glob.glob(filemanager_dir + "/protomodule*/{}/*build*upload*".format(dateStr))
 		upload_files += glob.glob(filemanager_dir + "/protomodule*/{}/*cond*upload*".format(dateStr))
+		upload_files += glob.glob(filemanager_dir + "/protomodule*/{}/*assembly*upload*".format(dateStr))
 		# 3.  Module files
 		#     3.1  build
 		#     3.2  cond
@@ -513,6 +517,10 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		upload_files += glob.glob(filemanager_dir + "/module*/{}/*cond*upload*".format(dateStr))
 		upload_files += glob.glob(filemanager_dir + "/module*/{}/*assembly*upload*".format(dateStr))
 		upload_files += glob.glob(filemanager_dir + "/module*/{}/*wirebond*upload*".format(dateStr))
+		#     3.5  testing
+		upload_files += glob.glob(filemanager_dir + "/module*/{}/*pedestal_test*upload*".format(dateStr))
+		upload_files += glob.glob(filemanager_dir + "/module*/{}/*pedestal_plots*upload*".format(dateStr))
+		upload_files += glob.glob(filemanager_dir + "/module*/{}/*iv_test*upload*".format(dateStr))
   
 		print("Preparing to upload multiple object files:", upload_files)
 

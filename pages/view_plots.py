@@ -46,7 +46,7 @@ class simple_fsobj_pt(object):  # from tools
 		pbGo,
 		listFiles,
 		pbDeleteFiles,
-		pbAddFiles,
+		# pbAddFiles,
 		pbDeleteComment,
 		listComments,
 		pteWriteComment,
@@ -63,7 +63,7 @@ class simple_fsobj_pt(object):  # from tools
 		self.pbGo = pbGo
 		self.listFiles = listFiles
 		self.pbDeleteFiles = pbDeleteFiles
-		self.pbAddFiles = pbAddFiles
+		# self.pbAddFiles = pbAddFiles
 		self.pbDeleteComment = pbDeleteComment
 		self.listComments = listComments
 		self.pteWriteComment = pteWriteComment
@@ -90,7 +90,8 @@ class simple_fsobj_pt(object):  # from tools
 
 
 		self.listFiles.clear()
-		if self.fsobj_pt.test_files is None:  return
+		print("test_files",self.fsobj_pt.test_files)
+		if self.fsobj_pt.test_files is None or not self.fsobj_pt.test_files:  return
 		for f in self.fsobj_pt.test_files.split(';;'):
 			name = os.path.split(f)[1]
 			self.listFiles.addItem(name)
@@ -146,17 +147,19 @@ class simple_fsobj_pt(object):  # from tools
 		if index >= 0:
 			self.listComments.takeItem(index)
 
-	def add_file(self,f):
+	def add_file(self,f,tabel_name):
 		fdir, fname = self.fsobj_pt.get_filedir_filename()
 		# Create a copy of the file in the module storage directory
 		tmp_filename = os.path.split(f)[1]
-		new_filepath = fdir + '/' + tmp_filename
+		part_type = self.fsobj_pt.__class__.__name__
+		new_filename = part_type + '_' + self.fsobj_pt.ID + '_' + tabel_name + '_upload.xml'
+		new_filepath = fdir + '/' + new_filename
 		shutil.copyfile(f, new_filepath)
 		# From here on, the file is ONLY referred to by its name, not the full path!
 		if self.fsobj_pt.test_files:
-			self.fsobj_pt.test_files += ';;' + tmp_filename
+			self.fsobj_pt.test_files += ';;' + new_filename
 		else:
-			self.fsobj_pt.test_files = tmp_filename
+			self.fsobj_pt.test_files = new_filename
 		self.fsobj_pt.save()
 		self.update_info()
 
@@ -167,7 +170,7 @@ class simple_fsobj_pt(object):  # from tools
 		os.remove(fdir + '/' + fname)  # remove file and save immediately (cancelling is hard to implement otherwise)
 		files = self.fsobj_pt.test_files.split(';;')
 		del files[row]
-		self.fsobj_pt.test_files = files
+		self.fsobj_pt.test_files = ';;'.join(files)
 		self.fsobj_pt.save()
 		self.update_info()
 
@@ -191,7 +194,7 @@ class func(object):
 			self.page.pbGoPCB,
 			self.page.listFilesPCB,
 			self.page.pbDeleteFilesPCB,
-			self.page.pbAddFilesPCB,
+			# self.page.pbAddFilesPCB,
 			self.page.pbDeleteCommentPCB,
 			self.page.listCommentsPCB,
 			self.page.pteWriteCommentPCB,
@@ -208,7 +211,7 @@ class func(object):
 			self.page.pbGoMod,
 			self.page.listFilesMod,
 			self.page.pbDeleteFilesMod,
-			self.page.pbAddFilesMod,
+			# self.page.pbAddFilesMod,
 			self.page.pbDeleteCommentMod,
 			self.page.listCommentsMod,
 			self.page.pteWriteCommentMod,
@@ -272,7 +275,8 @@ class func(object):
 		self.page.pbAddCommentPCB.clicked.connect(self.addCommentPCB)
 
 		self.fwnd_pcb = Filewindow()
-		self.page.pbAddFilesPCB.clicked.connect(self.getFilePCB)
+		# self.page.pbAddFilesPCB.clicked.connect(self.getFilePCB)
+		self.page.pbAddPedTestPCB.clicked.connect(self.getPedTestFilePCB)
 		self.page.pbDeleteFilesPCB.clicked.connect(self.deleteFilePCB)
 
 		self.page.pbLoadMod.clicked.connect(self.loadPartMod)
@@ -284,7 +288,10 @@ class func(object):
 		self.page.pbAddCommentMod.clicked.connect(self.addCommentMod)
 
 		self.fwnd_mod = Filewindow()
-		self.page.pbAddFilesMod.clicked.connect(self.getFileMod)
+		# self.page.pbAddFilesMod.clicked.connect(self.getFileMod)
+		self.page.pbAddPedTestMod.clicked.connect(self.getPedTestFileMod)
+		self.page.pbAddPedPlotsMod.clicked.connect(self.getPedPlotsFileMod)
+		self.page.pbAddIVTestMod.clicked.connect(self.getIVTestFileMod)
 		self.page.pbDeleteFilesMod.clicked.connect(self.deleteFileMod)
 
 
@@ -342,8 +349,12 @@ class func(object):
 		self.page.pteWriteCommentPCB.setEnabled(mode_editing_pcb)
 		self.page.pteWriteCommentMod.setEnabled(mode_editing_mod)
 
-		self.page.pbAddFilesPCB   .setEnabled(mode_editing_pcb)
-		self.page.pbAddFilesMod   .setEnabled(mode_editing_mod)
+		# self.page.pbAddFilesPCB   .setEnabled(mode_editing_pcb)
+		self.page.pbAddPedTestPCB   .setEnabled(mode_editing_pcb)
+		# self.page.pbAddFilesMod   .setEnabled(mode_editing_mod)
+		self.page.pbAddPedTestMod   .setEnabled(mode_editing_mod)
+		self.page.pbAddPedPlotsMod   .setEnabled(mode_editing_mod)
+		self.page.pbAddIVTestMod   .setEnabled(mode_editing_mod)
 		self.page.pbDeleteFilesPCB.setEnabled(mode_editing_pcb)
 		self.page.pbDeleteFilesMod.setEnabled(mode_editing_mod)
 
@@ -417,7 +428,7 @@ class func(object):
 	def goPCB(self,*args,**kwargs):
 		ID = self.page.leIDPCB.text()
 		if ID != "":
-			self.setUIPage('PCBs',ID=ID)
+			self.setUIPage('Hexaboards',ID=ID)
 
 	@enforce_mode('view')
 	def goMod(self,*args,**kwargs):
@@ -426,20 +437,51 @@ class func(object):
 			self.setUIPage('Modules',ID=ID)
 
 
+	# @enforce_mode('editing_pcb')
+	# def getFilePCB(self,*args,**kwargs):
+	# 	f = self.fwnd_pcb.getfile()
+	# 	if f:
+	# 		self.pcb_obj.add_file(f,self.page.pbAddPedTestPCB.text().split('Add ')[-1])
+	# 		self.updateElements()
+
 	@enforce_mode('editing_pcb')
-	def getFilePCB(self,*args,**kwargs):
+	def getPedTestFilePCB(self,*args,**kwargs):
 		f = self.fwnd_pcb.getfile()
+		tabel_name = self.page.pbAddPedTestPCB.text().split('Add ')[-1]
 		if f:
-			self.pcb_obj.add_file(f)
+			self.pcb_obj.add_file(f,tabel_name)
+			self.updateElements()
+
+	# @enforce_mode('editing_mod')
+	# def getFileMod(self,*args,**kwargs):
+	# 	f = self.fwnd_mod.getfile()
+	# 	if f:
+	# 		self.module_obj.add_file(f)
+	# 		self.updateElements()
+
+	@enforce_mode('editing_mod')
+	def getPedTestFileMod(self,*args,**kwargs):
+		f = self.fwnd_mod.getfile()
+		tabel_name = self.page.pbAddPedTestMod.text().split('Add ')[-1]
+		if f:
+			self.module_obj.add_file(f,tabel_name)
 			self.updateElements()
 
 	@enforce_mode('editing_mod')
-	def getFileMod(self,*args,**kwargs):
+	def getPedPlotsFileMod(self,*args,**kwargs):
 		f = self.fwnd_mod.getfile()
+		tabel_name = self.page.pbAddPedPlotsMod.text().split('Add ')[-1]
 		if f:
-			self.module_obj.add_file(f)
+			self.module_obj.add_file(f,tabel_name)
 			self.updateElements()
 
+	@enforce_mode('editing_mod')
+	def getIVTestFileMod(self,*args,**kwargs):
+		f = self.fwnd_mod.getfile()
+		tabel_name = self.page.pbAddIVTestMod.text().split('Add ')[-1]
+		if f:
+			self.module_obj.add_file(f,tabel_name)
+			self.updateElements()
 
 	@enforce_mode('editing_pcb')
 	def deleteFilePCB(self,*args,**kwargs):

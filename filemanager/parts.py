@@ -381,6 +381,7 @@ class pcb(fsobj_part):
 	XML_TEMPLATES = [
 		'build_upload.xml',
 		'cond_upload.xml',
+		'pedestal_test_upload.xml',
 	]
 
 	# Note:  serial_number == self.ID
@@ -686,6 +687,9 @@ class module(fsobj_part):
 		'cond_upload.xml',
 		'assembly_upload.xml',
 		'wirebond_upload.xml',
+		'pedestal_test_upload.xml',
+		'pedestal_plots_upload.xml',
+		'iv_test_upload.xml',
 	]
 
 	# Note:  serial_number == self.ID

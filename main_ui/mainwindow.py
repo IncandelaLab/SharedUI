@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1417, 883)
+        MainWindow.resize(1417, 886)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
@@ -91,6 +91,8 @@ class Ui_MainWindow(object):
         self.listAssembly.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.listAssembly.setAutoScroll(True)
         self.listAssembly.setObjectName("listAssembly")
+        item = QtWidgets.QListWidgetItem()
+        self.listAssembly.addItem(item)
         item = QtWidgets.QListWidgetItem()
         self.listAssembly.addItem(item)
         item = QtWidgets.QListWidgetItem()
@@ -237,6 +239,8 @@ class Ui_MainWindow(object):
         item.setText(_translate("MainWindow", "4. Hexaboard - post-assembly"))
         item = self.listAssembly.item(4)
         item.setText(_translate("MainWindow", "5. Wirebonding & encapsulating"))
+        item = self.listAssembly.item(5)
+        item.setText(_translate("MainWindow", "6. Module testing"))
         self.listAssembly.setSortingEnabled(__sortingEnabled)
         self.lineEdit_2.setText(_translate("MainWindow", "Protomodules and modules"))
         __sortingEnabled = self.listModules.isSortingEnabled()
