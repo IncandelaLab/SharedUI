@@ -573,6 +573,9 @@ class fsobj(object):
 		filedir, filename = self.get_filedir_filename()
 		for template in self.XML_TEMPLATES:
 			template_file = os.sep.join([TEMPLATEDIR, self.OBJECTNAME, template])
+			# Make sure the file exists
+			if not os.path.exists(template_file):
+				continue
 			with open(template_file, 'r') as file:
 				template_content = file.read()
 			template = Template(template_content)
