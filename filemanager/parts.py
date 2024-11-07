@@ -596,7 +596,10 @@ class protomodule(fsobj_part):
 	def barcode(self):
 		if self.ID is None:
 			return None
-		return "320" + self.ID.replace("-", "")
+		if self.ID.startswith("320"):
+			return self.ID.replace("-", "")
+		else:
+			return "320" + self.ID.replace("-", "")
 
 
 	## Assembly data properties:
@@ -860,7 +863,10 @@ class module(fsobj_part):
 	def barcode(self):
 		if self.ID is None:
 			return None
-		return "320" + self.ID.replace("-", "")
+		if self.ID.startswith("320"):
+			return self.ID.replace("-", "")
+		else:
+			return "320" + self.ID.replace("-", "")
 
 	# TEMPORARY:  NOTE:  Must fix this...
 	@property

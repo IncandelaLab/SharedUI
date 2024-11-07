@@ -81,13 +81,13 @@ def is_proper_name(name):
 	version_list = list(NAME_VERSION.values())
 	institution_list = list(NAME_INSTITUTION.values())
 	flag = False
-	if name[0] == 'P' \
-		and name[1] in density_list \
-		and name[2] in geometry_list \
-		and name[3] in thickness_list \
-		and name[4] in material_list \
-		and name[5] in version_list \
-		and name[7:9] in institution_list:
+	if name[3] == 'P' \
+		and name[4] in density_list \
+		and name[5] in geometry_list \
+		and name[6] in thickness_list \
+		and name[7] in material_list \
+		and name[8] in version_list \
+		and name[9:11] in institution_list:
 		flag = True
 	return flag
 
@@ -352,11 +352,6 @@ class func(object):
 
 			self.cb_versions[i].activated.connect( self.updateIssues )
 
-			# update protomodule ID
-			# self.le_baseplates[i].textChanged.connect( self.update_protoID)
-			# self.le_sensors[i].textChanged.connect( self.update_protoID)
-			# self.cb_versions[i].activated.connect( self.update_protoID )
-			# self.sb_serials[i].valueChanged.connect( self.update_protoID )
 			self.le_protomodules[i].textChanged.connect( self.updateIssues )
 
 			self.pb_clears[i].clicked.connect(self.clearRow)
@@ -510,8 +505,8 @@ class func(object):
 						for j, (_, name) in enumerate(NAME_VERSION.items()):
 							if name == protomodule_name[5]:
 								self.cb_versions[i].setCurrentIndex(j)
-						match = re.search(r'[1-9]', protomodule_name[7:])
-						snum = protomodule_name[7:][match.start():]
+						match = re.search(r'[1-9]', protomodule_name[9:])
+						snum = protomodule_name[9:][match.start():]
 						# fill the serial number if it is an integer
 						if not self.has_non_integer_characters(snum):
 							self.sb_serials[i].setValue(int(snum))
@@ -1450,7 +1445,7 @@ class func(object):
 		tmp_inst = self.page.cbInstitution.currentText()
 		serials = []
 		for part_id, date in part_list.items():
-			if is_proper_name(part_id) and part_id[7:9] == NAME_INSTITUTION[tmp_inst]\
+			if is_proper_name(part_id) and part_id[9:11] == NAME_INSTITUTION[tmp_inst]\
        		and not ('None' in self.sensors[which].kind_of_part)\
             and not ('None' in self.baseplates[which].kind_of_part):
 				name = 'P'
@@ -1459,9 +1454,10 @@ class func(object):
 				name += NAME_THICKNESS[self.sensors[which].sen_type]
 				name += NAME_MATERIAL[self.baseplates[which].material]
 				name += NAME_VERSION[self.cb_versions[which].currentText()]
+				name = '320' + name
 				if name in part_id:
-					match = re.search(r'[1-9]', part_id[7:])
-					s = int(part_id[7:][match.start():])
+					match = re.search(r'[1-9]', part_id[9:])
+					s = int(part_id[9:][match.start():])
 					serials.append(s)
 		if serials:
 			tmp_serial = max(serials) + 1
@@ -1516,13 +1512,13 @@ class func(object):
 
 	def make_name(self,i):
 		# print("channel_density: {} geometry: {} sen_type: {} material: {} version: {} serial: {}".format(self.sensors[i].channel_density, self.sensors[i].geometry, self.sensors[i].sen_type, self.baseplates[i].material, self.cb_versions[i].currentText(), self.sb_serials[i].value()))
-		name = 'P'
+		name = '320P'
 		name += NAME_DENSITY[self.sensors[i].channel_density]
 		name += NAME_GEOMETRY[self.sensors[i].geometry]
 		name += NAME_THICKNESS[self.sensors[i].sen_type]
 		name += NAME_MATERIAL[self.baseplates[i].material]
 		name += NAME_VERSION[self.cb_versions[i].currentText()]
-		name += '-' # TBD: may need to delete
+		# name += '-' # TBD: may need to delete
 		name += NAME_INSTITUTION[self.page.cbInstitution.currentText()]
 		name += str(self.sb_serials[i].value()).zfill(4)
 		return name

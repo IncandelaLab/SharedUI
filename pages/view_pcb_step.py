@@ -80,13 +80,13 @@ def is_proper_name(name):
 	version_list = list(NAME_VERSION.values())
 	institution_list = list(NAME_INSTITUTION.values())
 	flag = False
-	if name[0] == 'P' \
-		and name[1] in density_list \
-		and name[2] in geometry_list \
-		and name[3] in thickness_list \
-		and name[4] in material_list \
-		and name[5] in version_list \
-		and name[7:9] in institution_list:
+	if name[3] == 'P' \
+		and name[4] in density_list \
+		and name[5] in geometry_list \
+		and name[6] in thickness_list \
+		and name[7] in material_list \
+		and name[8] in version_list \
+		and name[9:11] in institution_list:
 		flag = True
 	return flag
 
@@ -1445,7 +1445,7 @@ class func(object):
 		# update module name from protomodule name
 		for i in range(6):
 			if self.le_protomodules[i].text() != "" and is_proper_name(self.le_protomodules[i].text()):
-				self.le_modules[i].setText("M"+self.le_protomodules[i].text()[1:])
+				self.le_modules[i].setText(self.le_protomodules[i].text().replace("P","M"))
 			else:
 				self.le_modules[i].setText("")
 		self.updateIssues()
