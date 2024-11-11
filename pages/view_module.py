@@ -1,4 +1,5 @@
 from filemanager import parts
+from PyQt5 import QtCore
 import os
 import shutil
 import glob
@@ -120,7 +121,16 @@ class func(object):
 
 	@enforce_mode('setup')
 	def rig(self):
-		self.page.leID.textChanged.connect(self.loadPart)
+		# Timer to delay processing
+		self.timer = QtCore.QTimer(self.page)
+		self.timer.setSingleShot(True)  # Only trigger once after delay
+		self.timer.setInterval(500)     # 500 ms delay
+		# Connect the line edit to start/reset the timer on each keystroke
+		self.page.leID.textChanged.connect(self.start_timer)
+		# When the timer times out, call the processing function
+		self.timer.timeout.connect(self.loadPart)
+
+		# self.page.leID.textChanged.connect(self.loadPart)
 		# self.page.pbLoad.clicked.connect(self.loadPart)
 		self.page.pbEdit.clicked.connect(self.startEditing)
 		self.page.pbSave.clicked.connect(self.saveEditing)
@@ -140,6 +150,9 @@ class func(object):
 		self.page.pbAddFiles.clicked.connect(self.getFile)
 		self.page.pbDeleteFile.clicked.connect(self.deleteFile)
 
+	def start_timer(self):
+		# Restart the timer every time the text changes
+		self.timer.start()
 
 	@enforce_mode(['view', 'editing'])
 	def update_info(self,ID=None,do_load=True,*args,**kwargs):

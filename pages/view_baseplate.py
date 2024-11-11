@@ -1,5 +1,5 @@
 from filemanager import parts
-from PyQt5 import QtGui
+from PyQt5 import QtGui, QtCore
 
 PAGE_NAME = "view_baseplate"
 OBJECTTYPE = "baseplate"
@@ -124,7 +124,16 @@ class func(object):
 
 	@enforce_mode('setup')
 	def rig(self):
-		self.page.leID.textChanged.connect(self.loadPart)
+		# Timer to delay processing
+		self.timer = QtCore.QTimer(self.page)
+		self.timer.setSingleShot(True)  # Only trigger once after delay
+		self.timer.setInterval(500)     # 500 ms delay
+		# Connect the line edit to start/reset the timer on each keystroke
+		self.page.leID.textChanged.connect(self.start_timer)
+		# When the timer times out, call the processing function
+		self.timer.timeout.connect(self.loadPart)
+
+		# self.page.leID.textChanged.connect(self.loadPart)
 		# self.page.pbLoad.clicked.connect(self.loadPart)
 		self.page.pbNew.clicked.connect(self.startCreating)
 		self.page.pbEdit.clicked.connect(self.startEditing)
@@ -139,6 +148,9 @@ class func(object):
 		self.page.pbDeleteComment.clicked.connect(self.deleteComment)
 		self.page.pbAddComment.clicked.connect(self.addComment)
 
+	def start_timer(self):
+		# Restart the timer every time the text changes
+		self.timer.start()
 
 	@enforce_mode(['view', 'editing', 'creating']) # NEW:  Now allowed in editing, creating mode
 	def update_info(self,do_load=True,ID=None):
