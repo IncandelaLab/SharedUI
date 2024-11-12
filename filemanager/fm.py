@@ -111,9 +111,16 @@ TEMPLATEDIR = None
 # - defines a directory DATADIR where all object data is stored
 # - creates files & directories in DATADIR for organizing object data
 
-def setup(datadir=None):
+def setup(datadir=None, database='int2r'):
 	global DATADIR
 	global TEMPLATEDIR
+	global DATABASE
+	global REMOTE_LIST_DIR
+	global API_URL
+
+	DATABASE = database
+	REMOTE_LIST_DIR = 'partlist_remote_{}'.format(database)
+	API_URL = 'https://hgcapi{}.web.cern.ch'.format('-cmsr' if database == 'cmsr' else '')
 
 	if datadir==None:
 		DATADIR = os.sep.join([os.getcwd(), 'filemanager_data'])  # data['datadir']
@@ -147,21 +154,68 @@ def setup(datadir=None):
 	if ENABLE_DB_COMMUNICATION:
 		obj_list_remote = ['baseplate', 'pcb', 'protomodule', 'module']  # sensor search is desabled for now
 		for part in obj_list_remote:
-			fetchRemoteDB(part)
+			fetchRemoteDB(part, db=database)
 	
 #setup()
 
 
-def fetchRemoteDB(part,location=None, limit=10000):
-	partlistdir_remote = os.sep.join([DATADIR, 'partlist_remote'])
+def fetchRemoteDB(part, db='int2r', location=None):
+	partlistdir_remote = os.sep.join([DATADIR, REMOTE_LIST_DIR])
 	if not os.path.exists(partlistdir_remote):
 		os.makedirs(partlistdir_remote)
 
 	fname = os.sep.join([partlistdir_remote, part+'s.json'])
 
 	# Make the GET request
-	url = 'https://hgcapi.web.cern.ch/mac/parts/types/{}s'.format(part)
-	url += '?page=0'  # only fetch page 0 (assuming limit is large enough)
+	url = '{}/mac/parts/types/{}s'.format(API_URL, part)
+	
+	remote_data = {}
+	max_page = -1
+	limit = 100
+
+	# Get page zero, and max page
+	response_0 = _get_response(url, limit, 0, location)
+	print(f"Fetched data from {url} page 0")
+	# print(f"Fetching data from {url} page 0: {response_0}")
+	if response_0:
+		max_page = response_0['pagination']['pages_total']
+		remote_data['parts'] = response_0['parts']
+		print(f"{part} max page {max_page}")
+
+		for npage in range(1, max_page):
+			print(f"Fetching data from {url} page {npage}")
+			response = _get_response(url, limit, npage, location)
+			if not response:
+				# report error and exit
+				print(f"Error: Failed to fetch data from {url} page {npage}")
+				exit(1)
+			remote_data['parts'].extend(response['parts'])
+	else:
+		print(f"Error: Failed to fetch data from {url}")
+		exit(1)
+
+	if not os.path.exists(fname):
+		# Store the response JSON data in a new file
+		with open(fname, 'w') as opfl:
+			# Dump an empty dict if nothing is found
+			# NOTE:  Format of dictionary is {ID:creation-date-string, ...}
+			# json.dump({}, opfl)
+			json.dump(remote_data, opfl, indent=4)
+			print("central DB JSON data saved to '{}'".format(fname))
+
+	else:
+		# Update existing JSON file
+		with open(fname, 'r') as file:
+			local_data = json.load(file)
+
+		if local_data != remote_data:
+			# Store the updated JSON data in the local file
+			with open(fname, 'w') as opfl:
+				json.dump(remote_data, opfl, indent=4)
+				print("Local JSON data updated for '{}'".format(part))
+
+def _get_response(url, limit, npage, location):
+	url += '?page={}'.format(npage)  # only fetch page 0 (assuming limit is large enough)
 	if limit:  # request limited by limit
 		url += '&limit={}'.format(limit)
 	if location:  # request filtered by location
@@ -169,46 +223,11 @@ def fetchRemoteDB(part,location=None, limit=10000):
 	
 	headers = {'accept': 'application/json'}
 	response = requests.get(url, headers=headers)
-	
-	if not os.path.exists(fname):
-		
-		# Check if the request was successful
-		if response.status_code == 200:
-			# Store the response JSON data in a file
-			with open(fname, 'w') as opfl:
-				# Dump an empty dict if nothing is found
-				# NOTE:  Format of dictionary is {ID:creation-date-string, ...}
-				# json.dump({}, opfl)
-				json.dump(response.json(), opfl, indent=4)
-				print("central DB JSON data saved to '{}'".format(fname))
-
-			# Read the saved JSON file and print serial numbers
-			# with open(fname, 'r') as file:
-			# 	data = json.load(file)
-				# serial_numbers = [part['serial_number'] for part in data['parts']]
-				# print("Serial Numbers:")
-				# for serial_number in serial_numbers:
-				# 	print(serial_number)
-		else:
-			print(f"Failed to fetch data: {response.status_code} - {response.text}")
+	if response.status_code == 200:
+		return response.json()
 	else:
-		# Read the local JSON file
-		with open(fname, 'r') as file:
-			local_data = json.load(file)
-
-		# Check if the request was successful
-		if response.status_code == 200:
-			# Compare the local and remote JSON data
-			remote_data = response.json()
-			if local_data != remote_data:
-				# Store the updated JSON data in the local file
-				with open(fname, 'w') as opfl:
-					json.dump(remote_data, opfl, indent=4)
-					print("Local JSON data updated for '{}'".format(part))
-		else:
-			print(f"Failed to fetch an update data: {response.status_code} - {response.text}")
-
-
+		print(f"Failed to fetch data from {url}: {response.status_code} - {response.text}")
+		return None
 
 ###############################################
 ############# UserManager class ###############
@@ -412,7 +431,7 @@ class fsobj(object):
 		if part_name not in ['baseplate', 'pcb', 'sensor', 'protomodule', 'module']:
 			return False
 		
-		remote_partlistfile = os.sep.join([ DATADIR, 'partlist_remote', part_name+'s.json' ])
+		remote_partlistfile = os.sep.join([ DATADIR, REMOTE_LIST_DIR, part_name+'s.json' ])
 
 		data_keys = []
 
@@ -420,7 +439,7 @@ class fsobj(object):
 		request_success = False
 		if full:
 			# Make the GET request
-			url = 'https://hgcapi.web.cern.ch/mac/part/{}/full'.format(ID)
+			url = '{}/mac/part/{}/full'.format(API_URL, ID)
 			headers = {'accept': 'application/json'}
 			response = requests.get(url, headers=headers)
 

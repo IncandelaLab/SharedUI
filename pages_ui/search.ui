@@ -193,7 +193,7 @@
     </property>
     <property name="dateTime">
      <datetime>
-      <hour>21</hour>
+      <hour>5</hour>
       <minute>0</minute>
       <second>0</second>
       <year>2023</year>
@@ -1201,6 +1201,38 @@
      <string>Tool/Supply info:</string>
     </property>
    </widget>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_28">
+   <property name="geometry">
+    <rect>
+     <x>480</x>
+     <y>20</y>
+     <width>91</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Central DB:</string>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="leDBType">
+   <property name="geometry">
+    <rect>
+     <x>570</x>
+     <y>20</y>
+     <width>81</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
   </widget>
  </widget>
  <resources/>

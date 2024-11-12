@@ -186,8 +186,22 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 
 	def __init__(self):
 		super(mainDesigner,self).__init__(None)
+
+		# NEW:  Set up ssh tunnel for DB access!
+		# First, request username:
+		ldlg = UserDialog(self)
+		loginResult = ldlg.exec_()
+		if loginResult != 1:
+			print("Login cancelled")
+			exit()
+		self.username = ldlg.getUsername()
+		self.password = ldlg.getPassword()
+		self.database = ldlg.getDatabase()
+		print("Got username:  ",  ldlg.getUsername())
+		print("Connect to database:  ",  ldlg.database)
+
 		print("Setting up filemanager...")
-		fm.setup()
+		fm.setup(database=self.database)
 		print("Finished setting up filemanager.  DATADIR is", fm.DATADIR)
 		print("Setting up user manager...")
 		self.userManager = fm.UserManager()
@@ -216,40 +230,6 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 			return
 		print("DB communication is ENABLED")
 
-		# NEW:  Set up ssh tunnel for DB access!
-		# First, request username:
-		ldlg = UserDialog(self)
-		loginResult = ldlg.exec_()
-		if loginResult != 1:
-			print("Login cancelled")
-			exit()
-		#loginResult = 0
-		#attempts = 0
-		#while attempts < 3 and loginResult != 1:
-		#	print("Login request: attempt {}".format(attempts))
-		#	loginResult = ldlg.exec_()
-		#	if loginResult == 1:  break
-		#	attempts += 1
-		self.username = ldlg.getUsername()
-		self.password = ldlg.getPassword()
-		print("Got username:  ",  ldlg.getUsername())
-		# WARNING:  May need ot be changed for developemnt DB!
-		# to:  ssh -L 10221:itrac5403-v.cern.ch:10121 -L 10222:itrac5423-v.cern.ch:10121 -L 10223:itrac5432-v.cern.ch:10121 username@lxplus.cern.ch
-		# os.system('ssh -fNT -M -S temp_socket -L 10131:itrac1609-v.cern.ch:10121 -L 10132:itrac1601-v.cern.ch:10121 {}@lxplus.cern.ch'.format(self.username))
-		#os.system('ssh -vvv -f -N -M -L 10131:itrac1609-v.cern.ch:10121 -L 10132:itrac1601-v.cern.ch:10121 {}@lxplus.cern.ch'.format(self.username))
-
-		# Now, connect to the DB
-		# fm.db_connect()
-	
-		# Close upon exiting
-		# def close_ssh():
-		# 	print("Closing ssh connection")
-		# 	os.system('ssh -S temp_socket -O exit lxplus.cern.ch')
-		# 	print("Closed ssh connection")
-		# atexit.register(close_ssh)
-
-		# After tunnel established, :
-		# fm.connectOracle()
 
 
 	def setupPagesUI(self):
@@ -430,7 +410,7 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 			#upload_status = lc.run(iargs=["--login", "--url", "https://cmsdca.cern.ch/hgc_loader/hgc/int2r", f, "--verbose"])
 			self.leStatus.setText("Uploading {} ...".format(os.path.basename(f)))
 			# scpcmd = "scp -vvv {} {}@dbloader-hgcal.cern.ch:/home/dbspool/spool/hgc/int2r".format(f, self.username)
-			scpcmd = "scp -o ProxyJump={}@lxplus.cern.ch {} {}@dbloader-hgcal:/home/dbspool/spool/hgc/int2r/".format(self.username, f, self.username)
+			scpcmd = "scp -o ProxyJump={}@lxplus.cern.ch {} {}@dbloader-hgcal:/home/dbspool/spool/hgc/{}/".format(self.username, f, self.username, self.database)
 			print("Scping {} ...".format(f))
 			# result = os.system(scpcmd)
 
@@ -568,6 +548,12 @@ class UserDialog(wdgt.QDialog):
   
 		self.labelName = wdgt.QLabel('Username:', self)
 		self.labelPass = wdgt.QLabel('Password:', self)
+
+		# Database selection
+		self.labelDatabase = wdgt.QLabel('Database:', self)
+		self.comboDatabase = wdgt.QComboBox(self)
+		self.comboDatabase.addItems(["cmsr", "int2r"])  # Add database options
+
 		self.buttonLogin = wdgt.QPushButton('Confirm', self)
 		self.buttonCancel = wdgt.QPushButton('Cancel', self)
 		self.buttonLogin.clicked.connect(self.handleLogin)
@@ -579,7 +565,8 @@ class UserDialog(wdgt.QDialog):
 		layout.addWidget(self.labelPass)
 		layout.addWidget(self.passName)
   
-		
+		layout.addWidget(self.labelDatabase)
+		layout.addWidget(self.comboDatabase)
 		# layout = wdgt.QVBoxLayout(self)
 		# layout.addWidget(self.textName)
 		# layout.addWidget(self.passName)
@@ -594,10 +581,12 @@ class UserDialog(wdgt.QDialog):
 		print("Got username {}".format(self.username))
 		self.password = self.passName.text()
 		print("Got password!")
+		self.database = self.comboDatabase.currentText()
 		
-		if self.username != "" and self.password != "":
+		if self.username != "" and self.password != "" and self.database != "":
 			self.accept()
 		else:
+			print("Username, password, or database not provided")
 			self.reject()
 
 	def handleCancel(self):
@@ -614,6 +603,9 @@ class UserDialog(wdgt.QDialog):
 
 	def getPassword(self):
 		return self.password
+
+	def getDatabase(self):
+		return self.database
 
 
 # Class for DB upload login

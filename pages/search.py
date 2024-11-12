@@ -101,6 +101,7 @@ class func(object):
 		self.setMainSwitchingEnabled = setSwitchingEnabled
 
 		self.mode = 'setup'
+		self.page.leDBType.setText(fm.DATABASE)
 
 
 	def setup(self):
@@ -199,9 +200,9 @@ class func(object):
 				return
 			# Load remote DB
 			self.page.leStatus.setText("Fetching sensor from remote DB...")
-			fm.fetchRemoteDB('sensor', self.page.cbInstitution.currentText())
+			fm.fetchRemoteDB('sensor', db=fm.DATABASE, location=self.page.cbInstitution.currentText())
 
-		obj_list_remote = os.sep.join([ fm.DATADIR, 'partlist_remote', part_type.lower()+'s.json' ])
+		obj_list_remote = os.sep.join([ fm.DATADIR, fm.REMOTE_LIST_DIR, part_type.lower()+'s.json' ])
 		
 		# Load part list from remote DB list
 		part_file_name_remote = {}  # serial:type
@@ -481,13 +482,13 @@ and l.LOCATION_NAME like \'{}\'"*"*".format(pt_query, search_criteria['location_
 
 		obj_list_remote = ['baseplate', 'pcb', 'protomodule', 'module']
 		for part in obj_list_remote:
-			fm.fetchRemoteDB(part)
+			fm.fetchRemoteDB(part, db=fm.DATABASE)
 
 		status_text = "Remote DB refreshed!"
 
 		# sensor search has to specify institute
 		if self.page.cbInstitution.currentText() != '':
-			fm.fetchRemoteDB('sensor', self.page.cbInstitution.currentText())
+			fm.fetchRemoteDB('sensor', db=fm.DATABASE, location=self.page.cbInstitution.currentText())
 		else:
 			status_text += " Sensor list is not refreshed, please specify institution!"
   

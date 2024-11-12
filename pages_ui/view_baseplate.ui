@@ -530,19 +530,6 @@
      </property>
     </item>
    </widget>
-   <widget class="QLabel" name="label_7">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>140</y>
-      <width>261</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Note: Full baseplate doesn't have resolution</string>
-    </property>
-   </widget>
    <zorder>lineEdit_3</zorder>
    <zorder>lineEdit_15</zorder>
    <zorder>cbMaterial</zorder>
@@ -560,7 +547,6 @@
    <zorder>cbChannelDensity</zorder>
    <zorder>lineEdit_16</zorder>
    <zorder>cbInstitution</zorder>
-   <zorder>label_7</zorder>
   </widget>
   <widget class="QLabel" name="label_8">
    <property name="geometry">
