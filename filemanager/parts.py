@@ -165,7 +165,7 @@ class baseplate(fsobj_part):
 	FILENAME = "baseplate_{ID}.json"
 
 	XML_TEMPLATES = [
-		'build_upload.xml',
+		# 'build_upload.xml',
 		'cond_upload.xml',
 	]
 
@@ -264,7 +264,7 @@ class sensor(fsobj_part):
 	FILENAME = "sensor_{ID}.json"
 
 	XML_TEMPLATES = [
-		'build_upload.xml',
+		# 'build_upload.xml',
 		'cond_upload.xml',
 	]
 
@@ -311,7 +311,13 @@ class sensor(fsobj_part):
 	@thickness.setter
 	def thickness(self, value):
 		splt = self.kind_of_part.split(" ")
-		splt[0] = str(value)
+		if value == 0.1:
+			splt[0] = "120um"
+		elif value == 0.3:
+			splt[0] = "300um"
+		elif value == 0.2:
+			splt[0] = "200um"
+		# splt[0] = str(value)
 		self.kind_of_part = " ".join(splt)
 
 	@property
@@ -379,7 +385,7 @@ class pcb(fsobj_part):
 	FILENAME = "pcb_{ID}.json"
 
 	XML_TEMPLATES = [
-		'build_upload.xml',
+		# 'build_upload.xml',
 		'cond_upload.xml',
 		'pedestal_test_upload.xml',
 	]

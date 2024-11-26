@@ -142,6 +142,12 @@ class func(object):
 		self.page.lwToolSupplyList.verticalScrollBar().valueChanged.connect(self.on_scroll_InfoList)
 		self.page.lwInfoList.verticalScrollBar().valueChanged.connect(self.on_scroll_ToolSupplyList)
 
+		# Enable horizontal scroll bar
+		self.page.lwPartList.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+		self.page.lwTypeList.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+		self.page.lwToolSupplyList.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+		self.page.lwInfoList.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+
 	def search(self, *args, **kwargs):  # WIP WIP WIP
 		self.clearResults()
 

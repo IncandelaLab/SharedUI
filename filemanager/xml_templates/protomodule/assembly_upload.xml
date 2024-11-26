@@ -45,7 +45,7 @@
 			<SLVR_EPXY_BATCH_NUM>{{ slvr_epxy_batch_num }}</SLVR_EPXY_BATCH_NUM> -->
 			<PRTO_GRADE>{{ grade }}</PRTO_GRADE>
 			<SNSR_TOOL_FEET_CHK>{{ snsr_tool_feet_chk }}</SNSR_TOOL_FEET_CHK>
-			<SNSR_STEP>{{ step_sensor }}</SNSR_STEP>
+			<!-- <SNSR_STEP>{{ step_sensor }}</SNSR_STEP> -->
 		</DATA>
 	</DATA_SET>
 

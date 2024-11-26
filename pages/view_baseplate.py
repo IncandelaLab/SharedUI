@@ -324,12 +324,14 @@ class func(object):
 	@enforce_mode('view')
 	def startEditing(self,*args,**kwargs):
 		tmp_baseplate = parts.baseplate()
+		tmp_baseplate_remote = parts.baseplate()
 		tmp_ID = self.page.leID.text()
 		tmp_exists = tmp_baseplate.load(tmp_ID)
-		if not tmp_exists:
-			self.page.leStatus.setText("does not exist")
+		tmp_exists_remote = tmp_baseplate_remote.load_remote(tmp_ID, full=True)
+		if not tmp_exists and not tmp_exists_remote:
+			self.page.leStatus.setText("DNE locally or in central DB")
 		else:
-			self.baseplate = tmp_baseplate
+			self.baseplate = tmp_baseplate if tmp_exists else tmp_baseplate_remote
 			self.mode = 'editing'
 			self.update_info()
 

@@ -321,12 +321,14 @@ class func(object):
 	@enforce_mode('view')
 	def startEditing(self,*args,**kwargs):
 		tmp_pcb = parts.pcb()
+		tmp_pcb_remote = parts.pcb()
 		tmp_ID = self.page.leID.text()
 		tmp_exists = tmp_pcb.load(tmp_ID)
-		if not tmp_exists:
-			self.page.leStatus.setText("does not exist")
+		tmp_exists_remote = tmp_pcb_remote.load_remote(tmp_ID, full=True)
+		if not tmp_exists and not tmp_exists_remote:
+			self.page.leStatus.setText("DNE locally or in central DB")
 		else:
-			self.pcb = tmp_pcb
+			self.pcb = tmp_pcb if tmp_exists else tmp_pcb_remote
 			self.mode = 'editing'
 			self.update_info()
 

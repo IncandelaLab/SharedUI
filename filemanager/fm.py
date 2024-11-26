@@ -171,7 +171,7 @@ def fetchRemoteDB(part, db='int2r', location=None):
 	
 	remote_data = {}
 	max_page = -1
-	limit = 100
+	limit = 1000
 
 	# Get page zero, and max page
 	response_0 = _get_response(url, limit, 0, location)

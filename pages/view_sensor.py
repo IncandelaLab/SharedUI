@@ -300,12 +300,14 @@ class func(object):
 	@enforce_mode('view')
 	def startEditing(self,*args,**kwargs):
 		tmp_sensor = parts.sensor()
+		tmp_sensor_remote = parts.sensor()
 		tmp_ID = self.page.leID.text()
 		tmp_exists = tmp_sensor.load(tmp_ID)
-		if not tmp_exists:
-			self.page.leStatus.setText("does not exist")
+		tmp_exists_remote = tmp_sensor_remote.load_remote(tmp_ID, full=True)
+		if not tmp_exists and not tmp_exists_remote:
+			self.page.leStatus.setText("DNE locally or in central DB")
 		else:
-			self.sensor = tmp_sensor
+			self.sensor = tmp_sensor if tmp_exists else tmp_sensor_remote
 			self.mode = 'editing'
 			self.update_info()
 

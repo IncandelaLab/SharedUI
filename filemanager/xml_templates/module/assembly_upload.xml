@@ -39,7 +39,7 @@
 			<GLUE_TYPE>Araldite</GLUE_TYPE>
 			<GLUE_BATCH_NUM>{{ adhesive_type }}</GLUE_BATCH_NUM>
 			<MOD_GRADE>{{ grade }}</MOD_GRADE>
-			<PCB_STEP>{{ step_pcb }}</PCB_STEP>
+			<!-- <PCB_STEP>{{ step_pcb }}</PCB_STEP> -->
 			<PCB_PLCMENT_X_OFFSET>{{ pcb_plcment_x_offset }}</PCB_PLCMENT_X_OFFSET>
 			<PCB_PLCMENT_Y_OFFSET>{{ pcb_plcment_y_offset }}</PCB_PLCMENT_Y_OFFSET>
 			<PCB_PLCMENT_ANG_OFFSET>{{ pcb_plcment_ang_offset }}</PCB_PLCMENT_ANG_OFFSET>

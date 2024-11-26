@@ -404,7 +404,8 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		if len(flist)==0: return
 
 		#lc = LoaderClient()
-		success = True
+		success = False
+		exit_status = None
 		for f in flist:
 			# Note:  .bash_history does NOT store commands run w/ subprocess
 			#upload_status = lc.run(iargs=["--login", "--url", "https://cmsdca.cern.ch/hgc_loader/hgc/int2r", f, "--verbose"])
@@ -412,6 +413,7 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 			# scpcmd = "scp -vvv {} {}@dbloader-hgcal.cern.ch:/home/dbspool/spool/hgc/int2r".format(f, self.username)
 			scpcmd = "scp -o ProxyJump={}@lxplus.cern.ch {} {}@dbloader-hgcal:/home/dbspool/spool/hgc/{}/".format(self.username, f, self.username, self.database)
 			print("Scping {} ...".format(f))
+			print("Scp command:  ", scpcmd)
 			# result = os.system(scpcmd)
 
 			# pexpect method
@@ -437,7 +439,7 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 				print("Password prompt not found")
 			
 			# print("scp'ed {} ...".format(f))
-			success = success and exit_status == 0
+			success = (exit_status == 0)
 			#success = (upload_status == 200) and success
 			if exit_status != 0:
 				print("File transfer:  possible error!  Return code {}".format(exit_status))
@@ -476,7 +478,7 @@ class mainDesigner(wdgt.QMainWindow,Ui_MainWindow):
 		#     1.2  cond
 		parts = ['baseplate', 'sensor', 'pcb']
 		for part in parts:
-			upload_files += glob.glob(filemanager_dir + "/{}*/{}/*build*upload*".format(part, dateStr))
+			# upload_files += glob.glob(filemanager_dir + "/{}*/{}/*build*upload*".format(part, dateStr))
 			upload_files += glob.glob(filemanager_dir + "/{}*/{}/*cond*upload*".format(part, dateStr))
 			# 1.3  hexaboard testing files
 			if part == 'pcb':
