@@ -6,7 +6,9 @@
 		<NAME>HGC Eight Inch Module Wire Bond Pull Test</NAME>
 	</TYPE>
 	<RUN>
-		<RUN_NAME>Wirebonding data {{ run_name_time_stamp }}</RUN_NAME>
+		<!-- <RUN_NAME>Wirebonding data {{ run_name_time_stamp }}</RUN_NAME> -->
+		<RUN_TYPE>Si module wirebonding and encapsulation</RUN_TYPE>
+		<RUN_NUMBER>{{ run_number }}</RUN_NUMBER>
 		<RUN_BEGIN_TIMESTAMP>{{ back_bonds_date }}</RUN_BEGIN_TIMESTAMP>
 		<RUN_END_TIMESTAMP>{{ front_bonds_date }}</RUN_END_TIMESTAMP>
 		<INITIATED_BY_USER>{{ bond_pull_user }}</INITIATED_BY_USER>

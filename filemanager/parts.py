@@ -58,6 +58,19 @@ INSTITUTION_FULLNAME = {
 	'FSU': 'Florida State University'
 }
 
+LOCATION_NUMBER = {
+	'UCSB': 3001,
+	'UMN': 2101,
+	'HEPHY': 1701,
+	'HPK': 9101,
+	'CMU': 1301,
+	'TTU': 2901,
+	'IHEP': 1801,
+	'TIFR': 2801,
+	'NTU': 2601,
+	'FSU': 1601
+}
+
 
 ### PARENT CLASS FOR PARTS
 
@@ -153,6 +166,18 @@ class fsobj_part(fm.fsobj):
 	@property
 	def run_name_time_stamp(self):
 		return str(datetime.datetime.now())
+
+	@property
+	def run_number(self):
+		# convention: SSSS X YY MM DD TTTTTT
+		SSSS = LOCATION_NUMBER[self.location] if self.location in LOCATION_NUMBER else 9999
+		SSSS = str(SSSS)
+		X = '1'  # assume only 1 stand for now
+		YY = str(datetime.datetime.now().year)[2:]
+		MM = str(datetime.datetime.now().month).zfill(2)
+		DD = str(datetime.datetime.now().day).zfill(2)
+		TTTTTT = datetime.datetime.now().time().strftime("%H%M%S")
+		return SSSS + X + YY + MM + DD + TTTTTT
 
 
 ###############################################
