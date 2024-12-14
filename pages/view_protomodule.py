@@ -264,7 +264,7 @@ class func(object):
 		if tmp_protomodule.load(tmp_ID):  # exist locally
 			self.protomodule = tmp_protomodule
 			self.update_info()
-			self.page.leStatus.setText("promodule exists locally")
+			self.page.leStatus.setText("Loading local data")
 		elif tmp_protomodule.load_remote(tmp_ID, full=True):  # exist in central DB
 			self.protomodule = tmp_protomodule
 			print("\n!! Loading promodule {} from central DB".format(tmp_ID))
@@ -274,7 +274,7 @@ class func(object):
 			print("flatness: {}".format(self.protomodule.flatness))
 			print("grade: {}".format(self.protomodule.grade))
 			self.update_info()
-			self.page.leStatus.setText("promodule only exists in central DB")
+			self.page.leStatus.setText("Loading central DB data")
 		else:  # DNE; good to create
 			self.update_info()
 			self.page.leStatus.setText("promodule DNE")

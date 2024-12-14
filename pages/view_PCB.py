@@ -278,7 +278,7 @@ class func(object):
 			self.pcb = tmp_pcb
 			print("PCB {} kind: {}, tmp_id: {}".format(self.pcb.ID, self.pcb.kind_of_part, self.pcb.module))
 			self.update_info()
-			self.page.leStatus.setText("Hexaboard exists locally")
+			self.page.leStatus.setText("Loading local data")
 		elif tmp_pcb.load_remote(tmp_ID, full=True):  # exist in central DB
 			self.pcb = tmp_pcb
 			print("\n!! Loading hexaboard {} from central DB".format(tmp_ID))
@@ -288,7 +288,7 @@ class func(object):
 			print("flatness: {}".format(self.pcb.flatness))
 			print("grade: {}".format(self.pcb.grade))
 			self.update_info()
-			self.page.leStatus.setText("Hexaboard only exists in central DB")
+			self.page.leStatus.setText("Loading central DB data")
 		else:  # DNE; good to create
 			self.update_info()
 			self.page.leStatus.setText("Hexaboard DNE")

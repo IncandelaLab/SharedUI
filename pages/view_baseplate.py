@@ -278,7 +278,7 @@ class func(object):
 		if tmp_baseplate.load(tmp_ID):  # exist locally
 			self.baseplate = tmp_baseplate
 			self.update_info()
-			self.page.leStatus.setText("baseplate exists locally")
+			self.page.leStatus.setText("Loading local data")
 		elif tmp_baseplate.load_remote(tmp_ID, full=True):  # exist in central DB
 			self.baseplate = tmp_baseplate
 			print("\n!! Loading baseplate {} from central DB".format(tmp_ID))
@@ -289,7 +289,7 @@ class func(object):
 			print("weight: {}".format(self.baseplate.weight))
 			print("grade: {}".format(self.baseplate.grade))
 			self.update_info()
-			self.page.leStatus.setText("baseplate only exists in central DB")
+			self.page.leStatus.setText("Loading central DB data")
 		else:  # DNE; good to create
 			self.update_info()
 			self.page.leStatus.setText("baseplate DNE")
