@@ -58,17 +58,14 @@ INSTITUTION_FULLNAME = {
 	'FSU': 'Florida State University'
 }
 
+# Only list MACs
 LOCATION_NUMBER = {
 	'UCSB': 3001,
-	'UMN': 2101,
-	'HEPHY': 1701,
-	'HPK': 9101,
 	'CMU': 1301,
 	'TTU': 2901,
 	'IHEP': 1801,
 	'TIFR': 2801,
 	'NTU': 2601,
-	'FSU': 1601
 }
 
 
